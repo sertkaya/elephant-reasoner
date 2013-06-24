@@ -78,7 +78,6 @@ void saturate_concepts(TBox* tbox) {
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
 		for (j = 0; j < tbox->atomic_concept_list[i]->told_subsumer_count; ++j)
 			push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers[j], 0, 0, INIT));
-			// enqueue(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers[j], 0, 0, INIT));
 
 	/*
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
@@ -101,8 +100,6 @@ void saturate_concepts(TBox* tbox) {
 				J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2);
 				if (lhs_is_subsumed_by_other_conjunct)
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], 1, 0, CONJ_INTRO_1));
-					// enqueue(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], 1, 0, CONJ_INTRO_1));
-
 			}
 
 			// now the same for the second conjunct
@@ -112,8 +109,6 @@ void saturate_concepts(TBox* tbox) {
 				J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
 				if (lhs_is_subsumed_by_other_conjunct)
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], 1, 0, CONJ_INTRO_2));
-					// enqueue(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], 1, 0, CONJ_INTRO_2));
-
 			}
 
 			switch (ax->rhs->type) {
@@ -122,11 +117,9 @@ void saturate_concepts(TBox* tbox) {
 				if (!ax->derived_via_conj_introduction) {
 					// conjunct 1 as rhs
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj->conjunct1, 0, 0, CONJ_DECOMP_1));
-					// enqueue(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj->conjunct1, 0, 0, CONJ_DECOMP_1));
+
 					// conjunct 2 as rhs
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj->conjunct2, 0, 0, CONJ_DECOMP_2));
-					// enqueue(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj->conjunct2, 0, 0, CONJ_DECOMP_2));
-
 				}
 				break;
 			case EXISTENTIAL_RESTRICTION:
@@ -138,7 +131,6 @@ void saturate_concepts(TBox* tbox) {
 				if (!ax->derived_via_exists_introduction) {
 					if (ax->rhs->description.exists->filler->type != ATOMIC_CONCEPT)
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->description.exists->filler, ax->rhs->description.exists->filler, 0, 0, INIT));
-						// enqueue(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->description.exists->filler, ax->rhs->description.exists->filler, 0, 0, INIT));
 
 					add_predecessor(ax->lhs, ax->rhs);
 
@@ -147,8 +139,11 @@ void saturate_concepts(TBox* tbox) {
 							Concept* ex = get_negative_exists(ax->rhs->description.exists->filler->subsumer_list[i], ax->rhs->description.exists->role->subsumer_list[j]);
 							if (ex != NULL && ax->rhs->description.exists->filler != ax->rhs->description.exists->filler->subsumer_list[i])
 								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, 0, 0, EXISTS_DECOMP));
-							// enqueue(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, 0, 0, EXISTS_DECOMP));
 						}
+					}
+
+					for (i = 0; i < ax->rhs->description.exists->role->first_component_of_count; ++i) {
+
 					}
 				}
 				break;
@@ -175,7 +170,6 @@ void saturate_concepts(TBox* tbox) {
 						J1F(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 						while (predecessor_bitmap_nonempty) {
 							push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, 0, 1, EXISTS_INTRO));
-							// enqueue(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, 0, 1, EXISTS_INTRO));
 							J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 						}
 					}
@@ -186,12 +180,9 @@ void saturate_concepts(TBox* tbox) {
 			// told subsumers
 			for (i = 0; i < ax->rhs->told_subsumer_count; i++)
 				push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i], 0, 0, TOLD_SUBSUMER));
-				// enqueue(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i], 0, 0, TOLD_SUBSUMER));
-
 		}
 		free(ax);
 		ax = pop(&scheduled_axioms);
-		// ax = dequeue(&scheduled_axioms);
 	}
 	// printf("Total derivations:%d\nUnique derivations:%d\n", total_derivation_count, unique_derivation_count);
 }
