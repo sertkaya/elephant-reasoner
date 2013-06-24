@@ -51,6 +51,24 @@ void index_concept(Concept* c) {
 	}
 }
 
+void index_role(Role* r) {
+	switch (r->type) {
+	case ATOMIC_ROLE:
+		break;
+	case ROLE_COMPOSITION:
+		// recursive calls should not be necessary!
+		// index_role(r->description.role_composition->role1);
+		// index_role(r->description.role_composition->role2);
+		add_role_to_first_component_of_list(r->description.role_composition->role1, r);
+		add_role_to_second_component_of_list(r->description.role_composition->role2, r);
+		break;
+	default:
+		fprintf(stderr, "unknown role type, aborting\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
+
 void index_tbox(TBox* tbox) {
 	int i;
 
@@ -70,12 +88,17 @@ void index_tbox(TBox* tbox) {
 		index_concept(tbox->eqclass_axioms[i]->rhs);
 	}
 
-	for (i = 0; i < tbox->subrole_axiom_count; ++i)
+	for (i = 0; i < tbox->subrole_axiom_count; ++i) {
 		add_told_subsumer_role(tbox->subrole_axioms[i]->lhs, tbox->subrole_axioms[i]->rhs);
+		index_role(tbox->subrole_axioms[i]->lhs);
+	}
 
 	for (i = 0; i < tbox->eqrole_axiom_count; ++i) {
 		add_told_subsumer_role(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs);
+		index_role(tbox->subrole_axioms[i]->lhs);
+
 		add_told_subsumer_role(tbox->eqrole_axioms[i]->rhs, tbox->eqrole_axioms[i]->lhs);
+		index_role(tbox->subrole_axioms[i]->rhs);
 	}
 
 }

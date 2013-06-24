@@ -237,6 +237,14 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	r->subsumer_count = 0;
 	r->subsumers = (Pvoid_t) NULL;
 
+	r->first_component_of_count = 0;
+	r->first_component_of_list = NULL;
+	r->first_component_of = (Pvoid_t) NULL;
+
+	r->second_component_of_count = 0;
+	r->second_component_of_list = NULL;
+	r->second_component_of = (Pvoid_t) NULL;
+
 	put_atomic_role((unsigned char*) name, r, tbox);
 	tbox->atomic_role_count++;
 
@@ -269,6 +277,14 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
 	r->subsumers = (Pvoid_t) NULL;
+
+	r->first_component_of_count = 0;
+	r->first_component_of_list = NULL;
+	r->first_component_of = (Pvoid_t) NULL;
+
+	r->second_component_of_count = 0;
+	r->second_component_of_list = NULL;
+	r->second_component_of = (Pvoid_t) NULL;
 
 	put_role_composition(r, tbox);
 	tbox->unique_binary_role_composition_count++;
@@ -316,10 +332,12 @@ SubClassAxiom* create_subclass_axiom(Concept* lhs, Concept* rhs) {
 // TODO: get_create ...
 // create the equivalent classes axiom with the given concept descriptions
 EqClassAxiom* create_eqclass_axiom(Concept* lhs, Concept* rhs) {
+	/*
 	if (lhs->type != ATOMIC_CONCEPT) {
 		fprintf(stderr,"the lhs of an equivalent classes axiom must be an atomic concept, aborting\n");
 		exit(EXIT_FAILURE);
 	}
+	*/
 	EqClassAxiom* ax = (EqClassAxiom*) malloc(sizeof(EqClassAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;

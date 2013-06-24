@@ -165,6 +165,16 @@ struct role {
 
 	// accessed via J1* operations
 	Pvoid_t subsumers;
+
+	// list of role compositions where this role is the first/second component
+	Role** first_component_of_list;
+	int first_component_of_count;
+	Role** second_component_of_list;
+	int second_component_of_count;
+
+	// same as above. the reason is performance in saturation.
+	Pvoid_t first_component_of;
+	Pvoid_t second_component_of;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
