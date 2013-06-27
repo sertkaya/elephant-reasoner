@@ -1,0 +1,54 @@
+
+ELepHant is a consequence-based reasoner for the EL+ fragment of Description
+Logics. 
+
+Currently it only supports input ontologies from command line in the 
+OWL Functional Style Syntax. The supported reasoning task is currently only
+classification.
+
+Usage
+--------------------------------------------------------------------------------
+$ elephant-reasoner input_ontology output_taxonomy
+
+
+Installation
+--------------------------------------------------------------------------------
+The ELepHant Reasoner is available both as precompiled binaries and source.
+Currently the binary distribution is available for the 64-bit Linux x86 
+platform. The binary is statically compiled, i.e., you do not need to install
+any external libraries. Binaries for other platforms are on the way.
+
+You can also install ELepHant from the sources. You can get the source 
+either as a tarball or check it out from the SVN. For compiling the source you 
+need the Judy array library. It is available for various linux distributions.
+The package name is libjudy-dev. Alternatively you can get the sources from 
+http://sourceforge.net/projects/judy/
+
+Compiling:
+----------
+
+Untar the tarball: 
+$ tar zxvf ELepHant-reasoner-0.1.1.tar.gz
+
+Change to the source directory
+$ cd ELepHant-reasoner-0.1.1
+
+Run the configure script with
+$ ./configure
+
+(If you installed the Judy library in a non-standard location, tell the 
+configure script about the location of the library and the header file Judy.h)
+
+Then run make:
+$ make
+
+If everything goes right, install it with:
+$ make install
+
+The executable elephant-reasoner will be installed in /usr/local/bin
+
+--------------------------------------------------------------------------------
+Known bugs:
+
+- Role compositions are currently not working due to a bug.
+--------------------------------------------------------------------------------
