@@ -87,14 +87,14 @@ void read_kb(char* kb_file_name, TBox* tbox) {
 	yyin = fopen(kb_file_name, "r");
 	assert(yyin != NULL);
 
-	printf("Loading KB.........................");
+	printf("Loading KB.........................:");
 	fflush(stdout);
 	START_TIMER;
 	parser = yyparse(tbox);
 	STOP_TIMER;
 	total_time += TIME_DIFF;
 	if (parser != 0) {
-		print_short_stats();
+		// print_short_stats();
 		fprintf(stderr,"aborting\n");
 		exit(-1);
 	}
@@ -103,7 +103,7 @@ void read_kb(char* kb_file_name, TBox* tbox) {
 }
 
 void classify(TBox* tbox) {
-	printf("Indexing...........................");
+	printf("Indexing...........................:");
 	fflush(stdout);
 	START_TIMER;
 	index_tbox(tbox);
@@ -111,7 +111,7 @@ void classify(TBox* tbox) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 
-	printf("Saturating..........................");
+	printf("Saturating.........................:");
 	fflush(stdout);
 	START_TIMER;
 	// init_saturation(tbox);
@@ -120,7 +120,7 @@ void classify(TBox* tbox) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 
-	printf("Computing concept hierarchy........");
+	printf("Computing concept hierarchy........:");
 	fflush(stdout);
 	START_TIMER;
 	compute_concept_hierarchy(tbox);
@@ -128,5 +128,5 @@ void classify(TBox* tbox) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 
-	printf("Total time.........................%.3f milisecs\n", total_time / 1000);
+	printf("Total time.........................:%.3f milisecs\n", total_time / 1000);
 }
