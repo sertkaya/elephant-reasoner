@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 	FILE* taxonomy_fp;
 
 	if (argc <= 2) {
-		fprintf(stderr,"%s input_kb output_taxonomy\n", argv[0]);
+		fprintf(stderr,"Usage: %s input_kb output_taxonomy\n", argv[0]);
 		return -1;
 	}
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	// read the kb
 	read_kb(argv[1], tbox);
 	// display kb information
-	print_short_stats(tbox);
+	// print_short_stats(tbox);
 
 	// classify the kb
 	classify(tbox);
