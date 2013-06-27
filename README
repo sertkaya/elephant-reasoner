@@ -48,8 +48,8 @@ $ make install
 The executable elephant-reasoner will be installed in /usr/local/bin
 
 Known bugs:
+--------------------------------------------------------------------------------
 
 - Role compositions are currently not working due to a bug. (26.06.2013)
 - Outputs separate EquivalentClasses axioms for each pair of equivalent classes
 in an equivalence class (25.06.2013) 
---------------------------------------------------------------------------------
