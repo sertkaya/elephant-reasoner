@@ -1,4 +1,4 @@
-elephant_reasoner_CFLAGS	= -DNDEBUG -Wall
+elephant_reasoner_CFLAGS	= -O2 -Wall
 
 bin_PROGRAMS     			= elephant-reasoner
 
