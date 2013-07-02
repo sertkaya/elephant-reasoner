@@ -159,6 +159,11 @@ void print_direct_subsumers(Concept* c, FILE* taxonomy_fp) {
 void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 	uint8_t atomic_concept_index[MAX_CONCEPT_NAME_LENGTH];
 	PWord_t pvalue;
+	// for keeping track of already printed equivalence classes
+	Pvoid_t printed = (Pvoid_t) NULL;
+	int added_to_printed;
+	Word_t equivalent_class_index;
+	int equivalents_list_nonempty;
 
 	// start with the smallest concept name
 	atomic_concept_index[0] = '\0';
@@ -166,7 +171,25 @@ void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 
 	while (pvalue != NULL) {
 		print_direct_subsumers((Concept*) *pvalue, taxonomy_fp);
-		print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
+
+		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
+		// check if the equivalence class is already printed
+		J1T(added_to_printed, printed, (Word_t) *pvalue);
+		if (!added_to_printed) {
+			equivalent_class_index = 0;
+			J1F(equivalents_list_nonempty, ((Concept*) *pvalue)->equivalent_concepts, equivalent_class_index);
+			if (equivalents_list_nonempty)
+				fprintf(taxonomy_fp, "EquivalentClasses(%s ", ((Concept*) *pvalue)->description.atomic->name);
+			while (equivalents_list_nonempty) {
+				// mark the concepts in the equivalent classes as already printed
+				J1S(added_to_printed, printed, (Word_t) equivalent_class_index);
+				// now print it
+				// if (((Concept*) *pvalue) != (Concept*) equivalent_class_index) // to avoid EquivalentConcepts(c,c)
+				fprintf(taxonomy_fp, "%s ", ((Concept*) equivalent_class_index)->description.atomic->name);
+				J1N(equivalents_list_nonempty, ((Concept*) *pvalue)->equivalent_concepts, equivalent_class_index);
+			}
+			fprintf(taxonomy_fp, ")\n");
+		}
 		JSLN(pvalue, tbox->atomic_concepts, atomic_concept_index);
 	}
 }

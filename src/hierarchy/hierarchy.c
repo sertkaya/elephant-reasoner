@@ -98,8 +98,10 @@ void compute_concept_hierarchy(TBox* tbox) {
 				continue;
 			// check if tbox->atomic_concept_list[i] is a subsumer of tbox->atomic_concept_list[i]->subsumer_list[j]
 			// if yes, then they are equivalent
-			if (is_subsumer_of(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->subsumer_list[j]))
-				add_equivalent_concept(tbox->atomic_concept_list[i]->subsumer_list[j], tbox->atomic_concept_list[i]);
+			if (is_subsumer_of(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->subsumer_list[j])) {
+				if (tbox->atomic_concept_list[i]->subsumer_list[j] != tbox->atomic_concept_list[i])
+					add_equivalent_concept(tbox->atomic_concept_list[i]->subsumer_list[j], tbox->atomic_concept_list[i]);
+			}
 			else {
 				is_direct_subsumer = 1;
 				direct_subsumer_index = 0;
