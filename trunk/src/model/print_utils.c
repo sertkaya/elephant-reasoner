@@ -170,12 +170,12 @@ void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 	JSLF(pvalue, tbox->atomic_concepts, atomic_concept_index);
 
 	while (pvalue != NULL) {
-		print_direct_subsumers((Concept*) *pvalue, taxonomy_fp);
-
 		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
 		// check if the equivalence class is already printed
 		J1T(added_to_printed, printed, (Word_t) *pvalue);
 		if (!added_to_printed) {
+			print_direct_subsumers((Concept*) *pvalue, taxonomy_fp);
+
 			equivalent_class_index = 0;
 			J1F(equivalents_list_nonempty, ((Concept*) *pvalue)->equivalent_concepts, equivalent_class_index);
 			char printing_equivalents = 0;
