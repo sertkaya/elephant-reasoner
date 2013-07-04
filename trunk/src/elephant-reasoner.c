@@ -31,23 +31,29 @@ void usage(char* program) {
 }
 
 int main(int argc, char *argv[]) {
-	FILE* taxonomy_fp;
+	FILE* input_kb;
+	FILE* output_taxonomy;
 
 	if (argc <= 2) {
 		fprintf(stderr,"Usage: %s input_kb output_taxonomy\n", argv[0]);
 		return -1;
 	}
 
-	taxonomy_fp = fopen(argv[2], "w");
-	assert(taxonomy_fp != NULL);
+	// the input kb file
+	input_kb = fopen(argv[1], "r");
+	assert(input_kb != NULL);
+
+	// the output taxonomy file
+	output_taxonomy = fopen(argv[2], "w");
+	assert(output_taxonomy != NULL);
 
 	TBox* tbox = NULL;
-
 	// initialize global variables, allocate space
 	tbox = init_reasoner();
 
-	// read the kb
-	read_kb(argv[1], tbox);
+	// read and parse the kb
+	read_kb(input_kb, tbox);
+	fclose(input_kb);
 	// display kb information
 	// print_short_stats(tbox);
 
@@ -55,7 +61,8 @@ int main(int argc, char *argv[]) {
 	classify(tbox);
 
 	// print the concept hierarchy
-	print_concept_hierarchy(tbox, taxonomy_fp);
+	print_concept_hierarchy(tbox, output_taxonomy);
+	fclose(output_taxonomy);
 
 	// free the kb
 	printf("Freed bytes:%d\n", free_tbox(tbox));
