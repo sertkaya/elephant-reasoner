@@ -28,9 +28,10 @@
 #include "../hierarchy/hierarchy.h"
 #include "reasoner.h"
 
+// the parser
 extern int yyparse(TBox* tbox);
-
-FILE* yyin;
+// file pointer for the parser
+extern FILE* yyin;
 
 // total runtime
 double total_time = 0.0;
@@ -80,12 +81,13 @@ TBox* init_reasoner() {
 }
 
 
-void read_kb(char* kb_file_name, TBox* tbox) {
+// void read_kb(char* kb_file_name, TBox* tbox) {
+void read_kb(FILE* input_kb, TBox* tbox) {
+
 	// parser return code
 	int parser;
 
-	yyin = fopen(kb_file_name, "r");
-	assert(yyin != NULL);
+	yyin = input_kb;
 
 	printf("Loading KB.........................:");
 	fflush(stdout);
@@ -99,7 +101,6 @@ void read_kb(char* kb_file_name, TBox* tbox) {
 		exit(-1);
 	}
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	fclose(yyin);
 }
 
 void classify(TBox* tbox) {

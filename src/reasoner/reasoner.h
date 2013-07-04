@@ -37,7 +37,7 @@ struct timeval tStart, tEnd;
 // initializes the reasoner and the necessary fields of the TBox
 TBox* init_reasoner();
 
-void read_kb(char* kb_file_name, TBox* tbox);
+void read_kb(FILE* input_kb, TBox* tbox);
 
 void classify(TBox* tbox);
 
