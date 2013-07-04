@@ -39,6 +39,10 @@
 	int cls_exp_count;      						/* number of conjuncts */
 	Concept* cls_exps[MAX_CONJUNCT_COUNT];			/* conjuncts */
 
+	// for parsing equivalent classes axioms containing more than 2 class expressions
+	int eq_cls_exp_count;							/* number of class exps */
+	Concept* eq_cls_exps[MAX_EQ_CLASS_EXP_COUNT];	/* class exps */
+	
 	// for parsing role composition
 	int role_exp_count;								/* number of roles in the role composition */
 	Role* role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles in the composition */
@@ -232,15 +236,34 @@ classAxiom:
 	| equivalentClasses;
 
 subClassOf:
-	SUB_CLASS_OF '(' classExpression classExpression ')' {
-		add_subclass_axiom(create_subclass_axiom($3.concept, $4.concept), tbox);
+	SUB_CLASS_OF '(' axiomAnnotations classExpression classExpression ')' {
+		add_subclass_axiom(create_subclass_axiom($4.concept, $5.concept), tbox);
 	};
+
+// for parsing EquivalentClasses axioms containing more than 2 class expressions
+eqClassExpressions:
+	| classExpression eqClassExpressions {
+		if ($1.concept != NULL)
+			eq_cls_exps[eq_cls_exp_count++] = $1.concept;
+	};
+
 
 equivalentClasses:
-	EQUIVALENT_CLASSES '(' classExpression classExpression ')' {
-		add_eqclass_axiom(create_eqclass_axiom($3.concept, $4.concept), tbox);
+	EQUIVALENT_CLASSES '(' axiomAnnotations classExpression classExpression eqClassExpressions ')' {
+		eq_cls_exps[eq_cls_exp_count++] = $4.concept;
+		eq_cls_exps[eq_cls_exp_count++] = $5.concept;
+		int i;
+		for (i = 0; i < eq_cls_exp_count - 1; ++i)
+			add_eqclass_axiom(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), tbox);
+		eq_cls_exp_count = 0;
 	};
 
+/*
+equivalentClasses:
+	EQUIVALENT_CLASSES '(' axiomAnnotations classExpression classExpression ')' {
+		add_eqclass_axiom(create_eqclass_axiom($4.concept, $5.concept), tbox);
+	};
+*/
 
 objectPropertyExpression:
 	objectProperty 
