@@ -38,11 +38,11 @@ int free_concept(Concept* c) {
 		free(c->description.atomic);
 		break;
 	case CONJUNCTION:
-		total_freed_bytes += sizeof(Exists);
-		free(c->description.exists);
+		total_freed_bytes += sizeof(Conjunction);
+		free(c->description.conj);
 		break;
 	case EXISTENTIAL_RESTRICTION:
-		total_freed_bytes += sizeof(Conjunction);
+		total_freed_bytes += sizeof(Exists);
 		free(c->description.exists);
 		break;
 	default:
@@ -129,6 +129,30 @@ int free_role(Role* r) {
 		break;
 	}
 
+	// free the told subsumers list
+	total_freed_bytes += sizeof(Role*) * r->told_subsumer_count;
+	free(r->told_subsumers);
+
+	// free the  subsumers list
+	total_freed_bytes += sizeof(Role*) * r->subsumer_count;
+	free(r->subsumer_list);
+
+	// free the subsumers hash
+	J1FA(freed_bytes, r->subsumers);
+	total_freed_bytes += freed_bytes;
+
+	// free the list of role compositions where this role occurs
+	total_freed_bytes += sizeof(Role*) * r->first_component_of_count;
+	free(r->first_component_of_list);
+	J1FA(freed_bytes, r->first_component_of);
+	total_freed_bytes += freed_bytes;
+
+	// now for the second component
+	total_freed_bytes += sizeof(Role*) * r->second_component_of_count;
+	free(r->second_component_of_list);
+	J1FA(freed_bytes, r->second_component_of);
+	total_freed_bytes += freed_bytes;
+
 	// finally free this role
 	total_freed_bytes += sizeof(Role);
 	free(r);
@@ -160,6 +184,19 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += sizeof(SubRoleAxiom*) * tbox->subrole_axiom_count;
 	free(tbox->subrole_axioms);
 
+	// free equivalent role axioms
+	total_freed_bytes += sizeof(EqRoleAxiom) * tbox->eqrole_axiom_count;
+	for  (i = 0; i < tbox->eqrole_axiom_count; i++)
+		free(tbox->eqrole_axioms[i]);
+	total_freed_bytes += sizeof(EqRoleAxiom*) * tbox->eqrole_axiom_count;
+	free(tbox->eqrole_axioms);
+
+	// free transitive role axioms
+	total_freed_bytes += sizeof(TransitiveRoleAxiom) * tbox->transitive_role_axiom_count;
+	for  (i = 0; i < tbox->transitive_role_axiom_count; i++)
+		free(tbox->transitive_role_axioms[i]);
+	total_freed_bytes += sizeof(TransitiveRoleAxiom*) * tbox->transitive_role_axiom_count;
+	free(tbox->transitive_role_axioms);
 
 	PWord_t key = NULL;
 	uint8_t index[MAX_CONCEPT_NAME_LENGTH];
@@ -183,6 +220,15 @@ int free_tbox(TBox* tbox) {
 	JSLFA(freed_bytes, tbox->conjunctions);
 	total_freed_bytes += freed_bytes;
 
+	// free the atomic concepts list
+	// this is the list kept for efficiently traversing over atomic concepts
+	// in hierarchy computation. the actual place for keeping atomic concepts
+	// is the atomic_concepts hash. note that here we just free place reserved for
+	// the atomic_concept_list. the place for reserved for the atomic concepts themselves
+	// is freed below
+	total_freed_bytes += sizeof(Concept*) * tbox->atomic_concept_count;
+	free(tbox->atomic_concept_list);
+
 	// free the atomic concepts
 	strcpy((char*) index, "");
 	JSLF(key, tbox->atomic_concepts, index);
@@ -192,6 +238,7 @@ int free_tbox(TBox* tbox) {
 	}
 	JSLFA(freed_bytes, tbox->atomic_concepts);
 	total_freed_bytes += freed_bytes;
+
 
 	// free the atomic roles
 	strcpy((char*) index, "");
@@ -203,7 +250,15 @@ int free_tbox(TBox* tbox) {
 	JSLFA(freed_bytes, tbox->atomic_roles);
 	total_freed_bytes += freed_bytes;
 
-	// TODO: free role compositions!
+	// free the role compositions
+	strcpy((char*) index, "");
+	JSLF(key, tbox->role_compositions, index);
+	while (key != NULL) {
+		total_freed_bytes += free_role((Role*) *key);
+		JSLN(key, tbox->role_compositions, index);
+	}
+	JSLFA(freed_bytes, tbox->role_compositions);
+	total_freed_bytes += freed_bytes;
 
 	return total_freed_bytes;
 }
