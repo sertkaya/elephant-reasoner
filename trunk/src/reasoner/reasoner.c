@@ -96,7 +96,7 @@ void read_kb(FILE* input_kb, TBox* tbox) {
 	STOP_TIMER;
 	total_time += TIME_DIFF;
 	if (parser != 0) {
-		// print_short_stats();
+		print_short_stats();
 		fprintf(stderr,"aborting\n");
 		exit(-1);
 	}

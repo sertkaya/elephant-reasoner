@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 	read_kb(input_kb, tbox);
 	fclose(input_kb);
 	// display kb information
-	// print_short_stats(tbox);
+	print_short_stats(tbox);
 
 	// classify the kb
 	classify(tbox);
