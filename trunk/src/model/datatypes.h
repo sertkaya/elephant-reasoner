@@ -227,6 +227,11 @@ struct eqrole_axiom {
 
 // TBox
 struct tbox {
+	// top concept
+	Concept* top_concept;
+	// bottom concept
+	Concept* bottom_concept;
+
 	// atomic concepts hash
 	Pvoid_t atomic_concepts;
 	Concept** atomic_concept_list;

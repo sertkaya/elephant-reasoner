@@ -73,6 +73,16 @@ void index_tbox(TBox* tbox) {
 	int i;
 
 	for (i = 0; i < tbox->subclass_axiom_count; i++) {
+		// no need to add told subsumers of bottom
+		// no need to index the bottom concept
+		if (tbox->subclass_axioms[i]->lhs == tbox->bottom_concept)
+			continue;
+		// no need to add top as a told subsumer
+		if (tbox->subclass_axioms[i]->rhs == tbox->top_concept) {
+			// still index the lhs, but do not add top to the lhs of rhs
+			index_concept(tbox->subclass_axioms[i]->lhs);
+			continue;
+		}
 		add_told_subsumer_concept(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
 		// add_to_subsumer_list(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
 		index_concept(tbox->subclass_axioms[i]->lhs);

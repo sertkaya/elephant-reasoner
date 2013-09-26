@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "../model/datatypes.h"
+#include "../model/model.h"
 #include "../index/index.h"
 #include "../saturation/saturation.h"
 #include "../hierarchy/hierarchy.h"
@@ -76,6 +77,10 @@ TBox* init_reasoner() {
 	tbox->eqrole_axiom_count = 0;
 	tbox->transitive_role_axioms = NULL;
 	tbox->transitive_role_axiom_count = 0;
+
+	// add the top and bottom concepts
+	tbox->top_concept = get_create_atomic_concept(OWL_THING, tbox);
+	tbox->bottom_concept = get_create_atomic_concept(OWL_NOTHING, tbox);
 
 	return tbox;
 }
