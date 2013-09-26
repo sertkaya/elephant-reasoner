@@ -23,7 +23,10 @@
 #include <Judy.h>
 #include "datatypes.h"
 
-
+// names of the top and bottom concepts
+// concepts created in init_reasoner (reasoner.c)
+#define OWL_THING	"owl:Thing"
+#define OWL_NOTHING	"owl:Nothing"
 
 /******************************************************************************
  * get/create functions for concepts
