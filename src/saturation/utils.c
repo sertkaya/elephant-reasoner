@@ -95,6 +95,34 @@ int add_predecessor(Concept* c, Concept* ex) {
 	return inserted_predecessor;
 }
 
+// add the filler of ex to the successors hash of c.
+// the key of the successors hash of c is ex->description.exists->role.
+// the value is a bitmap, whose index is ex->description.exists->filler.
+int add_successor(Concept* c, Concept* ex) {
+	PPvoid_t successors_bitmap_p;
+	int inserted_successor = 0;
+
+	JLI(successors_bitmap_p, c->successors, (Word_t) ex->description.exists->role);
+	if (successors_bitmap_p == PJERR) {
+		fprintf(stderr, "could not insert into successor map, aborting\n");
+		exit(EXIT_FAILURE);
+	}
+
+	// check if we are inserting a successor for this role for the first time
+	if (*successors_bitmap_p == 0) {
+		*successors_bitmap_p = (Pvoid_t) NULL;
+	}
+
+	J1S(inserted_successor, *successors_bitmap_p, (Word_t) ex->description.exists->filler);
+	if (inserted_successor == JERR) {
+		fprintf(stderr, "could not insert into successor bitmap, aborting\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return inserted_successor;
+}
+
+
 ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, char derived_conjunction, char derived_exists, enum saturation_axiom_type type) {
 	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
 	assert(ax != NULL);

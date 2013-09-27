@@ -87,6 +87,20 @@ int free_concept(Concept* c) {
 	JLFA(freed_bytes, c->predecessors);
 	total_freed_bytes += freed_bytes;
 
+	// similarly free the successors hash.
+	key = NULL;
+	index = 0;
+	bitmap = (Pvoid_t) NULL;
+	JLF(key, c->successors, index);
+	while (key != NULL) {
+		bitmap = (Pvoid_t) *key;
+		J1FA(freed_bytes, bitmap);
+		total_freed_bytes += freed_bytes;
+		JLN(key, c->successors, index);
+	}
+	JLFA(freed_bytes, c->successors);
+	total_freed_bytes += freed_bytes;
+
 	// free the filler of negative existentials hash
 	JLFA(freed_bytes, c->filler_of_negative_exists);
 	total_freed_bytes += freed_bytes;

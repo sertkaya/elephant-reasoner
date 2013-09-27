@@ -29,6 +29,7 @@ void print_exists(Exists* exists);
 void print_conjunction(Conjunction* conjunction);
 
 void print_atomic_role(AtomicRole* ar);
+void print_role_composition(RoleComposition* rc);
 
 void print_concept(Concept* c) {
 	switch (c->type) {
@@ -51,6 +52,9 @@ void print_role(Role* r) {
 	switch (r->type) {
 		case ATOMIC_ROLE:
 			print_atomic_role(r->description.atomic);
+			break;
+		case ROLE_COMPOSITION:
+			print_role_composition(r->description.role_composition);
 			break;
 		default:
 			fprintf(stderr,"unknown role type, aborting\n");
@@ -93,6 +97,13 @@ void print_atomic_role(AtomicRole* ar) {
 	printf("%s ", ar->name);
 }
 
+void print_role_composition(RoleComposition* rc) {
+	printf("ObjectPropertyChain( ");
+	print_role(rc->role1);
+	printf(" ");
+	print_role(rc->role2);
+	printf(")\n");
+}
 
 void print_subclass_axiom(SubClassAxiom* sc_ax) {
 	printf("(SubClassOf ");

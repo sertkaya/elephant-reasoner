@@ -67,6 +67,7 @@ Concept* get_create_atomic_concept(char* name, TBox* tbox) {
 	
 	c->filler_of_negative_exists = (Pvoid_t) NULL;
 	c->predecessors = (Pvoid_t) NULL;
+	c->successors = (Pvoid_t) NULL;
 
 	c->first_conjunct_of_list = NULL;
 	c->first_conjunct_of_count = 0;
@@ -122,6 +123,7 @@ Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox) {
 
 	c->filler_of_negative_exists = (Pvoid_t) NULL;
 	c->predecessors = (Pvoid_t) NULL;
+	c->successors = (Pvoid_t) NULL;
 
 	c->first_conjunct_of_list = NULL;
 	c->first_conjunct_of_count = 0;
@@ -169,6 +171,7 @@ Concept* get_create_conjunction_binary(Concept* c1, Concept* c2, TBox* tbox) {
 
 	c->filler_of_negative_exists = (Pvoid_t) NULL;
 	c->predecessors = (Pvoid_t) NULL;
+	c->successors = (Pvoid_t) NULL;
 
 	c->first_conjunct_of_list = NULL;
 	c->first_conjunct_of_count = 0;
