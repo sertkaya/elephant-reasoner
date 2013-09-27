@@ -46,6 +46,8 @@ int mark_concept_saturation_axiom_processed(ConceptSaturationAxiom* ax);
 
 int add_predecessor(Concept* c, Concept* ex);
 
+int add_successor(Concept* c, Concept* ex);
+
 ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, char derived_via_conj_intro, char derived_via_exists_intro,
 		enum saturation_axiom_type type);
 

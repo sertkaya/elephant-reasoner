@@ -109,6 +109,9 @@ struct concept {
 	// key is Role*, value is pointer to J1 array
 	// indices of the J1 array are Concept*
 	Pvoid_t predecessors;
+	// the same data structure to store the successors.
+	// needed for implementing the role composition rule in saturation
+	Pvoid_t successors;
 
 	// hash of negative existentials whose filler is this concept
 	Pvoid_t filler_of_negative_exists;
