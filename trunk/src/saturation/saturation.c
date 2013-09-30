@@ -42,17 +42,33 @@ void saturate_roles(TBox* tbox) {
 
 	// push the input axioms to the stack
     PWord_t key = NULL;
-    uint8_t atomic_role_index[MAX_ROLE_NAME_LENGTH];
+    uint8_t role_index[MAX_ROLE_NAME_LENGTH];
 
+    // first the atomic roles
 	// start with the smallest role name
-	atomic_role_index[0] = '\0';
-    JSLF(key, tbox->atomic_roles, atomic_role_index);
+	role_index[0] = '\0';
+    JSLF(key, tbox->atomic_roles, role_index);
     while (key != NULL) {
             push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
-            JSLN(key, tbox->atomic_roles, atomic_role_index);
+            JSLN(key, tbox->atomic_roles, role_index);
+    }
+    // now the role compositions
+    int i;
+	role_index[0] = '\0';
+    JSLF(key, tbox->role_compositions, role_index);
+    while (key != NULL) {
+    		printf("role comp:");
+    		print_role((Role*) *key);
+    		printf("\n");
+
+    		// for role compositions we do not need axioms of type role_comp(r,s) -> role_comp(r,s)
+    		// in the initialization. the reason is, they can only appear on the lhs of a role inclusion axiom
+    		// therefore, we push only axioms with told subsumer on the rhs
+    		for (i = 0; i < ((Role*) *key)->told_subsumer_count; ++i)
+    			push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, ((Role*) *key)->told_subsumers[i]));
+            JSLN(key, tbox->role_compositions, role_index);
     }
 
-    int i;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
@@ -91,6 +107,14 @@ void saturate_concepts(TBox* tbox) {
 		++total_derivation_count;
 		if (mark_concept_saturation_axiom_processed(ax)) {
 			++unique_derivation_count;
+
+			printf("=====> ax->lhs:");
+			print_concept(ax->lhs);
+			printf("\n");
+			printf("ax->rhs:");
+			print_concept(ax->rhs);
+			printf("\n<======\n");
+
 
 			// conjunction introduction
 			// the first conjunct
@@ -143,6 +167,8 @@ void saturate_concepts(TBox* tbox) {
 						}
 					}
 
+
+					// the role chain rule
 					// subsumers of role of existential on the rhs
 					for (i = 0; i < ax->rhs->description.exists->role->subsumer_count; ++i) {
 						printf("subsumer of filler of rhs: ");
@@ -170,11 +196,11 @@ void saturate_concepts(TBox* tbox) {
 									print_role(((Role*) role_p)->subsumer_list[k]);
 									printf("\n");
 									printf("ax->rhs->descriptin.exists->role->subsumer_list[i]->second_component_of_list[j]->role1: ");
-									print_role(((RoleComposition*) ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j])->role1);
+									print_role(ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->description.role_composition->role1);
 									printf("\n");
 
 									if (((Role*) role_p)->subsumer_list[k] ==
-											((RoleComposition*) ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j])->role1) {
+											ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->description.role_composition->role1) {
 										// such a composition has been found, now for each predecessor
 										predecessor_p = 0;
 										predecessor_bitmap = (Pvoid_t) *predecessor_bitmap_p;
@@ -200,59 +226,6 @@ void saturate_concepts(TBox* tbox) {
 
 						// now the same for the successors of the filler of the existential on the rhs
 						// the role composition where this role appears as the first component
-						/*
-						for (j = 0; j < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_count; ++j) {
-							printf("role composition where this role appears as the first component: ");
-							print_role(ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]);
-							printf("\n");
-
-							PWord_t successor_bitmap_p;
-							Pvoid_t successor_bitmap;
-							Word_t role_p;
-							int successor_bitmap_nonempty, k, l;
-							Word_t successor_p;
-							role_p = 0;
-							JLF(successor_bitmap_p, ax->lhs->successors, role_p);
-							while (successor_bitmap_p != NULL) {
-								printf("role_p: ");
-								print_role((Role*) role_p);
-								printf("\n");
-
-								for (k = 0; k < ((Role*) role_p)->subsumer_count; ++k) {
-									// now check:
-									// role_p->subsumer_list[k] == ax->rhs->descriptin.exists->role->subsumer_list[i]->first_component_of_list[j]->role2
-									printf("role_p->subsumer_list[k]: ");
-									print_role(((Role*) role_p)->subsumer_list[k]);
-									printf("\n");
-									printf("ax->rhs->descriptin.exists->role->subsumer_list[i]->first_component_of_list[j]->role2: ");
-									print_role(((RoleComposition*) ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j])->role2);
-									printf("\n");
-
-									if (((Role*) role_p)->subsumer_list[k] ==
-											((RoleComposition*) ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j])->role2) {
-										// such a composition has been found, now for each successor
-										successor_p = 0;
-										successor_bitmap = (Pvoid_t) *successor_bitmap_p;
-										Concept *ex = NULL;
-										J1F(successor_bitmap_nonempty, successor_bitmap, successor_p);
-										while (successor_bitmap_nonempty) {
-											for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_count; ++l) {
-												// create exists ... role=subsumers of the composition, filler=successor of the filler of the rhs
-												ex = get_create_exists_restriction(
-														ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_list[l],
-														(Concept*) successor_p,
-														tbox);
-												// create ax: lhs = ax->lhs, rhs = exists created
-												push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) ax->lhs, ex, 0, 0, EXISTS_DECOMP));
-												J1N(successor_bitmap_nonempty, successor_bitmap, successor_p);
-											}
-										}
-									}
-								}
-								JLN(successor_bitmap_p, ax->rhs->successors, role_p);
-							}
-						}
-						 */
 						for (j = 0; j < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_count; ++j) {
 							printf("role composition where this role appears as the first component: ");
 							print_role(ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]);
@@ -312,7 +285,6 @@ void saturate_concepts(TBox* tbox) {
 								JLN(successor_bitmap_p, ax->rhs->successors, role_p);
 							}
 						}
-
 
 
 					}

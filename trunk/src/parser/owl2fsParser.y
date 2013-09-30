@@ -291,8 +291,8 @@ superObjectPropertyExpression:
 
 propertyExpressionChain:
 	OBJECT_PROPERTY_CHAIN '(' objectPropertyExpression objectPropertyExpression objectPropertyExpressions ')' {
-		role_exps[role_exp_count++] = $3.role;
 		role_exps[role_exp_count++] = $4.role;
+		role_exps[role_exp_count++] = $3.role;
 		$$.role = get_create_role_composition(role_exp_count, role_exps, tbox);
 		role_exp_count = 0;
 	}

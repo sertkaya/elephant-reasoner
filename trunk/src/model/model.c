@@ -269,7 +269,7 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 	r->type = ROLE_COMPOSITION;
 	r->description.role_composition = (RoleComposition*) malloc(sizeof(RoleComposition));
 	assert(r->description.role_composition != NULL);
-	// we do not assume role1 and role2 to be ordered!
+	// we DO assume role1 and role2 to be ordered!
 	r->description.role_composition->role1 = r1;
 	r->description.role_composition->role2 = r2;
 	r->id = tbox->last_role_id++;
@@ -294,7 +294,7 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 	return r;
 }
 
-
+/*
 // comparison function for qsorting roles (based on ids) in a composition
 static int compare_role(const void* r1, const void* r2) {
 	if (((Role*) r1)->id < ((Role*) r2)->id)
@@ -303,6 +303,7 @@ static int compare_role(const void* r1, const void* r2) {
 		return 0;
 	return 1;
 }
+*/
 
 // get or create the role composition consisting of the given roles.
 // called by the parser.
@@ -311,9 +312,9 @@ Role* get_create_role_composition(int size, Role** roles, TBox* tbox) {
 	Role* composition = NULL;
 
 	tbox->role_composition_count++;
-	qsort(roles, size, sizeof(Role*), compare_role);
-	composition = get_create_role_composition_binary(roles[0], roles[1], tbox);
-	for (i = 2; i < size; ++i)
+	// qsort(roles, size, sizeof(Role*), compare_role);
+	composition = get_create_role_composition_binary(roles[size-1], roles[size-2], tbox);
+	for (i = 0 ; i < size - 2 ; ++i)
 		composition = get_create_role_composition_binary(composition, roles[i], tbox);
 
 	return composition;
