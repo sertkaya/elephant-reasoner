@@ -64,8 +64,9 @@ void saturate_roles(TBox* tbox) {
     		// for role compositions we do not need axioms of type role_comp(r,s) -> role_comp(r,s)
     		// in the initialization. the reason is, they can only appear on the lhs of a role inclusion axiom
     		// therefore, we push only axioms with told subsumer on the rhs
-    		for (i = 0; i < ((Role*) *key)->told_subsumer_count; ++i)
-    			push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, ((Role*) *key)->told_subsumers[i]));
+    		// for (i = 0; i < ((Role*) *key)->told_subsumer_count; ++i)
+    		// 	push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, ((Role*) *key)->told_subsumers[i]));
+    		push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
             JSLN(key, tbox->role_compositions, role_index);
     }
 
@@ -105,6 +106,9 @@ void saturate_concepts(TBox* tbox) {
 	// ax = dequeue(&scheduled_axioms);
 	while (ax != NULL) {
 		++total_derivation_count;
+
+
+
 		if (mark_concept_saturation_axiom_processed(ax)) {
 			++unique_derivation_count;
 
@@ -213,10 +217,16 @@ void saturate_concepts(TBox* tbox) {
 														ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_list[l],
 														ax->rhs->description.exists->filler,
 														tbox);
+												printf("###ex:");
+												print_concept(ex);
+												printf("###\n");
+												printf("!!!!predecessor_p:");
+												print_concept((Concept*) predecessor_p);
+												printf("!!!!\n");
 												// create ax: lhs = predecessor, rhs = exists created
 												push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, 0, 0, EXISTS_DECOMP));
-												J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 											}
+											J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 										}
 									}
 								}

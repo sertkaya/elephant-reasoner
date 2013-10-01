@@ -57,8 +57,8 @@ void index_role(Role* r) {
 		break;
 	case ROLE_COMPOSITION:
 		// recursive calls should not be necessary!
-		// index_role(r->description.role_composition->role1);
-		// index_role(r->description.role_composition->role2);
+		index_role(r->description.role_composition->role1);
+		index_role(r->description.role_composition->role2);
 		add_role_to_first_component_of_list(r->description.role_composition->role1, r);
 		add_role_to_second_component_of_list(r->description.role_composition->role2, r);
 		break;
