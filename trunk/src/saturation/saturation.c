@@ -154,8 +154,8 @@ void saturate_concepts(TBox* tbox) {
 
 					for (i = 0; i < ax->rhs->description.exists->filler->subsumer_count; ++i)
 						for (j = 0; j < ax->rhs->description.exists->role->subsumer_count; ++j)
-							if (ax->rhs->description.exists->filler != ax->rhs->description.exists->filler->subsumer_list[i] &&
-									ax->rhs->description.exists->role != ax->rhs->description.exists->role->subsumer_list[j]) {
+							if (ax->rhs->description.exists->filler != ax->rhs->description.exists->filler->subsumer_list[i]) { // &&
+									// ax->rhs->description.exists->role != ax->rhs->description.exists->role->subsumer_list[j]) {
 								Concept* ex = get_negative_exists(ax->rhs->description.exists->filler->subsumer_list[i], ax->rhs->description.exists->role->subsumer_list[j]);
 								if (ex != NULL)
 									push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, 0, 0, EXISTS_DECOMP));
@@ -173,7 +173,7 @@ void saturate_concepts(TBox* tbox) {
 					}
 */
 
-
+/*
 					// the role chain rule
 					// subsumers of role of existential on the rhs
 					for (i = 0; i < ax->rhs->description.exists->role->subsumer_count; ++i) {
@@ -300,7 +300,7 @@ void saturate_concepts(TBox* tbox) {
 							}
 						}
 					}
-
+*/
 
 				break;
 			}
