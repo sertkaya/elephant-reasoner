@@ -87,20 +87,11 @@ void saturate_concepts(TBox* tbox) {
 	init_stack(&scheduled_axioms);
 
 	// push the input axioms to the stack
-
 	int i,j;
-
-	for (i = 0; i < tbox->atomic_concept_count ; ++i)
-		for (j = 0; j < tbox->atomic_concept_list[i]->told_subsumer_count; ++j)
-			push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers[j], 0, 0, INIT));
-
-	/*
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
 		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i], 0, 0, INIT));
-	*/
 
 	ax = pop(&scheduled_axioms);
-	// ax = dequeue(&scheduled_axioms);
 	while (ax != NULL) {
 		++total_derivation_count;
 
@@ -138,40 +129,21 @@ void saturate_concepts(TBox* tbox) {
 				}
 				break;
 			case EXISTENTIAL_RESTRICTION:
-/*
-				for (i = 0; i < ax->rhs->description.exists->role->subsumer_count; ++i) {
-					Concept* ex = get_negative_exists(ax->rhs->description.exists->filler, ax->rhs->description.exists->role->subsumer_list[i]);
-					if (ex != NULL)
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, 0, 0, EXISTS_DECOMP));
-				}
-*/
 				if (!ax->derived_via_exists_introduction) {
 					if (ax->rhs->description.exists->filler->type != ATOMIC_CONCEPT)
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->description.exists->filler, ax->rhs->description.exists->filler, 0, 0, INIT));
-				}
+
 					add_predecessor(ax->lhs, ax->rhs);
-					add_successor(ax->lhs, ax->rhs);
+					// add_successor(ax->lhs, ax->rhs);
 
 					for (i = 0; i < ax->rhs->description.exists->filler->subsumer_count; ++i)
-						for (j = 0; j < ax->rhs->description.exists->role->subsumer_count; ++j)
-							if (ax->rhs->description.exists->filler != ax->rhs->description.exists->filler->subsumer_list[i]) { // &&
-									// ax->rhs->description.exists->role != ax->rhs->description.exists->role->subsumer_list[j]) {
-								Concept* ex = get_negative_exists(ax->rhs->description.exists->filler->subsumer_list[i], ax->rhs->description.exists->role->subsumer_list[j]);
-								if (ex != NULL)
-									push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, 0, 0, EXISTS_DECOMP));
-							}
-					// }
-
-
-/*
-					for (i = 0; i < ax->rhs->description.exists->filler->subsumer_count; ++i) {
 						for (j = 0; j < ax->rhs->description.exists->role->subsumer_count; ++j) {
 							Concept* ex = get_negative_exists(ax->rhs->description.exists->filler->subsumer_list[i], ax->rhs->description.exists->role->subsumer_list[j]);
-							if (ex != NULL && ax->rhs->description.exists->filler != ax->rhs->description.exists->filler->subsumer_list[i])
-								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, 0, 0, EXISTS_DECOMP));
+							if (ex != NULL)
+								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, 0, 1, EXISTS_INTRO));
 						}
-					}
-*/
+				}
+
 
 /*
 					// the role chain rule
