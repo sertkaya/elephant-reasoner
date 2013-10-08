@@ -28,39 +28,16 @@
 // For marking an axiom as processed, we add the rhs to the subsumers
 // of the lhs. The function returns 1 if it is added, 0 if the rhs was
 // already in the list of subsumers of the lhs.
-
+// now as macro in utils.h
+/*
 int mark_concept_saturation_axiom_processed(ConceptSaturationAxiom* ax) {
 	int added_to_subsumer_list;
 
-	/*
-	 // (replace with a call to the function add_subsumer, check perf. change. first move the function from package hierarchy to model)
-	 J1S(added_to_subsumer_list, ax->lhs->subsumers, (Word_t) ax->rhs);
-	 if (added_to_subsumer_list == JERR) {
-		 fprintf(stderr, "could not mark axiom as processed, aborting\n");
-		 exit(EXIT_FAILURE);
-	 }
-	*/
-
 	added_to_subsumer_list = add_to_concept_subsumer_list(ax->lhs, ax->rhs);
-
-	/*
-	Concept** tmp;
-	J1S(added_to_subsumer_list, ax->lhs->subsumers, (Word_t) ax->rhs);
-	// if (added_to_subsumer_list == JERR) {
-	// 	fprintf(stderr, "could not add to subsumer list, aborting\n");
-	// 	exit(EXIT_FAILURE);
-	// }
-	if (added_to_subsumer_list) {
-		tmp = realloc(ax->lhs->subsumer_list, (ax->lhs->subsumer_count + 1) * sizeof(Concept*));
-		assert(tmp != NULL);
-		ax->lhs->subsumer_list = tmp;
-		ax->lhs->subsumer_list[ax->lhs->subsumer_count] = ax->rhs;
-		ax->lhs->subsumer_count++;
-	}
-	*/
 
 	return added_to_subsumer_list;
 }
+*/
 
 // add c to the predecessors hash of the filler of ex.
 // the key of the predecessors hash of filler of ex is ex->description.exists->role.

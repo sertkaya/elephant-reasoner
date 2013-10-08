@@ -24,25 +24,14 @@
 
 #include "datatypes.h"
 #include "../model/datatypes.h"
+#include "../model/utils.h"
 #include "context.h"
 #include "locals.h"
 
 
-// returns 1 if axiom is added, 0 if the axiom already exists
-// char add_to_processed_axioms(SubClassAxiom* ax);
-
 // marks the axiom with the premise lhs and conclusion rhs as processed
-// void mark_axiom_processed(Concept* lhs, Concept* rhs);
-
-int mark_concept_saturation_axiom_processed(ConceptSaturationAxiom* ax);
-
-// checks whether the axiom with the premise lhs and conclusion rhs has
-// already been processed
-// int is_axiom_processed(Concept* lhs, Concept* rhs);
-
-// void enqueue(SaturationAxiom* ax);
-
-// SaturationAxiom* dequeue();
+#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		add_to_concept_subsumer_list(ax->lhs, ax->rhs)
+// int mark_concept_saturation_axiom_processed(ConceptSaturationAxiom* ax);
 
 int add_predecessor(Concept* c, Concept* ex);
 
