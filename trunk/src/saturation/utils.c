@@ -100,13 +100,11 @@ int add_successor(Concept* c, Concept* ex) {
 }
 
 
-ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, char derived_conjunction, char derived_exists, enum saturation_axiom_type type) {
+ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, enum saturation_axiom_type type) {
 	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
 	ax->rhs = rhs;
-	ax->derived_via_conj_introduction = derived_conjunction;
-	ax->derived_via_exists_introduction = derived_exists;
 	ax->type = type;
 	return ax;
 }

@@ -24,15 +24,12 @@ typedef struct concept_saturation_axiom ConceptSaturationAxiom;
 typedef struct role_saturation_axiom RoleSaturationAxiom;
 
 enum saturation_axiom_type {
-	INPUT_KB_SUBCLASS, INPUT_KB_EQCLASS, CONJ_INTRO_1, CONJ_INTRO_2, CONJ_DECOMP_1, CONJ_DECOMP_2,
-	EXISTS_DECOMP, INIT, EXISTS_INTRO, TOLD_SUBSUMER
+	TOLD_SUBSUMER, INITIALIZATION, CONJUNCTION_DECOMPOSITION, CONJUNCTION_INTRODUCTION, EXISTENTIAL_DECOMPOSITION, EXISTENTIAL_INTRODUCTION, ROLE_CHAIN, LINK
 };
 
 struct concept_saturation_axiom {
 	Concept* lhs;
 	Concept* rhs;
-	char derived_via_conj_introduction;
-	char derived_via_exists_introduction;
 	enum saturation_axiom_type type;
 };
 
