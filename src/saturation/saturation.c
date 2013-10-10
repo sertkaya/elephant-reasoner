@@ -57,9 +57,9 @@ void saturate_roles(TBox* tbox) {
     		// for role compositions we do not need axioms of type role_comp(r,s) -> role_comp(r,s)
     		// in the initialization. the reason is, they can only appear on the lhs of a role inclusion axiom
     		// therefore, we push only axioms with told subsumer on the rhs
-    		// for (i = 0; i < ((Role*) *key)->told_subsumer_count; ++i)
-    		// 	push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, ((Role*) *key)->told_subsumers[i]));
-    		push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
+    		for (i = 0; i < ((Role*) *key)->told_subsumer_count; ++i)
+    			push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, ((Role*) *key)->told_subsumers[i]));
+    		// push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
             JSLN(key, tbox->role_compositions, role_index);
     }
 
@@ -454,12 +454,12 @@ void saturate_concepts(TBox* tbox) {
 									Concept *ex = NULL;
 									J1F(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 									while (predecessor_bitmap_nonempty) {
-										// for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_count; ++l) {
-										for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumer_count; ++l) {
+										for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_count; ++l) {
+										// for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumer_count; ++l) {
 											// create exists ... role=subsumers of the composition, filler=filler of the rhs
 											ex = get_create_exists_restriction(
-													// ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_list[l],
-													ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumers[l],
+													ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_list[l],
+													// ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumers[l],
 													ax->rhs->description.exists->filler,
 													tbox);
 											// ex = get_exists_restriction(
@@ -467,7 +467,7 @@ void saturate_concepts(TBox* tbox) {
 											// 		ax->rhs->description.exists->filler->id, tbox);
 											// create ax: lhs = predecessor, rhs = exists created
 											// if (ex != NULL)
-											push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, ROLE_CHAIN));
+											push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, EXISTENTIAL_INTRODUCTION));
 										}
 										J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 									}
@@ -522,8 +522,8 @@ void saturate_concepts(TBox* tbox) {
 										// print_concept((Concept*) successor_p);
 										// printf("\n");
 
-										// for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_count; ++l) {
-										for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumer_count; ++l) {
+										for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_count; ++l) {
+										// for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumer_count; ++l) {
 											// create exists ... role=subsumers of the composition, filler=successor of the filler of the rhs
 
 											// printf("ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_list[l]: ");
@@ -531,8 +531,8 @@ void saturate_concepts(TBox* tbox) {
 											// printf("\n");
 
 											ex = get_create_exists_restriction(
-													// ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_list[l],
-													ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumers[l],
+													ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_list[l],
+													// ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumers[l],
 													(Concept*) successor_p,
 													tbox);
 											// ex = get_exists_restriction(
@@ -541,7 +541,7 @@ void saturate_concepts(TBox* tbox) {
 											// create ax: lhs = ax->lhs, rhs = exists created
 											// create ax: lhs = ax->lhs, rhs = exists created
 											// if (ex != NULL)
-											push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) ax->lhs, ex, ROLE_CHAIN));
+											push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) ax->lhs, ex, EXISTENTIAL_INTRODUCTION));
 										}
 										J1N(successor_bitmap_nonempty, successor_bitmap, successor_p);
 									}
