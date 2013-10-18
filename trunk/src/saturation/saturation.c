@@ -349,8 +349,17 @@ void saturate_concepts(TBox* tbox) {
 
 	// push the input axioms to the stack
 	int i,j;
+	// for (i = 0; i < tbox->atomic_concept_count ; ++i)
+	// 	push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i], INITIALIZATION));
+
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
-		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i], INITIALIZATION));
+		for (j = 0; j < tbox->atomic_concept_list[i]->told_subsumer_count; ++j)
+			push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers[j], INITIALIZATION));
+
+	/*
+	for (i = 0; i < tbox->subclass_axiom_count; ++i)
+		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs, INITIALIZATION));
+		*/
 
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
@@ -359,11 +368,11 @@ void saturate_concepts(TBox* tbox) {
 		if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 			++unique_derivation_count;
 
-			// printf("%d:", ax->type);
-			// print_concept(ax->lhs);
-			// printf("=>");
-			// print_concept(ax->rhs);
-			// printf("\n");
+			printf("%d:", ax->type);
+			print_concept(ax->lhs);
+			printf("=>");
+			print_concept(ax->rhs);
+			printf("\n");
 
 			// conjunction introduction
 			// the first conjunct
@@ -400,8 +409,8 @@ void saturate_concepts(TBox* tbox) {
 					if (ax->rhs->description.exists->filler->type != ATOMIC_CONCEPT)
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->description.exists->filler, ax->rhs->description.exists->filler, INITIALIZATION));
 
-					add_predecessor(ax->lhs, ax->rhs);
-					add_successor(ax->lhs, ax->rhs);
+					add_predecessor(ax->rhs->description.exists->filler, ax->rhs->description.exists->role, ax->lhs);
+					add_successor(ax->lhs, ax->rhs->description.exists->role, ax->rhs->description.exists->filler);
 
 					for (i = 0; i < ax->rhs->description.exists->filler->subsumer_count; ++i)
 						for (j = 0; j < ax->rhs->description.exists->role->subsumer_count; ++j) {
@@ -411,7 +420,7 @@ void saturate_concepts(TBox* tbox) {
 						}
 
 				}
-// /*
+
 				// the role chain rule
 				// subsumers of role of existential on the rhs
 				for (i = 0; i < ax->rhs->description.exists->role->subsumer_count; ++i) {
@@ -454,20 +463,22 @@ void saturate_concepts(TBox* tbox) {
 									Concept *ex = NULL;
 									J1F(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 									while (predecessor_bitmap_nonempty) {
-										for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_count; ++l) {
-										// for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumer_count; ++l) {
+										for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumer_count; ++l) {
 											// create exists ... role=subsumers of the composition, filler=filler of the rhs
-											ex = get_create_exists_restriction(
-													ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_list[l],
-													// ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumers[l],
-													ax->rhs->description.exists->filler,
-													tbox);
+											// ex = get_create_exists_restriction(
+											// 		ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_list[l],
+											// 		// ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumers[l],
+											// 		ax->rhs->description.exists->filler,
+											// 		tbox);
+											add_successor((Concept*) predecessor_p, ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumers[l], ax->rhs->description.exists->filler);
+											add_predecessor(ax->rhs->description.exists->filler, ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->told_subsumers[l], (Concept*) predecessor_p);
 											// ex = get_exists_restriction(
 											// 		ax->rhs->description.exists->role->subsumer_list[i]->second_component_of_list[j]->subsumer_list[l]->id,
 											// 		ax->rhs->description.exists->filler->id, tbox);
 											// create ax: lhs = predecessor, rhs = exists created
 											// if (ex != NULL)
-											push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, EXISTENTIAL_INTRODUCTION));
+											// push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, EXISTENTIAL_INTRODUCTION));
+											push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->description.exists->filler, ax->rhs->description.exists->filler, INITIALIZATION));
 										}
 										J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 									}
@@ -476,6 +487,7 @@ void saturate_concepts(TBox* tbox) {
 							JLN(predecessor_bitmap_p, ax->lhs->predecessors, role_p);
 						}
 					}
+
 
 					// now the same for the successors of the filler of the existential on the rhs
 					// the role composition where this role appears as the first component
@@ -522,26 +534,28 @@ void saturate_concepts(TBox* tbox) {
 										// print_concept((Concept*) successor_p);
 										// printf("\n");
 
-										for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_count; ++l) {
-										// for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumer_count; ++l) {
+										for (l = 0; l < ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumer_count; ++l) {
 											// create exists ... role=subsumers of the composition, filler=successor of the filler of the rhs
 
 											// printf("ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_list[l]: ");
 											// print_role(ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_list[l]);
 											// printf("\n");
 
-											ex = get_create_exists_restriction(
-													ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_list[l],
-													// ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumers[l],
-													(Concept*) successor_p,
-													tbox);
+											// ex = get_create_exists_restriction(
+											// 		ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->subsumer_list[l],
+											// 		// ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumers[l],
+											// 		(Concept*) successor_p,
+											// 		tbox);
+											add_successor(ax->lhs, ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumers[l], (Concept*) successor_p);
+											add_predecessor((Concept*) successor_p, ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumers[l], ax->lhs);
 											// ex = get_exists_restriction(
 											// 		ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]->told_subsumers[l]->id,
 											// 		((Concept*) successor_p)->id, tbox);
 											// create ax: lhs = ax->lhs, rhs = exists created
 											// create ax: lhs = ax->lhs, rhs = exists created
 											// if (ex != NULL)
-											push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) ax->lhs, ex, EXISTENTIAL_INTRODUCTION));
+											// push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) ax->lhs, ex, EXISTENTIAL_INTRODUCTION));
+											push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) successor_p, (Concept*) successor_p, INITIALIZATION));
 										}
 										J1N(successor_bitmap_nonempty, successor_bitmap, successor_p);
 									}
