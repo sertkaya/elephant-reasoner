@@ -39,16 +39,13 @@ int mark_concept_saturation_axiom_processed(ConceptSaturationAxiom* ax) {
 }
 */
 
-// add c to the predecessors hash of the filler of ex.
-// the key of the predecessors hash of filler of ex is ex->description.exists->role.
-// the value is a bitmap, whose index is c
-int add_predecessor(Concept* c, Concept* ex) {
-	// PWord_t predecessors_bitmap_p;
+// add p to the predecessors hash of c
+// the key of the predecessors hash is r
+int add_predecessor(Concept* c, Role* r, Concept* p) {
 	PPvoid_t predecessors_bitmap_p;
-	// Pvoid_t predecessors_bitmap;
 	int inserted_predecessor = 0;
 
-	JLI(predecessors_bitmap_p, ex->description.exists->filler->predecessors, (Word_t) ex->description.exists->role);
+	JLI(predecessors_bitmap_p, c->predecessors, (Word_t) r);
 	if (predecessors_bitmap_p == PJERR) {
 		fprintf(stderr, "could not insert into predecessor map, aborting\n");
 		exit(EXIT_FAILURE);
@@ -56,14 +53,10 @@ int add_predecessor(Concept* c, Concept* ex) {
 
 	// check if we are inserting a predecessor for this role for the first time
 	if (*predecessors_bitmap_p == 0) {
-		// predecessors_bitmap = (Pvoid_t) NULL;
-		// *predecessors_bitmap_p = (Word_t) predecessors_bitmap;
 		*predecessors_bitmap_p = (Pvoid_t) NULL;
 	}
 
-	// predecessors_bitmap =  (Pvoid_t) *predecessors_bitmap_p;
-	// J1S(inserted_predecessor, predecessors_bitmap, (Word_t) c);
-	J1S(inserted_predecessor, *predecessors_bitmap_p, (Word_t) c);
+	J1S(inserted_predecessor, *predecessors_bitmap_p, (Word_t) p);
 	if (inserted_predecessor == JERR) {
 		fprintf(stderr, "could not insert into predecessor bitmap, aborting\n");
 		exit(EXIT_FAILURE);
@@ -72,14 +65,13 @@ int add_predecessor(Concept* c, Concept* ex) {
 	return inserted_predecessor;
 }
 
-// add the filler of ex to the successors hash of c.
-// the key of the successors hash of c is ex->description.exists->role.
-// the value is a bitmap, whose index is ex->description.exists->filler.
-int add_successor(Concept* c, Concept* ex) {
+// add s to the successors hash of c.
+// the key of the successors hash of c is r
+int add_successor(Concept* c, Role* r, Concept* s) {
 	PPvoid_t successors_bitmap_p;
 	int inserted_successor = 0;
 
-	JLI(successors_bitmap_p, c->successors, (Word_t) ex->description.exists->role);
+	JLI(successors_bitmap_p, c->successors, (Word_t) r);
 	if (successors_bitmap_p == PJERR) {
 		fprintf(stderr, "could not insert into successor map, aborting\n");
 		exit(EXIT_FAILURE);
@@ -90,7 +82,7 @@ int add_successor(Concept* c, Concept* ex) {
 		*successors_bitmap_p = (Pvoid_t) NULL;
 	}
 
-	J1S(inserted_successor, *successors_bitmap_p, (Word_t) ex->description.exists->filler);
+	J1S(inserted_successor, *successors_bitmap_p, (Word_t) s);
 	if (inserted_successor == JERR) {
 		fprintf(stderr, "could not insert into successor bitmap, aborting\n");
 		exit(EXIT_FAILURE);
