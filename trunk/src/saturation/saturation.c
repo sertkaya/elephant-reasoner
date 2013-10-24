@@ -80,7 +80,7 @@ void saturate_roles(TBox* tbox) {
 void saturate_concepts(TBox* tbox) {
 	ConceptSaturationAxiom* ax;
 	Stack scheduled_axioms;
-	int unique_derivation_count = 0, total_derivation_count = 0;
+	int unique_subsumption_count = 0, total_subsumption_count = 0;
 
 	// initialize the stack
 	init_stack(&scheduled_axioms);
@@ -92,7 +92,7 @@ void saturate_concepts(TBox* tbox) {
 
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
-		++total_derivation_count;
+		++total_subsumption_count;
 
 		if (ax->type == LINK || MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 			// printf("%d:", ax->type);
@@ -246,7 +246,7 @@ void saturate_concepts(TBox* tbox) {
 				}
 			}
 			else {
-				++unique_derivation_count;
+				++unique_subsumption_count;
 				// printf("%d:", ax->type);
 				// print_concept(ax->lhs);
 				// printf("=>");
@@ -335,14 +335,15 @@ void saturate_concepts(TBox* tbox) {
 		free(ax);
 		ax = pop(&scheduled_axioms);
 	}
-	// printf("Total derivations:%d\nUnique derivations:%d\n", total_derivation_count, unique_derivation_count);
+	// printf("Total derivations:%d\nUnique derivations:%d\n", total_subsumption_count, unique_subsumption_count);
 }
 */
 
 void saturate_concepts(TBox* tbox) {
 	ConceptSaturationAxiom* ax;
 	Stack scheduled_axioms;
-	int unique_derivation_count = 0, total_derivation_count = 0;
+	int unique_subsumption_count = 0, total_subsumption_count = 0;
+	int unique_link_count = 0, total_link_count = 0;
 
 	// initialize the stack
 	init_stack(&scheduled_axioms);
@@ -352,7 +353,7 @@ void saturate_concepts(TBox* tbox) {
 	/*
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
 		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i], NULL, SUBSUMPTION_INITIALIZATION));
-	*/
+		*/
 
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
 		for (j = 0; j < tbox->atomic_concept_list[i]->told_subsumer_count; ++j)
@@ -371,13 +372,13 @@ void saturate_concepts(TBox* tbox) {
 
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
-		++total_derivation_count;
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
+			++total_subsumption_count;
 			// no conjunction decomposition and no existential decomposition here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
-				++unique_derivation_count;
+				++unique_subsumption_count;
 
 				// conjunction introduction
 				// the first conjunct
@@ -428,71 +429,13 @@ void saturate_concepts(TBox* tbox) {
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i], NULL, SUBSUMPTION_TOLD_SUBSUMER));
 			}
 			break;
-/*
-		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
-			// all except conjunction introduction here
-			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
-				++unique_derivation_count;
-
-				// conjunction introduction
-				// the first conjunct
-				int lhs_is_subsumed_by_other_conjunct;
-				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
-					// check if lhs is subsumed by the second conjunct as well
-					J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2);
-					if (lhs_is_subsumed_by_other_conjunct)
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-				}
-
-				// now the same for the second conjunct
-				for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
-					// check if lhs is also subsumed by the first conjunct
-					J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
-					if (lhs_is_subsumed_by_other_conjunct)
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-				}
-
-				// existential decomposition
-				push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.exists->filler, ax->rhs->description.exists->role, LINK));
-
-				// existential introduction
-				PWord_t predecessor_bitmap_p;
-				Pvoid_t predecessor_bitmap;
-				Word_t role_p;
-				Concept* ex;
-				int predecessor_bitmap_nonempty;
-				Word_t predecessor_p;
-
-				role_p = 0;
-				JLF(predecessor_bitmap_p, ax->lhs->predecessors, role_p);
-				while (predecessor_bitmap_p != NULL) {
-					for (i = 0; i < ((Role*) role_p)->subsumer_count; ++i) {
-						ex = get_negative_exists(ax->rhs, ((Role*) role_p)->subsumer_list[i]);
-						if (ex != NULL) {
-							predecessor_p = 0;
-							predecessor_bitmap = (Pvoid_t) *predecessor_bitmap_p;
-							J1F(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
-							while (predecessor_bitmap_nonempty) {
-								push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
-								J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
-							}
-						}
-					}
-					JLN(predecessor_bitmap_p, ax->lhs->predecessors, role_p);
-				}
-
-				// told subsumers
-				for (i = 0; i < ax->rhs->told_subsumer_count; i++)
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i], NULL, SUBSUMPTION_TOLD_SUBSUMER));
-			}
-			break;
-*/
 		case SUBSUMPTION_INITIALIZATION:
 		case SUBSUMPTION_CONJUNCTION_DECOMPOSITION:
 		case SUBSUMPTION_TOLD_SUBSUMER:
+			++total_subsumption_count;
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
-				++unique_derivation_count;
+				++unique_subsumption_count;
 
 				// conjunction introduction
 				// the first conjunct
@@ -559,8 +502,10 @@ void saturate_concepts(TBox* tbox) {
 			}
 			break;
 		case LINK:
+			++total_link_count;
 			if (add_successor(ax->lhs, ax->role, ax->rhs)) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs);
+				++unique_link_count;
 
 				// existential introduction
 				for (i = 0; i < ax->rhs->subsumer_count; ++i)
@@ -691,13 +636,15 @@ void saturate_concepts(TBox* tbox) {
 		free(ax);
 		ax = pop(&scheduled_axioms);
 	}
+	printf("Total subsumptions:%d\nUnique subsumptions:%d\n", total_subsumption_count, unique_subsumption_count);
+	printf("Total links:%d\nUnique links:%d\n", total_link_count, unique_link_count);
 }
 
 /*
 void saturate_concepts(TBox* tbox) {
 	ConceptSaturationAxiom* ax;
 	Stack scheduled_axioms;
-	int unique_derivation_count = 0, total_derivation_count = 0;
+	int unique_subsumption_count = 0, total_subsumption_count = 0;
 
 	// initialize the stack
 	init_stack(&scheduled_axioms);
@@ -716,10 +663,10 @@ void saturate_concepts(TBox* tbox) {
 
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
-		++total_derivation_count;
+		++total_subsumption_count;
 
 		if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
-			++unique_derivation_count;
+			++unique_subsumption_count;
 
 			printf("%d:", ax->type);
 			print_concept(ax->lhs);
@@ -958,7 +905,7 @@ void saturate_concepts(TBox* tbox) {
 		free(ax);
 		ax = pop(&scheduled_axioms);
 	}
-	// printf("Total derivations:%d\nUnique derivations:%d\n", total_derivation_count, unique_derivation_count);
+	// printf("Total derivations:%d\nUnique derivations:%d\n", total_subsumption_count, unique_subsumption_count);
 }
 */
 
