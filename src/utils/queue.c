@@ -30,6 +30,11 @@
  * Linked list implementation
 */
 
+void init_queue(Queue* q) {
+	q->front = NULL;
+	q->rear = NULL;
+}
+
 void enqueue(Queue* queue, void* data) {
 	QueueElement* new_qe;
 
