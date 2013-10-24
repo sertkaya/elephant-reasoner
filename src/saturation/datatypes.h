@@ -23,13 +23,20 @@
 typedef struct concept_saturation_axiom ConceptSaturationAxiom;
 typedef struct role_saturation_axiom RoleSaturationAxiom;
 
+/*
 enum saturation_axiom_type {
 	TOLD_SUBSUMER, INITIALIZATION, CONJUNCTION_DECOMPOSITION, CONJUNCTION_INTRODUCTION, EXISTENTIAL_DECOMPOSITION, EXISTENTIAL_INTRODUCTION, ROLE_CHAIN, LINK
+};
+*/
+enum saturation_axiom_type {
+	SUBSUMPTION_CONJUNCTION_INTRODUCTION, SUBSUMPTION_EXISTENTIAL_INTRODUCTION, SUBSUMPTION_INITIALIZATION, SUBSUMPTION_TOLD_SUBSUMER, SUBSUMPTION_CONJUNCTION_DECOMPOSITION,
+	LINK
 };
 
 struct concept_saturation_axiom {
 	Concept* lhs;
 	Concept* rhs;
+	Role* role;
 	enum saturation_axiom_type type;
 };
 

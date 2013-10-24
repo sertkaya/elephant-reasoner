@@ -41,7 +41,7 @@ int add_predecessor(Concept* c, Role* r, Concept* p);
 // add r-successor s to c
 int add_successor(Concept* c, Role* r, Concept* s);
 
-ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, enum saturation_axiom_type type);
+ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, Role* role, enum saturation_axiom_type type);
 
 RoleSaturationAxiom* create_role_saturation_axiom(Role* lhs, Role* rhs);
 
