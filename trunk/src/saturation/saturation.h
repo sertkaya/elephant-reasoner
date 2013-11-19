@@ -22,7 +22,6 @@
 
 #include "../model/datatypes.h"
 
-// void init_saturation();
 
 void saturate_tbox(TBox* tbox);
 
