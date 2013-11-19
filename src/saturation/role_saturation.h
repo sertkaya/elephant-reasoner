@@ -17,27 +17,12 @@
  */
 
 
-#ifndef SATURATION_LOCALS_H_
-#define SATURATION_LOCALS_H_
+#ifndef ROLE_SATURATION_H_
+#define ROLE_SATURATION_H_
 
-#include <Judy.h>
 
-#include "../model/datatypes.h"
-// #include "../utils/stack.h"
-// #include "../utils/queue.h"
 #include "datatypes.h"
 
-// int scheduled_axiom_count;
-// SaturationAxiom** scheduled_axioms;
+void saturate_roles(TBox* tbox);
 
-// for saturating concepts
-// Stack scheduled_axioms;
-
-// for saturating roles
-// Stack scheduled_subrole_axioms;
-
-// Queue scheduled_axioms;
-
-// Pvoid_t processed_axioms;
-
-#endif /* LOCALS_H_ */
+#endif

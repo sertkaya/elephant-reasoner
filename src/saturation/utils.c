@@ -20,10 +20,7 @@
 #include <assert.h>
 #include <Judy.h>
 
-#include "locals.h"
-#include "datatypes.h"
 #include "../model/datatypes.h"
-#include "../model/utils.h"
 
 // For marking an axiom as processed, we add the rhs to the subsumers
 // of the lhs. The function returns 1 if it is added, 0 if the rhs was
@@ -92,28 +89,3 @@ int add_successor(Concept* c, Role* r, Concept* s) {
 }
 
 
-ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, Role* role, enum saturation_axiom_type type) {
-	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
-	assert(ax != NULL);
-	ax->lhs = lhs;
-	ax->rhs = rhs;
-	ax->role = role;
-	ax->type = type;
-	return ax;
-}
-
-RoleSaturationAxiom* create_role_saturation_axiom(Role* lhs, Role* rhs) {
-	RoleSaturationAxiom* ax = (RoleSaturationAxiom*) malloc(sizeof(RoleSaturationAxiom));
-	assert(ax != NULL);
-	ax->lhs = lhs;
-	ax->rhs = rhs;
-
-	return ax;
-}
-
-int mark_role_saturation_axiom_processed(RoleSaturationAxiom* ax) {
-	int added_to_subsumer_list;
-
-	added_to_subsumer_list = add_to_role_subsumer_list(ax->lhs, ax->rhs);
-	return added_to_subsumer_list;
-}
