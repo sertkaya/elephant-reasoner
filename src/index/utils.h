@@ -41,6 +41,8 @@ void add_told_subsumer_concept(Concept* c, Concept* s);
  *****************************************************************************/
 int add_to_role_subsumer_list(Role* r, Role* s);
 
+int add_to_role_subsumees(Role* r, Role* s);
+
 // add s to the told subsumer list of r
 // note that multiple occurrence of s is allowed!
 void add_told_subsumer_role(Role* r, Role* s);

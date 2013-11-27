@@ -169,6 +169,10 @@ struct role {
 	// accessed via J1* operations
 	Pvoid_t subsumers;
 
+	// only necessary for optimizing the processing of role compositions
+	// for that we need to access the subsumees
+	Pvoid_t subsumees;
+
 	// list of role compositions where this role is the first/second component
 	Role** first_component_of_list;
 	int first_component_of_count;
