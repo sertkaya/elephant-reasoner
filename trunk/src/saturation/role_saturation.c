@@ -37,7 +37,12 @@ RoleSaturationAxiom* create_role_saturation_axiom(Role* lhs, Role* rhs) {
 int mark_role_saturation_axiom_processed(RoleSaturationAxiom* ax) {
 	int added_to_subsumer_list;
 
+	// add to the subsumer list to mark it as processed
 	added_to_subsumer_list = add_to_role_subsumer_list(ax->lhs, ax->rhs);
+
+	// add to the subsumees hash too
+	add_to_role_subsumees(ax->rhs, ax->lhs);
+
 	return added_to_subsumer_list;
 }
 
@@ -61,8 +66,15 @@ void saturate_roles(TBox* tbox) {
             push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
             JSLN(key, tbox->atomic_roles, role_index);
     }
+    // now the role compositions
+	role_index[0] = '\0';
+    JSLF(key, tbox->role_compositions, role_index);
+    while (key != NULL) {
+    		push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
+            JSLN(key, tbox->role_compositions, role_index);
+    }
 
-    // reflexive transitive closure of role inclusion axioms
+    // reflexive transitive closure of (complex) role inclusion axioms
     int i;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {

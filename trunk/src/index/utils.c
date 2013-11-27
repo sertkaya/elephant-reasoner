@@ -116,6 +116,17 @@ int add_to_role_subsumer_list(Role* r, Role* s) {
 	return added_to_subsumer_list;
 }
 
+int add_to_role_subsumees(Role*r, Role* s) {
+	int added_to_subsumees;
+
+	J1S(added_to_subsumees, r->subsumees, (Word_t) s);
+	if (added_to_subsumees == JERR) {
+		fprintf(stderr, "could not add to subsumees, aborting\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return added_to_subsumees;
+}
 
 /******************************************************************************
  * functions for adding ...

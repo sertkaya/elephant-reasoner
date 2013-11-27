@@ -240,6 +240,8 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	r->subsumer_count = 0;
 	r->subsumers = (Pvoid_t) NULL;
 
+	r->subsumees = (Pvoid_t) NULL;
+
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
 	r->first_component_of = (Pvoid_t) NULL;
@@ -280,6 +282,8 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
 	r->subsumers = (Pvoid_t) NULL;
+
+	r->subsumees = (Pvoid_t) NULL;
 
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
