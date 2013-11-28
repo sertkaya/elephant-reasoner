@@ -54,6 +54,7 @@ Role* get_create_atomic_role(char* name, TBox* tbox);
 // called by the parser.
 Role* get_create_role_composition(int size, Role** roles, TBox* tbox);
 
+Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox);
 /******************************************************************************
  * create functions for axioms
  *****************************************************************************/

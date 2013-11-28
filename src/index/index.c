@@ -56,7 +56,7 @@ void index_role(Role* r) {
 	case ATOMIC_ROLE:
 		break;
 	case ROLE_COMPOSITION:
-		// recursive calls should not be necessary!
+		// recursive calls are necessary because role1 or role2 can also be a role comoposition
 		index_role(r->description.role_composition->role1);
 		index_role(r->description.role_composition->role2);
 		add_role_to_first_component_of_list(r->description.role_composition->role1, r);
