@@ -18,6 +18,7 @@
 
 #include <string.h>
 #include <assert.h>
+#include <Judy.h>
 
 #include "../model/model.h"
 #include "../model/limits.h"
@@ -74,7 +75,7 @@ void saturate_roles(TBox* tbox) {
             JSLN(key, tbox->role_compositions, role_index);
     }
 
-    // reflexive transitive closure of (complex) role inclusion axioms
+    // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
     int i;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
@@ -88,21 +89,28 @@ void saturate_roles(TBox* tbox) {
 	}
 
 	// TODO:
-    // now new role composition hierarchies using the computed role hierarchies.
+	// now new role composition hierarchies using the computed role hierarchies.
 	// this is for optimizing the role composition rule in concept saturation
-	/*
 	role_index[0] = '\0';
-    JSLF(key, tbox->role_compositions, role_index);
-    while (key != NULL) {
-    		// for role compositions we do not need axioms of type role_comp(r,s) -> role_comp(r,s)
-    		// in the initialization. the reason is, they can only appear on the lhs of a role inclusion axiom
-    		// therefore, we push only axioms with told subsumer on the rhs
-    		for (i = 0; i < ((Role*) *key)->told_subsumer_count; ++i)
-    			push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, ((Role*) *key)->told_subsumers[i]));
-    		// push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
-            JSLN(key, tbox->role_compositions, role_index);
-    }
-    */
+	JSLF(key, tbox->role_compositions, role_index);
+	Word_t subsumee_index1, subsumee_index2;
+	int subsumees1_nonempty, subsumees2_nonempty;
+	Role* composition;
+	while (key != NULL) {
+		subsumee_index1 = 0;
+		J1F(subsumees1_nonempty, ((Role*) *key)->description.role_composition->role1->subsumees, subsumee_index1);
+		while (subsumees1_nonempty) {
+			subsumee_index2 = 0;
+			J1F(subsumees2_nonempty, ((Role*) *key)->description.role_composition->role2->subsumees, subsumee_index2);
+			while (subsumees2_nonempty) {
+				composition = get_create_role_composition_binary(((Role*) subsumee_index1), ((Role*) subsumee_index2), tbox);
+				index_role(composition);
+				J1N(subsumees2_nonempty, ((Role*) *key)->description.role_composition->role2->subsumees, subsumee_index2);
+			}
+			J1N(subsumees1_nonempty, ((Role*) *key)->description.role_composition->role1->subsumees, subsumee_index1);
+		}
+		JSLN(key, tbox->role_compositions, role_index);
+	}
 
 }
 

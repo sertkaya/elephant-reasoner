@@ -24,5 +24,6 @@
 
 void index_tbox(TBox* tbox);
 
+void index_role(Role* r);
 
 #endif /* INDEX_H_ */

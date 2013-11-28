@@ -26,9 +26,6 @@
 #include "../model/datatypes.h"
 #include "../model/utils.h"
 
-// marks the axiom with the premise lhs and conclusion rhs as processed
-#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		add_to_concept_subsumer_list(ax->lhs, ax->rhs)
-// int mark_concept_saturation_axiom_processed(ConceptSaturationAxiom* ax);
 
 // int add_predecessor(Concept* c, Concept* ex);
 // add r-predecessor p to c
