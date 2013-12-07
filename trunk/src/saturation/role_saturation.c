@@ -89,25 +89,35 @@ void saturate_roles(TBox* tbox) {
 	}
 
 	// TODO:
-	// now new role composition hierarchies using the computed role hierarchies.
-	// this is for optimizing the role composition rule in concept saturation
+	// Compute the role composition hierarchies.
+	// This is for optimizing the role composition rule in concept saturation
+	// We first make a temporary copy of the  role compositions
+	int original_binary_composition_count = tbox->unique_binary_role_composition_count;
+	Role** tmp = (Role**) malloc(original_binary_composition_count * sizeof(Role*));
+	assert(tmp != NULL);
+	int j = 0;
 	role_index[0] = '\0';
 	JSLF(key, tbox->role_compositions, role_index);
+	while (key != NULL) {
+		tmp[j] =  ((Role*) *key);
+		JSLN(key, tbox->role_compositions, role_index);
+	}
+
 	Word_t subsumee_index1, subsumee_index2;
 	int subsumees1_nonempty, subsumees2_nonempty;
 	Role* composition;
-	while (key != NULL) {
+	for (j = 0; j < original_binary_composition_count; ++j) {
 		subsumee_index1 = 0;
-		J1F(subsumees1_nonempty, ((Role*) *key)->description.role_composition->role1->subsumees, subsumee_index1);
+		J1F(subsumees1_nonempty, tmp[j]->description.role_composition->role1->subsumees, subsumee_index1);
 		while (subsumees1_nonempty) {
 			subsumee_index2 = 0;
-			J1F(subsumees2_nonempty, ((Role*) *key)->description.role_composition->role2->subsumees, subsumee_index2);
+			J1F(subsumees2_nonempty, tmp[j]->description.role_composition->role2->subsumees, subsumee_index2);
 			while (subsumees2_nonempty) {
 				composition = get_create_role_composition_binary(((Role*) subsumee_index1), ((Role*) subsumee_index2), tbox);
 				index_role(composition);
-				J1N(subsumees2_nonempty, ((Role*) *key)->description.role_composition->role2->subsumees, subsumee_index2);
+				J1N(subsumees2_nonempty, tmp[j]->description.role_composition->role2->subsumees, subsumee_index2);
 			}
-			J1N(subsumees1_nonempty, ((Role*) *key)->description.role_composition->role1->subsumees, subsumee_index1);
+			J1N(subsumees1_nonempty, tmp[j]->description.role_composition->role1->subsumees, subsumee_index1);
 		}
 		JSLN(key, tbox->role_compositions, role_index);
 	}
