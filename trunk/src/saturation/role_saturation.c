@@ -99,7 +99,7 @@ void saturate_roles(TBox* tbox) {
 	role_index[0] = '\0';
 	JSLF(key, tbox->role_compositions, role_index);
 	while (key != NULL) {
-		tmp[j] =  ((Role*) *key);
+		tmp[j++] =  (Role*) *key;
 		JSLN(key, tbox->role_compositions, role_index);
 	}
 
@@ -115,6 +115,10 @@ void saturate_roles(TBox* tbox) {
 			while (subsumees2_nonempty) {
 				composition = get_create_role_composition_binary(((Role*) subsumee_index1), ((Role*) subsumee_index2), tbox);
 				index_role(composition);
+				// now add the subsumers of tmp[j] as the subsumers of composition
+				int k;
+				for (k = 0; k < tmp[j]->subsumer_count; ++k)
+					add_to_role_subsumer_list(composition, tmp[j]->subsumer_list[k]);
 				J1N(subsumees2_nonempty, tmp[j]->description.role_composition->role2->subsumees, subsumee_index2);
 			}
 			J1N(subsumees1_nonempty, tmp[j]->description.role_composition->role1->subsumees, subsumee_index1);

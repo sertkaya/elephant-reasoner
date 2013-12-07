@@ -517,8 +517,9 @@ void saturate_concepts(TBox* tbox) {
 							// printf("predecessor: ");
 							// print_concept((Concept*) predecessor_p);
 							// printf("\n");
-							for (l = 0; l < ax->role->second_component_of_list[j]->subsumer_count; ++l)
-								push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ax->rhs, ax->role->second_component_of_list[j]->subsumer_list[l], LINK));
+							// for (l = 0; l < ax->role->second_component_of_list[j]->subsumer_count; ++l)
+								// push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ax->rhs, ax->role->second_component_of_list[j]->subsumer_list[l], LINK));
+							push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ax->rhs, ax->role->second_component_of_list[j], LINK));
 							J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
 						}
 					}
@@ -548,8 +549,9 @@ void saturate_concepts(TBox* tbox) {
 							// print_concept((Concept*) successor_p);
 							// printf("\n");
 
-							for (l = 0; l < ax->role->first_component_of_list[j]->subsumer_count; ++l)
-								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (Concept*) successor_p, ax->role->first_component_of_list[j]->subsumer_list[l], LINK));
+							// for (l = 0; l < ax->role->first_component_of_list[j]->subsumer_count; ++l)
+								// push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (Concept*) successor_p, ax->role->first_component_of_list[j]->subsumer_list[l], LINK));
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (Concept*) successor_p, ax->role->first_component_of_list[j], LINK));
 							J1N(successor_bitmap_nonempty, successor_bitmap, successor_p);
 						}
 					}
