@@ -88,7 +88,6 @@ void saturate_roles(TBox* tbox) {
 		ax = pop(&scheduled_axioms);
 	}
 
-	// TODO:
 	// Compute the role composition hierarchies.
 	// This is for optimizing the role composition rule in concept saturation
 	// We first make a temporary copy of the  role compositions
@@ -125,6 +124,8 @@ void saturate_roles(TBox* tbox) {
 		}
 		JSLN(key, tbox->role_compositions, role_index);
 	}
+	// now free tmp
+	free(tmp);
 
 }
 

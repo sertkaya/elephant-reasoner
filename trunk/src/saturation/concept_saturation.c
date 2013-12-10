@@ -83,6 +83,14 @@ void saturate_concepts(TBox* tbox) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++unique_subsumption_count;
 
+				/*
+				printf("SUBS:");
+				print_concept(ax->lhs);
+				printf("->");
+				print_concept(ax->rhs);
+				printf("\n");
+				*/
+
 				// conjunction introduction
 				// the first conjunct
 				int lhs_is_subsumed_by_other_conjunct;
@@ -139,6 +147,14 @@ void saturate_concepts(TBox* tbox) {
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++unique_subsumption_count;
+
+				/*
+				printf("SUBS:");
+				print_concept(ax->lhs);
+				printf("->");
+				print_concept(ax->rhs);
+				printf("\n");
+				*/
 
 				// conjunction introduction
 				// the first conjunct
@@ -209,7 +225,6 @@ void saturate_concepts(TBox* tbox) {
 			if (add_successor(ax->lhs, ax->role, ax->rhs)) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs);
 				++unique_link_count;
-
 
 				/*
 				printf("LINK:");
