@@ -83,13 +83,11 @@ void saturate_concepts(TBox* tbox) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++unique_subsumption_count;
 
-				/*
 				printf("SUBS:");
 				print_concept(ax->lhs);
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
-				*/
 
 				// conjunction introduction
 				// the first conjunct
@@ -148,13 +146,11 @@ void saturate_concepts(TBox* tbox) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++unique_subsumption_count;
 
-				/*
 				printf("SUBS:");
 				print_concept(ax->lhs);
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
-				*/
 
 				// conjunction introduction
 				// the first conjunct
@@ -226,7 +222,6 @@ void saturate_concepts(TBox* tbox) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs);
 				++unique_link_count;
 
-				/*
 				printf("LINK:");
 				print_concept(ax->lhs);
 				printf("->");
@@ -234,7 +229,6 @@ void saturate_concepts(TBox* tbox) {
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
-				*/
 
 				// existential introduction
 				for (i = 0; i < ax->rhs->subsumer_count; ++i)
