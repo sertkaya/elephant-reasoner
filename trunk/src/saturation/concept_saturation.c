@@ -21,7 +21,7 @@
 #include <assert.h>
 
 #include "../model/model.h"
-// #include "../model/utils.h"
+#include "../model/utils.h"
 // #include "../model/memory_utils.h"
 #include "../model/print_utils.h"
 #include "../model/limits.h"
@@ -83,28 +83,45 @@ void saturate_concepts(TBox* tbox) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++unique_subsumption_count;
 
+				/*
 				printf("SUBS:");
 				print_concept(ax->lhs);
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
+				*/
 
 				// conjunction introduction
-				// the first conjunct
-				int lhs_is_subsumed_by_other_conjunct;
-				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
-					// check if lhs is subsumed by the second conjunct as well
-					J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2);
-					if (lhs_is_subsumed_by_other_conjunct)
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-				}
+				if (ax->lhs->subsumer_count > (ax->rhs->first_conjunct_of_count + ax->rhs->second_conjunct_of_count)) {
+					// the first conjunct
+					int lhs_is_subsumed_by_other_conjunct;
+					for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
+						// check if lhs is subsumed by the second conjunct as well
+						J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2);
+						if (lhs_is_subsumed_by_other_conjunct)
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					}
 
-				// now the same for the second conjunct
-				for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
-					// check if lhs is also subsumed by the first conjunct
-					J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
-					if (lhs_is_subsumed_by_other_conjunct)
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					// now the same for the second conjunct
+					for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
+						// check if lhs is also subsumed by the first conjunct
+						J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
+						if (lhs_is_subsumed_by_other_conjunct)
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					}
+				}
+				else {
+					// conjunction introduction
+					// the alternative way
+					Concept* conjunction = NULL;
+					for (i = 0; i < ax->lhs->subsumer_count; i++) {
+						if (ax->lhs->subsumer_list[i]->id < ax->rhs->id)
+							conjunction = get_conjunction(ax->lhs->subsumer_list[i], ax->rhs, tbox);
+						else
+							conjunction = get_conjunction(ax->rhs, ax->lhs->subsumer_list[i], tbox);
+						if (conjunction != NULL && conjunction->description.conj->negative_occurrence)
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, conjunction, NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					}
 				}
 
 				// existential introduction
@@ -146,12 +163,15 @@ void saturate_concepts(TBox* tbox) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++unique_subsumption_count;
 
+				/*
 				printf("SUBS:");
 				print_concept(ax->lhs);
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
+				*/
 
+				/*
 				// conjunction introduction
 				// the first conjunct
 				int lhs_is_subsumed_by_other_conjunct;
@@ -168,6 +188,39 @@ void saturate_concepts(TBox* tbox) {
 					J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
 					if (lhs_is_subsumed_by_other_conjunct)
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+				}
+				*/
+				// conjunction introduction
+				if (ax->lhs->subsumer_count > (ax->rhs->first_conjunct_of_count + ax->rhs->second_conjunct_of_count)) {
+					// the first conjunct
+					int lhs_is_subsumed_by_other_conjunct;
+					for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
+						// check if lhs is subsumed by the second conjunct as well
+						J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2);
+						if (lhs_is_subsumed_by_other_conjunct)
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					}
+
+					// now the same for the second conjunct
+					for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
+						// check if lhs is also subsumed by the first conjunct
+						J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
+						if (lhs_is_subsumed_by_other_conjunct)
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					}
+				}
+				else {
+					// conjunction introduction
+					// the alternative way
+					Concept* conjunction = NULL;
+					for (i = 0; i < ax->lhs->subsumer_count; i++) {
+						if (ax->lhs->subsumer_list[i]->id < ax->rhs->id)
+							conjunction = get_conjunction(ax->lhs->subsumer_list[i], ax->rhs, tbox);
+						else
+							conjunction = get_conjunction(ax->rhs, ax->lhs->subsumer_list[i], tbox);
+						if (conjunction != NULL && conjunction->description.conj->negative_occurrence)
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, conjunction, NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					}
 				}
 
 				switch (ax->rhs->type) {
@@ -222,6 +275,7 @@ void saturate_concepts(TBox* tbox) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs);
 				++unique_link_count;
 
+				/*
 				printf("LINK:");
 				print_concept(ax->lhs);
 				printf("->");
@@ -229,6 +283,7 @@ void saturate_concepts(TBox* tbox) {
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
+				*/
 
 				// existential introduction
 				for (i = 0; i < ax->rhs->subsumer_count; ++i)

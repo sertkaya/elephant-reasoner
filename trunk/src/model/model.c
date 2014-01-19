@@ -151,16 +151,21 @@ Concept* get_create_conjunction_binary(Concept* c1, Concept* c2, TBox* tbox) {
 	c->type = CONJUNCTION;
 	c->description.conj = (Conjunction*) malloc(sizeof(Conjunction));
 	assert(c->description.conj != NULL);
-	// we do not assume the conjuncts to be ordered!
-	c->description.conj->conjunct1 = c1;
-	c->description.conj->conjunct2 = c2;
-	c->id = tbox->last_concept_id++;
+	c->description.conj->negative_occurrence = 0;
 
-	// c->occurs_on_lhs = 0;
+	// we order the conjuncts!
+	if (c1->id < c2->id) {
+		c->description.conj->conjunct1 = c1;
+		c->description.conj->conjunct2 = c2;
+	}
+	else {
+		c->description.conj->conjunct1 = c2;
+		c->description.conj->conjunct2 = c1;
+	}
+	c->id = tbox->last_concept_id++;
 
 	c->told_subsumers = NULL;
 	c->told_subsumer_count = 0;
-	// c->told_subsumers = (Pvoid_t) NULL;
 
 	c->subsumer_list = NULL;
 	c->subsumer_count = 0;

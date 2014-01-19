@@ -113,10 +113,11 @@ void put_exists_restriction(int r, int f, Concept* c, TBox* tbox) {
 	*pvalue = (Word_t) c;
 }
 
+// we assume c->id and d->id to be ordered!
+// the caller function is responsible for providing c and d s.t. c->id < d->id !
 Concept* get_conjunction(Concept* c, Concept* d, TBox* tbox) {
 	PWord_t conjunction_pp;
 
-	// BUILD_CONJUNCTION_ID(c, d);
 	BUILD_CONJUNCTION_ID(c->id, d->id);
 	JSLG(conjunction_pp, tbox->conjunctions, (unsigned char*) conjunctions_buffer);
 	if (conjunction_pp == NULL)
@@ -125,10 +126,10 @@ Concept* get_conjunction(Concept* c, Concept* d, TBox* tbox) {
 	return (Concept*) *conjunction_pp;
 }
 
+// the conjuncts of c are assumed to be ordered
 void put_conjunction(Concept* c, TBox* tbox) {
 	PWord_t conjunction_pp;
 
-	// BUILD_CONJUNCTION_ID(c->description.conj->conjunct1, c->description.conj->conjunct2);
 	BUILD_CONJUNCTION_ID(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id);
 	JSLI(conjunction_pp, tbox->conjunctions, (unsigned char*) conjunctions_buffer);
 	if (conjunction_pp == PJERR) {

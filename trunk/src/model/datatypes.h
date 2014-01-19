@@ -66,6 +66,7 @@ struct atomic_concept {
 struct conjunction {
 	Concept* conjunct1;
 	Concept* conjunct2;
+	char negative_occurrence;
 };
 
 
