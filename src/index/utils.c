@@ -18,6 +18,8 @@
 
 
 #include <assert.h>
+#include <stdlib.h>
+#include <Judy.h>
 
 #include "../model/datatypes.h"
 

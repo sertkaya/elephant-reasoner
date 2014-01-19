@@ -42,12 +42,10 @@ Concept* get_exists_restriction(int r, int f, TBox* tbox);
 // put the existential restriction with role r and filler f into hash
 void put_exists_restriction(int r, int f, Concept* c, TBox* tbox);
 
-// get the conjunction with the given conjuncts
-// Concept* get_conjunction(int size, Concept** conjuncts, TBox* tbox);
+// get the (binary) conjunction with the first conjunct c1 and second conjunct c2
 Concept* get_conjunction(Concept* c1, Concept* c2, TBox* tbox);
 
-// put the conjunction with the given conjunctions into the conjunctions hash
-// void put_conjunction(int size, Concept* c, TBox* tbox);
+// put the (binary) conjunction
 void put_conjunction(Concept* c, TBox* tbox);
 
 // get the role compoisiton with the given roles

@@ -39,6 +39,8 @@ void index_concept(Concept* c) {
 		index_concept(c->description.conj->conjunct2);
 		add_to_first_conjunct_of_list(c->description.conj->conjunct1, c);
 		add_to_second_conjunct_of_list(c->description.conj->conjunct2, c);
+		// mark it as negative occurrence
+		c->description.conj->negative_occurrence = 1;
 		break;
 	case EXISTENTIAL_RESTRICTION:
 		// add_to_filler_of_list(c->description.exists->filler, c);
