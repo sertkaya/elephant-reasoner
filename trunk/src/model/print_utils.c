@@ -22,6 +22,7 @@
 #include "datatypes.h"
 #include "model.h"
 #include "limits.h"
+#include "../hashing/key_hash_table.h"
 
 
 void print_atomic_concept(AtomicConcept* ac);
@@ -155,28 +156,18 @@ void print_direct_subsumers(TBox* tbox, Concept* c, FILE* taxonomy_fp) {
 	for (i = 0; i < c->description.atomic->direct_subsumer_count; ++i)
 		fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", c->description.atomic->name,
 				c->description.atomic->direct_subsumer_list[i]->description.atomic->name);
-/*
-	index = 0;
-	J1F(direct_subsumers_list_nonempty, c->direct_subsumers, index);
-	while (direct_subsumers_list_nonempty) {
-		fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", c->description.atomic->name,
-				((Concept*) index)->description.atomic->name);
-		J1N(direct_subsumers_list_nonempty, c->direct_subsumers, index);
-	}
-	*/
 }
 
 void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 	// for keeping track of already printed equivalence classes
-	Pvoid_t printed = (Pvoid_t) NULL;
-	int added_to_printed;
+	// Pvoid_t printed = (Pvoid_t) NULL;
+	KeyHashTable* printed = create_key_hash_table(10);
 
 	int i;
 	for (i = 0; i < tbox->atomic_concept_count; ++i) {
 		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
 		// check if the equivalence class is already printed
-		J1T(added_to_printed, printed, (Word_t) tbox->atomic_concept_list[i]);
-		if (!added_to_printed) {
+		if (!contains_key(printed, tbox->atomic_concept_list[i]->id)) {
 			print_direct_subsumers(tbox, tbox->atomic_concept_list[i], taxonomy_fp);
 
 			char printing_equivalents = 0;
@@ -187,7 +178,7 @@ void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 			int j;
 			for (j = 0; j < tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count; ++j ) {
 				// mark the concepts in the equivalent classes as already printed
-				J1S(added_to_printed, printed, (Word_t) tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]);
+				insert_key(printed, tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->id);
 				// now print it
 				fprintf(taxonomy_fp, " %s", tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->description.atomic->name);
 			}
@@ -195,6 +186,7 @@ void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 				fprintf(taxonomy_fp, ")\n");
 		}
 	}
+	free_key_hash_table(printed);
 }
 
 void print_short_stats(TBox* tbox) {
