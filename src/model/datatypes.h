@@ -179,8 +179,7 @@ struct role {
 	Role** subsumer_list;
 	int subsumer_count;
 
-	// accessed via J1* operations
-	Pvoid_t subsumers;
+	KeyHashTable* subsumers;
 
 	// only necessary for optimizing the processing of role compositions
 	// for that we need to access the subsumees

@@ -262,7 +262,7 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
-	r->subsumers = (Pvoid_t) NULL;
+	r->subsumers = create_key_hash_table(DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
 
 	r->subsumees = (Pvoid_t) NULL;
 
@@ -310,7 +310,7 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
-	r->subsumers = (Pvoid_t) NULL;
+	r->subsumers = create_key_hash_table(DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
 
 	r->subsumees = (Pvoid_t) NULL;
 
