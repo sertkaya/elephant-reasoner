@@ -22,9 +22,11 @@
 #include <assert.h>
 #include <string.h>
 
+#include "../hashing/key_hash_table.h"
 #include "datatypes.h"
 #include "model.h"
 #include "utils.h"
+#include "limits.h"
 
 /******************************************************************************
  * get/create functions for concepts
@@ -34,11 +36,11 @@ Concept* get_create_atomic_concept(char* name, TBox* tbox) {
 	Concept* c;
 	Concept** tmp;
 
-	// check if the atomic concept already exists
+	// check if the atomic concept with this name already exists
 	if ((c = get_atomic_concept((unsigned char*) name, tbox)) != NULL)
 		return c;
 
-	// if it does not already exist, create it
+	// if an atomic concept with the name does not already exist, create it
 	c = (Concept*) malloc(sizeof(Concept));
 	assert(c != NULL);
 
@@ -48,33 +50,42 @@ Concept* get_create_atomic_concept(char* name, TBox* tbox) {
 	c->description.atomic->name = (char*) malloc((strlen(name) + 1) * sizeof(char));
 	assert(c->description.atomic->name != NULL);
 
-	c->type = ATOMIC_CONCEPT;
 	strcpy(c->description.atomic->name, name);
-	c->id = tbox->last_concept_id++;
 
-	// c->occurs_on_lhs = 0;
+	c->description.atomic->direct_subsumers = create_key_hash_table(DEFAULT_DIRECT_SUBSUMERS_HASH_SIZE);
+	c->description.atomic->direct_subsumer_list = NULL;
+	c->description.atomic->direct_subsumer_count = 0;
+
+	c->description.atomic->equivalent_concepts = (Pvoid_t) NULL;
+
+	c->type = ATOMIC_CONCEPT;
+	c->id = tbox->last_concept_id++;
 
 	c->told_subsumers = NULL;
 	c->told_subsumer_count = 0;
-	// c->told_subsumers = (Pvoid_t) NULL;
 
 	c->subsumer_list = NULL;
 	c->subsumer_count = 0;
-	c->subsumers = (Pvoid_t) NULL;
+	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
 
-	c->direct_subsumers = (Pvoid_t) NULL;
-	c->equivalent_concepts = (Pvoid_t) NULL;
-	
-	c->filler_of_negative_exists = (Pvoid_t) NULL;
-	c->predecessors = (Pvoid_t) NULL;
-	c->successors = (Pvoid_t) NULL;
+	c->filler_of_negative_exists = NULL;
 
-	c->first_conjunct_of_list = NULL;
+	// initialize the 2-dim dynamic predecessors array
+	c->predecessors = NULL;
+	c->predecessor_r_count = 0;
+
+	c->successors = NULL;
+	c->successor_r_count = 0;
+
 	c->first_conjunct_of_count = 0;
-	c->second_conjunct_of_list = NULL;
+	// space will be allocated in indexing
+	c->first_conjunct_of_list = NULL;
+	c->first_conjunct_of = NULL;
+
 	c->second_conjunct_of_count = 0;
-	c->first_conjunct_of = (Pvoid_t) NULL;
-	c->second_conjunct_of = (Pvoid_t) NULL;
+	// space will be allocated in indexing
+	c->second_conjunct_of_list = NULL;
+	c->second_conjunct_of = NULL;
 
 	put_atomic_concept((unsigned char*) c->description.atomic->name, c, tbox);
 	tbox->atomic_concept_count++;
@@ -108,29 +119,31 @@ Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox) {
 	c->description.exists->filler = f;
 	c->id = tbox->last_concept_id++;
 
-	// c->occurs_on_lhs = 0;
-
 	c->told_subsumers = NULL;
 	c->told_subsumer_count = 0;
-	// c->told_subsumers = (Pvoid_t) NULL;
 
 	c->subsumer_list = NULL;
 	c->subsumer_count = 0;
-	c->subsumers = (Pvoid_t) NULL;
+	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
 
-	c->direct_subsumers = (Pvoid_t) NULL;
-	c->equivalent_concepts = (Pvoid_t) NULL;
+	c->filler_of_negative_exists = NULL;
 
-	c->filler_of_negative_exists = (Pvoid_t) NULL;
-	c->predecessors = (Pvoid_t) NULL;
-	c->successors = (Pvoid_t) NULL;
+	// initialize the 2-dim dynamic predecessors array
+	c->predecessors = NULL;
+	c->predecessor_r_count = 0;
 
-	c->first_conjunct_of_list = NULL;
+	c->successors = NULL;
+	c->successor_r_count = 0;
+
 	c->first_conjunct_of_count = 0;
-	c->second_conjunct_of_list = NULL;
+	// space will be allocated in indexing
+	c->first_conjunct_of_list = NULL;
+	c->first_conjunct_of = NULL;
+
 	c->second_conjunct_of_count = 0;
-	c->first_conjunct_of = (Pvoid_t) NULL;
-	c->second_conjunct_of = (Pvoid_t) NULL;
+	// space will be allocated in indexing
+	c->second_conjunct_of_list = NULL;
+	c->second_conjunct_of = NULL;
 
 	put_exists_restriction(r->id,f->id,c, tbox);
 	tbox->unique_exists_restriction_count++;
@@ -169,21 +182,26 @@ Concept* get_create_conjunction_binary(Concept* c1, Concept* c2, TBox* tbox) {
 
 	c->subsumer_list = NULL;
 	c->subsumer_count = 0;
-	c->subsumers = (Pvoid_t) NULL;
+	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
 
-	c->direct_subsumers = (Pvoid_t) NULL;
-	c->equivalent_concepts = (Pvoid_t) NULL;
+	c->filler_of_negative_exists = NULL;
 
-	c->filler_of_negative_exists = (Pvoid_t) NULL;
-	c->predecessors = (Pvoid_t) NULL;
-	c->successors = (Pvoid_t) NULL;
+	// initialize the 2-dim dynamic predecessors array
+	c->predecessors = NULL;
+	c->predecessor_r_count = 0;
 
-	c->first_conjunct_of_list = NULL;
+	c->successors = NULL;
+	c->successor_r_count = 0;
+
 	c->first_conjunct_of_count = 0;
-	c->second_conjunct_of_list = NULL;
+	// space will be allocated in indexing
+	c->first_conjunct_of_list = NULL;
+	c->first_conjunct_of = NULL;
+
 	c->second_conjunct_of_count = 0;
-	c->first_conjunct_of = (Pvoid_t) NULL;
-	c->second_conjunct_of = (Pvoid_t) NULL;
+	// space will be allocated in indexing
+	c->second_conjunct_of_list = NULL;
+	c->second_conjunct_of = NULL;
 
 	put_conjunction(c, tbox);
 	tbox->unique_binary_conjunction_count++;
@@ -258,6 +276,11 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	put_atomic_role((unsigned char*) name, r, tbox);
 	tbox->atomic_role_count++;
 
+	Role **tmp = realloc(tbox->role_list, (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(Role*));
+	assert(tmp != NULL);
+	tbox->role_list = tmp;
+	tbox->role_list[tbox->atomic_role_count + tbox->unique_binary_role_composition_count - 1] = r;
+
 	return r;
 }
 
@@ -300,6 +323,12 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 
 	put_role_composition(r, tbox);
 	tbox->unique_binary_role_composition_count++;
+
+	Role **tmp = realloc(tbox->role_list, (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(Role*));
+	assert(tmp != NULL);
+	tbox->role_list = tmp;
+	tbox->role_list[tbox->atomic_role_count + tbox->unique_binary_role_composition_count - 1] = r;
+
 	return r;
 }
 

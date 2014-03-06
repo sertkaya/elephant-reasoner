@@ -27,10 +27,11 @@
 #include "../model/limits.h"
 #include "../utils/stack.h"
 #include "../index/utils.h"
+#include "../hashing/key_hash_table.h"
 #include "utils.h"
 
 // marks the axiom with the premise lhs and conclusion rhs as processed
-#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		add_to_concept_subsumer_list(ax->lhs, ax->rhs)
+#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		insert_key(ax->lhs->subsumers, ax->rhs->id)
 
 ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, Role* role, enum saturation_axiom_type type) {
 	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
@@ -52,7 +53,7 @@ void saturate_concepts(TBox* tbox) {
 	init_stack(&scheduled_axioms);
 
 	// push the input axioms to the stack
-	int i, j;
+	int i, j, k;
 	/*
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
 		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i], NULL, SUBSUMPTION_INITIALIZATION));
@@ -75,6 +76,7 @@ void saturate_concepts(TBox* tbox) {
 
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
+
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
@@ -89,66 +91,36 @@ void saturate_concepts(TBox* tbox) {
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
-				*/
+				 */
+
+				add_to_concept_subsumer_list(ax->lhs, ax->rhs);
 
 				// conjunction introduction
-				if (ax->lhs->subsumer_count > (ax->rhs->first_conjunct_of_count + ax->rhs->second_conjunct_of_count)) {
-					// the first conjunct
-					int lhs_is_subsumed_by_other_conjunct;
-					for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
-						// check if lhs is subsumed by the second conjunct as well
-						J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2);
-						if (lhs_is_subsumed_by_other_conjunct)
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-					}
-
-					// now the same for the second conjunct
-					for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
-						// check if lhs is also subsumed by the first conjunct
-						J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
-						if (lhs_is_subsumed_by_other_conjunct)
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-					}
+				// the first conjunct
+				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
+					// check if lhs is subsumed by the second conjunct as well
+					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2))
+						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
-				else {
-					// conjunction introduction
-					// the alternative way
-					Concept* conjunction = NULL;
-					for (i = 0; i < ax->lhs->subsumer_count; i++) {
-						if (ax->lhs->subsumer_list[i]->id < ax->rhs->id)
-							conjunction = get_conjunction(ax->lhs->subsumer_list[i], ax->rhs, tbox);
-						else
-							conjunction = get_conjunction(ax->rhs, ax->lhs->subsumer_list[i], tbox);
-						if (conjunction != NULL && conjunction->description.conj->negative_occurrence)
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, conjunction, NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-					}
+
+				// now the same for the second conjunct
+				for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
+					// check if lhs is also subsumed by the first conjunct
+					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1))
+						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
 				// existential introduction
-				PWord_t predecessor_bitmap_p;
-				Pvoid_t predecessor_bitmap;
-				Word_t role_p;
+				int j,k;
 				Concept* ex;
-				int predecessor_bitmap_nonempty;
-				Word_t predecessor_p;
-
-				role_p = 0;
-				JLF(predecessor_bitmap_p, ax->lhs->predecessors, role_p);
-				while (predecessor_bitmap_p != NULL) {
-					for (i = 0; i < ((Role*) role_p)->subsumer_count; ++i) {
-						ex = get_negative_exists(ax->rhs, ((Role*) role_p)->subsumer_list[i]);
-						if (ex != NULL) {
-							predecessor_p = 0;
-							predecessor_bitmap = (Pvoid_t) *predecessor_bitmap_p;
-							J1F(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
-							while (predecessor_bitmap_nonempty) {
-								push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
-								J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
-							}
-						}
+				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
+					for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_list[j]);
+						if (ex != NULL)
+							for (k = 0; k < ax->lhs->predecessors[i]->filler_count; ++k)
+								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
-					JLN(predecessor_bitmap_p, ax->lhs->predecessors, role_p);
-				}
+
 
 				// told subsumers
 				for (i = 0; i < ax->rhs->told_subsumer_count; i++)
@@ -163,64 +135,31 @@ void saturate_concepts(TBox* tbox) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++unique_subsumption_count;
 
+				add_to_concept_subsumer_list(ax->lhs, ax->rhs);
+
 				/*
 				printf("SUBS:");
 				print_concept(ax->lhs);
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
-				*/
+				 */
 
-				/*
+
 				// conjunction introduction
 				// the first conjunct
 				int lhs_is_subsumed_by_other_conjunct;
 				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
 					// check if lhs is subsumed by the second conjunct as well
-					J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2);
-					if (lhs_is_subsumed_by_other_conjunct)
+					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2))
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
 				// now the same for the second conjunct
 				for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
 					// check if lhs is also subsumed by the first conjunct
-					J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
-					if (lhs_is_subsumed_by_other_conjunct)
+					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1))
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-				}
-				*/
-				// conjunction introduction
-				if (ax->lhs->subsumer_count > (ax->rhs->first_conjunct_of_count + ax->rhs->second_conjunct_of_count)) {
-					// the first conjunct
-					int lhs_is_subsumed_by_other_conjunct;
-					for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
-						// check if lhs is subsumed by the second conjunct as well
-						J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2);
-						if (lhs_is_subsumed_by_other_conjunct)
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-					}
-
-					// now the same for the second conjunct
-					for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
-						// check if lhs is also subsumed by the first conjunct
-						J1T(lhs_is_subsumed_by_other_conjunct, ax->lhs->subsumers, (Word_t) ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1);
-						if (lhs_is_subsumed_by_other_conjunct)
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-					}
-				}
-				else {
-					// conjunction introduction
-					// the alternative way
-					Concept* conjunction = NULL;
-					for (i = 0; i < ax->lhs->subsumer_count; i++) {
-						if (ax->lhs->subsumer_list[i]->id < ax->rhs->id)
-							conjunction = get_conjunction(ax->lhs->subsumer_list[i], ax->rhs, tbox);
-						else
-							conjunction = get_conjunction(ax->rhs, ax->lhs->subsumer_list[i], tbox);
-						if (conjunction != NULL && conjunction->description.conj->negative_occurrence)
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, conjunction, NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-					}
 				}
 
 				switch (ax->rhs->type) {
@@ -239,30 +178,16 @@ void saturate_concepts(TBox* tbox) {
 				}
 
 				// existential introduction
-				PWord_t predecessor_bitmap_p;
-				Pvoid_t predecessor_bitmap;
-				Word_t role_p;
+				int j,k;
 				Concept* ex;
-				int predecessor_bitmap_nonempty;
-				Word_t predecessor_p;
-
-				role_p = 0;
-				JLF(predecessor_bitmap_p, ax->lhs->predecessors, role_p);
-				while (predecessor_bitmap_p != NULL) {
-					for (i = 0; i < ((Role*) role_p)->subsumer_count; ++i) {
-						ex = get_negative_exists(ax->rhs, ((Role*) role_p)->subsumer_list[i]);
-						if (ex != NULL) {
-							predecessor_p = 0;
-							predecessor_bitmap = (Pvoid_t) *predecessor_bitmap_p;
-							J1F(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
-							while (predecessor_bitmap_nonempty) {
-								push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
-								J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
-							}
-						}
+				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
+					for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_list[j]);
+						if (ex != NULL)
+							for (k = 0; k < ax->lhs->predecessors[i]->filler_count; ++k)
+								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
-					JLN(predecessor_bitmap_p, ax->lhs->predecessors, role_p);
-				}
+
 
 				// told subsumers
 				for (i = 0; i < ax->rhs->told_subsumer_count; i++)
@@ -271,8 +196,8 @@ void saturate_concepts(TBox* tbox) {
 			break;
 		case LINK:
 			++total_link_count;
-			if (add_successor(ax->lhs, ax->role, ax->rhs)) {
-				add_predecessor(ax->rhs, ax->role, ax->lhs);
+			if (add_successor(ax->lhs, ax->role, ax->rhs, tbox)) {
+				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
 				++unique_link_count;
 
 				/*
@@ -285,10 +210,11 @@ void saturate_concepts(TBox* tbox) {
 				printf("\n");
 				*/
 
+				int i, j, k;
 				// existential introduction
 				for (i = 0; i < ax->rhs->subsumer_count; ++i)
 					for (j = 0; j < ax->role->subsumer_count; ++j) {
-						Concept* ex = get_negative_exists(ax->rhs->subsumer_list[i], ax->role->subsumer_list[j]);
+						Concept* ex = GET_NEGATIVE_EXISTS(ax->rhs->subsumer_list[i], ax->role->subsumer_list[j]);
 						if (ex != NULL)
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
@@ -296,7 +222,7 @@ void saturate_concepts(TBox* tbox) {
 
 				// the role chain rule
 				// the role composition where this role appears as the second component
-				for (j = 0; j < ax->role->second_component_of_count; ++j) {
+				for (i = 0; i < ax->role->second_component_of_count; ++i) {
 
 					/*
 					 printf("role composition where this role appears as the second component: ");
@@ -304,37 +230,40 @@ void saturate_concepts(TBox* tbox) {
 					 printf("\n");
 					 */
 
-					PWord_t predecessor_bitmap_p;
-					JLG(predecessor_bitmap_p, ax->lhs->predecessors, (Word_t) ax->role->second_component_of_list[j]->description.role_composition->role1);
+					for (j = 0; j < ax->lhs->predecessor_r_count; ++j)
+						if (ax->lhs->predecessors[j]->role == ax->role->second_component_of_list[i]->description.role_composition->role1) {
+							for (k = 0; k < ax->lhs->predecessors[j]->filler_count; ++k) {
+								push(&scheduled_axioms,
+										create_concept_saturation_axiom(
+												ax->lhs->predecessors[j]->fillers[k],
+												ax->rhs,
+												ax->role->second_component_of_list[i], LINK));
 
-					// if ax->lhs has ax->role->...->role1 predecessor
-					if (predecessor_bitmap_p != NULL) {
-						int predecessor_bitmap_nonempty, k, l;
-						Word_t predecessor_p = 0;
-						Pvoid_t predecessor_bitmap = (Pvoid_t) *predecessor_bitmap_p;
-
-						J1F(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
-						while (predecessor_bitmap_nonempty) {
-							// printf("predecessor: ");
-							// print_concept((Concept*) predecessor_p);
-							// printf("\n");
-							// for (l = 0; l < ax->role->second_component_of_list[j]->subsumer_count; ++l)
-								// push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ax->rhs, ax->role->second_component_of_list[j]->subsumer_list[l], LINK));
-							push(&scheduled_axioms, create_concept_saturation_axiom((Concept*) predecessor_p, ax->rhs, ax->role->second_component_of_list[j], LINK));
-							J1N(predecessor_bitmap_nonempty, predecessor_bitmap, predecessor_p);
+							}
 						}
-					}
 				}
 
 
 				// now the same for the successors of the filler of the existential on the rhs
 				// the role composition where this role appears as the first component
-				for (j = 0; j < ax->role->first_component_of_count; ++j) {
+				for (i = 0; i < ax->role->first_component_of_count; ++i) {
 
 					// printf("role composition where this role appears as the first component: ");
 					// print_role(ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]);
 					// printf("\n");
 
+					for (j = 0; j < ax->rhs->successor_r_count; ++j)
+						if (ax->rhs->successors[j]->role == ax->role->first_component_of_list[i]->description.role_composition->role2) {
+							for (k = 0; k < ax->rhs->successors[j]->filler_count; ++k) {
+								push(&scheduled_axioms,
+										create_concept_saturation_axiom(
+												ax->lhs,
+												ax->rhs->successors[j]->fillers[k],
+												ax->role->first_component_of_list[i], LINK));
+
+							}
+						}
+					/*
 					PWord_t successor_bitmap_p;
 					JLG(successor_bitmap_p, ax->rhs->successors, (Word_t) ax->role->first_component_of_list[j]->description.role_composition->role2);
 
@@ -356,6 +285,7 @@ void saturate_concepts(TBox* tbox) {
 							J1N(successor_bitmap_nonempty, successor_bitmap, successor_p);
 						}
 					}
+					*/
 				}
 
 

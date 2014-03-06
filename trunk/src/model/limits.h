@@ -20,6 +20,8 @@
 #ifndef LIMITS_H_
 #define LIMITS_H_
 
+// configuration parameters
+
 // max number of conjuncts for a conjunction
 #define MAX_CONJUNCT_COUNT				1024
 
@@ -31,4 +33,11 @@
 
 #define MAX_CONCEPT_NAME_LENGTH			1024
 #define MAX_ROLE_NAME_LENGTH			1024
+
+// default size of hash tables
+#define DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE		10
+#define DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE	10
+#define DEFAULT_SUBSUMERS_HASH_SIZE				10
+#define DEFAULT_DIRECT_SUBSUMERS_HASH_SIZE		10
+
 #endif

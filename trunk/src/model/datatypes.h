@@ -21,12 +21,16 @@
 #define DATATYPES_H_
 
 #include <Judy.h>
+#include "../hashing/key_hash_table.h"
+#include "../hashing/key_value_hash_table.h"
 
 typedef struct atomic_concept AtomicConcept;
 typedef struct conjunction Conjunction;
 typedef struct existential_restriction Exists;
 typedef union concept_description ConceptDescription;
 typedef struct concept Concept;
+
+typedef struct link Link;
 
 typedef struct atomic_role AtomicRole;
 typedef struct role_composition RoleComposition;
@@ -59,6 +63,12 @@ enum concept_description_type {
 // atomic concept
 struct atomic_concept {
 	char* name;
+
+	// accessed via J1* operations
+	Pvoid_t equivalent_concepts;
+	KeyHashTable* direct_subsumers;
+	Concept** direct_subsumer_list;
+	int direct_subsumer_count;
 };
 
 
@@ -92,30 +102,26 @@ struct concept {
 	enum concept_description_type type;
 	ConceptDescription description;
 
-	// char occurs_on_lhs;
-
-	// Pvoid_t told_subsumers;
 	Concept** told_subsumers;
 	int told_subsumer_count;
 
 	Concept** subsumer_list;
 	int subsumer_count;
 
-	// accessed via J1* operations
-	Pvoid_t subsumers;
-	Pvoid_t equivalent_concepts;
-	Pvoid_t direct_subsumers;
+	KeyHashTable* subsumers;
 
-	// 2 dimensional Judy array
-	// key is Role*, value is pointer to J1 array
-	// indices of the J1 array are Concept*
-	Pvoid_t predecessors;
+	// 2-dimensional dynamic array for storing predecessors.
+	Link** predecessors;
+	// Number of roles, for which this concept has a predecessor (the size of predecessors array)
+	int predecessor_r_count;
+
 	// the same data structure to store the successors.
 	// needed for implementing the role composition rule in saturation
-	Pvoid_t successors;
+	Link** successors;
+	int successor_r_count;
 
-	// hash of negative existentials whose filler is this concept
-	Pvoid_t filler_of_negative_exists;
+	// list of negative existentials whose filler is this concept
+	Concept** filler_of_negative_exists;
 
 	// list of conjunctions where this concept is the first/second conjunct
 	Concept** first_conjunct_of_list;
@@ -124,11 +130,17 @@ struct concept {
 	int second_conjunct_of_count;
 
 	// same as above. the reason is performance in saturation.
-	Pvoid_t first_conjunct_of;
-	Pvoid_t second_conjunct_of;
+	KeyHashTable* first_conjunct_of;
+	KeyHashTable* second_conjunct_of;
 
 };
 
+// for keeping successors and predecessors of a  concept
+struct link {
+	Role* role;
+	Concept** fillers;
+	int filler_count;
+};
 ///////////////////////////////////////////////////////////////////////////////
 
 // role description types
@@ -262,6 +274,10 @@ struct tbox {
 
 	Pvoid_t atomic_roles;
 	int atomic_role_count;
+
+	// atomic roles and binary role compositions together
+	// int role_count;
+	Role** role_list;
 
 	Pvoid_t role_compositions;
 	int role_composition_count;

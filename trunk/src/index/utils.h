@@ -63,11 +63,14 @@ void add_to_second_conjunct_of_list(Concept* concept, Concept* conjunction);
 
 // add ex to the filler_of_negative_exists hash of the filler of ex.
 // key of the hash is ex->description.exists->role, the value is ex.
-void add_to_negative_exists(Concept* ex);
+void add_to_negative_exists(Concept* ex, TBox* tbox);
+// #define ADD_TO_NEGATIVE_EXISTS(ex)		insert_key_value(ex->description.exists->filler->filler_of_negative_exists, ex->description.exists->role->id, ex)
 
 // return the negative existential restriction whose role is r and filler is c
 // returns NULL is no such existential restriction is found
-Concept* get_negative_exists(Concept* c, Role* r);
+// Concept* get_negative_exists(Concept* c, Role* r);
+// #define GET_NEGATIVE_EXISTS(c, r)	((Concept*) get_value(c->filler_of_negative_exists, r->id))
+#define GET_NEGATIVE_EXISTS(c, r)	(c->filler_of_negative_exists == NULL ? NULL : c->filler_of_negative_exists[r->id])
 
 
 
