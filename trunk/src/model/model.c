@@ -56,7 +56,8 @@ Concept* get_create_atomic_concept(char* name, TBox* tbox) {
 	c->description.atomic->direct_subsumer_list = NULL;
 	c->description.atomic->direct_subsumer_count = 0;
 
-	c->description.atomic->equivalent_concepts = (Pvoid_t) NULL;
+	c->description.atomic->equivalent_concepts_list = NULL;
+	c->description.atomic->equivalent_concepts_count = 0;
 
 	c->type = ATOMIC_CONCEPT;
 	c->id = tbox->last_concept_id++;

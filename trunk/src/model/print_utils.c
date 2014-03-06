@@ -141,17 +141,12 @@ void print_tbox(TBox* tbox) {
 }
 
 void print_equivalent_concepts(Concept* c, FILE* taxonomy_fp) {
-	Word_t index ;
-	int equivalents_list_nonempty;
+	int i;
 
-	index = 0;
-	J1F(equivalents_list_nonempty, c->description.atomic->equivalent_concepts, index);
-	while (equivalents_list_nonempty) {
-		if (c != (Concept*) index) // to avoid EquivalentConcepts(c,c)
+	for (i = 0; i < c->description.atomic->equivalent_concepts_count; ++i)
+		if (c != c->description.atomic->equivalent_concepts_list[i]) // to avoid EquivalentConcepts(c,c)
 			fprintf(taxonomy_fp, "EquivalentConcepts(%s, %s)\n", c->description.atomic->name,
-					((Concept*) index)->description.atomic->name);
-		J1N(equivalents_list_nonempty, c->description.atomic->equivalent_concepts, index);
-	}
+					c->description.atomic->equivalent_concepts_list[i]);
 }
 
 void print_direct_subsumers(TBox* tbox, Concept* c, FILE* taxonomy_fp) {
@@ -172,44 +167,33 @@ void print_direct_subsumers(TBox* tbox, Concept* c, FILE* taxonomy_fp) {
 }
 
 void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
-	uint8_t atomic_concept_index[MAX_CONCEPT_NAME_LENGTH];
-	PWord_t pvalue;
 	// for keeping track of already printed equivalence classes
 	Pvoid_t printed = (Pvoid_t) NULL;
 	int added_to_printed;
-	Word_t equivalent_class_index;
-	int equivalents_list_nonempty;
 
-	// start with the smallest concept name
-	atomic_concept_index[0] = '\0';
-	JSLF(pvalue, tbox->atomic_concepts, atomic_concept_index);
-
-	while (pvalue != NULL) {
+	int i;
+	for (i = 0; i < tbox->atomic_concept_count; ++i) {
 		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
 		// check if the equivalence class is already printed
-		J1T(added_to_printed, printed, (Word_t) *pvalue);
+		J1T(added_to_printed, printed, (Word_t) tbox->atomic_concept_list[i]);
 		if (!added_to_printed) {
-			print_direct_subsumers(tbox, (Concept*) *pvalue, taxonomy_fp);
+			print_direct_subsumers(tbox, tbox->atomic_concept_list[i], taxonomy_fp);
 
-			equivalent_class_index = 0;
-			J1F(equivalents_list_nonempty, ((Concept*) *pvalue)->description.atomic->equivalent_concepts, equivalent_class_index);
 			char printing_equivalents = 0;
-			if (equivalents_list_nonempty) {
-				fprintf(taxonomy_fp, "EquivalentClasses(%s", ((Concept*) *pvalue)->description.atomic->name);
+			if (tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count > 0) {
+				fprintf(taxonomy_fp, "EquivalentClasses(%s", tbox->atomic_concept_list[i]->description.atomic->name);
 				printing_equivalents = 1;
 			}
-			while (equivalents_list_nonempty) {
+			int j;
+			for (j = 0; j < tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count; ++j ) {
 				// mark the concepts in the equivalent classes as already printed
-				J1S(added_to_printed, printed, (Word_t) equivalent_class_index);
+				J1S(added_to_printed, printed, (Word_t) tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]);
 				// now print it
-				// if (((Concept*) *pvalue) != (Concept*) equivalent_class_index) // to avoid EquivalentConcepts(c,c)
-				fprintf(taxonomy_fp, " %s", ((Concept*) equivalent_class_index)->description.atomic->name);
-				J1N(equivalents_list_nonempty, ((Concept*) *pvalue)->description.atomic->equivalent_concepts, equivalent_class_index);
+				fprintf(taxonomy_fp, " %s", tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->description.atomic->name);
 			}
 			if (printing_equivalents)
 				fprintf(taxonomy_fp, ")\n");
 		}
-		JSLN(pvalue, tbox->atomic_concepts, atomic_concept_index);
 	}
 }
 

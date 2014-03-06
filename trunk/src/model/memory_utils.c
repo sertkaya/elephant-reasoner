@@ -32,9 +32,9 @@ int free_concept(Concept* c, TBox* tbox) {
 	// free the 3 different description types
 	switch (c->type) {
 	case ATOMIC_CONCEPT:
-		// free the equivalent concepts hash
-		J1FA(freed_bytes, c->description.atomic->equivalent_concepts);
-		total_freed_bytes += freed_bytes;
+		// free the equivalent concepts list
+		total_freed_bytes += sizeof(Concept*) * c->description.atomic->equivalent_concepts_count;
+		free(c->description.atomic->equivalent_concepts_list);
 
 		// free the direct subsumers hash
 		freed_bytes = free_key_hash_table(c->description.atomic->direct_subsumers);

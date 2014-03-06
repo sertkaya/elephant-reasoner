@@ -17,49 +17,22 @@
  */
 
 
-#include <Judy.h>
 #include <assert.h>
 
 #include "../model/datatypes.h"
 
-// add c1 to the list of direct equivalent of c2
-void add_equivalent_concept(Concept* c1, Concept* c2) {
-	int ret_code;
+// add c1 to the list of equivalent concepts of c2
+int add_equivalent_concept(Concept* c1, Concept* c2) {
 
-	J1S(ret_code, c2->description.atomic->equivalent_concepts, (Word_t) c1);
-	if (ret_code == JERR) {
-		fprintf(stderr, "could not add to the list of equivalent concepts, aborting");
-		exit(EXIT_FAILURE);
-	}
+	Concept** tmp = realloc(c2->description.atomic->equivalent_concepts_list,
+			sizeof(Concept*) * (c2->description.atomic->equivalent_concepts_count + 1));
+	assert(tmp != NULL);
+	c2->description.atomic->equivalent_concepts_list = tmp;
+	c2->description.atomic->equivalent_concepts_list[c2->description.atomic->equivalent_concepts_count] = c1;
+	++c2->description.atomic->equivalent_concepts_count;
+
+	return 1;
 }
-
-// returns 1 if c1 is a subsumer of c2, otherwise 0
-/*
-int is_subsumer_of(Concept* c1, Concept* c2) {
-	int is_subsumer;
-
-	J1T(is_subsumer, c2->subsumers, (Word_t) c1);
-	return is_subsumer;
-}
-*/
-
-/*
-// returns 1 if c1 is a direct subsumer of c2, otherwise 0
-int is_direct_subsumer_of(Concept* c1, Concept* c2) {
-	int is_direct_subsumer;
-
-	J1T(is_direct_subsumer, c2->direct_subsumers, (Word_t) c1);
-	return is_direct_subsumer;
-}
-
-// returns 1 if c1 is in the list of equivalent concepts of c2
-int is_equivalent_concept_of(Concept* c1, Concept* c2) {
-	int is_equivalent;
-
-	J1T(is_equivalent, c2->equivalent_concepts, (Word_t) c1);
-	return is_equivalent;
-}
-*/
 
 // add c1 to the list of direct subsumers of c2
 int add_direct_subsumer(Concept* c1, Concept* c2) {

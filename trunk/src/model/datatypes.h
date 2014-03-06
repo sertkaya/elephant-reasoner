@@ -64,8 +64,8 @@ enum concept_description_type {
 struct atomic_concept {
 	char* name;
 
-	// accessed via J1* operations
-	Pvoid_t equivalent_concepts;
+	Concept** equivalent_concepts_list;
+	int equivalent_concepts_count;
 	KeyHashTable* direct_subsumers;
 	Concept** direct_subsumer_list;
 	int direct_subsumer_count;
@@ -230,20 +230,6 @@ struct eqrole_axiom {
 	Role* lhs;
 	Role* rhs;
 };
-
-// Obsolete.
-// inclusion axiom
-// union axiom_body {
-// 	SubClassAxiom* subclass_ax;
-// 	EqClassAxiom* eqclass_ax;
-// 	SubRoleAxiom* subrole_ax;
-// };
-
-// axiom
-// struct axiom {
-// 	enum axiom_type type;
-// 	union axiom_body body;
-// };
 
 // TBox
 struct tbox {
