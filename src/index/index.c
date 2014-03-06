@@ -27,7 +27,7 @@
 
 
 
-void index_concept(Concept* c) {
+void index_concept(Concept* c, TBox* tbox) {
 
 	// c->occurs_on_lhs = 1;
 
@@ -35,8 +35,8 @@ void index_concept(Concept* c) {
 	case ATOMIC_CONCEPT:
 		break;
 	case CONJUNCTION:
-		index_concept(c->description.conj->conjunct1);
-		index_concept(c->description.conj->conjunct2);
+		index_concept(c->description.conj->conjunct1, tbox);
+		index_concept(c->description.conj->conjunct2, tbox);
 		add_to_first_conjunct_of_list(c->description.conj->conjunct1, c);
 		add_to_second_conjunct_of_list(c->description.conj->conjunct2, c);
 		// mark it as negative occurrence
@@ -44,8 +44,8 @@ void index_concept(Concept* c) {
 		break;
 	case EXISTENTIAL_RESTRICTION:
 		// add_to_filler_of_list(c->description.exists->filler, c);
-		add_to_negative_exists(c);
-		index_concept(c->description.exists->filler);
+		add_to_negative_exists(c, tbox);
+		index_concept(c->description.exists->filler, tbox);
 		break;
 	default:
 		fprintf(stderr, "unknown concept type, aborting\n");
@@ -82,22 +82,22 @@ void index_tbox(TBox* tbox) {
 		// no need to add top as a told subsumer
 		if (tbox->subclass_axioms[i]->rhs == tbox->top_concept) {
 			// still index the lhs, but do not add top to the lhs of rhs
-			index_concept(tbox->subclass_axioms[i]->lhs);
+			index_concept(tbox->subclass_axioms[i]->lhs, tbox);
 			continue;
 		}
 		add_told_subsumer_concept(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
 		// add_to_subsumer_list(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
-		index_concept(tbox->subclass_axioms[i]->lhs);
+		index_concept(tbox->subclass_axioms[i]->lhs, tbox);
 	}
 
 	for (i = 0; i < tbox->eqclass_axiom_count; i++) {
 		add_told_subsumer_concept(tbox->eqclass_axioms[i]->lhs, tbox->eqclass_axioms[i]->rhs);
 		// add_to_subsumer_list(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
-		index_concept(tbox->eqclass_axioms[i]->lhs);
+		index_concept(tbox->eqclass_axioms[i]->lhs, tbox);
 
 		add_told_subsumer_concept(tbox->eqclass_axioms[i]->rhs, tbox->eqclass_axioms[i]->lhs);
 		// add_to_subsumer_list(tbox->subclass_axioms[i]->rhs, tbox->subclass_axioms[i]->lhs);
-		index_concept(tbox->eqclass_axioms[i]->rhs);
+		index_concept(tbox->eqclass_axioms[i]->rhs, tbox);
 	}
 
 	for (i = 0; i < tbox->subrole_axiom_count; ++i) {

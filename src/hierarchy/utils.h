@@ -24,7 +24,8 @@
 void add_equivalent_concept(Concept* c1, Concept* c2);
 
 // Add concept c1 to the list of direct subsumers of c2
-void add_direct_subsumer(Concept* c1, Concept* c2);
+int add_direct_subsumer(Concept* c1, Concept* c2);
+// #define ADD_DIRECT_SUBSUMER(c1,c2)			insert_key(c2->description.atomic->direct_subsumers, c1->id)
 
 // returns 1 if c1 is a direct subsumer of c2, otherwise 0
 int is_direct_subsumer_of(Concept* c1, Concept* c2);
@@ -33,5 +34,8 @@ int is_direct_subsumer_of(Concept* c1, Concept* c2);
 int is_subsumer_of(Concept* c1, Concept* c2);
 
 // remove c1 from the list of direct subsumers of c2
-void remove_direct_subsumer(Concept* c1, Concept* c2);
+int remove_direct_subsumer(Concept* c1, Concept* c2);
+// #define REMOVE_DIRECT_SUBSUMER(c1,c2)		remove_key(c2->description.atomic->direct_subsumers, c1->id)
+
+
 #endif /* _HIERARCHY_UTILS_H_ */

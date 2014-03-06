@@ -25,15 +25,28 @@
 
 
 
-int free_concept(Concept* c) {
+int free_concept(Concept* c, TBox* tbox) {
 	int total_freed_bytes = 0;
 	Word_t freed_bytes;
 
 	// free the 3 different description types
 	switch (c->type) {
 	case ATOMIC_CONCEPT:
+		// free the equivalent concepts hash
+		J1FA(freed_bytes, c->description.atomic->equivalent_concepts);
+		total_freed_bytes += freed_bytes;
+
+		// free the direct subsumers hash
+		freed_bytes = free_key_hash_table(c->description.atomic->direct_subsumers);
+		total_freed_bytes += freed_bytes;
+
+		// now the direct subsumers list
+		total_freed_bytes += sizeof(Concept*) * c->description.atomic->direct_subsumer_count;
+		free(c->description.atomic->direct_subsumer_list);
+
 		total_freed_bytes += sizeof(char) * strlen(c->description.atomic->name);
 		free(c->description.atomic->name);
+
 		total_freed_bytes += sizeof(AtomicConcept);
 		free(c->description.atomic);
 		break;
@@ -61,22 +74,15 @@ int free_concept(Concept* c) {
 	free(c->subsumer_list);
 
 	// free the subsumers hash
-	J1FA(freed_bytes, c->subsumers);
-	total_freed_bytes += freed_bytes;
-
-	// free the equivalent concepts hash
-	J1FA(freed_bytes, c->equivalent_concepts);
-	total_freed_bytes += freed_bytes;
-
-	// free the direct subsumers hash
-	J1FA(freed_bytes, c->direct_subsumers);
-	total_freed_bytes += freed_bytes;
+	// J1FA(freed_bytes, c->subsumers);
+	// total_freed_bytes += freed_bytes;
 
 	// free the predecessors hash. note that this is
 	// 2 dimensional
 	PWord_t key;
-	Word_t index = 0;
 	Pvoid_t bitmap;
+	Word_t index = 0;
+	/*
 	JLF(key, c->predecessors, index);
 	while (key != NULL) {
 		bitmap = (Pvoid_t) *key;
@@ -86,8 +92,27 @@ int free_concept(Concept* c) {
 	}
 	JLFA(freed_bytes, c->predecessors);
 	total_freed_bytes += freed_bytes;
+	*/
+	int i;
+	for (i = 0; i < c->predecessor_r_count; ++i) {
+		free(c->predecessors[i]->fillers);
+		total_freed_bytes += c->predecessors[i]->filler_count * sizeof(Concept*);
+		free(c->predecessors[i]);
+		total_freed_bytes += sizeof(Link);
+	}
+	free(c->predecessors);
+	total_freed_bytes += c->predecessor_r_count  * sizeof(Link*);
 
 	// similarly free the successors hash.
+	for (i = 0; i < c->successor_r_count; ++i) {
+		free(c->successors[i]->fillers);
+		total_freed_bytes += c->successors[i]->filler_count * sizeof(Concept*);
+		free(c->successors[i]);
+		total_freed_bytes += sizeof(Link);
+	}
+	free(c->successors);
+	total_freed_bytes += c->successor_r_count  * sizeof(Link*);
+	/*
 	key = NULL;
 	index = 0;
 	bitmap = (Pvoid_t) NULL;
@@ -100,22 +125,31 @@ int free_concept(Concept* c) {
 	}
 	JLFA(freed_bytes, c->successors);
 	total_freed_bytes += freed_bytes;
+	*/
 
 	// free the filler of negative existentials hash
-	JLFA(freed_bytes, c->filler_of_negative_exists);
-	total_freed_bytes += freed_bytes;
+	// JLFA(freed_bytes, c->filler_of_negative_exists);
+	// total_freed_bytes += freed_bytes;
+	free(c->filler_of_negative_exists);
+	total_freed_bytes += (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(Concept*);
 
 	// free the list of conjunctions where this concept occurs
-	total_freed_bytes += sizeof(Concept*) * c->first_conjunct_of_count;
 	free(c->first_conjunct_of_list);
-	J1FA(freed_bytes, c->first_conjunct_of);
-	total_freed_bytes += freed_bytes;
+	total_freed_bytes += sizeof(Concept*) * c->first_conjunct_of_count;
+	// free it if the first_conjunct_of hash exists
+	if (c->first_conjunct_of != NULL) {
+		freed_bytes = free_key_hash_table(c->first_conjunct_of);
+		total_freed_bytes += freed_bytes;
+	}
 
 	// now for the second conjunct
-	total_freed_bytes += sizeof(Concept*) * c->second_conjunct_of_count;
 	free(c->second_conjunct_of_list);
-	J1FA(freed_bytes, c->second_conjunct_of);
-	total_freed_bytes += freed_bytes;
+	total_freed_bytes += sizeof(Concept*) * c->second_conjunct_of_count;
+	// free it if the second_conjunct_of hash exists
+	if (c->second_conjunct_of != NULL) {
+		freed_bytes = free_key_hash_table(c->second_conjunct_of);
+		total_freed_bytes += freed_bytes;
+	}
 
 	// finally free this concept
 	total_freed_bytes += sizeof(Concept);
@@ -222,7 +256,7 @@ int free_tbox(TBox* tbox) {
 	strcpy((char*) index, "");
 	JSLF(key, tbox->exists_restrictions, index);
 	while (key != NULL) {
-		total_freed_bytes += free_concept((Concept*) *key);
+		total_freed_bytes += free_concept((Concept*) *key, tbox);
 		JSLN(key, tbox->exists_restrictions, index);
 	}
 	JSLFA(freed_bytes, tbox->exists_restrictions);
@@ -232,7 +266,7 @@ int free_tbox(TBox* tbox) {
 	strcpy((char*) index, "");
 	JSLF(key, tbox->conjunctions, index);
 	while (key != NULL) {
-		total_freed_bytes += free_concept((Concept*) *key);
+		total_freed_bytes += free_concept((Concept*) *key, tbox);
 		JSLN(key, tbox->conjunctions, index);
 	}
 	JSLFA(freed_bytes, tbox->conjunctions);
@@ -251,14 +285,17 @@ int free_tbox(TBox* tbox) {
 	strcpy((char*) index, "");
 	JSLF(key, tbox->atomic_concepts, index);
 	while (key != NULL) {
-		total_freed_bytes += free_concept((Concept*) *key);
+		total_freed_bytes += free_concept((Concept*) *key, tbox);
 		JSLN(key, tbox->atomic_concepts, index);
 	}
 	JSLFA(freed_bytes, tbox->atomic_concepts);
 	total_freed_bytes += freed_bytes;
 
+	// free the atomic roles list
+	total_freed_bytes += sizeof(Role*) * (tbox->atomic_role_count + tbox->unique_binary_role_composition_count);
+	free(tbox->role_list);
 
-	// free the atomic roles
+	// free the atomic roles hash
 	strcpy((char*) index, "");
 	JSLF(key, tbox->atomic_roles, index);
 	while (key != NULL) {

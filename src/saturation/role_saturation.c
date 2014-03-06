@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <Judy.h>
 
+#include "../model/datatypes.h"
 #include "../model/model.h"
 #include "../model/limits.h"
 #include "../model/print_utils.h"
@@ -60,6 +61,7 @@ void saturate_roles(TBox* tbox) {
     uint8_t role_index[MAX_ROLE_NAME_LENGTH];
 
     // first the atomic roles
+    /*
 	// start with the smallest role name
 	role_index[0] = '\0';
     JSLF(key, tbox->atomic_roles, role_index);
@@ -67,6 +69,12 @@ void saturate_roles(TBox* tbox) {
             push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
             JSLN(key, tbox->atomic_roles, role_index);
     }
+    */
+    int i;
+    for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
+            push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
+
+    /*
     // now the role compositions
 	role_index[0] = '\0';
     JSLF(key, tbox->role_compositions, role_index);
@@ -74,9 +82,9 @@ void saturate_roles(TBox* tbox) {
     		push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
             JSLN(key, tbox->role_compositions, role_index);
     }
+    */
 
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
-    int i;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {

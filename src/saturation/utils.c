@@ -21,6 +21,7 @@
 #include <Judy.h>
 
 #include "../model/datatypes.h"
+#include "utils.h"
 
 // For marking an axiom as processed, we add the rhs to the subsumers
 // of the lhs. The function returns 1 if it is added, 0 if the rhs was
@@ -36,8 +37,19 @@ int mark_concept_saturation_axiom_processed(ConceptSaturationAxiom* ax) {
 }
 */
 
+/*
+int is_subsumed_by(Concept* c1, Concept* c2) {
+	int is_subsumer;
+
+	J1T(is_subsumer, processed_axioms, HASH(c1->id, c2->id));
+	// J1T(is_subsumer, processed_axioms, hash_it(c1->id, c2->id));
+	return is_subsumer;
+}
+*/
+
 // add p to the predecessors hash of c
 // the key of the predecessors hash is r
+/*
 int add_predecessor(Concept* c, Role* r, Concept* p) {
 	PPvoid_t predecessors_bitmap_p;
 	int inserted_predecessor = 0;
@@ -61,9 +73,68 @@ int add_predecessor(Concept* c, Role* r, Concept* p) {
 
 	return inserted_predecessor;
 }
+*/
+
+int add_predecessor(Concept* c, Role* r, Concept* p, TBox* tbox) {
+
+	// first check if we already have a link for role r
+	int i, j;
+	void* tmp;
+	for (i = 0; i < c->predecessor_r_count; ++i)
+		if (c->predecessors[i]->role == r) {
+			// yes, we have a link for role r, now check if we already have p in its fillers list
+			for (j = 0; j < c->predecessors[i]->filler_count; ++j)
+				if (c->predecessors[i]->fillers[j] == p)
+					return 0;
+			// no we do not have p in this list, add it
+			tmp = realloc(c->predecessors[i]->fillers, (c->predecessors[i]->filler_count + 1) * sizeof(Concept*));
+			assert(tmp != NULL);
+			c->predecessors[i]->fillers = (Concept**) tmp;
+			c->predecessors[i]->fillers[c->predecessors[i]->filler_count] = p;
+			++c->predecessors[i]->filler_count;
+			return 1;
+		}
+	// no, we do not already have a link for role r, create it, add p to its filler list
+	// 1) extend the list for links
+	tmp = realloc(c->predecessors, (c->predecessor_r_count + 1) * sizeof(Link*));
+	assert(tmp != NULL);
+	c->predecessors = (Link**) tmp;
+	// 2) create the the r-predecessors list of c
+	c->predecessors[c->predecessor_r_count] = calloc(1, sizeof(Link));
+	assert(c->predecessors[c->predecessor_r_count] != NULL);
+	// 3) fill the fields of the new link
+	c->predecessors[c->predecessor_r_count]->role = r;
+	c->predecessors[c->predecessor_r_count]->fillers = calloc(1, sizeof(Concept*));
+	assert(c->predecessors[c->predecessor_r_count]->fillers != NULL);
+	c->predecessors[c->predecessor_r_count]->fillers[0] = p;
+	c->predecessors[c->predecessor_r_count]->filler_count = 1;
+
+	// finally increment the r_count
+	++c->predecessor_r_count;
+
+	return 1;
+	/*
+	// first check if r-predecessor of c has already been added
+	for (i = 0; i < c->predecessor_counts[r->id]; ++i)
+		if (c->predecessors[r->id][i] == p)
+			return 0;
+
+	// now add it
+	Concept **tmp = realloc(c->predecessors[r->id], (c->predecessor_counts[r->id] + 1) * sizeof(Concept*));
+	assert(tmp != NULL);
+	c->predecessors[r->id] = tmp;
+	c->predecessors[r->id][c->predecessor_counts[r->id]] = p;
+	// increment the count
+	++c->predecessor_counts[r->id];
+
+	return 1;
+	*/
+}
+
 
 // add s to the successors hash of c.
 // the key of the successors hash of c is r
+/*
 int add_successor(Concept* c, Role* r, Concept* s) {
 	PPvoid_t successors_bitmap_p;
 	int inserted_successor = 0;
@@ -87,5 +158,44 @@ int add_successor(Concept* c, Role* r, Concept* s) {
 
 	return inserted_successor;
 }
+*/
 
+int add_successor(Concept* c, Role* r, Concept* p, TBox* tbox) {
 
+	// first check if we already have a link for role r
+	int i, j;
+	void* tmp;
+	for (i = 0; i < c->successor_r_count; ++i)
+		if (c->successors[i]->role == r) {
+			// yes, we have a link for role r, now check if we already have p in its fillers list
+			for (j = 0; j < c->successors[i]->filler_count; ++j)
+				if (c->successors[i]->fillers[j] == p)
+					return 0;
+			// no we do not have p in this list, add it
+			tmp = realloc(c->successors[i]->fillers, (c->successors[i]->filler_count + 1) * sizeof(Concept*));
+			assert(tmp != NULL);
+			c->successors[i]->fillers = (Concept**) tmp;
+			c->successors[i]->fillers[c->successors[i]->filler_count] = p;
+			++c->successors[i]->filler_count;
+			return 1;
+		}
+	// no, we do not already have a link for role r, create it, add p to its filler list
+	// 1) extend the list for links
+	tmp = realloc(c->successors, (c->successor_r_count + 1) * sizeof(Link*));
+	assert(tmp != NULL);
+	c->successors = (Link**) tmp;
+	// 2) create the the r-successors list of c
+	c->successors[c->successor_r_count] = calloc(1, sizeof(Link));
+	assert(c->successors[c->successor_r_count] != NULL);
+	// 3) fill the fields of the new link
+	c->successors[c->successor_r_count]->role = r;
+	c->successors[c->successor_r_count]->fillers = calloc(1, sizeof(Concept*));
+	assert(c->successors[c->successor_r_count]->fillers != NULL);
+	c->successors[c->successor_r_count]->fillers[0] = p;
+	c->successors[c->successor_r_count]->filler_count = 1;
+
+	// finally increment the r_count
+	++c->successor_r_count;
+
+	return 1;
+}

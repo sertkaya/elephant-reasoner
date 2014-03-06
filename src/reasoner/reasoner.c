@@ -52,6 +52,8 @@ TBox* init_reasoner() {
 	tbox->atomic_role_count = 0;
 	tbox->atomic_roles = (Pvoid_t) NULL;
 
+	tbox->role_list = NULL;
+
 	tbox->exists_restriction_count = 0;
 	tbox->unique_exists_restriction_count = 0;
 	tbox->exists_restrictions = (Pvoid_t) NULL;
