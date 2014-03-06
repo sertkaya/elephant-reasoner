@@ -97,27 +97,23 @@ void add_told_subsumer_role(Role* r, Role* s) {
 
 // add role s to the subsumer list of concept r
 // returns 1 if added, 0 otherwise
-// note that it maintains both the array and the judy array
+// note that it maintains both the array and the hash table
 // of subsumers. the reason for keeping the subsumers twice
 // is performance in saturation
 int add_to_role_subsumer_list(Role* r, Role* s) {
-	int added_to_subsumer_list;
 	Role** tmp;
 
-	J1S(added_to_subsumer_list, r->subsumers, (Word_t) s);
-	if (added_to_subsumer_list == JERR) {
-		fprintf(stderr, "could not add to subsumer list, aborting\n");
-		exit(EXIT_FAILURE);
-	}
-	if (added_to_subsumer_list) {
+	if (insert_key(r->subsumers, s->id)) {
 		tmp = realloc(r->subsumer_list, (r->subsumer_count + 1) * sizeof(Role*));
 		assert(tmp != NULL);
 		r->subsumer_list = tmp;
 		r->subsumer_list[r->subsumer_count] = s;
 		r->subsumer_count++;
+
+		return 1;
 	}
 
-	return added_to_subsumer_list;
+	return 0;
 }
 
 int add_to_role_subsumees(Role*r, Role* s) {

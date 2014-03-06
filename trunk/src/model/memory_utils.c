@@ -186,7 +186,7 @@ int free_role(Role* r) {
 	free(r->subsumer_list);
 
 	// free the subsumers hash
-	J1FA(freed_bytes, r->subsumers);
+	freed_bytes = free_key_hash_table(r->subsumers);
 	total_freed_bytes += freed_bytes;
 
 	// free the subsumees hash
