@@ -21,7 +21,7 @@
 #define _HIERARCHY_UTILS_H_
 
 // Add concept c1 to the list of equivalent concepts of c2
-void add_equivalent_concept(Concept* c1, Concept* c2);
+int add_equivalent_concept(Concept* c1, Concept* c2);
 
 // Add concept c1 to the list of direct subsumers of c2
 int add_direct_subsumer(Concept* c1, Concept* c2);
