@@ -176,14 +176,15 @@ struct role {
 	Role** told_subsumers;
 	int told_subsumer_count;
 
+	KeyHashTable* subsumers;
 	Role** subsumer_list;
 	int subsumer_count;
 
-	KeyHashTable* subsumers;
-
 	// only necessary for optimizing the processing of role compositions
 	// for that we need to access the subsumees
-	Pvoid_t subsumees;
+	KeyHashTable* subsumees;
+	Role** subsumee_list;
+	int subsumee_count;
 
 	// list of role compositions where this role is the first/second component
 	Role** first_component_of_list;
