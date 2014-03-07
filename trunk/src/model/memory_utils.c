@@ -200,13 +200,15 @@ int free_role(Role* r) {
 	// free the list of role compositions where this role occurs
 	total_freed_bytes += sizeof(Role*) * r->first_component_of_count;
 	free(r->first_component_of_list);
-	J1FA(freed_bytes, r->first_component_of);
+
+	freed_bytes = free_key_hash_table(r->first_component_of);
 	total_freed_bytes += freed_bytes;
 
 	// now for the second component
 	total_freed_bytes += sizeof(Role*) * r->second_component_of_count;
 	free(r->second_component_of_list);
-	J1FA(freed_bytes, r->second_component_of);
+
+	freed_bytes = free_key_hash_table(r->second_component_of);
 	total_freed_bytes += freed_bytes;
 
 	// finally free this role

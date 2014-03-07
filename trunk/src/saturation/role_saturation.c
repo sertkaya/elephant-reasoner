@@ -111,7 +111,7 @@ void saturate_roles(TBox* tbox) {
 	}
 
 	int role1_subsumee_count, role2_subsumee_count;
-	for (i = 0; i < original_binary_composition_count; ++i) {
+	for (i = 0; i < original_binary_composition_count; ++i)
 		for (j = 0; j < tmp[i]->description.role_composition->role1->subsumee_count; ++j) {
 			int k;
 			for (k = 0; k < tmp[i]->description.role_composition->role2->subsumee_count; ++k) {
@@ -120,15 +120,14 @@ void saturate_roles(TBox* tbox) {
 						tmp[i]->description.role_composition->role2->subsumee_list[k],
 						tbox);
 				index_role(composition);
-				// now add the subsumers of tmp[j] as the subsumers of composition
+				// now add the subsumers of tmp[i] as the subsumers of composition
 				int l;
 				for (l = 0; l < tmp[i]->subsumer_count; ++l)
 					add_to_role_subsumer_list(composition, tmp[i]->subsumer_list[l]);
 			}
 		}
-	}
+
 	// now free tmp
 	free(tmp);
-
 }
 

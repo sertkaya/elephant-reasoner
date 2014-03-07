@@ -270,11 +270,11 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
-	r->first_component_of = (Pvoid_t) NULL;
+	r->first_component_of = create_key_hash_table(DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
 
 	r->second_component_of_count = 0;
 	r->second_component_of_list = NULL;
-	r->second_component_of = (Pvoid_t) NULL;
+	r->second_component_of = create_key_hash_table(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
 	put_atomic_role((unsigned char*) name, r, tbox);
 	tbox->atomic_role_count++;
@@ -320,11 +320,11 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
-	r->first_component_of = (Pvoid_t) NULL;
+	r->first_component_of = create_key_hash_table(DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
 
 	r->second_component_of_count = 0;
 	r->second_component_of_list = NULL;
-	r->second_component_of = (Pvoid_t) NULL;
+	r->second_component_of = create_key_hash_table(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
 	put_role_composition(r, tbox);
 	tbox->unique_binary_role_composition_count++;

@@ -217,20 +217,13 @@ Concept* get_negative_exists(Concept* c, Role* r) {
 
 // add 'composition' to the list of compositions whose first component is 'role'
 // note that for performance reasons in saturation, this information is kept twice:
-// once in a judy array, once in a usual array. the judy array is for searching
+// once in a hash table, once in a usual array. the hash table is for searching
 // during saturation, the usual array is for iteration on the elements. the memory
 // overhead is worth the performance gain.
 void add_role_to_first_component_of_list(Role* role, Role* composition) {
-	int added_to_component_of_list;
 	Role** tmp;
 
-	J1S(added_to_component_of_list, role->first_component_of, (Word_t) composition);
-	if (added_to_component_of_list == JERR) {
-		fprintf(stderr, "could not add to first conjunct of list, aborting\n");
-		exit(EXIT_FAILURE);
-	}
-
-	if (added_to_component_of_list) {
+	if (insert_key(role->first_component_of, composition->id)) {
 		tmp = realloc(role->first_component_of_list, (role->first_component_of_count + 1) * sizeof(Role*));
 		assert(tmp != NULL);
 		role->first_component_of_list = tmp;
@@ -245,12 +238,7 @@ void add_role_to_second_component_of_list(Role* role, Role* composition) {
 	int added_to_component_of_list;
 	Role** tmp;
 
-	J1S(added_to_component_of_list, role->second_component_of, (Word_t) composition);
-	if (added_to_component_of_list == JERR) {
-		fprintf(stderr, "could not add to second conjunct of list, aborting\n");
-		exit(EXIT_FAILURE);
-	}
-	if (added_to_component_of_list) {
+	if (insert_key(role->second_component_of, composition->id)) {
 		tmp = realloc(role->second_component_of_list, (role->second_component_of_count + 1) * sizeof(Concept*));
 		assert(tmp != NULL);
 		role->second_component_of_list = tmp;

@@ -193,8 +193,8 @@ struct role {
 	int second_component_of_count;
 
 	// same as above. the reason is performance in saturation.
-	Pvoid_t first_component_of;
-	Pvoid_t second_component_of;
+	KeyHashTable* first_component_of;
+	KeyHashTable* second_component_of;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
