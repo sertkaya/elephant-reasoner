@@ -189,8 +189,12 @@ int free_role(Role* r) {
 	freed_bytes = free_key_hash_table(r->subsumers);
 	total_freed_bytes += freed_bytes;
 
+	// free the  subsumees list
+	total_freed_bytes += sizeof(Role*) * r->subsumee_count;
+	free(r->subsumee_list);
+
 	// free the subsumees hash
-	J1FA(freed_bytes, r->subsumees);
+	freed_bytes = free_key_hash_table(r->subsumees);
 	total_freed_bytes += freed_bytes;
 
 	// free the list of role compositions where this role occurs

@@ -43,7 +43,7 @@ int mark_role_saturation_axiom_processed(RoleSaturationAxiom* ax) {
 	added_to_subsumer_list = add_to_role_subsumer_list(ax->lhs, ax->rhs);
 
 	// add to the subsumees hash too
-	add_to_role_subsumees(ax->rhs, ax->lhs);
+	add_to_role_subsumee_list(ax->rhs, ax->lhs);
 
 	return added_to_subsumer_list;
 }
@@ -110,26 +110,21 @@ void saturate_roles(TBox* tbox) {
 		JSLN(key, tbox->role_compositions, role_index);
 	}
 
-	Word_t subsumee_index1, subsumee_index2;
-	int subsumees1_nonempty, subsumees2_nonempty;
-	Role* composition;
-	for (j = 0; j < original_binary_composition_count; ++j) {
-		subsumee_index1 = 0;
-		J1F(subsumees1_nonempty, tmp[j]->description.role_composition->role1->subsumees, subsumee_index1);
-		while (subsumees1_nonempty) {
-			subsumee_index2 = 0;
-			J1F(subsumees2_nonempty, tmp[j]->description.role_composition->role2->subsumees, subsumee_index2);
-			while (subsumees2_nonempty) {
-				composition = get_create_role_composition_binary(((Role*) subsumee_index1), ((Role*) subsumee_index2), tbox);
+	int role1_subsumee_count, role2_subsumee_count;
+	for (i = 0; i < original_binary_composition_count; ++i) {
+		for (j = 0; j < tmp[i]->description.role_composition->role1->subsumee_count; ++j) {
+			int k;
+			for (k = 0; k < tmp[i]->description.role_composition->role2->subsumee_count; ++k) {
+				Role* composition = get_create_role_composition_binary(
+						tmp[i]->description.role_composition->role1->subsumee_list[j],
+						tmp[i]->description.role_composition->role2->subsumee_list[k],
+						tbox);
 				index_role(composition);
 				// now add the subsumers of tmp[j] as the subsumers of composition
-				int k;
-				for (k = 0; k < tmp[j]->subsumer_count; ++k) {
-					add_to_role_subsumer_list(composition, tmp[j]->subsumer_list[k]);
-				}
-				J1N(subsumees2_nonempty, tmp[j]->description.role_composition->role2->subsumees, subsumee_index2);
+				int l;
+				for (l = 0; l < tmp[i]->subsumer_count; ++l)
+					add_to_role_subsumer_list(composition, tmp[i]->subsumer_list[l]);
 			}
-			J1N(subsumees1_nonempty, tmp[j]->description.role_composition->role1->subsumees, subsumee_index1);
 		}
 	}
 	// now free tmp

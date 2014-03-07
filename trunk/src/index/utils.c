@@ -116,16 +116,20 @@ int add_to_role_subsumer_list(Role* r, Role* s) {
 	return 0;
 }
 
-int add_to_role_subsumees(Role*r, Role* s) {
-	int added_to_subsumees;
+int add_to_role_subsumee_list(Role*r, Role* s) {
+	Role** tmp;
 
-	J1S(added_to_subsumees, r->subsumees, (Word_t) s);
-	if (added_to_subsumees == JERR) {
-		fprintf(stderr, "could not add to subsumees, aborting\n");
-		exit(EXIT_FAILURE);
+	if (insert_key(r->subsumees, s->id)) {
+		tmp = realloc(r->subsumee_list, (r->subsumee_count + 1) * sizeof(Role*));
+		assert(tmp != NULL);
+		r->subsumee_list = tmp;
+		r->subsumee_list[r->subsumee_count] = s;
+		++r->subsumee_count;
+
+		return 1;
 	}
 
-	return added_to_subsumees;
+	return 0;
 }
 
 /******************************************************************************
