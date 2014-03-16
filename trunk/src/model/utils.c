@@ -45,25 +45,20 @@ unsigned char role_composition_buffer[16];
 
 // return the atomic concept with the given name if it exists
 // NULL if it does not exist
-Concept* get_atomic_concept(unsigned char* name, TBox* tbox) {
-	PWord_t pvalue;
-
-	JSLG(pvalue, tbox->atomic_concepts, name);
-	if (pvalue == NULL)
-			return NULL;
-	return (Concept*) *pvalue;
+inline Concept* get_atomic_concept(unsigned char* name, TBox* tbox) {
+	return get_value(tbox->atomic_concepts,
+			hash_string(tbox->atomic_concepts, name),
+			(int (*) (void *, void *)) strcmp,
+			name);
 }
 
 // insert the atomic concept with the given name
-void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox) {
-	PWord_t pvalue;
-
-	JSLI(pvalue, tbox->atomic_concepts, name);
-	if (pvalue == PJERR) {
-		fprintf(stderr, "could not insert atomic concept %s, aborting\n", name);
-		exit(EXIT_FAILURE);
-	}
-	*pvalue = (Word_t) c;
+inline void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox) {
+	insert_key_value(tbox->atomic_concepts,
+			hash_string(tbox->atomic_concepts, name),
+			(int (*) (void *, void *)) strcmp,
+			name,
+			c);
 }
 
 // return the atomic role with the given name if it exists

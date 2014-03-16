@@ -161,8 +161,6 @@ union role_description {
 	
 // role composition
 struct role_composition {
-	// int size;
-	// Role** roles;
 	Role* role1;
 	Role* role2;
 };
@@ -239,7 +237,7 @@ struct tbox {
 	Concept* bottom_concept;
 
 	// atomic concepts hash
-	Pvoid_t atomic_concepts;
+	KeyValueHashTable* atomic_concepts;
 	Concept** atomic_concept_list;
 	int atomic_concept_count;
 
