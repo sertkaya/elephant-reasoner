@@ -288,6 +288,8 @@ int free_tbox(TBox* tbox) {
 	free(tbox->atomic_concept_list);
 
 	// free the atomic concepts
+	/**
+	 * !!! TODO
 	strcpy((char*) index, "");
 	JSLF(key, tbox->atomic_concepts, index);
 	while (key != NULL) {
@@ -296,6 +298,7 @@ int free_tbox(TBox* tbox) {
 	}
 	JSLFA(freed_bytes, tbox->atomic_concepts);
 	total_freed_bytes += freed_bytes;
+	 */
 
 	// free the atomic roles list
 	total_freed_bytes += sizeof(Role*) * (tbox->atomic_role_count + tbox->unique_binary_role_composition_count);
