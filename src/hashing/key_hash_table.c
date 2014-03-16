@@ -7,37 +7,6 @@
 #include "utils.h"
 
 
-static inline int hash(KeyHashTable* hash_table, uint32_t key) {
-	// return ((key << 5) - key) % hash_table->size;
-	// this is more efficient
-	return ((key << 5) - key) & hash_table->bucket_mask;
-}
-
-
-
-/*
- * Integer hash of 32 bits.
- * Implementation of the Robert Jenkins "4-byte Integer Hashing",
- * from http://burtleburtle.net/bob/hash/integer.html
- */
-
-/*
-static inline uint32_t hash(KeyHashTable* hash_table, key_t key) {
-    key -= (key<<6);
-    key ^= (key>>17);
-    key -= (key<<9);
-    key ^= (key<<4);
-    key -= (key<<3);
-    key ^= (key<<10);
-    key ^= (key>>15);
-
-    key &= hash_table->bucket_mask;
-    return key;
-}
-*/
-
-
-
 inline KeyHashTable* create_key_hash_table(unsigned size) {
 
 	KeyHashTable* hash_table = (KeyHashTable*) malloc(sizeof(KeyHashTable));
@@ -84,7 +53,7 @@ int free_key_hash_table(KeyHashTable* hash_table) {
 
 inline char insert_key(KeyHashTable* hash_table, uint32_t key) {
 	int i;
-	int hash_value = hash(hash_table, key);
+	int hash_value = HASH_UNSIGNED(hash_table, key);
 	int chain_size = hash_table->chain_sizes[hash_value];
 
 	for (i = 0; i < chain_size; i++)
@@ -101,7 +70,7 @@ inline char insert_key(KeyHashTable* hash_table, uint32_t key) {
 }
 
 inline char contains_key(KeyHashTable* hash_table, uint32_t key) {
-	int hash_value = hash(hash_table, key);
+	int hash_value = HASH_UNSIGNED(hash_table, key);
 	int chain_size = hash_table->chain_sizes[hash_value];
 
 	int i;
@@ -119,7 +88,7 @@ inline char remove_key(KeyHashTable* hash_table, uint32_t key) {
 		return 0;
 
 	int i;
-	int hash_value = hash(hash_table, key);
+	int hash_value = HASH_UNSIGNED(hash_table, key);
 	int chain_size = hash_table->chain_sizes[hash_value];
 
 	for (i = 0; i < chain_size; ++i)

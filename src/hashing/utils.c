@@ -17,11 +17,13 @@ inline uint32_t roundup_pow2(uint32_t value) {
   return value;
 }
 
+/*
 inline int hash_unsigned(KeyHashTable* hash_table, uint32_t key) {
 	// return ((key << 5) - key) % hash_table->size;
 	// this is more efficient
 	return ((key << 5) - key) & hash_table->bucket_mask;
 }
+*/
 
 inline int hash_string(KeyValueHashTable* hash_table, unsigned char* key) {
 	unsigned long hash_value = 5381;
