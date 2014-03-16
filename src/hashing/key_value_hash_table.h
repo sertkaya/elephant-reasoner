@@ -1,9 +1,3 @@
-/*
- * hash_table.h
- *
- *  Created on: Feb 4, 2014
- *      Author: baris
- */
 
 #ifndef KEY_VALUE_HASH_TABLE_H_
 #define KEY_VALUE_HASH_TABLE_H_
@@ -14,7 +8,7 @@ typedef struct node Node;
 typedef struct key_value_hash_table KeyValueHashTable;
 
 struct node {
-	uint32_t key;
+	void* key;
 	void* value;
 };
 
@@ -27,11 +21,18 @@ struct key_value_hash_table {
 
 KeyValueHashTable* create_key_value_hash_table(unsigned size);
 
-inline char insert_key_value(KeyValueHashTable* hash_table, uint32_t key, void* value);
+// inline char insert_key_value(KeyValueHashTable* hash_table, void* key, uint32_t hash_value, void* value);
+// the compare_func returns 0 if the two keys are equal, 1 otherwise
+inline char insert_key_value(KeyValueHashTable* hash_table,
+		uint32_t hash_value,
+		int (*compare_func)(void* key_to_insert, void* key),
+		void* key_to_insert,
+		void* value);
 
-// inline char contains_key(KeyValueHashTable* hash_table, uint32_t key);
+// inline void* get_value(KeyValueHashTable* hash_table, void* key, uint32_t hash_value);
+inline void* get_value(KeyValueHashTable* hash_table,
+		uint32_t hash_value,
+		int (*compare_func)(void* key_to_insert, void* key),
+		void* key);
 
-inline void* get_value(KeyValueHashTable* hash_table, uint32_t key);
-
-
-#endif /* HASH_TABLE_H_ */
+#endif

@@ -7,8 +7,9 @@
 #include "utils.h"
 
 inline int hash(KeyValueHashTable* hash_table, key_t key) {
-	return ((key << 5) - key) % hash_table->size;
-	// return ((key << 5) - key) & hash_table->bucket_mask;
+	// return ((key << 5) - key) % hash_table->size;
+	// this is more efficient
+	return ((key << 5) - key) & hash_table->bucket_mask;
 }
 
 
@@ -62,18 +63,22 @@ inline KeyValueHashTable* create_key_value_hash_table(unsigned size) {
 	}
 	*/
 	memset(hash_table->buckets, 0, hash_table->size * sizeof(Node**));
-	memset(hash_table->chain_sizes, 0, hash_table->size * sizeof(int));
+	memset(hash_table->chain_sizes, 0, hash_table->size * sizeof(unsigned));
 
 	return hash_table;
 }
 
-inline char insert_key_value(KeyValueHashTable* hash_table, uint32_t key, void* value) {
+inline char insert_key_value(KeyValueHashTable* hash_table,
+		uint32_t hash_value,
+		int (*compare_func)(void* key_to_insert, void* key),
+		void* key_to_insert,
+		void* value) {
 	int i;
-	int hash_value = hash(hash_table, key);
 	int chain_size = hash_table->chain_sizes[hash_value];
 
 	for (i = 0; i < chain_size; i++)
-		if (hash_table->buckets[hash_value][i]->key == key)
+		// if (hash_table->buckets[hash_value][i]->key == key)
+		if (!compare_func(key_to_insert, hash_table->buckets[hash_value][i]->key))
 			return 0;
 
 	Node** tmp = realloc(hash_table->buckets[hash_value], (chain_size + 1) * sizeof(Node*));
@@ -82,7 +87,7 @@ inline char insert_key_value(KeyValueHashTable* hash_table, uint32_t key, void* 
 
 	hash_table->buckets[hash_value][chain_size] = malloc(sizeof(Node));
 	assert(hash_table->buckets[hash_value][chain_size] != NULL);
-	hash_table->buckets[hash_value][chain_size]->key = key;
+	hash_table->buckets[hash_value][chain_size]->key = key_to_insert;
 	hash_table->buckets[hash_value][chain_size]->value = value;
 
 	++hash_table->chain_sizes[hash_value];
@@ -90,13 +95,13 @@ inline char insert_key_value(KeyValueHashTable* hash_table, uint32_t key, void* 
 	return 1;
 }
 
-inline void* get_value(KeyValueHashTable* hash_table, uint32_t key) {
-	int hash_value = hash(hash_table, key);
+inline void* get_value(KeyValueHashTable* hash_table, uint32_t hash_value, int (*compare_func)(void* key_to_search, void* key), void* key_to_search) {
 	int chain_size = hash_table->chain_sizes[hash_value];
 
 	int i;
 	for (i = 0; i < chain_size; i++)
-		if (hash_table->buckets[hash_value][i]->key == key)
+		// if (hash_table->buckets[hash_value][i]->key == key)
+		if (!compare_func(key_to_search, hash_table->buckets[hash_value][i]->key))
 			return hash_table->buckets[hash_value][i]->value;
 
 	return NULL;
