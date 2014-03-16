@@ -131,7 +131,6 @@ inline void* get_value(KeyValueHashTable* hash_table, uint32_t hash_value, int (
 
 	int i;
 	for (i = 0; i < chain_size; i++)
-		// if (hash_table->buckets[hash_value][i]->key == key)
 		if (!compare_func(key_to_search, hash_table->buckets[hash_value][i]->key))
 			return hash_table->buckets[hash_value][i]->value;
 
