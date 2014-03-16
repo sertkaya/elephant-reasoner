@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "../model/datatypes.h"
+#include "../model/limits.h"
 #include "../model/model.h"
 #include "../index/index.h"
 #include "../saturation/saturation.h"
@@ -47,7 +48,7 @@ TBox* init_reasoner() {
 
 	tbox->atomic_concept_count = 0;
 	tbox->atomic_concept_list = NULL;
-	tbox->atomic_concepts = (Pvoid_t) NULL;
+	tbox->atomic_concepts = create_key_value_hash_table(DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
 	tbox->atomic_role_count = 0;
 	tbox->atomic_roles = (Pvoid_t) NULL;
