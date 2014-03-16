@@ -7,8 +7,9 @@
 #include "utils.h"
 
 
-static inline int hash(KeyHashTable* hash_table, key_t key) {
+static inline int hash(KeyHashTable* hash_table, uint32_t key) {
 	// return ((key << 5) - key) % hash_table->size;
+	// this is more efficient
 	return ((key << 5) - key) & hash_table->bucket_mask;
 }
 
