@@ -68,6 +68,37 @@ inline KeyValueHashTable* create_key_value_hash_table(unsigned size) {
 	return hash_table;
 }
 
+int free_key_value_hash_table(KeyValueHashTable* hash_table) {
+	int freed_bytes = 0;
+
+	int i;
+	for (i = 0; i < hash_table->size; ++i) {
+		if (hash_table->buckets[i] != NULL) {
+			int j;
+			for (j = 0; j < hash_table->chain_sizes[i]; ++j) {
+				// note that we only free the node.
+				// the space allocated for node->key and node->value are not freed!
+				free(hash_table->buckets[i][j]);
+				freed_bytes += sizeof(Node);
+			}
+
+			free(hash_table->buckets[i]);
+			freed_bytes += hash_table->chain_sizes[i] * sizeof(Node*);
+		}
+	}
+	free(hash_table->buckets);
+	freed_bytes += hash_table->size * sizeof(Node***);
+
+	free(hash_table->chain_sizes);
+	freed_bytes += hash_table->size * sizeof(unsigned);
+
+	free(hash_table);
+	freed_bytes += sizeof(KeyValueHashTable);
+
+	return freed_bytes;
+}
+
+
 inline char insert_key_value(KeyValueHashTable* hash_table,
 		uint32_t hash_value,
 		int (*compare_func)(void* key_to_insert, void* key),
