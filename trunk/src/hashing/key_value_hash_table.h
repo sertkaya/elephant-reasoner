@@ -15,7 +15,7 @@ struct node {
 struct key_value_hash_table {
 	Node*** buckets;		// the buckets
 	unsigned bucket_mask;	// bit mask to access the buckets
-	unsigned size;			// the number of elements
+	unsigned bucket_count;			// the number of buckets
 	unsigned* chain_sizes;	// sizes of the chains
 };
 

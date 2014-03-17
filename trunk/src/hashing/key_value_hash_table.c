@@ -6,35 +6,6 @@
 #include "key_value_hash_table.h"
 #include "utils.h"
 
-inline int hash(KeyValueHashTable* hash_table, key_t key) {
-	// return ((key << 5) - key) % hash_table->size;
-	// this is more efficient
-	return ((key << 5) - key) & hash_table->bucket_mask;
-}
-
-
-
-/*
- * Integer hash of 32 bits.
- * Implementation of the Robert Jenkins "4-byte Integer Hashing",
- * from http://burtleburtle.net/bob/hash/integer.html
- */
-
-/*
-static inline uint32_t hash(KeyValueHashTable* hash_table, key_t key) {
-    key -= (key<<6);
-    key ^= (key>>17);
-    key -= (key<<9);
-    key ^= (key<<4);
-    key -= (key<<3);
-    key ^= (key<<10);
-    key ^= (key>>15);
-
-    key &= hash_table->bucket_mask;
-    return key;
-}
-*/
-
 
 inline KeyValueHashTable* create_key_value_hash_table(unsigned size) {
 
@@ -52,8 +23,8 @@ inline KeyValueHashTable* create_key_value_hash_table(unsigned size) {
 	hash_table->chain_sizes = (unsigned*) malloc(size * sizeof(unsigned));
 	assert(hash_table->buckets != NULL);
 
-	hash_table->size = size;
-	hash_table->bucket_mask = hash_table->size - 1;
+	hash_table->bucket_count = size;
+	hash_table->bucket_mask = hash_table->bucket_count - 1;
 
 	/*
 	int i;
@@ -62,8 +33,8 @@ inline KeyValueHashTable* create_key_value_hash_table(unsigned size) {
 		hash_table->chain_sizes[i] = 0;
 	}
 	*/
-	memset(hash_table->buckets, 0, hash_table->size * sizeof(Node**));
-	memset(hash_table->chain_sizes, 0, hash_table->size * sizeof(unsigned));
+	memset(hash_table->buckets, 0, hash_table->bucket_count * sizeof(Node**));
+	memset(hash_table->chain_sizes, 0, hash_table->bucket_count * sizeof(unsigned));
 
 	return hash_table;
 }
@@ -72,7 +43,7 @@ int free_key_value_hash_table(KeyValueHashTable* hash_table) {
 	int freed_bytes = 0;
 
 	int i;
-	for (i = 0; i < hash_table->size; ++i) {
+	for (i = 0; i < hash_table->bucket_count; ++i) {
 		if (hash_table->buckets[i] != NULL) {
 			int j;
 			for (j = 0; j < hash_table->chain_sizes[i]; ++j) {
@@ -87,10 +58,10 @@ int free_key_value_hash_table(KeyValueHashTable* hash_table) {
 		}
 	}
 	free(hash_table->buckets);
-	freed_bytes += hash_table->size * sizeof(Node***);
+	freed_bytes += hash_table->bucket_count * sizeof(Node***);
 
 	free(hash_table->chain_sizes);
-	freed_bytes += hash_table->size * sizeof(unsigned);
+	freed_bytes += hash_table->bucket_count * sizeof(unsigned);
 
 	free(hash_table);
 	freed_bytes += sizeof(KeyValueHashTable);

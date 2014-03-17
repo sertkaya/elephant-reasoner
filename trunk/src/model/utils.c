@@ -47,7 +47,7 @@ unsigned char role_composition_buffer[16];
 // NULL if it does not exist
 inline Concept* get_atomic_concept(unsigned char* name, TBox* tbox) {
 	return get_value(tbox->atomic_concepts,
-			hash_string(tbox->atomic_concepts, name),
+			hash_string(tbox->atomic_concepts->bucket_count, name),
 			(int (*) (void *, void *)) strcmp,
 			name);
 }
@@ -55,7 +55,7 @@ inline Concept* get_atomic_concept(unsigned char* name, TBox* tbox) {
 // insert the atomic concept with the given name
 inline void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox) {
 	insert_key_value(tbox->atomic_concepts,
-			hash_string(tbox->atomic_concepts, name),
+			hash_string(tbox->atomic_concepts->bucket_count, name),
 			(int (*) (void *, void *)) strcmp,
 			name,
 			c);

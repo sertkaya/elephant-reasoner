@@ -5,12 +5,21 @@
 #include "key_hash_table.h"
 #include "key_value_hash_table.h"
 
-#define HASH_UNSIGNED(hash_table,key)			(((key << 5) - key) & hash_table->bucket_mask)
+#define HASH_UNSIGNED(hash_table_bucket_count,key)			(((key << 5) - key) & (hash_table_bucket_count - 1))
 
+/**
+ * Round up to the next higher power of 2. Used for hash sizes.
+ */
 inline uint32_t roundup_pow2(uint32_t value);
 
-inline int hash_unsigned(KeyHashTable* hash_table, uint32_t key);
+/**
+ * Hash an unsigned integer.
+ * inline int hash_unsigned(KeyHashTable* hash_table, uint32_t key);
+ */
 
-inline int hash_string(KeyValueHashTable* hash_table, uint32_t key);
+/**
+ * Hash a string into an integer
+ */
+inline int hash_string(int hash_table_bucket_count, uint32_t key);
 
 #endif /* UTILS_H_ */
