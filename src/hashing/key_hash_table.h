@@ -20,7 +20,7 @@ typedef struct key_hash_table KeyHashTable;
 struct key_hash_table {
 	unsigned** buckets;		// the buckets
 	unsigned bucket_mask;	// bit mask to access the buckets
-	unsigned size;			// the number of elements
+	unsigned bucket_count;	// the number of buckets
 	unsigned* chain_sizes;	// sizes of the chains
 };
 

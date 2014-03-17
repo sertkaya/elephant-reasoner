@@ -23,8 +23,8 @@ inline KeyHashTable* create_key_hash_table(unsigned size) {
 	hash_table->chain_sizes = (unsigned*) calloc(size, sizeof(unsigned));
 	assert(hash_table->buckets != NULL);
 
-	hash_table->size = size;
-	hash_table->bucket_mask = hash_table->size - 1;
+	hash_table->bucket_count = size;
+	hash_table->bucket_mask = hash_table->bucket_count - 1;
 
 	return hash_table;
 }
@@ -33,17 +33,17 @@ int free_key_hash_table(KeyHashTable* hash_table) {
 	int i;
 	int freed_bytes = 0;
 
-	for (i = 0; i < hash_table->size; ++i) {
+	for (i = 0; i < hash_table->bucket_count; ++i) {
 		if (hash_table->buckets[i] != NULL) {
 			free(hash_table->buckets[i]);
 			freed_bytes += hash_table->chain_sizes[i] * sizeof(unsigned);
 		}
 	}
 	free(hash_table->buckets);
-	freed_bytes += hash_table->size * sizeof(unsigned*);
+	freed_bytes += hash_table->bucket_count * sizeof(unsigned*);
 
 	free(hash_table->chain_sizes);
-	freed_bytes += hash_table->size * sizeof(unsigned);
+	freed_bytes += hash_table->bucket_count * sizeof(unsigned);
 
 	free(hash_table);
 	freed_bytes += sizeof(KeyHashTable);
@@ -53,7 +53,7 @@ int free_key_hash_table(KeyHashTable* hash_table) {
 
 inline char insert_key(KeyHashTable* hash_table, uint32_t key) {
 	int i;
-	int hash_value = HASH_UNSIGNED(hash_table, key);
+	int hash_value = HASH_UNSIGNED(hash_table->bucket_count, key);
 	int chain_size = hash_table->chain_sizes[hash_value];
 
 	for (i = 0; i < chain_size; i++)
@@ -70,7 +70,7 @@ inline char insert_key(KeyHashTable* hash_table, uint32_t key) {
 }
 
 inline char contains_key(KeyHashTable* hash_table, uint32_t key) {
-	int hash_value = HASH_UNSIGNED(hash_table, key);
+	int hash_value = HASH_UNSIGNED(hash_table->bucket_count, key);
 	int chain_size = hash_table->chain_sizes[hash_value];
 
 	int i;
@@ -88,7 +88,7 @@ inline char remove_key(KeyHashTable* hash_table, uint32_t key) {
 		return 0;
 
 	int i;
-	int hash_value = HASH_UNSIGNED(hash_table, key);
+	int hash_value = HASH_UNSIGNED(hash_table->bucket_count, key);
 	int chain_size = hash_table->chain_sizes[hash_value];
 
 	for (i = 0; i < chain_size; ++i)
