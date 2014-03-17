@@ -21,6 +21,8 @@ struct key_value_hash_table {
 
 KeyValueHashTable* create_key_value_hash_table(unsigned size);
 
+int free_key_value_hash_table(KeyValueHashTable* hash_table);
+
 /**
  * The compare_func returns 0 if the two keys are equal, 1 otherwise
  */

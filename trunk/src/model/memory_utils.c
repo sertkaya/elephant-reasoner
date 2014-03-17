@@ -278,27 +278,21 @@ int free_tbox(TBox* tbox) {
 	JSLFA(freed_bytes, tbox->conjunctions);
 	total_freed_bytes += freed_bytes;
 
+	// free the atomic concepts hash
+	// note that here we just free place reserved for
+	// the hash. the place for reserved for the atomic concepts themselves
+	// is freed below
+	total_freed_bytes += free_key_value_hash_table(tbox->atomic_concepts);
+
 	// free the atomic concepts list
 	// this is the list kept for efficiently traversing over atomic concepts
 	// in hierarchy computation. the actual place for keeping atomic concepts
-	// is the atomic_concepts hash. note that here we just free place reserved for
-	// the atomic_concept_list. the place for reserved for the atomic concepts themselves
-	// is freed below
+	// is the atomic_concepts hash.
+	// here we also free the space allocated for the atomic concepts, not only the list
+	for (i = 0; i < tbox->atomic_concept_count; ++i)
+		total_freed_bytes += free_concept(tbox->atomic_concept_list[i], tbox);
 	total_freed_bytes += sizeof(Concept*) * tbox->atomic_concept_count;
 	free(tbox->atomic_concept_list);
-
-	// free the atomic concepts
-	/**
-	 * !!! TODO
-	strcpy((char*) index, "");
-	JSLF(key, tbox->atomic_concepts, index);
-	while (key != NULL) {
-		total_freed_bytes += free_concept((Concept*) *key, tbox);
-		JSLN(key, tbox->atomic_concepts, index);
-	}
-	JSLFA(freed_bytes, tbox->atomic_concepts);
-	total_freed_bytes += freed_bytes;
-	 */
 
 	// free the atomic roles list
 	total_freed_bytes += sizeof(Role*) * (tbox->atomic_role_count + tbox->unique_binary_role_composition_count);
