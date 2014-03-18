@@ -51,7 +51,7 @@ TBox* init_reasoner() {
 	tbox->atomic_concepts = create_key_value_hash_table(DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
 	tbox->atomic_role_count = 0;
-	tbox->atomic_roles = (Pvoid_t) NULL;
+	tbox->atomic_roles = create_key_value_hash_table(DEFAULT_ATOMIC_ROLES_HASH_SIZE);
 
 	tbox->role_list = NULL;
 

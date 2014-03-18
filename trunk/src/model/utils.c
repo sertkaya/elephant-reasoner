@@ -64,23 +64,19 @@ inline void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox) {
 // return the atomic role with the given name if it exists
 // NULL if it does not exist
 Role* get_atomic_role(unsigned char* name, TBox* tbox) {
-	PWord_t pvalue;
-	JSLG(pvalue, tbox->atomic_roles, name);
-	if (pvalue == NULL)
- 		return NULL;
-	return (Role*) *pvalue;
+	return get_value(tbox->atomic_roles,
+			hash_string(tbox->atomic_roles->bucket_count, name),
+			(int (*) (void *, void *)) strcmp,
+			name);
 }
 
 // insert the atomic role with the given name
 void put_atomic_role(unsigned char* name, Role* r, TBox* tbox) {
-	PWord_t pvalue;
-
-	JSLI(pvalue, tbox->atomic_roles, name);
-	if (pvalue == PJERR) {
-		fprintf(stderr, "could not insert atomic role %s, aborting", name);
-		exit(EXIT_FAILURE);
-	}
-	*pvalue = (Word_t) r;
+	insert_key_value(tbox->atomic_roles,
+			hash_string(tbox->atomic_roles->bucket_count, name),
+			(int (*) (void *, void *)) strcmp,
+			name,
+			r);
 }
 
 // get the existential restriction with role r and filler f from hash
