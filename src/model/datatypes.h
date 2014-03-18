@@ -256,7 +256,7 @@ struct tbox {
 	int binary_conjunction_count;
 	int unique_binary_conjunction_count;
 
-	Pvoid_t atomic_roles;
+	KeyValueHashTable* atomic_roles;
 	int atomic_role_count;
 
 	// atomic roles and binary role compositions together

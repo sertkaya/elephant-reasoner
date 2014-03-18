@@ -294,19 +294,14 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += sizeof(Concept*) * tbox->atomic_concept_count;
 	free(tbox->atomic_concept_list);
 
-	// free the atomic roles list
+	// free the atomic roles hash
+	total_freed_bytes += free_key_value_hash_table(tbox->atomic_roles);
+
+	// free the roles and roles list
+	for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
+		total_freed_bytes += free_role(tbox->role_list[i]);
 	total_freed_bytes += sizeof(Role*) * (tbox->atomic_role_count + tbox->unique_binary_role_composition_count);
 	free(tbox->role_list);
-
-	// free the atomic roles hash
-	strcpy((char*) index, "");
-	JSLF(key, tbox->atomic_roles, index);
-	while (key != NULL) {
-		total_freed_bytes += free_role((Role*) *key);
-		JSLN(key, tbox->atomic_roles, index);
-	}
-	JSLFA(freed_bytes, tbox->atomic_roles);
-	total_freed_bytes += freed_bytes;
 
 	// free the role compositions
 	strcpy((char*) index, "");

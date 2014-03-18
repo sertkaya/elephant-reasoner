@@ -276,7 +276,7 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	r->second_component_of_list = NULL;
 	r->second_component_of = create_key_hash_table(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
-	put_atomic_role((unsigned char*) name, r, tbox);
+	put_atomic_role((unsigned char*) r->description.atomic->name, r, tbox);
 	tbox->atomic_role_count++;
 
 	Role **tmp = realloc(tbox->role_list, (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(Role*));
