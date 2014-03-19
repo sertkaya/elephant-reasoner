@@ -22,6 +22,7 @@
 
 #include "datatypes.h"
 #include "limits.h"
+#include "../hashing/key_value_hash_table.h"
 
 
 
@@ -256,17 +257,17 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += sizeof(TransitiveRoleAxiom*) * tbox->transitive_role_axiom_count;
 	free(tbox->transitive_role_axioms);
 
+	// iterate over the existentials hash, free the existentials
+	Node* node = last_node(tbox->exists_restrictions);
+	while (node) {
+		total_freed_bytes += free_concept((Concept*) node->value, tbox);
+		node = previous_node(node);
+	}
+	// free the existentials hash
+	total_freed_bytes += free_key_value_hash_table(tbox->exists_restrictions);
+
 	PWord_t key = NULL;
 	uint8_t index[MAX_CONCEPT_NAME_LENGTH];
-	// free the existentials
-	strcpy((char*) index, "");
-	JSLF(key, tbox->exists_restrictions, index);
-	while (key != NULL) {
-		total_freed_bytes += free_concept((Concept*) *key, tbox);
-		JSLN(key, tbox->exists_restrictions, index);
-	}
-	JSLFA(freed_bytes, tbox->exists_restrictions);
-	total_freed_bytes += freed_bytes;
 
 	// free the conjunctions
 	strcpy((char*) index, "");
@@ -278,10 +279,14 @@ int free_tbox(TBox* tbox) {
 	JSLFA(freed_bytes, tbox->conjunctions);
 	total_freed_bytes += freed_bytes;
 
+	// iterate over the atomic concepts hash, free the atomic concepts
+	node = last_node(tbox->atomic_concepts);
+	while (node) {
+		total_freed_bytes += free_concept((Concept*) node->value, tbox);
+		node = previous_node(node);
+	}
+
 	// free the atomic concepts hash
-	// note that here we just free place reserved for
-	// the hash. the place for reserved for the atomic concepts themselves
-	// is freed below
 	total_freed_bytes += free_key_value_hash_table(tbox->atomic_concepts);
 
 	// free the atomic concepts list
@@ -289,19 +294,19 @@ int free_tbox(TBox* tbox) {
 	// in hierarchy computation. the actual place for keeping atomic concepts
 	// is the atomic_concepts hash.
 	// here we also free the space allocated for the atomic concepts, not only the list
-	for (i = 0; i < tbox->atomic_concept_count; ++i)
-		total_freed_bytes += free_concept(tbox->atomic_concept_list[i], tbox);
+	// for (i = 0; i < tbox->atomic_concept_count; ++i)
+	// 	total_freed_bytes += free_concept(tbox->atomic_concept_list[i], tbox);
 	total_freed_bytes += sizeof(Concept*) * tbox->atomic_concept_count;
 	free(tbox->atomic_concept_list);
 
-	// free the atomic roles hash
-	total_freed_bytes += free_key_value_hash_table(tbox->atomic_roles);
-
 	// free the roles and roles list
+	// TODO: !!!
+	/*
 	for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
 		total_freed_bytes += free_role(tbox->role_list[i]);
 	total_freed_bytes += sizeof(Role*) * (tbox->atomic_role_count + tbox->unique_binary_role_composition_count);
 	free(tbox->role_list);
+	*/
 
 	// free the role compositions
 	strcpy((char*) index, "");
@@ -312,6 +317,16 @@ int free_tbox(TBox* tbox) {
 	}
 	JSLFA(freed_bytes, tbox->role_compositions);
 	total_freed_bytes += freed_bytes;
+
+	// iterate over atomic roles, free them
+	node = last_node(tbox->atomic_roles);
+	while (node) {
+		total_freed_bytes += free_role((Role*) node->value);
+		node = previous_node(node);
+	}
+
+	// free the atomic roles hash
+	total_freed_bytes += free_key_value_hash_table(tbox->atomic_roles);
 
 	return total_freed_bytes;
 }
