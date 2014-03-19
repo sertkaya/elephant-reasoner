@@ -269,7 +269,15 @@ int free_tbox(TBox* tbox) {
 	PWord_t key = NULL;
 	uint8_t index[MAX_CONCEPT_NAME_LENGTH];
 
-	// free the conjunctions
+	// iterate over the conjunctions hash, free the conjunctions
+	node = last_node(tbox->conjunctions);
+	while (node) {
+		total_freed_bytes += free_concept((Concept*) node->value, tbox);
+		node = previous_node(node);
+	}
+	// free the conjunctions hash
+	total_freed_bytes += free_key_value_hash_table(tbox->conjunctions);
+	/*
 	strcpy((char*) index, "");
 	JSLF(key, tbox->conjunctions, index);
 	while (key != NULL) {
@@ -278,6 +286,7 @@ int free_tbox(TBox* tbox) {
 	}
 	JSLFA(freed_bytes, tbox->conjunctions);
 	total_freed_bytes += freed_bytes;
+	*/
 
 	// iterate over the atomic concepts hash, free the atomic concepts
 	node = last_node(tbox->atomic_concepts);

@@ -23,6 +23,7 @@
 #include "model.h"
 #include "limits.h"
 #include "../hashing/key_hash_table.h"
+#include "../hashing/key_value_hash_table.h"
 
 
 void print_atomic_concept(AtomicConcept* ac);
@@ -83,14 +84,11 @@ void print_conjunction(Conjunction* conj) {
 }
 
 void print_conjunctions(TBox* tbox) {
-	uint8_t index[16];
-	PWord_t conj_p;
 
-	index[0] = '\0';
-	JSLF(conj_p, tbox->conjunctions, index);
-	while (conj_p != NULL) {
-		print_conjunction(((Concept*) *conj_p)->description.conj);
-		JSLN(conj_p, tbox->conjunctions, index);
+	Node* node = last_node(tbox->conjunctions);
+	while (node) {
+		print_conjunction(((Concept*) node->value)->description.conj);
+		node = previous_node(node);
 	}
 }
 
