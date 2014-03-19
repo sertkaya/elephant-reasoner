@@ -63,7 +63,7 @@ TBox* init_reasoner() {
 	// tbox->unique_conjunction_count = 0;
 	tbox->binary_conjunction_count = 0;
 	tbox->unique_binary_conjunction_count = 0;
-	tbox->conjunctions = (Pvoid_t) NULL;
+	tbox->conjunctions = create_key_value_hash_table(DEFAULT_CONJUNCTIONS_HASH_SIZE);
 
 	tbox->role_composition_count = 0;
 	tbox->binary_role_composition_count = 0;

@@ -250,7 +250,7 @@ struct tbox {
 	// hash for conjunctions
 	// key: id of conjuct1_id of conjunct2
 	// where conjuct ids are sorted
-	Pvoid_t conjunctions;
+	KeyValueHashTable* conjunctions;
 	int conjunction_count;
 	// int unique_conjunction_count;
 	int binary_conjunction_count;
