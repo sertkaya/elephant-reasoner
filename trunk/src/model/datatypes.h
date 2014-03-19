@@ -243,7 +243,7 @@ struct tbox {
 
 	// exists restictions hash
 	// the key is role id_filler id
-	Pvoid_t exists_restrictions;
+	KeyValueHashTable* exists_restrictions;
 	int exists_restriction_count;
 	int unique_exists_restriction_count;
 

@@ -106,7 +106,7 @@ Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox) {
 	tbox->exists_restriction_count++;
 	// first check if we already created an existential
 	// restriction with the same role and filler
-	if ((c = get_exists_restriction(r->id,f->id, tbox)) != NULL)
+	if ((c = get_exists_restriction(r->id, f->id, tbox)) != NULL)
 		return c;
 
 	// if it does not already exist, create it
@@ -146,7 +146,7 @@ Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox) {
 	c->second_conjunct_of_list = NULL;
 	c->second_conjunct_of = NULL;
 
-	put_exists_restriction(r->id,f->id,c, tbox);
+	put_exists_restriction(r->id, f->id, c, tbox);
 	tbox->unique_exists_restriction_count++;
 
 	return c;

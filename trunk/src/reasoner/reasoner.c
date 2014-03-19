@@ -57,7 +57,7 @@ TBox* init_reasoner() {
 
 	tbox->exists_restriction_count = 0;
 	tbox->unique_exists_restriction_count = 0;
-	tbox->exists_restrictions = (Pvoid_t) NULL;
+	tbox->exists_restrictions = create_key_value_hash_table(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
 
 	tbox->conjunction_count = 0;
 	// tbox->unique_conjunction_count = 0;
