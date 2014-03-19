@@ -18,6 +18,6 @@ inline uint32_t roundup_pow2(uint32_t value);
 /**
  * Hash a string into an integer
  */
-inline int hash_string(int hash_table_bucket_count, uint32_t key);
+inline int hash_string(unsigned long key);
 
 #endif /* UTILS_H_ */
