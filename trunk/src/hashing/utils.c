@@ -37,13 +37,13 @@ inline int hash_string(int bucket_count, unsigned char* key) {
 }
 */
 
-inline unsigned int hash_string(unsigned char* key) {
-	unsigned int hash_value = 5381;
+inline unsigned long hash_string(unsigned char* key) {
+	unsigned long hash_value = 5381;
 	int c;
 
 	while (c = *key++)
 		// hash_value = ((hash_value << 5) + hash_value) + c; /* hash * 33 + c */
-		hash_value = ((hash_value << 5) - hash_value) + c; /* hash * 33 - c */
+		hash_value = ((hash_value << 5) + hash_value) + c; /* hash * 33 - c */
 
 	return hash_value;
 }
