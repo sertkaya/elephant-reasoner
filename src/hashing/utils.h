@@ -10,6 +10,7 @@
  */
 #define HASH_UNSIGNED(hash_table_bucket_count,key)			(((key << 5) - key) & (hash_table_bucket_count - 1))
 
+#define HASH_INTEGERS(int1,int2)							((uint64_t)int1 << 32 | int2)
 /**
  * Round up to the next higher power of 2. Used for hash sizes.
  */
@@ -23,6 +24,6 @@ inline uint64_t hash_string(unsigned char* key);
 /**
  * Hash two integers into a 64-bit int.
  */
-inline uint64_t hash_integers(unsigned int int1, unsigned int int2);
+uint64_t hash_integers(unsigned int int1, unsigned int int2);
 
 #endif /* UTILS_H_ */

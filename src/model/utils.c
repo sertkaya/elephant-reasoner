@@ -23,10 +23,13 @@
 #include <string.h>
 #include <assert.h>
 #include <Judy.h>
+#include <inttypes.h>
+#include <stdint.h>
 
 #include "model.h"
 #include "datatypes.h"
 #include "limits.h"
+#include "../hashing/utils.h"
 
 // two ids of type int + the underscore in between
 #define BUILD_EXISTS_RESTRICTION_ID(r, f, buffer) snprintf((char*) buffer, 16, "%d_%d", r, f)
@@ -67,11 +70,17 @@ void put_atomic_role(unsigned char* name, Role* r, TBox* tbox) {
 // get the existential restriction with role r and filler f from hash
 Concept* get_exists_restriction(int r, int f, TBox* tbox) {
 	// unsigned char buffer[16];
-
+	// uint64_t tmp = (uint64_t) HASH_INTEGERS(r, f);
 	// BUILD_EXISTS_RESTRICTION_ID(r, f, buffer);
 	Concept* c = get_value(tbox->exists_restrictions,
 			// hash_string(buffer));
-			hash_integers(r, f));
+			HASH_INTEGERS(r, f));
+	/*
+     if (c != NULL)
+             printf("retrieved %d\t%d\t%" PRIu64 "\t%d\t%d\n", r, f, (uint64_t) tmp, c->description.exists->role->id, c->description.exists->filler->id);
+     else
+             printf("retrieved %d\t%d\t%" PRIu64 " NULL\n", r, f, (uint64_t) tmp);
+             */
 
 	return c;
 }
@@ -80,11 +89,13 @@ Concept* get_exists_restriction(int r, int f, TBox* tbox) {
 void put_exists_restriction(int r, int f, Concept* c, TBox* tbox) {
 	// unsigned char buffer[16];
 
+	// uint64_t tmp = (uint64_t) HASH_INTEGERS(r, f);
 	// BUILD_EXISTS_RESTRICTION_ID(r, f, buffer);
 	insert_key_value(tbox->exists_restrictions,
 			// hash_string(buffer),
-			hash_integers(r, f),
+			HASH_INTEGERS(r, f),
 			c);
+	// printf("inserted %d\t%d\t%" PRIu64 "\t%d\t%d\n", r, f, (uint64_t) tmp, c->description.exists->role->id, c->description.exists->filler->id);
 }
 
 // we assume c->id and d->id to be ordered!

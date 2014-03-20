@@ -50,9 +50,10 @@ inline uint64_t hash_string(unsigned char* key) {
 	return hash_value;
 }
 
-inline uint64_t hash_integers(int int1, int int2) {
-	uint64_t result = (uint64_t)int1 << 32;
-	result = result | (uint64_t)int2;
-	// printf("%d\t%d\t%" PRIu64 "\n", int1, int2, result);
+uint64_t hash_integers(unsigned int int1, unsigned int int2) {
+	// uint64_t result = (uint64_t)int1 << 32;
+	// result = result | (uint64_t)int2;
+	uint64_t result = (uint64_t)int1 << 32 | int2;
+	printf("===>%d\t%d\t%" PRIu64 "\n", int1, int2, result);
 	return result;
 }
