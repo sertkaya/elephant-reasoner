@@ -69,33 +69,17 @@ void put_atomic_role(unsigned char* name, Role* r, TBox* tbox) {
 
 // get the existential restriction with role r and filler f from hash
 Concept* get_exists_restriction(int role_id, uint32_t filler_id, TBox* tbox) {
-	// unsigned char buffer[16];
-	// uint64_t tmp = (uint64_t) HASH_INTEGERS(r, f);
-	// BUILD_EXISTS_RESTRICTION_ID(r, f, buffer);
 	Concept* c = get_value(tbox->exists_restrictions,
-			// hash_string(buffer));
 			HASH_INTEGERS(role_id, filler_id));
-	/*
-     if (c != NULL)
-             printf("retrieved %d\t%d\t%" PRIu64 "\t%d\t%d\n", r, f, (uint64_t) tmp, c->description.exists->role->id, c->description.exists->filler->id);
-     else
-             printf("retrieved %d\t%d\t%" PRIu64 " NULL\n", r, f, (uint64_t) tmp);
-             */
 
 	return c;
 }
 
 // put the existential restriction with role r and filler f into hash
 void put_exists_restriction(int role_id, uint32_t filler_id, Concept* c, TBox* tbox) {
-	// unsigned char buffer[16];
-
-	// uint64_t tmp = (uint64_t) HASH_INTEGERS(r, f);
-	// BUILD_EXISTS_RESTRICTION_ID(r, f, buffer);
 	insert_key_value(tbox->exists_restrictions,
-			// hash_string(buffer),
 			HASH_INTEGERS(role_id, filler_id),
 			c);
-	// printf("inserted %d\t%d\t%" PRIu64 "\t%d\t%d\n", r, f, (uint64_t) tmp, c->description.exists->role->id, c->description.exists->filler->id);
 }
 
 // we assume c->id and d->id to be ordered!

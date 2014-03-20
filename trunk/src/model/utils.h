@@ -20,6 +20,7 @@
 #ifndef MODEL_UTILS_H_
 #define MODEL_UTILS_H_
 
+#include <stdint.h>
 #include "datatypes.h"
 
 // returns the atomic concept with the given name if it exists
@@ -37,10 +38,10 @@ Role* get_atomic_role(unsigned char* name, TBox* tbox);
 void put_atomic_role(unsigned char* name, Role* c, TBox* tbox);
 
 // get the existential restriction with role r and filler f from hash
-Concept* get_exists_restriction(int r, int f, TBox* tbox);
+Concept* get_exists_restriction(int role_id, uint32_t filler_id, TBox* tbox);
 
 // put the existential restriction with role r and filler f into hash
-void put_exists_restriction(int r, int f, Concept* c, TBox* tbox);
+void put_exists_restriction(int role_id, uint32_t filler_id, Concept* c, TBox* tbox);
 
 // get the (binary) conjunction with the first conjunct c1 and second conjunct c2
 Concept* get_conjunction(Concept* c1, Concept* c2, TBox* tbox);
