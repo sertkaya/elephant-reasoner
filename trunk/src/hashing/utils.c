@@ -19,26 +19,6 @@ inline uint32_t roundup_pow2(uint32_t value) {
   return value;
 }
 
-/*
-inline int hash_unsigned(KeyHashTable* hash_table, uint32_t key) {
-	// return ((key << 5) - key) % hash_table->size;
-	// this is more efficient
-	return ((key << 5) - key) & hash_table->bucket_mask;
-}
-*/
-
-/*
-inline int hash_string(int bucket_count, unsigned char* key) {
-	unsigned long hash_value = 5381;
-	int c;
-
-	while (c = *key++)
-		hash_value = ((hash_value << 5) + hash_value) + c; // hash * 33 + c
-
-	return hash_value & (bucket_count - 1);
-}
-*/
-
 inline uint64_t hash_string(unsigned char* key) {
 	uint64_t hash_value = 5381;
 	int c;
@@ -48,12 +28,4 @@ inline uint64_t hash_string(unsigned char* key) {
 		hash_value = ((hash_value << 5) - hash_value) + c; /* hash * 31 + c */
 
 	return hash_value;
-}
-
-uint64_t hash_integers(unsigned int int1, unsigned int int2) {
-	// uint64_t result = (uint64_t)int1 << 32;
-	// result = result | (uint64_t)int2;
-	uint64_t result = (uint64_t)int1 << 32 | int2;
-	printf("===>%d\t%d\t%" PRIu64 "\n", int1, int2, result);
-	return result;
 }
