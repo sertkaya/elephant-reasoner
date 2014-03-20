@@ -9,7 +9,7 @@ typedef struct key_value_hash_table KeyValueHashTable;
 
 struct node {
 	// void* key;
-	unsigned long key;
+	uint64_t key;
 	void* value;
 	Node* previous;
 };
@@ -37,7 +37,7 @@ inline char insert_key_value(KeyValueHashTable* hash_table,
 		void* value);
 		*/
 inline char insert_key_value(KeyValueHashTable* hash_table,
-		unsigned long key,
+		uint64_t key,
 		void* value);
 
 /*
@@ -48,7 +48,7 @@ inline void* get_value(KeyValueHashTable* hash_table,
 		*/
 
 inline void* get_value(KeyValueHashTable* hash_table,
-		unsigned long key);
+		uint64_t key);
 
 /**
  * Returns the last node in the hash table or NULL if it is empty.
