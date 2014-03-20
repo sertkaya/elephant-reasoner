@@ -66,22 +66,24 @@ void put_atomic_role(unsigned char* name, Role* r, TBox* tbox) {
 
 // get the existential restriction with role r and filler f from hash
 Concept* get_exists_restriction(int r, int f, TBox* tbox) {
-	unsigned char buffer[16];
+	// unsigned char buffer[16];
 
-	BUILD_EXISTS_RESTRICTION_ID(r, f, buffer);
+	// BUILD_EXISTS_RESTRICTION_ID(r, f, buffer);
 	Concept* c = get_value(tbox->exists_restrictions,
-			hash_string(buffer));
+			// hash_string(buffer));
+			hash_integers(r, f));
 
 	return c;
 }
 
 // put the existential restriction with role r and filler f into hash
 void put_exists_restriction(int r, int f, Concept* c, TBox* tbox) {
-	unsigned char buffer[16];
+	// unsigned char buffer[16];
 
-	BUILD_EXISTS_RESTRICTION_ID(r, f, buffer);
+	// BUILD_EXISTS_RESTRICTION_ID(r, f, buffer);
 	insert_key_value(tbox->exists_restrictions,
-			hash_string(buffer),
+			// hash_string(buffer),
+			hash_integers(r, f),
 			c);
 }
 
