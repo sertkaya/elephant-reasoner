@@ -97,7 +97,9 @@ union concept_description {
 
 // concept description
 struct concept {
-	int id;
+	// Unique concept id.
+	// 32-bit unsigned integer, needed for hashing.
+	uint32_t id;
 
 	enum concept_description_type type;
 	ConceptDescription description;
@@ -268,7 +270,7 @@ struct tbox {
 	int binary_role_composition_count;
 	int unique_binary_role_composition_count;
 
-	int last_concept_id;
+	uint32_t last_concept_id;
 	int last_role_id;
 
 	SubClassAxiom** subclass_axioms;
