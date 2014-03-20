@@ -16,8 +16,13 @@
 inline uint32_t roundup_pow2(uint32_t value);
 
 /**
- * Hash a string into an integer
+ * Hash a string into a 64-bit int.
  */
-inline int hash_string(unsigned long key);
+inline uint64_t hash_string(unsigned char* key);
+
+/**
+ * Hash two integers into a 64-bit int.
+ */
+inline uint64_t hash_integers(unsigned int int1, unsigned int int2);
 
 #endif /* UTILS_H_ */

@@ -1,4 +1,6 @@
+#include <stdio.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "key_hash_table.h"
 #include "key_value_hash_table.h"
@@ -37,13 +39,20 @@ inline int hash_string(int bucket_count, unsigned char* key) {
 }
 */
 
-inline unsigned long hash_string(unsigned char* key) {
-	unsigned long hash_value = 5381;
+inline uint64_t hash_string(unsigned char* key) {
+	uint64_t hash_value = 5381;
 	int c;
 
 	while (c = *key++)
 		// hash_value = ((hash_value << 5) + hash_value) + c; /* hash * 33 + c */
-		hash_value = ((hash_value << 5) + hash_value) + c; /* hash * 33 - c */
+		hash_value = ((hash_value << 5) - hash_value) + c; /* hash * 31 + c */
 
 	return hash_value;
+}
+
+inline uint64_t hash_integers(int int1, int int2) {
+	uint64_t result = (uint64_t)int1 << 32;
+	result = result | (uint64_t)int2;
+	// printf("%d\t%d\t%" PRIu64 "\n", int1, int2, result);
+	return result;
 }

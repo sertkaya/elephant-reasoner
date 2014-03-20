@@ -96,7 +96,7 @@ inline char insert_key_value(KeyValueHashTable* hash_table,
 
 
 inline char insert_key_value(KeyValueHashTable* hash_table,
-		unsigned long key,
+		uint64_t key,
 		void* value) {
 
 	int bucket_index = key & (hash_table->bucket_count - 1);
@@ -138,7 +138,7 @@ inline void* get_value(KeyValueHashTable* hash_table, uint32_t hash_value, int (
 }
 */
 
-inline void* get_value(KeyValueHashTable* hash_table, unsigned long key) {
+inline void* get_value(KeyValueHashTable* hash_table, uint64_t key) {
 	int bucket_index = key & (hash_table->bucket_count - 1);
 	Node** bucket = hash_table->buckets[bucket_index];
 	int chain_size = hash_table->chain_sizes[bucket_index];
