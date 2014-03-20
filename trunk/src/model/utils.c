@@ -82,47 +82,37 @@ void put_exists_restriction(int role_id, uint32_t filler_id, Concept* c, TBox* t
 			c);
 }
 
-// we assume c->id and d->id to be ordered!
-// the caller function is responsible for providing c and d s.t. c->id < d->id !
+// We order c and d based on c->id and d->id!
 Concept* get_conjunction(Concept* c, Concept* d, TBox* tbox) {
 	unsigned char buffer[16];
 
+	if (c->id <= d->id)
+		return get_value(tbox->conjunctions, HASH_INTEGERS(c->id, d->id));
+	else
+		return get_value(tbox->conjunctions, HASH_INTEGERS(d->id, c->id));
+	/*
 	BUILD_CONJUNCTION_ID(c->id, d->id, buffer);
 	Concept* conjunction = get_value(tbox->conjunctions,
 			hash_string(buffer));
-
 	return conjunction;
-	/*
-	PWord_t conjunction_pp;
+			*/
 
-	BUILD_CONJUNCTION_ID(c->id, d->id);
-	JSLG(conjunction_pp, tbox->conjunctions, (unsigned char*) conjunctions_buffer);
-	if (conjunction_pp == NULL)
-		return NULL;
-
-	return (Concept*) *conjunction_pp;
-	*/
 }
 
 // the conjuncts of c are assumed to be ordered
 void put_conjunction(Concept* c, TBox* tbox) {
 	unsigned char buffer[16];
 
+	if (c->description.conj->conjunct1->id <= c->description.conj->conjunct2->id)
+		insert_key_value(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id), c);
+	else
+		insert_key_value(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct2->id, c->description.conj->conjunct1->id), c);
+	/*
 	BUILD_CONJUNCTION_ID(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id, buffer);
 	insert_key_value(tbox->conjunctions,
 			hash_string(buffer),
 			c);
-	/*
-	PWord_t conjunction_pp;
-
-	BUILD_CONJUNCTION_ID(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id);
-	JSLI(conjunction_pp, tbox->conjunctions, (unsigned char*) conjunctions_buffer);
-	if (conjunction_pp == PJERR) {
-		fprintf(stderr, "could not insert conjunction, aborting\n");
-		exit(EXIT_FAILURE);
-	}
-	*conjunction_pp = (Word_t) c;
-	*/
+			*/
 }
 
 Role* get_role_composition(Role* r, Role* s, TBox* tbox) {
