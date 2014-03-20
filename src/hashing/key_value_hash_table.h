@@ -26,26 +26,9 @@ KeyValueHashTable* create_key_value_hash_table(unsigned size);
 
 int free_key_value_hash_table(KeyValueHashTable* hash_table);
 
-/**
- * The compare_func returns 0 if the two keys are equal, 1 otherwise
- */
-/*
-inline char insert_key_value(KeyValueHashTable* hash_table,
-		uint32_t hash_value,
-		int (*compare_func)(void* key_to_insert, void* key),
-		void* key_to_insert,
-		void* value);
-		*/
 inline char insert_key_value(KeyValueHashTable* hash_table,
 		uint64_t key,
 		void* value);
-
-/*
-inline void* get_value(KeyValueHashTable* hash_table,
-		uint32_t hash_value,
-		int (*compare_func)(void* key_to_insert, void* key),
-		void* key);
-		*/
 
 inline void* get_value(KeyValueHashTable* hash_table,
 		uint64_t key);
