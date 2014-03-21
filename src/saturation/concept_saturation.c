@@ -114,8 +114,10 @@ void saturate_concepts(TBox* tbox) {
 				int j,k;
 				Concept* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_list[j]);
+					// for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
+					// 	ex = GET_NEGATIVE_EXISTS(ax->rhs, tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_list[j]);
+					for (j = 0; j < ax->lhs->predecessors[i]->role->subsumer_count; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i]->role->subsumer_list[j]);
 						if (ex != NULL)
 							for (k = 0; k < ax->lhs->predecessors[i]->filler_count; ++k)
 								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
@@ -181,8 +183,10 @@ void saturate_concepts(TBox* tbox) {
 				int j,k;
 				Concept* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_list[j]);
+					// for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
+					// 	ex = GET_NEGATIVE_EXISTS(ax->rhs, tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_list[j]);
+					for (j = 0; j < ax->lhs->predecessors[i]->role->subsumer_count; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i]->role->subsumer_list[j]);
 						if (ex != NULL)
 							for (k = 0; k < ax->lhs->predecessors[i]->filler_count; ++k)
 								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
