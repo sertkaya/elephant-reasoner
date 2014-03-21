@@ -20,6 +20,8 @@
 #ifndef PRINT_UTILS_H
 #define PRINT_UTILS_H
 
+#include <stdio.h>
+
 #include "../model/datatypes.h"
 
 // utility functions for printing concepts, axioms and statistics

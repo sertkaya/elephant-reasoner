@@ -17,6 +17,7 @@
  */
 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -31,7 +32,6 @@
 void compute_concept_hierarchy(TBox* tbox) {
 
 	int is_direct_subsumer;
-	Word_t direct_subsumer_index;
 	int is_direct_subsumer_list_nonempty;
 
 	int i, j;

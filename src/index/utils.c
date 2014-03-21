@@ -17,9 +17,9 @@
  */
 
 
-#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <Judy.h>
+#include <assert.h>
 
 #include "../model/datatypes.h"
 #include "../model/limits.h"

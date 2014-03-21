@@ -20,8 +20,6 @@
 #ifndef SATURATION_UTILS_H_
 #define SATURATION_UTILS_H_
 
-#include <Judy.h>
-
 #include "datatypes.h"
 #include "../model/datatypes.h"
 #include "../model/utils.h"

@@ -17,8 +17,8 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 #include <assert.h>
-#include <Judy.h>
 
 #include "../model/datatypes.h"
 #include "../model/model.h"
@@ -57,12 +57,12 @@ void saturate_roles(TBox* tbox) {
 	init_stack(&scheduled_axioms);
 
 	// push the input axioms to the stack
-    PWord_t key = NULL;
-    uint8_t role_index[MAX_ROLE_NAME_LENGTH];
 
     // first the atomic roles
     /*
 	// start with the smallest role name
+    PWord_t key = NULL;
+    uint8_t role_index[MAX_ROLE_NAME_LENGTH];
 	role_index[0] = '\0';
     JSLF(key, tbox->atomic_roles, role_index);
     while (key != NULL) {
