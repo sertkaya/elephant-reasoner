@@ -20,7 +20,6 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
-#include <Judy.h>
 #include "datatypes.h"
 
 // names of the top and bottom concepts

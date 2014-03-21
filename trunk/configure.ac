@@ -9,7 +9,6 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
-AC_CHECK_LIB(Judy, JudySLGet)
 
 # Checks for programs.
 AC_PROG_CC

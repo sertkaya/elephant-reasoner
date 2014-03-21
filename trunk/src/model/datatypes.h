@@ -20,7 +20,6 @@
 #ifndef DATATYPES_H_
 #define DATATYPES_H_
 
-#include <Judy.h>
 #include "../hashing/key_hash_table.h"
 #include "../hashing/key_value_hash_table.h"
 
