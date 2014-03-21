@@ -58,31 +58,11 @@ void saturate_roles(TBox* tbox) {
 
 	// push the input axioms to the stack
 
-    // first the atomic roles
-    /*
-	// start with the smallest role name
-    PWord_t key = NULL;
-    uint8_t role_index[MAX_ROLE_NAME_LENGTH];
-	role_index[0] = '\0';
-    JSLF(key, tbox->atomic_roles, role_index);
-    while (key != NULL) {
-            push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
-            JSLN(key, tbox->atomic_roles, role_index);
-    }
-    */
+    // both atomic roles and role compositions
     int i;
     for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
             push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
 
-    /*
-    // now the role compositions
-	role_index[0] = '\0';
-    JSLF(key, tbox->role_compositions, role_index);
-    while (key != NULL) {
-    		push(&scheduled_axioms, create_role_saturation_axiom((Role*) *key, (Role*) *key));
-            JSLN(key, tbox->role_compositions, role_index);
-    }
-    */
 
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
 	ax = pop(&scheduled_axioms);
@@ -98,19 +78,12 @@ void saturate_roles(TBox* tbox) {
 
 	// Compute the role composition hierarchies.
 	// This is for optimizing the role composition rule in concept saturation
-	// We first make a temporary copy of the  role compositions
+	// (We first make a temporary copy of the  role compositions and work with the copy
+	// since new binary role compositions are generated during this process)
 	int original_binary_composition_count = tbox->unique_binary_role_composition_count;
 	Role** tmp = (Role**) malloc(original_binary_composition_count * sizeof(Role*));
 	assert(tmp != NULL);
 	int j = 0;
-	/*
-	role_index[0] = '\0';
-	JSLF(key, tbox->role_compositions, role_index);
-	while (key != NULL) {
-		tmp[j++] =  (Role*) *key;
-		JSLN(key, tbox->role_compositions, role_index);
-	}
-	*/
 	// iterate over the role_compositions hash, copy to the tmp
 	Node* node = last_node(tbox->role_compositions);
 	while (node) {
