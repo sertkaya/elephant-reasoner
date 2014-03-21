@@ -40,16 +40,6 @@ void add_told_subsumer_concept(Concept* c, Concept* s) {
 	c->told_subsumers = tmp;
 	c->told_subsumers[c->told_subsumer_count] = s;
 	c->told_subsumer_count++;
-
-/*
-	int added_told_subsumer;
-
-	J1S(added_told_subsumer, c->told_subsumers, (Word_t) s);
-	if (added_told_subsumer == JERR) {
-		fprintf(stderr, "could not add told subsumer, aborting\n");
-		exit(EXIT_FAILURE);
-	}
-	*/
 }
 
 // add concept s to the subsumer list of concept c
@@ -59,23 +49,13 @@ void add_told_subsumer_concept(Concept* c, Concept* s) {
 // is performance in saturation
 // int add_to_concept_subsumer_list(Concept* c, Concept* s) {
 void add_to_concept_subsumer_list(Concept* c, Concept* s) {
-	// int added_to_subsumer_list;
 	Concept** tmp;
 
-	// J1S(added_to_subsumer_list, c->subsumers, (Word_t) s);
-	// if (added_to_subsumer_list == JERR) {
-	// 	fprintf(stderr, "could not add to subsumer list, aborting\n");
-	// 	exit(EXIT_FAILURE);
-	// }
-	// if (added_to_subsumer_list) {
-		tmp = realloc(c->subsumer_list, (c->subsumer_count + 1) * sizeof(Concept*));
-		assert(tmp != NULL);
-		c->subsumer_list = tmp;
-		c->subsumer_list[c->subsumer_count] = s;
-		c->subsumer_count++;
-	// }
-
-	// return added_to_subsumer_list;
+	tmp = realloc(c->subsumer_list, (c->subsumer_count + 1) * sizeof(Concept*));
+	assert(tmp != NULL);
+	c->subsumer_list = tmp;
+	c->subsumer_list[c->subsumer_count] = s;
+	c->subsumer_count++;
 }
 
 
@@ -175,6 +155,7 @@ void add_to_second_conjunct_of_list(Concept* concept, Concept* conjunction) {
 	}
 }
 
+// add ex to the filler_of_negative_exists hash of the filler of ex.
 void add_to_negative_exists(Concept* ex, TBox* tbox) {
 	// We allocate the space here (in indexing)
 	if (ex->description.exists->filler->filler_of_negative_exists == NULL) {
@@ -184,36 +165,6 @@ void add_to_negative_exists(Concept* ex, TBox* tbox) {
 	}
 	ex->description.exists->filler->filler_of_negative_exists[ex->description.exists->role->id] = ex;
 }
-
-// add ex to the filler_of_negative_exists hash of the filler of ex.
-// key of the hash is ex->description.exists->role, the value is ex.
-/*
-void add_to_negative_exists(Concept* ex) {
-	PWord_t neg_exists_pp;
-
-	// JLI(neg_exists_pp, c->filler_of_negative_exits, (Word_t) ex->description.exists->role);
-	JLI(neg_exists_pp, ex->description.exists->filler->filler_of_negative_exists, (Word_t) ex->description.exists->role);
-	if (neg_exists_pp == PJERR) {
-		fprintf(stderr, "could not insert into the negative existentials hash, aborting\n");
-		exit(EXIT_FAILURE);
-	}
-	*neg_exists_pp = (Word_t) ex;
-}
-*/
-
-// return the negative existential restriction whose role is r and filler is c
-// returns NULL if no such existential restriction is found
-/*
-Concept* get_negative_exists(Concept* c, Role* r) {
-	PWord_t neg_exists_pp;
-
-	JLG(neg_exists_pp, c->filler_of_negative_exists, (Word_t) r);
-	if (neg_exists_pp == NULL)
-		return NULL;
-
-	return (Concept*) *neg_exists_pp;
-}
-*/
 
 // add 'composition' to the list of compositions whose first component is 'role'
 // note that for performance reasons in saturation, this information is kept twice:

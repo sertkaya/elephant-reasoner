@@ -16,27 +16,10 @@
  * limitations under the License.
  */
 
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <assert.h>
-#include <inttypes.h>
-#include <stdint.h>
-
 #include "model.h"
 #include "datatypes.h"
 #include "limits.h"
 #include "../hashing/utils.h"
-
-// two ids of type int + the underscore in between
-#define BUILD_EXISTS_RESTRICTION_ID(r, f, buffer) snprintf((char*) buffer, 16, "%d_%d", r, f)
-
-#define BUILD_CONJUNCTION_ID(c1, c2, buffer) (c1 <= c2) ? snprintf((char*) buffer, 16, "%d_%d", c1, c2) : snprintf((char*) buffer, 16, "%d_%d", c2, c1)
-
-unsigned char role_composition_buffer[16];
-#define BUILD_ROLE_COMPOSITION_ID(r1,r2) (r1 <= r2) ? snprintf((char*) role_composition_buffer, 16, "%d_%d", r1, r2) : snprintf((char*) role_composition_buffer, 16, "%d_%d", r2, r1)
 
 // return the atomic concept with the given name if it exists
 // NULL if it does not exist
@@ -88,30 +71,15 @@ Concept* get_conjunction(Concept* c, Concept* d, TBox* tbox) {
 		return get_value(tbox->conjunctions, HASH_INTEGERS(c->id, d->id));
 	else
 		return get_value(tbox->conjunctions, HASH_INTEGERS(d->id, c->id));
-	/*
-	unsigned char buffer[16];
-	BUILD_CONJUNCTION_ID(c->id, d->id, buffer);
-	Concept* conjunction = get_value(tbox->conjunctions,
-			hash_string(buffer));
-	return conjunction;
-			*/
-
 }
 
 // the conjuncts of c are assumed to be ordered
 void put_conjunction(Concept* c, TBox* tbox) {
-	// unsigned char buffer[16];
 
 	if (c->description.conj->conjunct1->id <= c->description.conj->conjunct2->id)
 		insert_key_value(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id), c);
 	else
 		insert_key_value(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct2->id, c->description.conj->conjunct1->id), c);
-	/*
-	BUILD_CONJUNCTION_ID(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id, buffer);
-	insert_key_value(tbox->conjunctions,
-			hash_string(buffer),
-			c);
-			*/
 }
 
 Role* get_role_composition(Role* r, Role* s, TBox* tbox) {
@@ -119,16 +87,6 @@ Role* get_role_composition(Role* r, Role* s, TBox* tbox) {
 		return get_value(tbox->role_compositions, HASH_INTEGERS(r->id, s->id));
 	else
 		return get_value(tbox->role_compositions, HASH_INTEGERS(s->id, r->id));
-	/*
-	PWord_t role_composition_pp;
-
-	BUILD_ROLE_COMPOSITION_ID(r->id, s->id);
-	JSLG(role_composition_pp, tbox->role_compositions, (unsigned char*) role_composition_buffer);
-	if (role_composition_pp == NULL)
-		return NULL;
-
-	return (Role*) *role_composition_pp;
-	*/
 }
 
 void put_role_composition(Role* r, TBox* tbox) {
@@ -136,15 +94,4 @@ void put_role_composition(Role* r, TBox* tbox) {
 		insert_key_value(tbox->role_compositions, HASH_INTEGERS(r->description.role_composition->role1->id, r->description.role_composition->role2->id), r);
 	else
 		insert_key_value(tbox->role_compositions, HASH_INTEGERS(r->description.role_composition->role2->id, r->description.role_composition->role1->id), r);
-	/*
-	PWord_t role_composition_pp;
-
-	BUILD_ROLE_COMPOSITION_ID(r->description.role_composition->role1->id, r->description.role_composition->role2->id);
-	JSLI(role_composition_pp, tbox->role_compositions, (unsigned char*) role_composition_buffer);
-	if (role_composition_pp == PJERR) {
-		fprintf(stderr, "could not insert role composition, aborting\n");
-		exit(EXIT_FAILURE);
-	}
-	*role_composition_pp = (Word_t) r;
-	*/
 }
