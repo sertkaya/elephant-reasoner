@@ -169,7 +169,10 @@ struct role_composition {
 
 // role 
 struct role {
-	int id;
+	// Unique role id.
+	// 32-bit unsigned integer, needed for hashing.
+	uint32_t id;
+
 	enum role_description_type type;
 	RoleDescription description;
 
@@ -265,13 +268,13 @@ struct tbox {
 	// int role_count;
 	Role** role_list;
 
-	Pvoid_t role_compositions;
+	KeyValueHashTable* role_compositions;
 	int role_composition_count;
 	int binary_role_composition_count;
 	int unique_binary_role_composition_count;
 
 	uint32_t last_concept_id;
-	int last_role_id;
+	uint32_t last_role_id;
 
 	SubClassAxiom** subclass_axioms;
 	int subclass_axiom_count;

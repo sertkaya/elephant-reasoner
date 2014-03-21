@@ -68,7 +68,7 @@ TBox* init_reasoner() {
 	tbox->role_composition_count = 0;
 	tbox->binary_role_composition_count = 0;
 	tbox->unique_binary_role_composition_count = 0;
-	tbox->role_compositions = (Pvoid_t) NULL;
+	tbox->role_compositions = create_key_value_hash_table(DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
 
 	tbox->subclass_axioms = NULL;
 	tbox->subclass_axiom_count = 0;

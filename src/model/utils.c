@@ -68,7 +68,7 @@ void put_atomic_role(unsigned char* name, Role* r, TBox* tbox) {
 }
 
 // get the existential restriction with role r and filler f from hash
-Concept* get_exists_restriction(int role_id, uint32_t filler_id, TBox* tbox) {
+Concept* get_exists_restriction(uint32_t role_id, uint32_t filler_id, TBox* tbox) {
 	Concept* c = get_value(tbox->exists_restrictions,
 			HASH_INTEGERS(role_id, filler_id));
 
@@ -76,7 +76,7 @@ Concept* get_exists_restriction(int role_id, uint32_t filler_id, TBox* tbox) {
 }
 
 // put the existential restriction with role r and filler f into hash
-void put_exists_restriction(int role_id, uint32_t filler_id, Concept* c, TBox* tbox) {
+void put_exists_restriction(uint32_t role_id, uint32_t filler_id, Concept* c, TBox* tbox) {
 	insert_key_value(tbox->exists_restrictions,
 			HASH_INTEGERS(role_id, filler_id),
 			c);
@@ -84,13 +84,13 @@ void put_exists_restriction(int role_id, uint32_t filler_id, Concept* c, TBox* t
 
 // We order c and d based on c->id and d->id!
 Concept* get_conjunction(Concept* c, Concept* d, TBox* tbox) {
-	unsigned char buffer[16];
 
 	if (c->id <= d->id)
 		return get_value(tbox->conjunctions, HASH_INTEGERS(c->id, d->id));
 	else
 		return get_value(tbox->conjunctions, HASH_INTEGERS(d->id, c->id));
 	/*
+	unsigned char buffer[16];
 	BUILD_CONJUNCTION_ID(c->id, d->id, buffer);
 	Concept* conjunction = get_value(tbox->conjunctions,
 			hash_string(buffer));
@@ -101,7 +101,7 @@ Concept* get_conjunction(Concept* c, Concept* d, TBox* tbox) {
 
 // the conjuncts of c are assumed to be ordered
 void put_conjunction(Concept* c, TBox* tbox) {
-	unsigned char buffer[16];
+	// unsigned char buffer[16];
 
 	if (c->description.conj->conjunct1->id <= c->description.conj->conjunct2->id)
 		insert_key_value(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id), c);
@@ -116,6 +116,11 @@ void put_conjunction(Concept* c, TBox* tbox) {
 }
 
 Role* get_role_composition(Role* r, Role* s, TBox* tbox) {
+	if (r->id <= s->id)
+		return get_value(tbox->role_compositions, HASH_INTEGERS(r->id, s->id));
+	else
+		return get_value(tbox->role_compositions, HASH_INTEGERS(s->id, r->id));
+	/*
 	PWord_t role_composition_pp;
 
 	BUILD_ROLE_COMPOSITION_ID(r->id, s->id);
@@ -124,9 +129,15 @@ Role* get_role_composition(Role* r, Role* s, TBox* tbox) {
 		return NULL;
 
 	return (Role*) *role_composition_pp;
+	*/
 }
 
 void put_role_composition(Role* r, TBox* tbox) {
+	if (r->description.role_composition->role1->id <= r->description.role_composition->role2->id)
+		insert_key_value(tbox->role_compositions, HASH_INTEGERS(r->description.role_composition->role1->id, r->description.role_composition->role2->id), r);
+	else
+		insert_key_value(tbox->role_compositions, HASH_INTEGERS(r->description.role_composition->role2->id, r->description.role_composition->role1->id), r);
+	/*
 	PWord_t role_composition_pp;
 
 	BUILD_ROLE_COMPOSITION_ID(r->description.role_composition->role1->id, r->description.role_composition->role2->id);
@@ -136,4 +147,5 @@ void put_role_composition(Role* r, TBox* tbox) {
 		exit(EXIT_FAILURE);
 	}
 	*role_composition_pp = (Word_t) r;
+	*/
 }

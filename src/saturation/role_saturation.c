@@ -103,11 +103,19 @@ void saturate_roles(TBox* tbox) {
 	Role** tmp = (Role**) malloc(original_binary_composition_count * sizeof(Role*));
 	assert(tmp != NULL);
 	int j = 0;
+	/*
 	role_index[0] = '\0';
 	JSLF(key, tbox->role_compositions, role_index);
 	while (key != NULL) {
 		tmp[j++] =  (Role*) *key;
 		JSLN(key, tbox->role_compositions, role_index);
+	}
+	*/
+	// iterate over the role_compositions hash, copy to the tmp
+	Node* node = last_node(tbox->role_compositions);
+	while (node) {
+		tmp[j++] = (Role*) node->value;
+		node = previous_node(node);
 	}
 
 	int role1_subsumee_count, role2_subsumee_count;

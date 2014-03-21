@@ -266,9 +266,6 @@ int free_tbox(TBox* tbox) {
 	// free the existentials hash
 	total_freed_bytes += free_key_value_hash_table(tbox->exists_restrictions);
 
-	PWord_t key = NULL;
-	uint8_t index[MAX_CONCEPT_NAME_LENGTH];
-
 	// iterate over the conjunctions hash, free the conjunctions
 	node = last_node(tbox->conjunctions);
 	while (node) {
@@ -317,6 +314,19 @@ int free_tbox(TBox* tbox) {
 	free(tbox->role_list);
 	*/
 
+	// iterate over the role_compositions hash, free the role compositions
+	node = last_node(tbox->role_compositions);
+	while (node) {
+		total_freed_bytes += free_role((Role*) node->value);
+		node = previous_node(node);
+	}
+	// free the role compositions hash
+	total_freed_bytes += free_key_value_hash_table(tbox->role_compositions);
+
+	/*
+	PWord_t key = NULL;
+	uint8_t index[MAX_CONCEPT_NAME_LENGTH];
+
 	// free the role compositions
 	strcpy((char*) index, "");
 	JSLF(key, tbox->role_compositions, index);
@@ -326,6 +336,7 @@ int free_tbox(TBox* tbox) {
 	}
 	JSLFA(freed_bytes, tbox->role_compositions);
 	total_freed_bytes += freed_bytes;
+	*/
 
 	// iterate over atomic roles, free them
 	node = last_node(tbox->atomic_roles);
