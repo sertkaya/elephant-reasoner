@@ -57,14 +57,25 @@ void saturate_roles(TBox* tbox) {
 	init_stack(&scheduled_axioms);
 
 	// push the input axioms to the stack
-
-    // both atomic roles and role compositions
-    int i;
-    for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
-            push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
+    // first the atomic roles
+	Node* node = last_node(tbox->atomic_roles);
+	while (node) {
+		push(&scheduled_axioms, create_role_saturation_axiom((Role*) node->value, (Role*) node->value));
+		node = previous_node(node);
+	}
+    // for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
+    // 	push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
+    // Now the role compositions.
+	// Iterate over the role_compositions hash, copy to the tmp
+	node = last_node(tbox->role_compositions);
+	while (node) {
+		push(&scheduled_axioms, create_role_saturation_axiom((Role*) node->value, (Role*) node->value));
+		node = previous_node(node);
+	}
 
 
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
+    int i;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
@@ -85,7 +96,7 @@ void saturate_roles(TBox* tbox) {
 	assert(tmp != NULL);
 	int j = 0;
 	// iterate over the role_compositions hash, copy to the tmp
-	Node* node = last_node(tbox->role_compositions);
+	node = last_node(tbox->role_compositions);
 	while (node) {
 		tmp[j++] = (Role*) node->value;
 		node = previous_node(node);
