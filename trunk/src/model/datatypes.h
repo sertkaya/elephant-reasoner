@@ -263,10 +263,6 @@ struct tbox {
 	KeyValueHashTable* atomic_roles;
 	int atomic_role_count;
 
-	// atomic roles and binary role compositions together
-	// int role_count;
-	Role** role_list;
-
 	KeyValueHashTable* role_compositions;
 	int role_composition_count;
 	int binary_role_composition_count;

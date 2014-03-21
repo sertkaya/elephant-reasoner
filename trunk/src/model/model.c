@@ -279,11 +279,6 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	put_atomic_role((unsigned char*) r->description.atomic->name, r, tbox);
 	tbox->atomic_role_count++;
 
-	Role **tmp = realloc(tbox->role_list, (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(Role*));
-	assert(tmp != NULL);
-	tbox->role_list = tmp;
-	tbox->role_list[tbox->atomic_role_count + tbox->unique_binary_role_composition_count - 1] = r;
-
 	return r;
 }
 
@@ -328,11 +323,6 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 
 	put_role_composition(r, tbox);
 	tbox->unique_binary_role_composition_count++;
-
-	Role **tmp = realloc(tbox->role_list, (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(Role*));
-	assert(tmp != NULL);
-	tbox->role_list = tmp;
-	tbox->role_list[tbox->atomic_role_count + tbox->unique_binary_role_composition_count - 1] = r;
 
 	return r;
 }
