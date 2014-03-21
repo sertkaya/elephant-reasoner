@@ -251,15 +251,6 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += sizeof(Concept*) * tbox->atomic_concept_count;
 	free(tbox->atomic_concept_list);
 
-	// free the roles and roles list
-	// TODO: !!!
-	/*
-	for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
-		total_freed_bytes += free_role(tbox->role_list[i]);
-	total_freed_bytes += sizeof(Role*) * (tbox->atomic_role_count + tbox->unique_binary_role_composition_count);
-	free(tbox->role_list);
-	*/
-
 	// iterate over the role_compositions hash, free the role compositions
 	node = last_node(tbox->role_compositions);
 	while (node) {
@@ -269,28 +260,12 @@ int free_tbox(TBox* tbox) {
 	// free the role compositions hash
 	total_freed_bytes += free_key_value_hash_table(tbox->role_compositions);
 
-	/*
-	PWord_t key = NULL;
-	uint8_t index[MAX_CONCEPT_NAME_LENGTH];
-
-	// free the role compositions
-	strcpy((char*) index, "");
-	JSLF(key, tbox->role_compositions, index);
-	while (key != NULL) {
-		total_freed_bytes += free_role((Role*) *key);
-		JSLN(key, tbox->role_compositions, index);
-	}
-	JSLFA(freed_bytes, tbox->role_compositions);
-	total_freed_bytes += freed_bytes;
-	*/
-
 	// iterate over atomic roles, free them
 	node = last_node(tbox->atomic_roles);
 	while (node) {
 		total_freed_bytes += free_role((Role*) node->value);
 		node = previous_node(node);
 	}
-
 	// free the atomic roles hash
 	total_freed_bytes += free_key_value_hash_table(tbox->atomic_roles);
 

@@ -68,8 +68,6 @@ void add_to_negative_exists(Concept* ex, TBox* tbox);
 
 // return the negative existential restriction whose role is r and filler is c
 // returns NULL is no such existential restriction is found
-// Concept* get_negative_exists(Concept* c, Role* r);
-// #define GET_NEGATIVE_EXISTS(c, r)	((Concept*) get_value(c->filler_of_negative_exists, r->id))
 #define GET_NEGATIVE_EXISTS(c, r)	(c->filler_of_negative_exists == NULL ? NULL : c->filler_of_negative_exists[r->id])
 
 
