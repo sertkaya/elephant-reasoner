@@ -263,29 +263,7 @@ void saturate_concepts(TBox* tbox) {
 
 							}
 						}
-					/*
-					PWord_t successor_bitmap_p;
-					JLG(successor_bitmap_p, ax->rhs->successors, (Word_t) ax->role->first_component_of_list[j]->description.role_composition->role2);
 
-					// if ax->rhs has an ax->role->...->role2 successor
-					if (successor_bitmap_p != NULL) {
-						int successor_bitmap_nonempty, k, l;
-						Word_t successor_p = 0;
-						Pvoid_t successor_bitmap = (Pvoid_t) *successor_bitmap_p;
-
-						J1F(successor_bitmap_nonempty, successor_bitmap, successor_p);
-						while (successor_bitmap_nonempty) {
-							// printf("successor: ");
-							// print_concept((Concept*) successor_p);
-							// printf("\n");
-
-							// for (l = 0; l < ax->role->first_component_of_list[j]->subsumer_count; ++l)
-								// push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (Concept*) successor_p, ax->role->first_component_of_list[j]->subsumer_list[l], LINK));
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (Concept*) successor_p, ax->role->first_component_of_list[j], LINK));
-							J1N(successor_bitmap_nonempty, successor_bitmap, successor_p);
-						}
-					}
-					*/
 				}
 
 
