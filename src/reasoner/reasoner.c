@@ -53,8 +53,6 @@ TBox* init_reasoner() {
 	tbox->atomic_role_count = 0;
 	tbox->atomic_roles = create_key_value_hash_table(DEFAULT_ATOMIC_ROLES_HASH_SIZE);
 
-	tbox->role_list = NULL;
-
 	tbox->exists_restriction_count = 0;
 	tbox->unique_exists_restriction_count = 0;
 	tbox->exists_restrictions = create_key_value_hash_table(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
