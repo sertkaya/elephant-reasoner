@@ -73,9 +73,8 @@ void saturate_roles(TBox* tbox) {
 		node = previous_node(node);
 	}
 
-
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
-    int i;
+	int i;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
