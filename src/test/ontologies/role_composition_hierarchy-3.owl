@@ -2,9 +2,11 @@ Ontology(<http://www.ihtsdo.org/>
 
 SubObjectPropertyOf(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#r1>)
 SubObjectPropertyOf(<http://www.ihtsdo.org#s> <http://www.ihtsdo.org#s1>)
+SubObjectPropertyOf(<http://www.ihtsdo.org#w> <http://www.ihtsdo.org#w1>)
+
 SubObjectPropertyOf(
-	ObjectPropertyChain(<http://www.ihtsdo.org#r1> <http://www.ihtsdo.org#s1>)
-	<http://www.ihtsdo.org#t>)
+	ObjectPropertyChain(<http://www.ihtsdo.org#r1> <http://www.ihtsdo.org#s1> <http://www.ihtsdo.org#w1>)
+	<http://www.ihtsdo.org#x>)
 
 SubClassOf(<http://www.ihtsdo.org#A> 
 	ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#B>))
@@ -13,6 +15,11 @@ SubClassOf(<http://www.ihtsdo.org#B>
 	ObjectSomeValuesFrom(<http://www.ihtsdo.org#s> <http://www.ihtsdo.org#C>))
 
 SubClassOf(
-	ObjectSomeValuesFrom(<http://www.ihtsdo.org#t> <http://www.ihtsdo.org#C>)
+	<http://www.ihtsdo.org#C>
+	ObjectSomeValuesFrom(<http://www.ihtsdo.org#w> <http://www.ihtsdo.org#D>))
+
+SubClassOf(
+	ObjectSomeValuesFrom(<http://www.ihtsdo.org#x> <http://www.ihtsdo.org#D>)
 	<http://www.ihtsdo.org#X>)
+
 )
