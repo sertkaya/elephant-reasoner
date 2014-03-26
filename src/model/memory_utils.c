@@ -131,42 +131,43 @@ int free_role(Role* r) {
 		free(r->description.atomic);
 		break;
 	case ROLE_COMPOSITION:
-		// total_freed_bytes += sizeof(Role*) * r->description.role_composition->size;
-		// free(r->description.role_composition->roles);
 		total_freed_bytes += sizeof(RoleComposition);
 		free(r->description.role_composition);
 		break;
 	}
 
 	// free the told subsumers list
-	total_freed_bytes += sizeof(Role*) * r->told_subsumer_count;
-	free(r->told_subsumers);
+	// total_freed_bytes += sizeof(Role*) * r->told_subsumer_count;
+	// free(r->told_subsumers);
+	total_freed_bytes += free_key_value_hash_table(r->told_subsumers);
+
+	total_freed_bytes += free_key_value_hash_table(r->told_subsumees);
 
 	// free the  subsumers list
 	total_freed_bytes += sizeof(Role*) * r->subsumer_count;
 	free(r->subsumer_list);
 
 	// free the subsumers hash
-	total_freed_bytes = free_key_hash_table(r->subsumers);
+	total_freed_bytes += free_key_hash_table(r->subsumers);
 
 	// free the  subsumees list
 	total_freed_bytes += sizeof(Role*) * r->subsumee_count;
 	free(r->subsumee_list);
 
 	// free the subsumees hash
-	total_freed_bytes = free_key_hash_table(r->subsumees);
+	total_freed_bytes += free_key_hash_table(r->subsumees);
 
 	// free the list of role compositions where this role occurs
 	total_freed_bytes += sizeof(Role*) * r->first_component_of_count;
 	free(r->first_component_of_list);
 
-	total_freed_bytes = free_key_hash_table(r->first_component_of);
+	total_freed_bytes += free_key_hash_table(r->first_component_of);
 
 	// now for the second component
 	total_freed_bytes += sizeof(Role*) * r->second_component_of_count;
 	free(r->second_component_of_list);
 
-	total_freed_bytes = free_key_hash_table(r->second_component_of);
+	total_freed_bytes += free_key_hash_table(r->second_component_of);
 
 	// finally free this role
 	total_freed_bytes += sizeof(Role);

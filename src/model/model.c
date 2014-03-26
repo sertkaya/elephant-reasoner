@@ -165,7 +165,6 @@ Concept* get_create_conjunction_binary(Concept* c1, Concept* c2, TBox* tbox) {
 	c->type = CONJUNCTION;
 	c->description.conj = (Conjunction*) malloc(sizeof(Conjunction));
 	assert(c->description.conj != NULL);
-	c->description.conj->negative_occurrence = 0;
 
 	// we order the conjuncts!
 	if (c1->id < c2->id) {
@@ -257,8 +256,9 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	strcpy(r->description.atomic->name, name);
 	r->id = tbox->last_role_id++;
 
-	r->told_subsumers = NULL;
-	r->told_subsumer_count = 0;
+	r->told_subsumers = create_key_value_hash_table(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
+	// r->told_subsumer_count = 0;
+	r->told_subsumees = create_key_value_hash_table(DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
@@ -302,8 +302,10 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 	r->description.role_composition->role2 = r2;
 	r->id = tbox->last_role_id++;
 
-	r->told_subsumers = NULL;
-	r->told_subsumer_count = 0;
+	r->told_subsumers = create_key_value_hash_table(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
+	// r->told_subsumers = NULL;
+	// r->told_subsumer_count = 0;
+	r->told_subsumees = create_key_value_hash_table(DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;

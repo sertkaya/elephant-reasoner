@@ -23,6 +23,7 @@
 
 #include "../model/datatypes.h"
 #include "../model/limits.h"
+#include "../hashing/key_value_hash_table.h"
 
 
 
@@ -66,6 +67,7 @@ void add_to_concept_subsumer_list(Concept* c, Concept* s) {
 // add s to the told subsumer list of c
 // note that multiple occurrence of s is allowed!
 void add_told_subsumer_role(Role* r, Role* s) {
+	/*
 	Role** tmp;
 
 	tmp = realloc(r->told_subsumers, (r->told_subsumer_count + 1) * sizeof(Role*));
@@ -73,9 +75,16 @@ void add_told_subsumer_role(Role* r, Role* s) {
 	r->told_subsumers = tmp;
 	r->told_subsumers[r->told_subsumer_count] = s;
 	r->told_subsumer_count++;
+	*/
+	insert_key_value(r->told_subsumers, s->id, s);
 }
 
-// add role s to the subsumer list of concept r
+// add role s to the subsumee list of  r
+void add_told_subsumee_role(Role* r, Role* s) {
+	insert_key_value(r->told_subsumees, s->id, s);
+}
+
+// add role s to the subsumer list of r
 // returns 1 if added, 0 otherwise
 // note that it maintains both the array and the hash table
 // of subsumers. the reason for keeping the subsumers twice
