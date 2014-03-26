@@ -24,6 +24,7 @@
 #include "../model/model.h"
 #include "../model/limits.h"
 #include "../model/print_utils.h"
+#include "../hashing/key_value_hash_table.h"
 #include "../utils/stack.h"
 #include "utils.h"
 
@@ -66,7 +67,6 @@ void saturate_roles(TBox* tbox) {
     // for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
     // 	push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
     // Now the role compositions.
-	// Iterate over the role_compositions hash, copy to the tmp
 	node = last_node(tbox->role_compositions);
 	while (node) {
 		push(&scheduled_axioms, create_role_saturation_axiom((Role*) node->value, (Role*) node->value));
@@ -79,8 +79,30 @@ void saturate_roles(TBox* tbox) {
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
 			// told subsumers
-			for (i = 0; i < ax->rhs->told_subsumer_count; ++i)
-				push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i]));
+			// for (i = 0; i < ax->rhs->told_subsumer_count; ++i)
+			// 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i]));
+			Node* told_subsumer = last_node(ax->rhs->told_subsumers);
+			while (told_subsumer) {
+			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (Role*) told_subsumer->value));
+			 	if (ax->lhs->type == ROLE_COMPOSITION) {
+			 		Node* told_subsumee1 = last_node(ax->lhs->description.role_composition->role1->told_subsumees);
+			 		while (told_subsumee1) {
+			 			Node* told_subsumee2 = last_node(ax->lhs->description.role_composition->role2->told_subsumees);
+			 			while (told_subsumee2) {
+			 				Role* composition = get_create_role_composition_binary(
+			 						(Role*) told_subsumee1->value,
+			 						(Role*) told_subsumee2->value,
+			 						tbox);
+			 				index_role(composition);
+			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (Role*) told_subsumer->value));
+			 				told_subsumee2 = previous_node(told_subsumee2);
+			 			}
+			 			told_subsumee1 = previous_node(told_subsumee1);
+			 		}
+			 	}
+			 	told_subsumer = previous_node(told_subsumer);
+			}
+
 		}
 		free(ax);
 		ax = pop(&scheduled_axioms);
@@ -90,6 +112,7 @@ void saturate_roles(TBox* tbox) {
 	// This is for optimizing the role composition rule in concept saturation
 	// (We first make a temporary copy of the  role compositions and work with the copy
 	// since new binary role compositions are generated during this process)
+	/*
 	int original_binary_composition_count = tbox->unique_binary_role_composition_count;
 	Role** tmp = (Role**) malloc(original_binary_composition_count * sizeof(Role*));
 	assert(tmp != NULL);
@@ -120,5 +143,7 @@ void saturate_roles(TBox* tbox) {
 
 	// now free tmp
 	free(tmp);
+	*/
+	printf("Role saturation finished\n");
 }
 

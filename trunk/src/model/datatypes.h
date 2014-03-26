@@ -75,7 +75,6 @@ struct atomic_concept {
 struct conjunction {
 	Concept* conjunct1;
 	Concept* conjunct2;
-	char negative_occurrence;
 };
 
 
@@ -175,8 +174,10 @@ struct role {
 	enum role_description_type type;
 	RoleDescription description;
 
-	Role** told_subsumers;
-	int told_subsumer_count;
+	// Role** told_subsumers;
+	// int told_subsumer_count;
+	KeyValueHashTable* told_subsumers;
+	KeyValueHashTable* told_subsumees;
 
 	KeyHashTable* subsumers;
 	Role** subsumer_list;

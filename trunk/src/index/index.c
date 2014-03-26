@@ -41,8 +41,6 @@ void index_concept(Concept* c, TBox* tbox) {
 		index_concept(c->description.conj->conjunct2, tbox);
 		add_to_first_conjunct_of_list(c->description.conj->conjunct1, c);
 		add_to_second_conjunct_of_list(c->description.conj->conjunct2, c);
-		// mark it as negative occurrence
-		c->description.conj->negative_occurrence = 1;
 		break;
 	case EXISTENTIAL_RESTRICTION:
 		// add_to_filler_of_list(c->description.exists->filler, c);
@@ -104,14 +102,17 @@ void index_tbox(TBox* tbox) {
 
 	for (i = 0; i < tbox->subrole_axiom_count; ++i) {
 		add_told_subsumer_role(tbox->subrole_axioms[i]->lhs, tbox->subrole_axioms[i]->rhs);
+		add_told_subsumee_role(tbox->subrole_axioms[i]->rhs, tbox->subrole_axioms[i]->lhs);
 		index_role(tbox->subrole_axioms[i]->lhs);
 	}
 
 	for (i = 0; i < tbox->eqrole_axiom_count; ++i) {
 		add_told_subsumer_role(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs);
+		add_told_subsumee_role(tbox->eqrole_axioms[i]->rhs, tbox->eqrole_axioms[i]->lhs);
 		index_role(tbox->subrole_axioms[i]->lhs);
 
 		add_told_subsumer_role(tbox->eqrole_axioms[i]->rhs, tbox->eqrole_axioms[i]->lhs);
+		add_told_subsumee_role(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs);
 		index_role(tbox->subrole_axioms[i]->rhs);
 	}
 
