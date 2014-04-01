@@ -162,6 +162,5 @@ void saturate_roles(TBox* tbox) {
 	// now free tmp
 	free(tmp);
 	*/
-	printf("Role saturation finished\n");
 }
 

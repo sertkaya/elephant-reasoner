@@ -35,6 +35,7 @@ AC_CONFIG_FILES([Makefile
 	src/hierarchy/Makefile
 	src/reasoner/Makefile
 	src/hashing/Makefile
+	src/preprocessing/Makefile
 	src/test/Makefile
 	src/utils/Makefile])
 AC_OUTPUT
