@@ -34,6 +34,9 @@
 #define MAX_CONCEPT_NAME_LENGTH			1024
 #define MAX_ROLE_NAME_LENGTH			1024
 
+// max number of disjoint classes
+#define MAX_DISJ_CLASS_EXP_COUNT		1024
+
 // default size of hash tables
 #define DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE		150000
 #define DEFAULT_ATOMIC_ROLES_HASH_SIZE			200

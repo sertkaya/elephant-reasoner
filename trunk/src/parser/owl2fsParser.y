@@ -46,6 +46,9 @@
 	// for parsing role composition
 	int role_exp_count;								/* number of roles in the role composition */
 	Role* role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles in the composition */
+	
+	int disj_cls_exp_count;								/* number of classes in a disjointclasses axiom */
+	Concept* disj_cls_exps[MAX_DISJ_CLASS_EXP_COUNT];	/* the class exps in a disjointclasses axiom */
 
 %}
 
@@ -63,7 +66,7 @@
 
 %token CLASS OBJECT_INTERSECTION_OF OBJECT_SOME_VALUES_FROM 
 %token OBJECT_PROPERTY OBJECT_INVERSE_OF OBJECT_PROPERTY_CHAIN
-%token SUB_CLASS_OF EQUIVALENT_CLASSES 
+%token SUB_CLASS_OF EQUIVALENT_CLASSES DISJOINT_CLASSES
 %token SUB_OBJECT_PROPERTY_OF TRANSITIVE_OBJECT_PROPERTY EQUIVALENT_OBJECT_PROPERTIES
 
 %%
@@ -258,12 +261,20 @@ equivalentClasses:
 		eq_cls_exp_count = 0;
 	};
 
-/*
-equivalentClasses:
-	EQUIVALENT_CLASSES '(' axiomAnnotations classExpression classExpression ')' {
-		add_eqclass_axiom(create_eqclass_axiom($4.concept, $5.concept), tbox);
+disjClassExpressions:
+	| classExpression disjClassExpressions {
+		if ($1.concept != NULL)
+			disj_cls_exps[disj_cls_exp_count++] = $1.concept;
 	};
-*/
+
+disjointClasses:
+	DISJOINT_CLASSES '(' axiomAnnotations classExpression classExpression disjClassExpressions ')' {
+		disj_cls_exps[disj_cls_exp_count++] = $4.concept;
+		disj_cls_exps[disj_cls_exp_count++] = $5.concept;
+		add_disjoint_classes_axiom(create_disjoint_classes_axiom(disj_cls_exp_count, disj_cls_exps), tbox);
+		disj_cls_exp_count = 0;
+	};
+
 
 objectPropertyExpression:
 	objectProperty 
@@ -303,6 +314,7 @@ objectPropertyExpressions:
 			role_exps[role_exp_count++] = $1.role;
 	};
 
+// TODO: treat axioms with multiple objectPropertyExpressions!
 equivalentObjectProperties:
 	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations objectPropertyExpression objectPropertyExpression objectPropertyExpressions ')' {
 		add_eqrole_axiom(create_eqrole_axiom($4.role, $5.role), tbox);
