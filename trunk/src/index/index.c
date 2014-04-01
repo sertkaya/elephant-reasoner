@@ -90,6 +90,8 @@ void index_tbox(TBox* tbox) {
 		index_concept(tbox->subclass_axioms[i]->lhs, tbox);
 	}
 
+	/*
+	 * now done in preprocessing
 	for (i = 0; i < tbox->eqclass_axiom_count; i++) {
 		add_told_subsumer_concept(tbox->eqclass_axioms[i]->lhs, tbox->eqclass_axioms[i]->rhs);
 		// add_to_subsumer_list(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
@@ -99,6 +101,7 @@ void index_tbox(TBox* tbox) {
 		// add_to_subsumer_list(tbox->subclass_axioms[i]->rhs, tbox->subclass_axioms[i]->lhs);
 		index_concept(tbox->eqclass_axioms[i]->rhs, tbox);
 	}
+	*/
 
 	for (i = 0; i < tbox->subrole_axiom_count; ++i) {
 		add_told_subsumer_role(tbox->subrole_axioms[i]->lhs, tbox->subrole_axioms[i]->rhs);
@@ -106,6 +109,8 @@ void index_tbox(TBox* tbox) {
 		index_role(tbox->subrole_axioms[i]->lhs);
 	}
 
+	/*
+	 * now done in preprocessing
 	for (i = 0; i < tbox->eqrole_axiom_count; ++i) {
 		add_told_subsumer_role(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs);
 		add_told_subsumee_role(tbox->eqrole_axioms[i]->rhs, tbox->eqrole_axioms[i]->lhs);
@@ -115,5 +120,6 @@ void index_tbox(TBox* tbox) {
 		add_told_subsumee_role(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs);
 		index_role(tbox->subrole_axioms[i]->rhs);
 	}
+	*/
 
 }

@@ -110,6 +110,14 @@ void read_kb(FILE* input_kb, TBox* tbox) {
 }
 
 void classify(TBox* tbox) {
+	printf("Preprocessing......................:");
+	fflush(stdout);
+	START_TIMER;
+	preprocess_tbox(tbox);
+	STOP_TIMER;
+	printf("%.3f milisecs\n", TIME_DIFF / 1000);
+	total_time += TIME_DIFF;
+
 	printf("Indexing...........................:");
 	fflush(stdout);
 	START_TIMER;
