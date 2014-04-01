@@ -70,7 +70,7 @@ void saturate_roles(TBox* tbox) {
 	Node* composition = last_node(tbox->role_compositions);
 	while (composition) {
 		push(&scheduled_axioms, create_role_saturation_axiom((Role*) composition->value, (Role*) composition->value));
-
+		/*
 		Node* told_subsumee1 = last_node(((Role*) composition->value)->description.role_composition->role1->told_subsumees);
 		while (told_subsumee1) {
 			Node* told_subsumee2 = last_node(((Role*) composition->value)->description.role_composition->role2->told_subsumees);
@@ -85,7 +85,7 @@ void saturate_roles(TBox* tbox) {
 			}
 			told_subsumee1 = previous_node(told_subsumee1);
 		}
-
+		*/
 		composition = previous_node(composition);
 	}
 
@@ -100,7 +100,7 @@ void saturate_roles(TBox* tbox) {
 			Node* told_subsumer = last_node(ax->rhs->told_subsumers);
 			while (told_subsumer) {
 			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (Role*) told_subsumer->value));
-			 	/*
+
 			 	if (ax->lhs->type == ROLE_COMPOSITION) {
 			 		Node* told_subsumee1 = last_node(ax->lhs->description.role_composition->role1->told_subsumees);
 			 		while (told_subsumee1) {
@@ -117,7 +117,7 @@ void saturate_roles(TBox* tbox) {
 			 			told_subsumee1 = previous_node(told_subsumee1);
 			 		}
 			 	}
-			 	*/
+
 			 	told_subsumer = previous_node(told_subsumer);
 			}
 
