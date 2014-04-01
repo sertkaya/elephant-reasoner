@@ -25,6 +25,7 @@
 #include "../model/datatypes.h"
 #include "../model/limits.h"
 #include "../model/model.h"
+#include "../preprocessing/preprocessing.h"
 #include "../index/index.h"
 #include "../saturation/saturation.h"
 #include "../hierarchy/hierarchy.h"
