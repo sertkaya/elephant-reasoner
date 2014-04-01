@@ -88,6 +88,7 @@ ObjectSomeValuesFrom					{ return OBJECT_SOME_VALUES_FROM; }
 										/* Class Axiom */
 SubClassOf								{ return SUB_CLASS_OF; }
 EquivalentClasses						{ return EQUIVALENT_CLASSES; }
+DisjointClasses							{ return DISJOINT_CLASSES; }
 
 										/* Object Property Axiom */
 SubObjectPropertyOf						{ return SUB_OBJECT_PROPERTY_OF; }
