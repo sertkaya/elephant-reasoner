@@ -64,7 +64,7 @@ SubClassAxiom* create_subclass_axiom(Concept* lhs, Concept* rhs);
 EqClassAxiom* create_eqclass_axiom(Concept* lhs, Concept* rhs);
 
 // create disjoint classes axiom
-DisjointClassesAxiom* create_disjoint_classes_axiom(int class_count, Concept** classes);
+DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, Concept** classes);
 
 // create the subrole axiom with the given role descriptions
 SubRoleAxiom* create_subrole_axiom(Role* lhs, Role* rhs);
@@ -81,12 +81,14 @@ void add_subclass_axiom(SubClassAxiom* ax, TBox* tbox);
 // add a given equivalent classes axiom to the TBox
 void add_eqclass_axiom(EqClassAxiom* ax, TBox* tbox);
 
+// add a given disjoint classes axiom to the TBox
+void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox);
+
 // add a given subrole axiom to the TBox
 void add_subrole_axiom(SubRoleAxiom* ax, TBox* tbox);
 
 // add a given transitive role axiom to the TBox
 void add_transitive_role_axiom(TransitiveRoleAxiom* ax, TBox* tbox);
-
 
 
 #endif /* MODEL_H_ */
