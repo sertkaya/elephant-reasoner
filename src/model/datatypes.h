@@ -38,6 +38,7 @@ typedef struct role Role;
 
 typedef struct subclass_axiom SubClassAxiom;
 typedef struct eqclass_axiom EqClassAxiom;
+typedef struct disjointclasses_axiom DisjointClassesAxiom;
 typedef struct subrole_axiom SubRoleAxiom;
 typedef struct eqrole_axiom EqRoleAxiom;
 typedef struct transitive_role_axiom TransitiveRoleAxiom;
@@ -206,16 +207,22 @@ struct role {
 // 	SUBCLASS_AX, EQCLASS_AX, SUBROLE_AX
 // };
 
-// Subclass axiom
+// SubClass axiom
 struct subclass_axiom {
 	Concept* lhs;
 	Concept* rhs;
 };
 
-// Equivalent class axiom
+// EquivalentClasses axiom
 struct eqclass_axiom {
 	Concept* lhs;
 	Concept* rhs;
+};
+
+// DisjointClasses axiom
+struct disjointclasses_axiom {
+	int concept_count;
+	Concept **concepts;
 };
 
 // RI

@@ -236,7 +236,8 @@ axiom:
 
 classAxiom:
 	subClassOf 
-	| equivalentClasses;
+	| equivalentClasses
+	| disjointClasses;
 
 subClassOf:
 	SUB_CLASS_OF '(' axiomAnnotations classExpression classExpression ')' {
@@ -271,7 +272,7 @@ disjointClasses:
 	DISJOINT_CLASSES '(' axiomAnnotations classExpression classExpression disjClassExpressions ')' {
 		disj_cls_exps[disj_cls_exp_count++] = $4.concept;
 		disj_cls_exps[disj_cls_exp_count++] = $5.concept;
-		add_disjoint_classes_axiom(create_disjoint_classes_axiom(disj_cls_exp_count, disj_cls_exps), tbox);
+		add_disjointclasses_axiom(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), tbox);
 		disj_cls_exp_count = 0;
 	};
 
