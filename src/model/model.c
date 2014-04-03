@@ -384,9 +384,18 @@ EqClassAxiom* create_eqclass_axiom(Concept* lhs, Concept* rhs) {
 	return ax;
 }
 
-// TODO:
+// create the disjointclasses axiom with the given concept descriptions
 DisjointClassesAxiom* create_disjointclasses_axiom(int concept_count, Concept** concepts) {
-	return NULL;
+	DisjointClassesAxiom* ax = (DisjointClassesAxiom*) calloc(1, sizeof(DisjointClassesAxiom));
+	assert(ax != NULL);
+	ax->concepts = (Concept**) calloc(concept_count, sizeof(Concept*));
+	assert(ax->concepts != NULL);
+	ax->concept_count = concept_count;
+	int i;
+	for (i = 0; i < ax->concept_count; ++i)
+		ax->concepts[i] = concepts[i];
+
+	return ax;
 }
 
 // create the subrole axiom with the given role descriptions
@@ -439,9 +448,13 @@ void add_eqclass_axiom(EqClassAxiom* ax, TBox* tbox) {
 	++tbox->eqclass_axiom_count;
 }
 
-// TODO:
 void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox) {
-
+	DisjointClassesAxiom** tmp;
+	tmp = realloc(tbox->disjointclasses_axioms, (tbox->disjointclasses_axiom_count + 1) * sizeof(DisjointClassesAxiom*));
+	assert(tmp != NULL);
+	tbox->disjointclasses_axioms = tmp;
+	tbox->disjointclasses_axioms[tbox->disjointclasses_axiom_count] = ax;
+	++tbox->disjointclasses_axiom_count;
 }
 
 // add a given subrole axiom to a given TBox

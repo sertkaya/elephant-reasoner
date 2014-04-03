@@ -180,39 +180,49 @@ int free_tbox(TBox* tbox) {
 	int i, total_freed_bytes = 0;
 
 	// free subclass axioms
-	total_freed_bytes += sizeof(SubClassAxiom) * tbox->subclass_axiom_count;
 	for (i = 0; i < tbox->subclass_axiom_count; i++)
 		free(tbox->subclass_axioms[i]);
-	total_freed_bytes += sizeof(SubClassAxiom*) * tbox->subclass_axiom_count;
+	total_freed_bytes += sizeof(SubClassAxiom) * tbox->subclass_axiom_count;
 	free(tbox->subclass_axioms);
+	total_freed_bytes += sizeof(SubClassAxiom*) * tbox->subclass_axiom_count;
 
 	// free equivalent class axioms
-	total_freed_bytes += sizeof(EqClassAxiom) * tbox->eqclass_axiom_count;
 	for  (i = 0; i < tbox->eqclass_axiom_count; i++)
 		free(tbox->eqclass_axioms[i]);
-	total_freed_bytes += sizeof(EqClassAxiom*) * tbox->eqclass_axiom_count;
+	total_freed_bytes += sizeof(EqClassAxiom) * tbox->eqclass_axiom_count;
 	free(tbox->eqclass_axioms);
+	total_freed_bytes += sizeof(EqClassAxiom*) * tbox->eqclass_axiom_count;
+
+	// free the disjoint classes axioms
+	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i) {
+		free(tbox->disjointclasses_axioms[i]->concepts);
+		total_freed_bytes += tbox->disjointclasses_axioms[i]->concept_count * sizeof(Concept*);
+		free(tbox->disjointclasses_axioms[i]);
+	}
+	total_freed_bytes += tbox->disjointclasses_axiom_count * sizeof(DisjointClassesAxiom);
+	free(tbox->disjointclasses_axioms);
+	total_freed_bytes += tbox->disjointclasses_axiom_count * sizeof(DisjointClassesAxiom*);
 
 	// free role subrole axioms
-	total_freed_bytes += sizeof(SubRoleAxiom) * tbox->subrole_axiom_count;
 	for (i = 0; i < tbox->subrole_axiom_count; i++)
 		free(tbox->subrole_axioms[i]);
-	total_freed_bytes += sizeof(SubRoleAxiom*) * tbox->subrole_axiom_count;
+	total_freed_bytes += sizeof(SubRoleAxiom) * tbox->subrole_axiom_count;
 	free(tbox->subrole_axioms);
+	total_freed_bytes += sizeof(SubRoleAxiom*) * tbox->subrole_axiom_count;
 
 	// free equivalent role axioms
-	total_freed_bytes += sizeof(EqRoleAxiom) * tbox->eqrole_axiom_count;
 	for  (i = 0; i < tbox->eqrole_axiom_count; i++)
 		free(tbox->eqrole_axioms[i]);
-	total_freed_bytes += sizeof(EqRoleAxiom*) * tbox->eqrole_axiom_count;
+	total_freed_bytes += sizeof(EqRoleAxiom) * tbox->eqrole_axiom_count;
 	free(tbox->eqrole_axioms);
+	total_freed_bytes += sizeof(EqRoleAxiom*) * tbox->eqrole_axiom_count;
 
 	// free transitive role axioms
-	total_freed_bytes += sizeof(TransitiveRoleAxiom) * tbox->transitive_role_axiom_count;
 	for  (i = 0; i < tbox->transitive_role_axiom_count; i++)
 		free(tbox->transitive_role_axioms[i]);
-	total_freed_bytes += sizeof(TransitiveRoleAxiom*) * tbox->transitive_role_axiom_count;
+	total_freed_bytes += sizeof(TransitiveRoleAxiom) * tbox->transitive_role_axiom_count;
 	free(tbox->transitive_role_axioms);
+	total_freed_bytes += sizeof(TransitiveRoleAxiom*) * tbox->transitive_role_axiom_count;
 
 	// iterate over the existentials hash, free the existentials
 	Node* node = last_node(tbox->exists_restrictions);
@@ -238,7 +248,6 @@ int free_tbox(TBox* tbox) {
 		total_freed_bytes += free_concept((Concept*) node->value, tbox);
 		node = previous_node(node);
 	}
-
 	// free the atomic concepts hash
 	total_freed_bytes += free_key_value_hash_table(tbox->atomic_concepts);
 
@@ -246,11 +255,8 @@ int free_tbox(TBox* tbox) {
 	// this is the list kept for efficiently traversing over atomic concepts
 	// in hierarchy computation. the actual place for keeping atomic concepts
 	// is the atomic_concepts hash.
-	// here we also free the space allocated for the atomic concepts, not only the list
-	// for (i = 0; i < tbox->atomic_concept_count; ++i)
-	// 	total_freed_bytes += free_concept(tbox->atomic_concept_list[i], tbox);
-	total_freed_bytes += sizeof(Concept*) * tbox->atomic_concept_count;
 	free(tbox->atomic_concept_list);
+	total_freed_bytes += sizeof(Concept*) * tbox->atomic_concept_count;
 
 	// iterate over the role_compositions hash, free the role compositions
 	node = last_node(tbox->role_compositions);

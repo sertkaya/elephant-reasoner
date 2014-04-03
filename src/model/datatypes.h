@@ -293,6 +293,9 @@ struct tbox {
 
 	EqRoleAxiom** eqrole_axioms;
 	int eqrole_axiom_count;
+
+	DisjointClassesAxiom** disjointclasses_axioms;
+	int disjointclasses_axiom_count;
 };
 
 #endif /* DATATYPES_H_ */
