@@ -81,7 +81,7 @@ void saturate_concepts(TBox* tbox) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
 			++total_subsumption_count;
-			// no conjunction decomposition and no existential decomposition here
+			// no conjunction decomposition, no existential decomposition and no bottom rule here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++unique_subsumption_count;
 
@@ -111,7 +111,7 @@ void saturate_concepts(TBox* tbox) {
 				}
 
 				// existential introduction
-				int j,k;
+				// int j,k;
 				Concept* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
 					// for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
@@ -132,6 +132,7 @@ void saturate_concepts(TBox* tbox) {
 		case SUBSUMPTION_INITIALIZATION:
 		case SUBSUMPTION_CONJUNCTION_DECOMPOSITION:
 		case SUBSUMPTION_TOLD_SUBSUMER:
+		case SUBSUMPTION_BOTTOM:
 			++total_subsumption_count;
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
@@ -146,6 +147,13 @@ void saturate_concepts(TBox* tbox) {
 				print_concept(ax->rhs);
 				printf("\n");
 				 */
+
+				// bottom rule
+				if (ax->rhs == tbox->bottom_concept) {
+				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
+					for (j = 0; j < ax->lhs->predecessors[i]->filler_count; ++j)
+						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[j], tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+				}
 
 
 				// conjunction introduction
@@ -215,6 +223,12 @@ void saturate_concepts(TBox* tbox) {
 				*/
 
 				int i, j, k;
+
+				// bottom rule
+				if (IS_SUBSUMED_BY(ax->rhs, tbox->bottom_concept))
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+
+
 				// existential introduction
 				for (i = 0; i < ax->rhs->subsumer_count; ++i)
 					for (j = 0; j < ax->role->subsumer_count; ++j) {
