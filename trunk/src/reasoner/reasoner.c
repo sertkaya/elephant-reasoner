@@ -79,6 +79,8 @@ TBox* init_reasoner() {
 	tbox->eqrole_axiom_count = 0;
 	tbox->transitive_role_axioms = NULL;
 	tbox->transitive_role_axiom_count = 0;
+	tbox->disjointclasses_axioms = NULL;
+	tbox->disjointclasses_axiom_count = 0;
 
 	// add the top and bottom concepts
 	tbox->top_concept = get_create_atomic_concept(OWL_THING, tbox);
