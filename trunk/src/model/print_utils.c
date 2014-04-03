@@ -146,7 +146,7 @@ void print_equivalent_concepts(Concept* c, FILE* taxonomy_fp) {
 	for (i = 0; i < c->description.atomic->equivalent_concepts_count; ++i)
 		if (c != c->description.atomic->equivalent_concepts_list[i]) // to avoid EquivalentConcepts(c,c)
 			fprintf(taxonomy_fp, "EquivalentConcepts(%s, %s)\n", c->description.atomic->name,
-					c->description.atomic->equivalent_concepts_list[i]);
+					c->description.atomic->equivalent_concepts_list[i]->description.atomic->name);
 }
 
 void print_direct_subsumers(TBox* tbox, Concept* c, FILE* taxonomy_fp) {
