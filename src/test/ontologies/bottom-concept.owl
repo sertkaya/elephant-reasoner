@@ -5,7 +5,13 @@ Ontology(<http://www.ihtsdo.org/>
 SubClassOf(<http://www.ihtsdo.org#A> 
 	ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#B>))
 
+SubClassOf(<http://www.ihtsdo.org#B> 
+	ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#C>))
+
 SubClassOf(<http://www.ihtsdo.org#B> owl:Nothing)
+
+
+SubClassOf(<http://www.ihtsdo.org#D> <http://www.ihtsdo.org#C>)
 
 )
 
