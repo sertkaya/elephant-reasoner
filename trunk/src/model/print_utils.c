@@ -205,6 +205,7 @@ void print_short_stats(TBox* tbox) {
 			"unique binary role compositions: %d\n"
 			"subclass ax: %d\n"
 			"eqclass ax: %d\n"
+			"disjointness ax: %d\n"
 			"subrole ax: %d\n"
 			"eqrole ax: %d\n"
 			"transitive role ax: %d\n",
@@ -221,6 +222,7 @@ void print_short_stats(TBox* tbox) {
 			tbox->unique_binary_role_composition_count,
 			tbox->subclass_axiom_count,
 			tbox->eqclass_axiom_count,
+			tbox->disjointclasses_axiom_count,
 			tbox->subrole_axiom_count,
 			tbox->eqrole_axiom_count,
 			tbox->transitive_role_axiom_count);

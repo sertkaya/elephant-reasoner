@@ -41,6 +41,9 @@ Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox);
 // get or create the existential restriction with the given conjuncts
 Concept* get_create_conjunction(int conjunct_count, Concept** conjuncts, TBox* tbox);
 
+// get or create the binary existential restriction with the given conjuncts
+Concept* get_create_conjunction_binary(Concept* conjunct1, Concept* conjunct2, TBox* tbox);
+
 
 /******************************************************************************
  * get/create functions for roles

@@ -25,4 +25,17 @@ void preprocess_tbox(TBox* tbox) {
 		add_subrole_axiom(create_subrole_axiom(composition, tbox->transitive_role_axioms[i]->r), tbox);
 	}
 
+	// Process the disjointclasses axioms.
+	// We express that the concept pairs imply bottom.
+	// Note that this generates n^2 new subclass axioms for a disjointness axiom with n concepts.
+	// TODO: optimize!
+	int j, k;
+	Concept* conjunction;
+	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i)
+		for (j = 0; j < tbox->disjointclasses_axioms[i]->concept_count - 1; ++j)
+			for (k = j + 1; k < tbox->disjointclasses_axioms[i]->concept_count ; ++k) {
+				conjunction = get_create_conjunction_binary(tbox->disjointclasses_axioms[i]->concepts[j], tbox->disjointclasses_axioms[i]->concepts[k], tbox);
+				add_subclass_axiom(create_subclass_axiom(conjunction, tbox->bottom_concept), tbox);
+			}
+
 }
