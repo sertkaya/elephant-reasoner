@@ -1,0 +1,8 @@
+
+
+TODO:
+	- Optimize treatment of role composition hierarchy. The current implementation generates
+	too many new role compositions in role saturation, that can be reduced.
+	
+	- Optimize the preprocessing of disjointness axioms. The current implementation introduces
+	n^2 new subclass axioms for a disjointness axiom containing n concepts.
