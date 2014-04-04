@@ -150,9 +150,12 @@ void saturate_concepts(TBox* tbox) {
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
-				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					for (j = 0; j < ax->lhs->predecessors[i]->filler_count; ++j)
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[j], tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+					// We push the saturation axiom bottom <= ax->lhs, if we already know ax->lhs <= bottom. This way ax->lhs = bottom
+					// gets computed. The information bottom <= c is not taken into account for any other concept c.
+					push(&scheduled_axioms, create_concept_saturation_axiom(tbox->bottom_concept, ax->lhs, NULL, SUBSUMPTION_BOTTOM));
+					for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
+						for (j = 0; j < ax->lhs->predecessors[i]->filler_count; ++j)
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[j], tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
 				}
 
 
