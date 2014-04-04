@@ -167,7 +167,9 @@ void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
 		// check if the equivalence class is already printed
 		if (!contains_key(printed, tbox->atomic_concept_list[i]->id)) {
-			print_direct_subsumers(tbox, tbox->atomic_concept_list[i], taxonomy_fp);
+			// do not print the direct subsumers of bottom
+			if (tbox->atomic_concept_list[i] != tbox->bottom_concept)
+				print_direct_subsumers(tbox, tbox->atomic_concept_list[i], taxonomy_fp);
 
 			char printing_equivalents = 0;
 			if (tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count > 0) {
