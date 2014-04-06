@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.7.  */
+/* A Bison parser, made by GNU Bison 2.5.  */
 
 /* Bison interface for Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2011 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,15 +30,6 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
-/* Enabling traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -63,16 +54,22 @@ extern int yydebug;
      ANNOTATION_PROPERTY_RANGE = 272,
      CLASS = 273,
      OBJECT_INTERSECTION_OF = 274,
-     OBJECT_SOME_VALUES_FROM = 275,
-     OBJECT_PROPERTY = 276,
-     OBJECT_INVERSE_OF = 277,
-     OBJECT_PROPERTY_CHAIN = 278,
-     SUB_CLASS_OF = 279,
-     EQUIVALENT_CLASSES = 280,
-     DISJOINT_CLASSES = 281,
-     SUB_OBJECT_PROPERTY_OF = 282,
-     TRANSITIVE_OBJECT_PROPERTY = 283,
-     EQUIVALENT_OBJECT_PROPERTIES = 284
+     OBJECT_ONE_OF = 275,
+     OBJECT_SOME_VALUES_FROM = 276,
+     OBJECT_HAS_VALUE = 277,
+     OBJECT_HAS_SELF = 278,
+     DATA_INTERSECTION_OF = 279,
+     DATA_ONE_OF = 280,
+     DATA_SOME_VALUES_FROM = 281,
+     DATA_HAS_VALUE = 282,
+     OBJECT_PROPERTY = 283,
+     OBJECT_PROPERTY_CHAIN = 284,
+     SUB_CLASS_OF = 285,
+     EQUIVALENT_CLASSES = 286,
+     DISJOINT_CLASSES = 287,
+     SUB_OBJECT_PROPERTY_OF = 288,
+     TRANSITIVE_OBJECT_PROPERTY = 289,
+     EQUIVALENT_OBJECT_PROPERTIES = 290
    };
 #endif
 /* Tokens.  */
@@ -93,16 +90,23 @@ extern int yydebug;
 #define ANNOTATION_PROPERTY_RANGE 272
 #define CLASS 273
 #define OBJECT_INTERSECTION_OF 274
-#define OBJECT_SOME_VALUES_FROM 275
-#define OBJECT_PROPERTY 276
-#define OBJECT_INVERSE_OF 277
-#define OBJECT_PROPERTY_CHAIN 278
-#define SUB_CLASS_OF 279
-#define EQUIVALENT_CLASSES 280
-#define DISJOINT_CLASSES 281
-#define SUB_OBJECT_PROPERTY_OF 282
-#define TRANSITIVE_OBJECT_PROPERTY 283
-#define EQUIVALENT_OBJECT_PROPERTIES 284
+#define OBJECT_ONE_OF 275
+#define OBJECT_SOME_VALUES_FROM 276
+#define OBJECT_HAS_VALUE 277
+#define OBJECT_HAS_SELF 278
+#define DATA_INTERSECTION_OF 279
+#define DATA_ONE_OF 280
+#define DATA_SOME_VALUES_FROM 281
+#define DATA_HAS_VALUE 282
+#define OBJECT_PROPERTY 283
+#define OBJECT_PROPERTY_CHAIN 284
+#define SUB_CLASS_OF 285
+#define EQUIVALENT_CLASSES 286
+#define DISJOINT_CLASSES 287
+#define SUB_OBJECT_PROPERTY_OF 288
+#define TRANSITIVE_OBJECT_PROPERTY 289
+#define EQUIVALENT_OBJECT_PROPERTIES 290
+
 
 
 
@@ -115,18 +119,4 @@ typedef int YYSTYPE;
 
 extern YYSTYPE yylval;
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
