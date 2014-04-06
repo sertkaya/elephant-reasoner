@@ -64,8 +64,9 @@
 %token ANNOTATION ANNOTATION_ASSERTION SUB_ANNOTATION_PROPERTY_OF
 %token ANNOTATION_PROPERTY_DOMAIN ANNOTATION_PROPERTY_RANGE
 
-%token CLASS OBJECT_INTERSECTION_OF OBJECT_SOME_VALUES_FROM 
-%token OBJECT_PROPERTY OBJECT_INVERSE_OF OBJECT_PROPERTY_CHAIN
+%token CLASS OBJECT_INTERSECTION_OF OBJECT_ONE_OF OBJECT_SOME_VALUES_FROM OBJECT_HAS_VALUE OBJECT_HAS_SELF
+%token DATA_INTERSECTION_OF DATA_ONE_OF DATA_SOME_VALUES_FROM DATA_HAS_VALUE
+%token OBJECT_PROPERTY OBJECT_PROPERTY_CHAIN
 %token SUB_CLASS_OF EQUIVALENT_CLASSES DISJOINT_CLASSES
 %token SUB_OBJECT_PROPERTY_OF TRANSITIVE_OBJECT_PROPERTY EQUIVALENT_OBJECT_PROPERTIES
 
@@ -124,6 +125,9 @@ axioms:
 /*****************************************************************************/
 /* Annotation */
 
+anonymousIndividual:
+	nodeID;
+
 annotationSubject:
 	IRI 
 	| anonymousIndividual;
@@ -131,13 +135,13 @@ annotationSubject:
 annotationValue:
 	anonymousIndividual 
 	| IRI 
-	| literal;
+	| Literal;
 	
 axiomAnnotations:
 	| axiomAnnotations annotation;
 	
 annotation:
-	ANNOTATION '(' annotationAnnotations annotationProperty annotationValue ')';
+	ANNOTATION '(' annotationAnnotations AnnotationProperty annotationValue ')';
 	
 annotationAnnotations:
 	| annotationAnnotations annotation;
@@ -149,50 +153,138 @@ annotationAxiom:
 	| annotationPropertyRange;
 	
 annotationAssertion:
-	ANNOTATION_ASSERTION '(' axiomAnnotations annotationProperty annotationSubject annotationValue ')';
+	ANNOTATION_ASSERTION '(' axiomAnnotations AnnotationProperty annotationSubject annotationValue ')';
 
 subAnnotationPropertyOf:
 	SUB_ANNOTATION_PROPERTY_OF '(' axiomAnnotations subAnnotationProperty superAnnotationProperty ')';
 	
 subAnnotationProperty:
-	annotationProperty;
+	AnnotationProperty;
 	
 superAnnotationProperty:
-	annotationProperty;
+	AnnotationProperty;
 
 annotationPropertyDomain:
-	ANNOTATION_PROPERTY_DOMAIN '(' axiomAnnotations annotationProperty IRI ')';
+	ANNOTATION_PROPERTY_DOMAIN '(' axiomAnnotations AnnotationProperty IRI ')';
 
 annotationPropertyRange:
-	ANNOTATION_PROPERTY_RANGE '(' axiomAnnotations annotationProperty IRI ')'; 
+	ANNOTATION_PROPERTY_RANGE '(' axiomAnnotations AnnotationProperty IRI ')'; 
 	
 /*****************************************************************************/
 	
-/* Definitions of OWL2 Constructs */
 
-/* TODO: here OWL_THING, OWL_NOTHING */
-class:
+Class:
 	IRI	{ $$.concept = get_create_atomic_concept(yytext, tbox); };
 
-dataType:
+Datatype:
 	IRI;
 
-objectProperty:
+ObjectProperty:
 	IRI	{ $$.role = get_create_atomic_role(yytext, tbox); };
 
-annotationProperty:
+DataProperty:
+	IRI { 
+		unsupported_feature("DataProperty");
+	};
+
+DataRange:
+	Datatype
+	| DataIntersectionOf
+	| DataOneOf;
+
+	// TODO:
+DataIntersectionOf:
+	DATA_INTERSECTION_OF '(' DataRange DataRange dataRanges ')' {
+		unsupported_feature("DataIntersectionOf");
+	};
+
+dataRanges:
+	| DataRange dataRanges {
+	};
+
+	// TODO:
+DataOneOf:
+	DATA_ONE_OF '(' Literal ')' {
+		unsupported_feature("DataOneOf");
+	}
+
+
+/* for now only these three */
+ClassExpression:
+	Class 
+	| ObjectIntersectionOf 
+	| ObjectOneOf
+	| ObjectSomeValuesFrom
+	| ObjectHasValue
+	| ObjectHasSelf
+	| DataSomeValuesFrom
+	| DataHasValue; 
+
+classExpressions:
+	| ClassExpression classExpressions {
+		if ($1.concept != NULL)
+			cls_exps[cls_exp_count++] = $1.concept;
+	};
+
+
+ObjectIntersectionOf:
+	OBJECT_INTERSECTION_OF '(' ClassExpression ClassExpression classExpressions ')' {
+		cls_exps[cls_exp_count++] = $3.concept;
+		cls_exps[cls_exp_count++] = $4.concept;
+		$$.concept = get_create_conjunction(cls_exp_count, cls_exps, tbox);
+		cls_exp_count = 0;
+	};
+
+
+	// TODO:
+ObjectOneOf:
+	OBJECT_ONE_OF '(' Individual ')' {
+		unsupported_feature("ObjectOneOf");
+	};
+
+ObjectSomeValuesFrom:
+	OBJECT_SOME_VALUES_FROM '(' ObjectPropertyExpression ClassExpression ')' {
+		$$.concept = get_create_exists_restriction($3.role, $4.concept, tbox);
+	};
+
+	// TODO:
+ObjectHasValue:
+	OBJECT_HAS_VALUE '(' ObjectPropertyExpression ClassExpression ')' {
+		unsupported_feature("ObjecHasValue");
+	};
+
+	// TODO:
+ObjectHasSelf:
+	OBJECT_HAS_SELF '(' ObjectPropertyExpression ')' {
+		unsupported_feature("ObjecHasSelf");
+	};
+
+DataSomeValuesFrom:
+	DATA_SOME_VALUES_FROM '(' DataPropertyExpression dataPropertyExpressions DataRange ')' {
+		unsupported_feature("DataSomeValuesFrom");
+	};
+
+DataHasValue:
+	DATA_HAS_VALUE '(' DataPropertyExpression Literal ')' {
+		unsupported_feature("DataHasValue");
+	};
+
+AnnotationProperty:
 	IRI;
 
-anonymousIndividual:
-	nodeID;
+Individual:
+	NamedIndividual;
 
-literal:
+NamedIndividual:
+	IRI;
+
+Literal:
 	typedLiteral 
 	| stringLiteralNoLanguage 
 	| stringLiteralWithLanguage;
 	
 typedLiteral:
-	lexicalForm DOUBLE_CARET dataType;
+	lexicalForm DOUBLE_CARET Datatype;
 	
 lexicalForm:
 	QUOTED_STRING;
@@ -203,31 +295,18 @@ stringLiteralNoLanguage:
 stringLiteralWithLanguage:
 	QUOTED_STRING languageTag;
 	
-/* for now only these three */
-classExpression:
-	class 
-	| objectIntersectionOf 
-	| objectSomeValuesFrom;
+/* Object Property Expression */
+ObjectPropertyExpression:
+	ObjectProperty;
 
-objectIntersectionOf:
-	OBJECT_INTERSECTION_OF '(' classExpression classExpression classExpressions ')' {
-		cls_exps[cls_exp_count++] = $3.concept;
-		cls_exps[cls_exp_count++] = $4.concept;
-		$$.concept = get_create_conjunction(cls_exp_count, cls_exps, tbox);
-		cls_exp_count = 0;
+/* Data Property Expression */
+DataPropertyExpression:
+	DataProperty;
+
+	// TODO:
+dataPropertyExpressions:
+	| DataPropertyExpression dataPropertyExpressions {
 	};
-
-objectSomeValuesFrom:
-	OBJECT_SOME_VALUES_FROM '(' objectPropertyExpression classExpression ')' {
-		$$.concept = get_create_exists_restriction($3.role, $4.concept, tbox);
-	};
-
-classExpressions:
-	| classExpression classExpressions {
-		if ($1.concept != NULL)
-			cls_exps[cls_exp_count++] = $1.concept;
-	};
-
 
 axiom:
 	classAxiom 
@@ -240,20 +319,20 @@ classAxiom:
 	| disjointClasses;
 
 subClassOf:
-	SUB_CLASS_OF '(' axiomAnnotations classExpression classExpression ')' {
+	SUB_CLASS_OF '(' axiomAnnotations ClassExpression ClassExpression ')' {
 		add_subclass_axiom(create_subclass_axiom($4.concept, $5.concept), tbox);
 	};
 
 // for parsing EquivalentClasses axioms containing more than 2 class expressions
 eqClassExpressions:
-	| classExpression eqClassExpressions {
+	| ClassExpression eqClassExpressions {
 		if ($1.concept != NULL)
 			eq_cls_exps[eq_cls_exp_count++] = $1.concept;
 	};
 
 
 equivalentClasses:
-	EQUIVALENT_CLASSES '(' axiomAnnotations classExpression classExpression eqClassExpressions ')' {
+	EQUIVALENT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression eqClassExpressions ')' {
 		eq_cls_exps[eq_cls_exp_count++] = $4.concept;
 		eq_cls_exps[eq_cls_exp_count++] = $5.concept;
 		int i;
@@ -263,26 +342,19 @@ equivalentClasses:
 	};
 
 disjClassExpressions:
-	| classExpression disjClassExpressions {
+	| ClassExpression disjClassExpressions {
 		if ($1.concept != NULL)
 			disj_cls_exps[disj_cls_exp_count++] = $1.concept;
 	};
 
 disjointClasses:
-	DISJOINT_CLASSES '(' axiomAnnotations classExpression classExpression disjClassExpressions ')' {
+	DISJOINT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression disjClassExpressions ')' {
 		disj_cls_exps[disj_cls_exp_count++] = $4.concept;
 		disj_cls_exps[disj_cls_exp_count++] = $5.concept;
 		add_disjointclasses_axiom(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), tbox);
 		disj_cls_exp_count = 0;
 	};
 
-
-objectPropertyExpression:
-	objectProperty 
-	| inverseObjectProperty;
-
-inverseObjectProperty:
-	OBJECT_INVERSE_OF '(' objectProperty ')';
 
 objectPropertyAxiom:
 	equivalentObjectProperties
@@ -295,14 +367,14 @@ subObjectPropertyOf:
 	};
 
 subObjectPropertyExpression:
-	objectPropertyExpression 
+	ObjectPropertyExpression 
 	| propertyExpressionChain;
 
 superObjectPropertyExpression:
-	objectPropertyExpression;
+	ObjectPropertyExpression;
 
 propertyExpressionChain:
-	OBJECT_PROPERTY_CHAIN '(' objectPropertyExpression objectPropertyExpression objectPropertyExpressions ')' {
+	OBJECT_PROPERTY_CHAIN '(' ObjectPropertyExpression ObjectPropertyExpression objectPropertyExpressions ')' {
 		role_exps[role_exp_count++] = $4.role;
 		role_exps[role_exp_count++] = $3.role;
 		$$.role = get_create_role_composition(role_exp_count, role_exps, tbox);
@@ -310,19 +382,19 @@ propertyExpressionChain:
 	}
 	
 objectPropertyExpressions:
-	| objectPropertyExpression objectPropertyExpressions {
+	| ObjectPropertyExpression objectPropertyExpressions {
 		if ($1.role != NULL)
 			role_exps[role_exp_count++] = $1.role;
 	};
 
 // TODO: treat axioms with multiple objectPropertyExpressions!
 equivalentObjectProperties:
-	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations objectPropertyExpression objectPropertyExpression objectPropertyExpressions ')' {
+	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations ObjectPropertyExpression ObjectPropertyExpression objectPropertyExpressions ')' {
 		add_eqrole_axiom(create_eqrole_axiom($4.role, $5.role), tbox);
 	};
 
 transitiveObjectProperty:
-	TRANSITIVE_OBJECT_PROPERTY '(' axiomAnnotations objectPropertyExpression ')' {
+	TRANSITIVE_OBJECT_PROPERTY '(' axiomAnnotations ObjectPropertyExpression ')' {
 		add_transitive_role_axiom(create_transitive_role_axiom($4.role), tbox);
 	}
 
@@ -330,4 +402,8 @@ transitiveObjectProperty:
 
 void yyerror(char *s) {
 	fprintf(stderr, "\nline %d: %s\n", yylineno, s);
+}
+
+void unsupported_feature(char* constructor) {
+	fprintf(stderr, "unsupported feature: %s\n", constructor);
 }
