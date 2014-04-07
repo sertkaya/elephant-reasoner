@@ -43,6 +43,10 @@
 	int eq_cls_exp_count;							/* number of class exps */
 	Concept* eq_cls_exps[MAX_EQ_CLASS_EXP_COUNT];	/* class exps */
 	
+	// for parsing equivalent roles axioms containing more than 2 role expressions 
+	int eq_role_exp_count;							/* number of roles */
+	Role* eq_role_exps[MAX_EQ_ROLE_EXP_COUNT];		/* roles in the composition */
+	
 	// for parsing role composition
 	int role_exp_count;								/* number of roles in the role composition */
 	Role* role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles in the composition */
@@ -65,12 +69,15 @@
 %token ANNOTATION ANNOTATION_ASSERTION SUB_ANNOTATION_PROPERTY_OF
 %token ANNOTATION_PROPERTY ANNOTATION_PROPERTY_DOMAIN ANNOTATION_PROPERTY_RANGE
 
-%token CLASS OBJECT_INTERSECTION_OF OBJECT_ONE_OF OBJECT_SOME_VALUES_FROM OBJECT_HAS_VALUE OBJECT_HAS_SELF
-%token OBJECT_PROPERTY OBJECT_PROPERTY_CHAIN
+%token CLASS 
+%token OBJECT_INTERSECTION_OF OBJECT_ONE_OF OBJECT_SOME_VALUES_FROM OBJECT_HAS_VALUE OBJECT_HAS_SELF
+%token OBJECT_PROPERTY OBJECT_PROPERTY_CHAIN OBJECT_PROPERTY_DOMAIN OBJECT_PROPERTY_RANGE
 %token DATA_INTERSECTION_OF DATA_ONE_OF DATA_SOME_VALUES_FROM DATA_HAS_VALUE 
-%token DATA_PROPERTY
+%token DATA_PROPERTY SUB_DATA_PROPERTY_OF
+%token DATATYPE
+%token NAMED_INDIVIDUAL
 %token SUB_CLASS_OF EQUIVALENT_CLASSES DISJOINT_CLASSES
-%token SUB_OBJECT_PROPERTY_OF TRANSITIVE_OBJECT_PROPERTY EQUIVALENT_OBJECT_PROPERTIES
+%token SUB_OBJECT_PROPERTY_OF TRANSITIVE_OBJECT_PROPERTY EQUIVALENT_OBJECT_PROPERTIES REFLEXIVE_OBJECT_PROPERTY
 
 %%
 
@@ -133,7 +140,7 @@ Entity:
     | OBJECT_PROPERTY '(' ObjectProperty ')'
     | DATA_PROPERTY '(' DataProperty ')'
     | ANNOTATION_PROPERTY '(' AnnotationProperty ')'
-    | NAMEDINDIVIDUAL '(' NamedIndividual ')';
+    | NAMED_INDIVIDUAL '(' NamedIndividual ')';
 
 /*****************************************************************************/
 /* Annotation */
@@ -159,7 +166,7 @@ annotation:
 annotationAnnotations:
 	| annotationAnnotations annotation;
 
-annotationAxiom:
+AnnotationAxiom:
 	annotationAssertion
 	| subAnnotationPropertyOf 
 	| annotationPropertyDomain 
@@ -285,8 +292,120 @@ DataHasValue:
 Axiom:
 	Declaration
 	| ClassAxiom 
-	| objectPropertyAxiom
-	| annotationAxiom;
+	| ObjectPropertyAxiom
+	| DataPropertyAxiom
+	| DataTypeDefinition
+	| HasKey
+	| Assertion
+	| AnnotationAxiom;
+
+ClassAxiom:
+	SubClassOf 
+	| EquivalentClasses
+	| DisjointClasses;
+
+SubClassOf:
+	SUB_CLASS_OF '(' axiomAnnotations ClassExpression ClassExpression ')' {
+		add_subclass_axiom(create_subclass_axiom($4.concept, $5.concept), tbox);
+	};
+
+EquivalentClasses:
+	EQUIVALENT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression equivalentClassExpressions ')' {
+		eq_cls_exps[eq_cls_exp_count++] = $4.concept;
+		eq_cls_exps[eq_cls_exp_count++] = $5.concept;
+		int i;
+		for (i = 0; i < eq_cls_exp_count - 1; ++i)
+			add_eqclass_axiom(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), tbox);
+		eq_cls_exp_count = 0;
+	};
+
+// for parsing EquivalentClasses axioms containing more than 2 class expressions
+equivalentClassExpressions:
+	| ClassExpression eqClassExpressions {
+		if ($1.concept != NULL)
+			eq_cls_exps[eq_cls_exp_count++] = $1.concept;
+	};
+
+DisjointClasses:
+	DISJOINT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression disjointClassExpressions ')' {
+		disj_cls_exps[disj_cls_exp_count++] = $4.concept;
+		disj_cls_exps[disj_cls_exp_count++] = $5.concept;
+		add_disjointclasses_axiom(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), tbox);
+		disj_cls_exp_count = 0;
+	};
+
+
+disjointClassExpressions:
+	| ClassExpression disjClassExpressions {
+		if ($1.concept != NULL)
+			disj_cls_exps[disj_cls_exp_count++] = $1.concept;
+	};
+
+
+ObjectPropertyAxiom:
+	EquivalentObjectProperties 
+	| SubObjectPropertyOf 
+	| ObjectPropertyDomain 
+	| ObjectPropertyRange 
+	| ReflexiveObjectProperty 
+	| TransitiveObjectProperty;
+
+	
+SubObjectPropertyOf:
+	SUB_OBJECT_PROPERTY_OF '(' axiomAnnotations subObjectPropertyExpression superObjectPropertyExpression ')' {
+		add_subrole_axiom(create_subrole_axiom($4.role, $5.role), tbox);
+	};
+
+subObjectPropertyExpression:
+	ObjectPropertyExpression 
+	| propertyExpressionChain;
+
+superObjectPropertyExpression:
+	ObjectPropertyExpression;
+
+// TODO: treat axioms with multiple objectPropertyExpressions!
+EquivalentObjectProperties:
+	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations ObjectPropertyExpression ObjectPropertyExpression eqObjectPropertyExpressions ')' {
+		add_eqrole_axiom(create_eqrole_axiom($4.role, $5.role), tbox);
+	};
+	
+eqObjectPropertyExpressions:
+	| ObjectPropertyExpression eqObjectPropertyExpressions {
+		if ($1.role != NULL)
+			eq_role_exps[eq_role_exp_count++] = $1.role;
+	};
+
+ObjectPropertyDomain:
+	OBJECT_PROPERTY_DOMAIN '(' axiomAnnotations ObjectPropertyExpression ClassExpression ')' {
+		unsupported_feature("ObjectPropertyDomain");
+	};
+
+ObjectPropertyRange:
+	OBJECT_PROPERTY_RANGE '(' axiomAnnotations ObjectPropertyExpression ClassExpression ')' {
+		unsupported_feature("ObjectPropertyRange");
+	};
+
+ReflexiveObjectProperty:
+	REFLEXIVE_OBJECT_PROPERTY '(' axiomAnnotations ObjectPropertyExpression ')' {
+		unsupported_feature("ReflexiveObjectProperty");
+	};
+
+TransitiveObjectProperty:
+	TRANSITIVE_OBJECT_PROPERTY '(' axiomAnnotations ObjectPropertyExpression ')' {
+		add_transitive_role_axiom(create_transitive_role_axiom($4.role), tbox);
+	};
+
+DataPropertyAxiom:
+    SubDataPropertyOf 
+    | EquivalentDataProperties 
+    | DataPropertyDomain 
+    | DataPropertyRange 
+    | FunctionalDataProperty;
+    
+SubDataPropertyOf:
+	SUB_DATA_PROPERTY_OF '(' axiomAnnotations DataPropertyExpression DataPropertyExpression ')' {
+		unsupported_feature("SubDataPropertyOf");
+	};
 
 AnnotationProperty:
 	IRI;
@@ -327,67 +446,6 @@ dataPropertyExpressions:
 	| DataPropertyExpression dataPropertyExpressions {
 	};
 
-
-ClassAxiom:
-	subClassOf 
-	| equivalentClasses
-	| disjointClasses;
-
-subClassOf:
-	SUB_CLASS_OF '(' axiomAnnotations ClassExpression ClassExpression ')' {
-		add_subclass_axiom(create_subclass_axiom($4.concept, $5.concept), tbox);
-	};
-
-// for parsing EquivalentClasses axioms containing more than 2 class expressions
-eqClassExpressions:
-	| ClassExpression eqClassExpressions {
-		if ($1.concept != NULL)
-			eq_cls_exps[eq_cls_exp_count++] = $1.concept;
-	};
-
-
-equivalentClasses:
-	EQUIVALENT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression eqClassExpressions ')' {
-		eq_cls_exps[eq_cls_exp_count++] = $4.concept;
-		eq_cls_exps[eq_cls_exp_count++] = $5.concept;
-		int i;
-		for (i = 0; i < eq_cls_exp_count - 1; ++i)
-			add_eqclass_axiom(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), tbox);
-		eq_cls_exp_count = 0;
-	};
-
-disjClassExpressions:
-	| ClassExpression disjClassExpressions {
-		if ($1.concept != NULL)
-			disj_cls_exps[disj_cls_exp_count++] = $1.concept;
-	};
-
-disjointClasses:
-	DISJOINT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression disjClassExpressions ')' {
-		disj_cls_exps[disj_cls_exp_count++] = $4.concept;
-		disj_cls_exps[disj_cls_exp_count++] = $5.concept;
-		add_disjointclasses_axiom(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), tbox);
-		disj_cls_exp_count = 0;
-	};
-
-
-objectPropertyAxiom:
-	equivalentObjectProperties
-	| subObjectPropertyOf 
-	| transitiveObjectProperty;
-	
-subObjectPropertyOf:
-	SUB_OBJECT_PROPERTY_OF '(' axiomAnnotations subObjectPropertyExpression superObjectPropertyExpression ')' {
-		add_subrole_axiom(create_subrole_axiom($4.role, $5.role), tbox);
-	};
-
-subObjectPropertyExpression:
-	ObjectPropertyExpression 
-	| propertyExpressionChain;
-
-superObjectPropertyExpression:
-	ObjectPropertyExpression;
-
 propertyExpressionChain:
 	OBJECT_PROPERTY_CHAIN '(' ObjectPropertyExpression ObjectPropertyExpression objectPropertyExpressions ')' {
 		role_exps[role_exp_count++] = $4.role;
@@ -395,23 +453,7 @@ propertyExpressionChain:
 		$$.role = get_create_role_composition(role_exp_count, role_exps, tbox);
 		role_exp_count = 0;
 	}
-	
-objectPropertyExpressions:
-	| ObjectPropertyExpression objectPropertyExpressions {
-		if ($1.role != NULL)
-			role_exps[role_exp_count++] = $1.role;
-	};
 
-// TODO: treat axioms with multiple objectPropertyExpressions!
-equivalentObjectProperties:
-	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations ObjectPropertyExpression ObjectPropertyExpression objectPropertyExpressions ')' {
-		add_eqrole_axiom(create_eqrole_axiom($4.role, $5.role), tbox);
-	};
-
-transitiveObjectProperty:
-	TRANSITIVE_OBJECT_PROPERTY '(' axiomAnnotations ObjectPropertyExpression ')' {
-		add_transitive_role_axiom(create_transitive_role_axiom($4.role), tbox);
-	}
 
 %%
 
