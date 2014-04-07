@@ -61,18 +61,12 @@ Prefix									{ return PREFIX; }
 Ontology 								{ return ONTOLOGY; }
 Import									{ return IMPORT; }
 
-										/* Declaration */
 Declaration								{ return DECLARATION; }	
-
-
-										/* Entity */
-Entity									{ return ENTITY; }
 Class									{ return CLASS; }
 ObjectProperty							{ return OBJECT_PROPERTY; }
-ObjectPropertyChain						{ return OBJECT_PROPERTY_CHAIN; }
+Datatype								{ return DATATYPE; }
+NamedIndividual							{ return NAMED_INDIVIDUAL; }
 
-
-	/* EntityAnnotation.*						;  */
 AnnotationAssertion						{ return ANNOTATION_ASSERTION; }
 Annotation								{ return ANNOTATION; }
 AnnotationProperty						{ return ANNOTATION_PROPERTY; }
@@ -80,10 +74,11 @@ SubAnnotationPropertyOf					{ return SUB_ANNOTATION_PROPERTY_OF; }
 AnnotationPropertyDomain				{ return ANNOTATION_PROPERTY_DOMAIN; }
 AnnotationPropertyRange					{ return ANNOTATION_PROPERTY_RANGE; }
 
-
 										/* Class Expression */
 ObjectIntersectionOf					{ return OBJECT_INTERSECTION_OF; }
 ObjectSomeValuesFrom					{ return OBJECT_SOME_VALUES_FROM; }
+
+ObjectPropertyChain						{ return OBJECT_PROPERTY_CHAIN; }
 
 DataIntersectionOf						{ return DATA_INTERSECTION_OF; }
 DataOneOf								{ return DATA_ONE_OF; }
@@ -95,8 +90,11 @@ EquivalentClasses						{ return EQUIVALENT_CLASSES; }
 DisjointClasses							{ return DISJOINT_CLASSES; }
 
 										/* Object Property Axiom */
-SubObjectPropertyOf						{ return SUB_OBJECT_PROPERTY_OF; }
 EquivalentObjectProperties				{ return EQUIVALENT_OBJECT_PROPERTIES; }
+SubObjectPropertyOf						{ return SUB_OBJECT_PROPERTY_OF; }
+ObjectPropertyDomain					{ return OBJECT_PROPERTY_DOMAIN; }
+ObjectPropertyRange						{ return OBJECT_PROPERTY_RANGE; }
+ReflexiveObjectProperty					{ return REFLEXIVE_OBJECT_PROPERTY; }
 TransitiveObjectProperty				{ return TRANSITIVE_OBJECT_PROPERTY; }
 
 

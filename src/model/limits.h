@@ -28,6 +28,9 @@
 // max number of class expressions that can occur in an EquivalentClasses axiom
 #define MAX_EQ_CLASS_EXP_COUNT			1024
 
+// max number of role expressions that can occur in an EquivalentObjectProperties axiom
+#define MAX_EQ_ROLE_EXP_COUNT			1024
+
 // max size of a role composition
 #define MAX_ROLE_COMPOSITION_SIZE		1024
 
