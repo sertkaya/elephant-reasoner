@@ -59,14 +59,16 @@
 
 /* Ontology */
 %token PREFIX ONTOLOGY IMPORT
+%token DECLARATION
 
 /* Annotation */
 %token ANNOTATION ANNOTATION_ASSERTION SUB_ANNOTATION_PROPERTY_OF
-%token ANNOTATION_PROPERTY_DOMAIN ANNOTATION_PROPERTY_RANGE
+%token ANNOTATION_PROPERTY ANNOTATION_PROPERTY_DOMAIN ANNOTATION_PROPERTY_RANGE
 
 %token CLASS OBJECT_INTERSECTION_OF OBJECT_ONE_OF OBJECT_SOME_VALUES_FROM OBJECT_HAS_VALUE OBJECT_HAS_SELF
-%token DATA_INTERSECTION_OF DATA_ONE_OF DATA_SOME_VALUES_FROM DATA_HAS_VALUE
 %token OBJECT_PROPERTY OBJECT_PROPERTY_CHAIN
+%token DATA_INTERSECTION_OF DATA_ONE_OF DATA_SOME_VALUES_FROM DATA_HAS_VALUE 
+%token DATA_PROPERTY
 %token SUB_CLASS_OF EQUIVALENT_CLASSES DISJOINT_CLASSES
 %token SUB_OBJECT_PROPERTY_OF TRANSITIVE_OBJECT_PROPERTY EQUIVALENT_OBJECT_PROPERTIES
 
@@ -120,7 +122,18 @@ ontologyAnnotations:
 	| ontologyAnnotations annotation;
 	
 axioms:
-	| axioms axiom;
+	| axioms Axiom;
+
+Declaration:
+	DECLARATION '(' axiomAnnotations Entity ')'
+
+Entity:
+	CLASS '(' Class ')'
+    | DATATYPE '(' Datatype ')'
+    | OBJECT_PROPERTY '(' ObjectProperty ')'
+    | DATA_PROPERTY '(' DataProperty ')'
+    | ANNOTATION_PROPERTY '(' AnnotationProperty ')'
+    | NAMEDINDIVIDUAL '(' NamedIndividual ')';
 
 /*****************************************************************************/
 /* Annotation */
@@ -269,6 +282,12 @@ DataHasValue:
 		unsupported_feature("DataHasValue");
 	};
 
+Axiom:
+	Declaration
+	| ClassAxiom 
+	| objectPropertyAxiom
+	| annotationAxiom;
+
 AnnotationProperty:
 	IRI;
 
@@ -308,12 +327,8 @@ dataPropertyExpressions:
 	| DataPropertyExpression dataPropertyExpressions {
 	};
 
-axiom:
-	classAxiom 
-	| objectPropertyAxiom
-	| annotationAxiom;
 
-classAxiom:
+ClassAxiom:
 	subClassOf 
 	| equivalentClasses
 	| disjointClasses;

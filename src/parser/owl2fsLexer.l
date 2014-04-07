@@ -62,21 +62,23 @@ Ontology 								{ return ONTOLOGY; }
 Import									{ return IMPORT; }
 
 										/* Declaration */
-Declaration.*							;	
+Declaration								{ return DECLARATION; }	
 
 
 										/* Entity */
-Class													{ return CLASS; }
-ObjectProperty								{ return OBJECT_PROPERTY; }
+Entity									{ return ENTITY; }
+Class									{ return CLASS; }
+ObjectProperty							{ return OBJECT_PROPERTY; }
 ObjectPropertyChain						{ return OBJECT_PROPERTY_CHAIN; }
 
 
 	/* EntityAnnotation.*						;  */
 AnnotationAssertion						{ return ANNOTATION_ASSERTION; }
-Annotation										{ return ANNOTATION; }
-SubAnnotationPropertyOf				{ return SUB_ANNOTATION_PROPERTY_OF; }
-AnnotationPropertyDomain			{ return ANNOTATION_PROPERTY_DOMAIN; }
-AnnotationPropertyRange				{ return ANNOTATION_PROPERTY_RANGE; }
+Annotation								{ return ANNOTATION; }
+AnnotationProperty						{ return ANNOTATION_PROPERTY; }
+SubAnnotationPropertyOf					{ return SUB_ANNOTATION_PROPERTY_OF; }
+AnnotationPropertyDomain				{ return ANNOTATION_PROPERTY_DOMAIN; }
+AnnotationPropertyRange					{ return ANNOTATION_PROPERTY_RANGE; }
 
 
 										/* Class Expression */
@@ -84,26 +86,27 @@ ObjectIntersectionOf					{ return OBJECT_INTERSECTION_OF; }
 ObjectSomeValuesFrom					{ return OBJECT_SOME_VALUES_FROM; }
 
 DataIntersectionOf						{ return DATA_INTERSECTION_OF; }
-DataOneOf											{ return DATA_ONE_OF; }
+DataOneOf								{ return DATA_ONE_OF; }
+DataProperty							{ return DATA_PROPERTY; }
 
 										/* Class Axiom */
-SubClassOf										{ return SUB_CLASS_OF; }
-EquivalentClasses							{ return EQUIVALENT_CLASSES; }
-DisjointClasses								{ return DISJOINT_CLASSES; }
+SubClassOf								{ return SUB_CLASS_OF; }
+EquivalentClasses						{ return EQUIVALENT_CLASSES; }
+DisjointClasses							{ return DISJOINT_CLASSES; }
 
 										/* Object Property Axiom */
 SubObjectPropertyOf						{ return SUB_OBJECT_PROPERTY_OF; }
-EquivalentObjectProperties		{ return EQUIVALENT_OBJECT_PROPERTIES; }
-TransitiveObjectProperty			{ return TRANSITIVE_OBJECT_PROPERTY; }
+EquivalentObjectProperties				{ return EQUIVALENT_OBJECT_PROPERTIES; }
+TransitiveObjectProperty				{ return TRANSITIVE_OBJECT_PROPERTY; }
 
 
-{IRI_REF}											{ return IRI_REF; }
-{PNAME_NS}										{ return PNAME_NS; }
-{PNAME_LN}										{ return PNAME_LN; }
+{IRI_REF}								{ return IRI_REF; }
+{PNAME_NS}								{ return PNAME_NS; }
+{PNAME_LN}								{ return PNAME_LN; }
 {BLANK_NODE_LABEL}						{ return BLANK_NODE_LABEL; }
-{LANGTAG}											{ return LANGTAG; }
-{QUOTED_STRING}								{ return QUOTED_STRING; }
-{DOUBLE_CARET}								{ return DOUBLE_CARET; }
+{LANGTAG}								{ return LANGTAG; }
+{QUOTED_STRING}							{ return QUOTED_STRING; }
+{DOUBLE_CARET}							{ return DOUBLE_CARET; }
 
 %%
 
