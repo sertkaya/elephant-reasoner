@@ -48,12 +48,17 @@
 	Role* eq_role_exps[MAX_EQ_ROLE_EXP_COUNT];		/* roles in the composition */
 	
 	// for parsing role composition
-	int role_exp_count;								/* number of roles in the role composition */
-	Role* role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles in the composition */
+	int comp_role_exp_count;								/* number of roles in the role composition */
+	Role* comp_role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles in the composition */
+	
+	// for parsing role exps in HasKey
+	int hasKey_role_exp_count;								/* number of roles */
+	Role* hasKey_role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles */
 	
 	int disj_cls_exp_count;								/* number of classes in a disjointclasses axiom */
 	Concept* disj_cls_exps[MAX_DISJ_CLASS_EXP_COUNT];	/* the class exps in a disjointclasses axiom */
 
+	void unsupported_feature(char* feature);
 %}
 
 %start ontologyDocument
@@ -73,9 +78,12 @@
 %token OBJECT_INTERSECTION_OF OBJECT_ONE_OF OBJECT_SOME_VALUES_FROM OBJECT_HAS_VALUE OBJECT_HAS_SELF
 %token OBJECT_PROPERTY OBJECT_PROPERTY_CHAIN OBJECT_PROPERTY_DOMAIN OBJECT_PROPERTY_RANGE
 %token DATA_INTERSECTION_OF DATA_ONE_OF DATA_SOME_VALUES_FROM DATA_HAS_VALUE 
-%token DATA_PROPERTY SUB_DATA_PROPERTY_OF
-%token DATATYPE
-%token NAMED_INDIVIDUAL
+%token DATA_PROPERTY SUB_DATA_PROPERTY_OF EQUIVALENT_DATA_PROPERTIES DATA_PROPERTY_DOMAIN DATA_PROPERTY_RANGE FUNCTIONAL_DATA_PROPERTY 
+%token DATA_PROPERTY_ASSERTION NEGATIVE_DATA_PROPERTY_ASSERTION
+%token DATATYPE DATATYPE_DEFINITION 
+%token HAS_KEY 
+%token NAMED_INDIVIDUAL SAME_INDIVIDUAL DIFFERENT_INDIVIDUALS 
+%token OBJECT_PROPERTY_ASSERTION CLASS_ASSERTION NEGATIVE_OBJECT_PROPERTY_ASSERTION 
 %token SUB_CLASS_OF EQUIVALENT_CLASSES DISJOINT_CLASSES
 %token SUB_OBJECT_PROPERTY_OF TRANSITIVE_OBJECT_PROPERTY EQUIVALENT_OBJECT_PROPERTIES REFLEXIVE_OBJECT_PROPERTY
 
@@ -279,6 +287,13 @@ ObjectHasSelf:
 		unsupported_feature("ObjecHasSelf");
 	};
 
+	// TODO:
+dataPropertyExpressions:
+	| DataPropertyExpression dataPropertyExpressions {
+		unsupported_feature("dataPropertyExpressions");
+	};
+
+	// 4 shift/reduce conflicts due to the dataPropertyExpressions in the middle
 DataSomeValuesFrom:
 	DATA_SOME_VALUES_FROM '(' DataPropertyExpression dataPropertyExpressions DataRange ')' {
 		unsupported_feature("DataSomeValuesFrom");
@@ -294,7 +309,7 @@ Axiom:
 	| ClassAxiom 
 	| ObjectPropertyAxiom
 	| DataPropertyAxiom
-	| DataTypeDefinition
+	| DatatypeDefinition
 	| HasKey
 	| Assertion
 	| AnnotationAxiom;
@@ -321,7 +336,7 @@ EquivalentClasses:
 
 // for parsing EquivalentClasses axioms containing more than 2 class expressions
 equivalentClassExpressions:
-	| ClassExpression eqClassExpressions {
+	| ClassExpression equivalentClassExpressions {
 		if ($1.concept != NULL)
 			eq_cls_exps[eq_cls_exp_count++] = $1.concept;
 	};
@@ -336,7 +351,7 @@ DisjointClasses:
 
 
 disjointClassExpressions:
-	| ClassExpression disjClassExpressions {
+	| ClassExpression disjointClassExpressions {
 		if ($1.concept != NULL)
 			disj_cls_exps[disj_cls_exp_count++] = $1.concept;
 	};
@@ -363,7 +378,7 @@ subObjectPropertyExpression:
 superObjectPropertyExpression:
 	ObjectPropertyExpression;
 
-// TODO: treat axioms with multiple objectPropertyExpressions!
+// TODO: treat axioms with multiple eqObjectPropertyExpressions!
 EquivalentObjectProperties:
 	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations ObjectPropertyExpression ObjectPropertyExpression eqObjectPropertyExpressions ')' {
 		add_eqrole_axiom(create_eqrole_axiom($4.role, $5.role), tbox);
@@ -406,6 +421,105 @@ SubDataPropertyOf:
 	SUB_DATA_PROPERTY_OF '(' axiomAnnotations DataPropertyExpression DataPropertyExpression ')' {
 		unsupported_feature("SubDataPropertyOf");
 	};
+	
+EquivalentDataProperties:
+	EQUIVALENT_DATA_PROPERTIES '(' axiomAnnotations DataPropertyExpression DataPropertyExpression dataPropertyExpressions ')' {
+		unsupported_feature("EquivalentDataProperties");
+	};
+	
+DataPropertyDomain:
+	DATA_PROPERTY_DOMAIN '(' axiomAnnotations DataPropertyExpression ClassExpression ')' {
+		unsupported_feature("DataPropertyDomain");
+	};
+
+DataPropertyRange:
+	DATA_PROPERTY_RANGE '(' axiomAnnotations DataPropertyExpression DataRange ')' {
+		unsupported_feature("DataPropertyRange");
+	};
+
+FunctionalDataProperty:
+	FUNCTIONAL_DATA_PROPERTY '(' axiomAnnotations DataPropertyExpression ')' {
+		unsupported_feature("FunctionalDataProperty");
+	};
+
+DatatypeDefinition:
+	DATATYPE_DEFINITION '(' axiomAnnotations Datatype DataRange ')' {
+		unsupported_feature("DatatypeDefinition");
+	};
+
+HasKey:
+	HAS_KEY '(' axiomAnnotations ClassExpression '(' hasKeyObjectPropertyExpressions ')' '(' dataPropertyExpressions ')' ')' {
+		unsupported_feature("HasKey");
+	};
+
+hasKeyObjectPropertyExpressions:
+	| ObjectPropertyExpression hasKeyObjectPropertyExpressions {
+		if ($1.role != NULL)
+			hasKey_role_exps[hasKey_role_exp_count++] = $1.role;
+	};
+
+Assertion:
+	SameIndividual 
+	| DifferentIndividuals 
+	| ClassAssertion 
+	| ObjectPropertyAssertion 
+	| NegativeObjectPropertyAssertion 
+	| DataPropertyAssertion 
+	| NegativeDataPropertyAssertion;
+	
+sourceIndividual: 
+	Individual;
+
+targetIndividual:
+	Individual;
+	
+targetValue:
+	Literal;
+	
+SameIndividual:
+	SAME_INDIVIDUAL '(' axiomAnnotations Individual Individual sameIndividuals ')' {
+		unsupported_feature("SameIndividual");
+	};
+	
+	// TODO:
+sameIndividuals:
+	| Individual sameIndividuals {
+	};
+
+DifferentIndividuals:
+	DIFFERENT_INDIVIDUALS '(' axiomAnnotations Individual Individual differentIndividuals  ')' {
+		unsupported_feature("DifferentIndividuals");
+	};
+
+	// TODO:
+differentIndividuals:
+	| Individual differentIndividuals {
+	};
+
+ClassAssertion:
+	CLASS_ASSERTION '(' axiomAnnotations ClassExpression Individual ')' {
+		unsupported_feature("ClassAssertion");
+	};
+
+ObjectPropertyAssertion:
+	OBJECT_PROPERTY_ASSERTION '(' axiomAnnotations ObjectPropertyExpression sourceIndividual targetIndividual ')' {
+		unsupported_feature("ObjectPropertyAssertion");
+	};
+
+NegativeObjectPropertyAssertion:
+	NEGATIVE_OBJECT_PROPERTY_ASSERTION '(' axiomAnnotations ObjectPropertyExpression sourceIndividual targetIndividual ')' {
+		unsupported_feature("NegativeObjectPropertyAssertion");
+	};
+
+DataPropertyAssertion:
+	DATA_PROPERTY_ASSERTION '(' axiomAnnotations DataPropertyExpression sourceIndividual targetValue ')' {
+		unsupported_feature("DataPropertyAssertion");
+	};
+	
+NegativeDataPropertyAssertion:
+	NEGATIVE_DATA_PROPERTY_ASSERTION '(' axiomAnnotations DataPropertyExpression sourceIndividual targetValue ')' {
+		unsupported_feature("NegativeDataPropertyAssertion");
+	};
 
 AnnotationProperty:
 	IRI;
@@ -441,18 +555,19 @@ ObjectPropertyExpression:
 DataPropertyExpression:
 	DataProperty;
 
-	// TODO:
-dataPropertyExpressions:
-	| DataPropertyExpression dataPropertyExpressions {
-	};
-
 propertyExpressionChain:
-	OBJECT_PROPERTY_CHAIN '(' ObjectPropertyExpression ObjectPropertyExpression objectPropertyExpressions ')' {
-		role_exps[role_exp_count++] = $4.role;
-		role_exps[role_exp_count++] = $3.role;
-		$$.role = get_create_role_composition(role_exp_count, role_exps, tbox);
-		role_exp_count = 0;
+	OBJECT_PROPERTY_CHAIN '(' ObjectPropertyExpression ObjectPropertyExpression compObjectPropertyExpressions ')' {
+		comp_role_exps[comp_role_exp_count++] = $4.role;
+		comp_role_exps[comp_role_exp_count++] = $3.role;
+		$$.role = get_create_role_composition(comp_role_exp_count, comp_role_exps, tbox);
+		comp_role_exp_count = 0;
 	}
+
+compObjectPropertyExpressions:
+	| ObjectPropertyExpression compObjectPropertyExpressions {
+		if ($1.role != NULL)
+			comp_role_exps[comp_role_exp_count++] = $1.role;
+	};
 
 
 %%
@@ -461,6 +576,6 @@ void yyerror(char *s) {
 	fprintf(stderr, "\nline %d: %s\n", yylineno, s);
 }
 
-void unsupported_feature(char* constructor) {
-	fprintf(stderr, "unsupported feature: %s\n", constructor);
+void unsupported_feature(char* feature) {
+	fprintf(stderr, "unsupported feature: %s\n", feature);
 }

@@ -65,7 +65,15 @@ Declaration								{ return DECLARATION; }
 Class									{ return CLASS; }
 ObjectProperty							{ return OBJECT_PROPERTY; }
 Datatype								{ return DATATYPE; }
+DatatypeDefinition						{ return DATATYPE_DEFINITION; }
+HasKey									{ return HAS_KEY; }
 NamedIndividual							{ return NAMED_INDIVIDUAL; }
+SameIndividual							{ return SAME_INDIVIDUAL; }
+DifferentIndividuals					{ return DIFFERENT_INDIVIDUALS; }
+
+ClassAssertion							{ return CLASS_ASSERTION; }
+ObjectPropertyAssertion					{ return OBJECT_PROPERTY_ASSERTION; }
+NegativeObjectPropertyAssertion			{ return NEGATIVE_OBJECT_PROPERTY_ASSERTION; }
 
 AnnotationAssertion						{ return ANNOTATION_ASSERTION; }
 Annotation								{ return ANNOTATION; }
@@ -82,8 +90,17 @@ ObjectPropertyChain						{ return OBJECT_PROPERTY_CHAIN; }
 
 DataIntersectionOf						{ return DATA_INTERSECTION_OF; }
 DataOneOf								{ return DATA_ONE_OF; }
-DataProperty							{ return DATA_PROPERTY; }
 
+DataProperty							{ return DATA_PROPERTY; }
+DataPropertyDomain						{ return DATA_PROPERTY_DOMAIN; }
+DataPropertyRange						{ return DATA_PROPERTY_RANGE; }
+FunctionalDataProperty					{ return FUNCTIONAL_DATA_PROPERTY; }
+
+DataPropertyAssertion					{ return DATA_PROPERTY_ASSERTION; }
+NegativeDataPropertyAssertion			{ return NEGATIVE_DATA_PROPERTY_ASSERTION; }
+ 
+SubDataPropertyOf						{ return SUB_DATA_PROPERTY_OF; }
+EquivalentDataProperties				{ return EQUIVALENT_DATA_PROPERTIES; }
 										/* Class Axiom */
 SubClassOf								{ return SUB_CLASS_OF; }
 EquivalentClasses						{ return EQUIVALENT_CLASSES; }
