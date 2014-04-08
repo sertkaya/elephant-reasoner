@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "../model/datatypes.h"
+#include "../model/abox/datatypes.h"
 #include "../model/limits.h"
 #include "../model/model.h"
 #include "../preprocessing/preprocessing.h"
@@ -39,7 +40,7 @@ extern FILE* yyin;
 // total runtime
 double total_time = 0.0;
 
-TBox* init_reasoner() {
+TBox* init_tbox() {
 
 	TBox* tbox = (TBox*) malloc(sizeof(TBox));
 	assert(tbox != NULL);
@@ -87,6 +88,19 @@ TBox* init_reasoner() {
 	tbox->bottom_concept = get_create_atomic_concept(OWL_NOTHING, tbox);
 
 	return tbox;
+}
+
+ABox* init_abox() {
+
+	ABox* abox = (ABox*) malloc(sizeof(ABox));
+	assert(abox != NULL);
+
+	abox->last_individual_id = 0;
+
+	abox->individual_count = 0;
+	abox->individual_list = NULL;
+
+	return abox;
 }
 
 

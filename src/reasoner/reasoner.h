@@ -23,6 +23,7 @@
 #include <sys/time.h>
 
 #include "../model/datatypes.h"
+#include "../model/abox/datatypes.h"
 
 struct timeval tStart, tEnd;
 #define START_TIMER	gettimeofday(&tStart, NULL)
@@ -34,8 +35,10 @@ struct timeval tStart, tEnd;
 // the TBox
 // TBox* tbox;
 
-// initializes the reasoner and the necessary fields of the TBox
-TBox* init_reasoner();
+// initializes the necessary fields of the TBox
+TBox* init_tbox();
+// initializes the necessary fields of the ABox
+ABox* init_abox();
 
 void read_kb(FILE* input_kb, TBox* tbox);
 
