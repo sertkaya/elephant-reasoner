@@ -23,7 +23,9 @@
 
 #include "reasoner/reasoner.h"
 #include "model/datatypes.h"
+#include "model/abox/datatypes.h"
 #include "model/memory_utils.h"
+#include "model/abox/memory_utils.h"
 #include "model/print_utils.h"
 
 void usage(char* program) {
@@ -48,14 +50,16 @@ int main(int argc, char *argv[]) {
 	assert(output_taxonomy != NULL);
 
 	TBox* tbox = NULL;
+	ABox* abox = NULL;
 	// initialize global variables, allocate space
-	tbox = init_reasoner();
+	tbox = init_tbox();
+	abox = init_abox();
 
 	// read and parse the kb
-	read_kb(input_kb, tbox);
+	read_kb(input_kb, tbox, abox);
 	fclose(input_kb);
 	// display kb information
-	print_short_stats(tbox);
+	print_short_stats(tbox, abox);
 
 	// classify the kb
 	classify(tbox);
@@ -65,7 +69,9 @@ int main(int argc, char *argv[]) {
 	fclose(output_taxonomy);
 
 	// free the kb
-	printf("Freed bytes:%d\n", free_tbox(tbox));
+	int freed_bytes = free_tbox(tbox);
+	freed_bytes += free_abox(abox);
+	printf("Freed bytes:%d\n", freed_bytes);
 
 	return 0;
 }

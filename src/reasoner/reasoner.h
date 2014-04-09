@@ -40,7 +40,7 @@ TBox* init_tbox();
 // initializes the necessary fields of the ABox
 ABox* init_abox();
 
-void read_kb(FILE* input_kb, TBox* tbox);
+void read_kb(FILE* input_kb, TBox* tbox, ABox* abox);
 
 void classify(TBox* tbox);
 

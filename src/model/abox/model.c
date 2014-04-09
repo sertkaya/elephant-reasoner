@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "datatypes.h"
+#include "utils.h"
 
 /******************************************************************************
  * get/create functions for concepts
@@ -32,19 +33,50 @@ Individual* get_create_individual(char* name, ABox* abox) {
 	Individual* i;
 	Individual** tmp;
 
-	// check if an individual with this name already exists
-	if ((i = get_individual((unsigned char*) name, abox)) != NULL)
+	// check if an individual with this name already exists in the ABox
+	if ((i = (Individual*) GET_INDIVIDUAL((unsigned char*) name, abox)) != NULL)
 		return i;
 
 	// if an individual with the name does not already exist, create it
 	i = (Individual*) malloc(sizeof(Individual));
 	assert(i != NULL);
 
+	i->id = abox->last_individual_id++;
+
 	i->name = (char*) malloc((strlen(name) + 1) * sizeof(char));
 	assert(i->name != NULL);
-
 	strcpy(i->name, name);
 
+	PUT_INDIVIDUAL(i->name, i, abox);
+
+	++abox->individual_count;
 
 	return i;
+}
+
+/******************************************************************************
+ * create functions for assertions
+ *****************************************************************************/
+// create the concept assertion with the given individual and concept
+ConceptAssertion* create_concept_assertion(Individual* ind, Concept* c) {
+	ConceptAssertion* as = (ConceptAssertion*) malloc(sizeof(ConceptAssertion));
+	assert(as != NULL);
+	as->individual = ind;
+	as->concept = c;
+
+	return as;
+}
+
+/******************************************************************************
+ * add functions for assertions
+ *****************************************************************************/
+
+// add a given concept assertion to a given ABox
+void add_concept_assertion(ConceptAssertion* as, ABox* abox) {
+	ConceptAssertion** tmp;
+	tmp = realloc(abox->concept_assertions, (abox->concept_assertion_count + 1) * sizeof(ConceptAssertion*));
+	assert(tmp != NULL);
+	abox->concept_assertions = tmp;
+	abox->concept_assertions[abox->concept_assertion_count] = as;
+	++abox->concept_assertion_count;
 }

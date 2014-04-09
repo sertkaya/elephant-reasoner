@@ -23,6 +23,7 @@
 #include "../hashing/key_hash_table.h"
 #include "../hashing/key_value_hash_table.h"
 
+
 typedef struct atomic_concept AtomicConcept;
 typedef struct conjunction Conjunction;
 typedef struct existential_restriction Exists;
@@ -46,14 +47,6 @@ typedef struct transitive_role_axiom TransitiveRoleAxiom;
 typedef struct axiom Axiom;
 
 typedef struct tbox TBox;
-
-// for lexer and parser
-typedef union expression Expression;
-union expression {
-	Concept* concept;
-	Role* role;
-};
-
 
 // concept description types
 enum concept_description_type {
@@ -297,5 +290,6 @@ struct tbox {
 	DisjointClassesAxiom** disjointclasses_axioms;
 	int disjointclasses_axiom_count;
 };
+
 
 #endif /* DATATYPES_H_ */

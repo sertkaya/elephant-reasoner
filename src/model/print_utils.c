@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include "datatypes.h"
+#include "abox/datatypes.h"
 #include "model.h"
 #include "limits.h"
 #include "../hashing/key_hash_table.h"
@@ -190,7 +191,7 @@ void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 	free_key_hash_table(printed);
 }
 
-void print_short_stats(TBox* tbox) {
+void print_short_stats(TBox* tbox, ABox* abox) {
 	printf("\n---------- KB statistics ----------\n");
 	printf("atomic concepts: %d\n"
 			"atomic roles: %d\n"
@@ -208,7 +209,9 @@ void print_short_stats(TBox* tbox) {
 			"disjointness ax: %d\n"
 			"subrole ax: %d\n"
 			"eqrole ax: %d\n"
-			"transitive role ax: %d\n",
+			"transitive role ax: %d\n"
+			"individuals: %d\n"
+			"concept assertions: %d\n",
 			tbox->atomic_concept_count,
 			tbox->atomic_role_count,
 			tbox->exists_restriction_count,
@@ -225,5 +228,7 @@ void print_short_stats(TBox* tbox) {
 			tbox->disjointclasses_axiom_count,
 			tbox->subrole_axiom_count,
 			tbox->eqrole_axiom_count,
-			tbox->transitive_role_axiom_count);
+			tbox->transitive_role_axiom_count,
+			abox->individual_count,
+			abox->concept_assertion_count);
 }
