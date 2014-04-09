@@ -20,18 +20,20 @@
 %{
 	#include <stdio.h>
 	#include <assert.h>
+	#include "datatypes.h"
 	#include "../model/datatypes.h"
+	#include "../model/abox/datatypes.h"
 	#include "../model/model.h"
+	#include "../model/abox/model.h"
 	#include "../model/limits.h"
 	
 	#define YYSTYPE Expression
-	#define YYPARSE_PARAM tbox
-	// %parse-param {TBox* tbox}
+	// #define YYPARSE_PARAM tbox 
 
 	char* yytext;
 	int yylex(void);
 	int yylineno;
-	void yyerror(char *);
+	void yyerror(TBox* tbox, ABox* abox, char* msg);
 	extern FILE *yyin;
 	// extern TBox* tbox;
 
@@ -60,6 +62,9 @@
 
 	void unsupported_feature(char* feature);
 %}
+
+%parse-param {TBox* tbox} 
+%parse-param {ABox* abox}
 
 %start ontologyDocument
 
@@ -498,7 +503,7 @@ differentIndividuals:
 
 ClassAssertion:
 	CLASS_ASSERTION '(' axiomAnnotations ClassExpression Individual ')' {
-		unsupported_feature("ClassAssertion");
+		add_concept_assertion(create_concept_assertion($5.individual, $4.concept), abox);
 	};
 
 ObjectPropertyAssertion:
@@ -528,7 +533,7 @@ Individual:
 	NamedIndividual;
 
 NamedIndividual:
-	IRI;
+	IRI	{ $$.individual = get_create_individual(yytext, abox); };
 
 Literal:
 	typedLiteral 
@@ -572,8 +577,8 @@ compObjectPropertyExpressions:
 
 %%
 
-void yyerror(char *s) {
-	fprintf(stderr, "\nline %d: %s\n", yylineno, s);
+void yyerror(TBox* tbox, ABox* abox, char* msg) {
+	fprintf(stderr, "\nline %d: %s\n", yylineno, msg);
 }
 
 void unsupported_feature(char* feature) {

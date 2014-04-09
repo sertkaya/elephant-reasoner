@@ -33,7 +33,7 @@
 #include "reasoner.h"
 
 // the parser
-extern int yyparse(TBox* tbox);
+extern int yyparse(TBox* tbox, ABox* abox);
 // file pointer for the parser
 extern FILE* yyin;
 
@@ -96,16 +96,19 @@ ABox* init_abox() {
 	assert(abox != NULL);
 
 	abox->last_individual_id = 0;
-
 	abox->individual_count = 0;
-	abox->individual_list = NULL;
+	abox->individuals = create_key_value_hash_table(DEFAULT_INDIVIDUALS_HASH_SIZE);
+	// abox->individual_list = NULL;
+
+	abox->concept_assertion_count = 0;
+	abox->concept_assertions = NULL;
 
 	return abox;
 }
 
 
 // void read_kb(char* kb_file_name, TBox* tbox) {
-void read_kb(FILE* input_kb, TBox* tbox) {
+void read_kb(FILE* input_kb, TBox* tbox, ABox* abox) {
 
 	// parser return code
 	int parser;
@@ -115,7 +118,7 @@ void read_kb(FILE* input_kb, TBox* tbox) {
 	printf("Loading KB.........................:");
 	fflush(stdout);
 	START_TIMER;
-	parser = yyparse(tbox);
+	parser = yyparse(tbox, abox);
 	STOP_TIMER;
 	total_time += TIME_DIFF;
 	if (parser != 0) {

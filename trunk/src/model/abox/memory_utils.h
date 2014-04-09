@@ -17,38 +17,11 @@
  */
 
 
-#ifndef ABOX_DATATYPES_H_
-#define ABOX_DATATYPES_H_
+#ifndef ABOX_MEMORY_UTILS_H_
+#define ABOX_MEMORY_UTILS_H_
 
-#include "../datatypes.h"
-#include "../../hashing/key_value_hash_table.h"
+#include "datatypes.h"
 
-typedef struct individual Individual;
-
-typedef struct concept_assertion ConceptAssertion;
-
-typedef struct abox ABox;
-
-struct individual {
-	uint32_t id;
-	char* name;
-};
-
-struct concept_assertion {
-	Individual* individual;
-	Concept* concept;
-};
-
-struct abox {
-	int last_individual_id;
-
-	int individual_count;
-	// Individual** individual_list;
-
-	KeyValueHashTable* individuals;
-
-	int concept_assertion_count;
-	ConceptAssertion** concept_assertions;
-};
+int free_abox(ABox* abox);
 
 #endif
