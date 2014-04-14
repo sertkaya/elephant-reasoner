@@ -67,6 +67,17 @@ ConceptAssertion* create_concept_assertion(Individual* ind, Concept* c) {
 	return as;
 }
 
+// create the role assertion with the given role and individuals
+RoleAssertion* create_role_assertion(Role* role, Individual* source_ind, Individual* target_ind) {
+	RoleAssertion* as = (RoleAssertion*) malloc(sizeof(RoleAssertion));
+	assert(as != NULL);
+	as->role = role;
+	as->source_individual = source_ind;
+	as->target_individual = target_ind;
+
+	return as;
+}
+
 /******************************************************************************
  * add functions for assertions
  *****************************************************************************/
@@ -79,4 +90,14 @@ void add_concept_assertion(ConceptAssertion* as, ABox* abox) {
 	abox->concept_assertions = tmp;
 	abox->concept_assertions[abox->concept_assertion_count] = as;
 	++abox->concept_assertion_count;
+}
+
+// add a given role assertion to a given ABox
+void add_role_assertion(RoleAssertion* as, ABox* abox) {
+	RoleAssertion** tmp;
+	tmp = realloc(abox->role_assertions, (abox->role_assertion_count + 1) * sizeof(RoleAssertion*));
+	assert(tmp != NULL);
+	abox->role_assertions = tmp;
+	abox->role_assertions[abox->role_assertion_count] = as;
+	++abox->role_assertion_count;
 }

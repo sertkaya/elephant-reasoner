@@ -26,6 +26,7 @@
 typedef struct individual Individual;
 
 typedef struct concept_assertion ConceptAssertion;
+typedef struct role_assertion RoleAssertion;
 
 typedef struct abox ABox;
 
@@ -39,6 +40,12 @@ struct concept_assertion {
 	Concept* concept;
 };
 
+struct role_assertion {
+	Role* role;
+	Individual* source_individual;
+	Individual* target_individual;
+};
+
 struct abox {
 	int last_individual_id;
 
@@ -49,6 +56,9 @@ struct abox {
 
 	int concept_assertion_count;
 	ConceptAssertion** concept_assertions;
+
+	int role_assertion_count;
+	RoleAssertion** role_assertions;
 };
 
 #endif

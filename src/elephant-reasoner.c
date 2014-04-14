@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 	// extern int optind;
 	int c, reasoning_task_flag = 0, input_flag = 0, output_flag = 0, wrong_argument_flag = 0, verbose_flag = 0;
 	char *reasoning_task = "", *ontology_file = "", *output_file = "";
-	static char usage[] = "Usage: %s -i ontology -o output -r[classify|realize|consistency]\n";
+	static char usage[] = "Usage: %s -i ontology -o output -r[classification|realisation|consistency]\n";
 	while ((c = getopt(argc, argv, "r:i:o:v")) != -1)
 		switch (c) {
 		case 'r':
@@ -81,12 +81,12 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 	if (reasoning_task_flag == 0) {
-		fprintf(stderr, "%s: Provide one of the reasoning tasks classify | realize | consistency\n", argv[0]);
+		fprintf(stderr, "%s: Provide one of the reasoning tasks: classification | realisation | consistency\n", argv[0]);
 		fprintf(stderr, usage, argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	if (strcmp(reasoning_task, "classify") != 0 && strcmp(reasoning_task, "realize") != 0 && strcmp(reasoning_task, "consistency") != 0) {
-		fprintf(stderr, "%s: Provide one of the reasoning tasks classify | realize | consistency\n", argv[0]);
+	if (strcmp(reasoning_task, "classification") != 0 && strcmp(reasoning_task, "realisation") != 0 && strcmp(reasoning_task, "consistency") != 0) {
+		fprintf(stderr, "%s: Provide one of the reasoning tasks: classification | realisation | consistency\n", argv[0]);
 		fprintf(stderr, usage, argv[0]);
 		exit(EXIT_FAILURE);
 	}
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
 	fclose(input_kb);
 
 	// classify the kb
-	if (!strcmp(reasoning_task, "classify"))
+	if (!strcmp(reasoning_task, "classification"))
 		classify(tbox);
 
 	// display kb information

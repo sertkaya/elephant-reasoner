@@ -103,6 +103,9 @@ ABox* init_abox() {
 	abox->concept_assertion_count = 0;
 	abox->concept_assertions = NULL;
 
+	abox->role_assertion_count = 0;
+	abox->role_assertions = NULL;
+
 	return abox;
 }
 

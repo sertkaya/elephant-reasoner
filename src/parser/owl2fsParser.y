@@ -508,7 +508,7 @@ ClassAssertion:
 
 ObjectPropertyAssertion:
 	OBJECT_PROPERTY_ASSERTION '(' axiomAnnotations ObjectPropertyExpression sourceIndividual targetIndividual ')' {
-		unsupported_feature("ObjectPropertyAssertion");
+		add_role_assertion(create_role_assertion($4.role, $5.individual, $6.individual));
 	};
 
 NegativeObjectPropertyAssertion:
