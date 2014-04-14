@@ -211,7 +211,8 @@ void print_short_stats(TBox* tbox, ABox* abox) {
 			"eqrole ax: %d\n"
 			"transitive role ax: %d\n"
 			"individuals: %d\n"
-			"concept assertions: %d\n",
+			"concept assertions: %d\n"
+			"role assertions: %d\n",
 			tbox->atomic_concept_count,
 			tbox->atomic_role_count,
 			tbox->exists_restriction_count,
@@ -230,5 +231,6 @@ void print_short_stats(TBox* tbox, ABox* abox) {
 			tbox->eqrole_axiom_count,
 			tbox->transitive_role_axiom_count,
 			abox->individual_count,
-			abox->concept_assertion_count);
+			abox->concept_assertion_count,
+			abox->role_assertion_count);
 }

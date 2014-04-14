@@ -42,12 +42,19 @@ int free_individual(Individual* ind) {
 int free_abox(ABox* abox) {
 	int i, total_freed_bytes = 0;
 
-	// free class assertions
+	// free concept assertions
 	for (i = 0; i < abox->concept_assertion_count; ++i)
 		free(abox->concept_assertions[i]);
 	total_freed_bytes += sizeof(ConceptAssertion) * abox->concept_assertion_count;
 	free(abox->concept_assertions);
 	total_freed_bytes += sizeof(ConceptAssertion*) * abox->concept_assertion_count;
+
+	// free role assertions
+	for (i = 0; i < abox->role_assertion_count; ++i)
+		free(abox->role_assertions[i]);
+	total_freed_bytes += sizeof(RoleAssertion) * abox->role_assertion_count;
+	free(abox->role_assertions);
+	total_freed_bytes += sizeof(RoleAssertion*) * abox->role_assertion_count;
 
 	return total_freed_bytes;
 }
