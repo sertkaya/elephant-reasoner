@@ -26,7 +26,7 @@
 #include "../model/tbox/utils.h"
 #include "../model/limits.h"
 #include "../utils/stack.h"
-#include "../index/utils.h"
+#include "../index/tbox/utils.h"
 #include "../hashing/key_hash_table.h"
 #include "utils.h"
 

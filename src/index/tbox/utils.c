@@ -21,9 +21,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../model/tbox/datatypes.h"
-#include "../model/limits.h"
-#include "../hashing/key_value_hash_table.h"
+#include "../../model/tbox/datatypes.h"
+#include "../../model/limits.h"
+#include "../../hashing/key_value_hash_table.h"
 
 
 

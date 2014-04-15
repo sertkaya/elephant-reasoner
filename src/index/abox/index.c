@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../model/abox/datatypes.h"
+#include "../../model/abox/datatypes.h"
 
 
 

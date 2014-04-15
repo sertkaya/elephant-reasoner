@@ -20,7 +20,7 @@
 #ifndef INDEX_H_
 #define INDEX_H_
 
-#include "../model/tbox/datatypes.h"
+#include "../../model/tbox/datatypes.h"
 
 void index_tbox(TBox* tbox);
 
