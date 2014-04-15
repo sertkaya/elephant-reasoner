@@ -21,7 +21,7 @@
 #define ABOX_MODEL_H_
 
 #include "datatypes.h"
-#include "../datatypes.h"
+#include "../tbox/datatypes.h"
 
 
 /******************************************************************************

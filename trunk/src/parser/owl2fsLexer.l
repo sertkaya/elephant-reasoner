@@ -37,8 +37,10 @@ DOUBLE_CARET			"^^"
 %{
 	#include <stdio.h>
 	#include "y.tab.h"
-	#include "../model/datatypes.h"
-	#include "../model/model.h"
+	#include "../model/tbox/datatypes.h"
+	#include "../model/tbox/model.h"
+	#include "../model/abox/datatypes.h"
+	#include "../model/abox/model.h"
 
 	// #define YYSTYPE Expression
 	extern YYSTYPE yylval;

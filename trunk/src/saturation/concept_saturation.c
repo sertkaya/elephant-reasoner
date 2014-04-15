@@ -17,13 +17,13 @@
  */
 
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../model/model.h"
-#include "../model/utils.h"
-#include "../model/print_utils.h"
+#include "../model/tbox/model.h"
+#include "../model/tbox/utils.h"
 #include "../model/limits.h"
 #include "../utils/stack.h"
 #include "../index/utils.h"

@@ -20,7 +20,7 @@
 #ifndef HIERARCHY_H_
 #define HIERARCHY_H_
 
-#include "../model/datatypes.h"
+#include "../model/tbox/datatypes.h"
 
 void compute_concept_hierarchy(TBox* tbox);
 

@@ -20,7 +20,7 @@
 #ifndef PARSER_DATATYPES_H_
 #define PARSER_DATATYPES_H_
 
-#include "../model/datatypes.h"
+#include "../model/tbox/datatypes.h"
 #include "../model/abox/datatypes.h"
 
 // for lexer and parser

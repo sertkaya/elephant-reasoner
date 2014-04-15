@@ -21,8 +21,9 @@
 #include <stdlib.h>
 
 #include "datatypes.h"
+#include "tbox/datatypes.h"
 #include "abox/datatypes.h"
-#include "model.h"
+#include "tbox/model.h"
 #include "limits.h"
 #include "../hashing/key_hash_table.h"
 #include "../hashing/key_value_hash_table.h"
@@ -191,7 +192,8 @@ void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 	free_key_hash_table(printed);
 }
 
-void print_short_stats(TBox* tbox, ABox* abox) {
+// void print_short_stats(TBox* tbox, ABox* abox) {
+void print_short_stats(KB* kb) {
 	printf("\n---------- KB statistics ----------\n");
 	printf("atomic concepts: %d\n"
 			"atomic roles: %d\n"
@@ -213,24 +215,24 @@ void print_short_stats(TBox* tbox, ABox* abox) {
 			"individuals: %d\n"
 			"concept assertions: %d\n"
 			"role assertions: %d\n",
-			tbox->atomic_concept_count,
-			tbox->atomic_role_count,
-			tbox->exists_restriction_count,
-			tbox->unique_exists_restriction_count,
-			tbox->conjunction_count,
+			kb->tbox->atomic_concept_count,
+			kb->tbox->atomic_role_count,
+			kb->tbox->exists_restriction_count,
+			kb->tbox->unique_exists_restriction_count,
+			kb->tbox->conjunction_count,
 			// tbox->unique_conjunction_count,
-			tbox->binary_conjunction_count,
-			tbox->unique_binary_conjunction_count,
-			tbox->role_composition_count,
-			tbox->binary_role_composition_count,
-			tbox->unique_binary_role_composition_count,
-			tbox->subclass_axiom_count,
-			tbox->eqclass_axiom_count,
-			tbox->disjointclasses_axiom_count,
-			tbox->subrole_axiom_count,
-			tbox->eqrole_axiom_count,
-			tbox->transitive_role_axiom_count,
-			abox->individual_count,
-			abox->concept_assertion_count,
-			abox->role_assertion_count);
+			kb->tbox->binary_conjunction_count,
+			kb->tbox->unique_binary_conjunction_count,
+			kb->tbox->role_composition_count,
+			kb->tbox->binary_role_composition_count,
+			kb->tbox->unique_binary_role_composition_count,
+			kb->tbox->subclass_axiom_count,
+			kb->tbox->eqclass_axiom_count,
+			kb->tbox->disjointclasses_axiom_count,
+			kb->tbox->subrole_axiom_count,
+			kb->tbox->eqrole_axiom_count,
+			kb->tbox->transitive_role_axiom_count,
+			kb->abox->individual_count,
+			kb->abox->concept_assertion_count,
+			kb->abox->role_assertion_count);
 }

@@ -18,8 +18,8 @@
 
 #include "model.h"
 #include "datatypes.h"
-#include "limits.h"
-#include "../hashing/utils.h"
+#include "../limits.h"
+#include "../../hashing/utils.h"
 
 // return the atomic concept with the given name if it exists
 // NULL if it does not exist

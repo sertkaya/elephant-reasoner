@@ -17,8 +17,8 @@
  */
 
 
-#ifndef MEMORY_UTILS_H_
-#define MEMORY_UTILS_H_
+#ifndef TBOX_MEMORY_UTILS_H_
+#define TBOX_MEMORY_UTILS_H_
 
 #include "datatypes.h"
 

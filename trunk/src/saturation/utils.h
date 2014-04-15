@@ -21,8 +21,8 @@
 #define SATURATION_UTILS_H_
 
 #include "datatypes.h"
-#include "../model/datatypes.h"
-#include "../model/utils.h"
+#include "../model/tbox/datatypes.h"
+#include "../model/tbox/utils.h"
 #include "../hashing/key_hash_table.h"
 
 

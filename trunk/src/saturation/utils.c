@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../model/datatypes.h"
+#include "../model/tbox/datatypes.h"
 #include "utils.h"
 
 // add p to the predecessors hash of c
