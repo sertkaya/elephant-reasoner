@@ -20,7 +20,7 @@
 #ifndef ABOX_DATATYPES_H_
 #define ABOX_DATATYPES_H_
 
-#include "../datatypes.h"
+#include "../tbox/datatypes.h"
 #include "../../hashing/key_value_hash_table.h"
 
 typedef struct individual Individual;

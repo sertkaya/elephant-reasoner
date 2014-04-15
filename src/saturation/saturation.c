@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "../model/model.h"
+#include "../model/tbox/model.h"
 #include "role_saturation.h"
 #include "concept_saturation.h"
 

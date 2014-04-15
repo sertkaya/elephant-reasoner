@@ -20,7 +20,7 @@
 #ifndef SATURATION_DATATYPES_H_
 #define SATURATION_DATATYPES_H_
 
-#include "../model/datatypes.h"
+#include "../model/tbox/datatypes.h"
 
 typedef struct concept_saturation_axiom ConceptSaturationAxiom;
 typedef struct role_saturation_axiom RoleSaturationAxiom;

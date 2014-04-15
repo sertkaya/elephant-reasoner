@@ -21,7 +21,7 @@
 #define ROLE_SATURATION_H_
 
 
-#include "../model/datatypes.h"
+#include "../model/tbox/datatypes.h"
 
 void saturate_roles(TBox* tbox);
 

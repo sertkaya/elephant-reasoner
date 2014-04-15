@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../model/datatypes.h"
-#include "../model/model.h"
+#include "../model/tbox/datatypes.h"
+#include "../model/tbox/model.h"
 #include "../model/limits.h"
-#include "../model/print_utils.h"
 #include "../hashing/key_value_hash_table.h"
 #include "../utils/stack.h"
 #include "utils.h"

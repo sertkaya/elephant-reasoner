@@ -22,11 +22,11 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../hashing/key_hash_table.h"
+#include "../../hashing/key_hash_table.h"
 #include "datatypes.h"
 #include "model.h"
 #include "utils.h"
-#include "limits.h"
+#include "../limits.h"
 
 /******************************************************************************
  * get/create functions for concepts

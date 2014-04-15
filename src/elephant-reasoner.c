@@ -25,9 +25,9 @@
 #include <getopt.h>
 
 #include "reasoner/reasoner.h"
-#include "model/datatypes.h"
+#include "model/tbox/datatypes.h"
 #include "model/abox/datatypes.h"
-#include "model/memory_utils.h"
+#include "model/tbox/memory_utils.h"
 #include "model/abox/memory_utils.h"
 #include "model/print_utils.h"
 
@@ -102,31 +102,35 @@ int main(int argc, char *argv[]) {
 	output_taxonomy = fopen(output_file, "w");
 	assert(output_taxonomy != NULL);
 
-	TBox* tbox = NULL;
-	ABox* abox = NULL;
+	// TBox* tbox = NULL;
+	// ABox* abox = NULL;
 	// initialize global variables, allocate space
-	tbox = init_tbox();
-	abox = init_abox();
+	// tbox = init_tbox();
+	// abox = init_abox();
+	KB* kb = init_kb();
 
 	// read and parse the kb
-	read_kb(input_kb, tbox, abox);
+	// read_kb(input_kb, tbox, abox);
+	read_kb(input_kb, kb);
 	fclose(input_kb);
 
 	// classify the kb
 	if (!strcmp(reasoning_task, "classification"))
-		classify(tbox);
+		// classify(tbox);
+		classify(kb->tbox);
 
 	// display kb information
 	if (verbose_flag)
-		print_short_stats(tbox, abox);
+		// print_short_stats(tbox, abox);
+		print_short_stats(kb);
 
 	// print the concept hierarchy
-	print_concept_hierarchy(tbox, output_taxonomy);
+	print_concept_hierarchy(kb->tbox, output_taxonomy);
 	fclose(output_taxonomy);
 
 	// free the kb
-	int freed_bytes = free_tbox(tbox);
-	freed_bytes += free_abox(abox);
+	int freed_bytes = free_tbox(kb->tbox);
+	freed_bytes += free_abox(kb->abox);
 	printf("Freed bytes:%d\n", freed_bytes);
 
 	return 0;

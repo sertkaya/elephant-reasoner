@@ -22,8 +22,9 @@
 	#include <assert.h>
 	#include "datatypes.h"
 	#include "../model/datatypes.h"
+	#include "../model/tbox/datatypes.h"
 	#include "../model/abox/datatypes.h"
-	#include "../model/model.h"
+	#include "../model/tbox/model.h"
 	#include "../model/abox/model.h"
 	#include "../model/limits.h"
 	
@@ -33,9 +34,11 @@
 	char* yytext;
 	int yylex(void);
 	int yylineno;
-	void yyerror(TBox* tbox, ABox* abox, char* msg);
+	// void yyerror(TBox* tbox, ABox* abox, char* msg);
+	void yyerror(KB* kb, char* msg);
 	extern FILE *yyin;
 	// extern TBox* tbox;
+	extern KB* kb;
 
 	// for parsing conjunction
 	int cls_exp_count;      						/* number of conjuncts */
@@ -63,8 +66,9 @@
 	void unsupported_feature(char* feature);
 %}
 
-%parse-param {TBox* tbox} 
-%parse-param {ABox* abox}
+	// %parse-param {TBox* tbox} 
+	// %parse-param {ABox* abox}
+%parse-param {KB* kb} 
 
 %start ontologyDocument
 
@@ -207,13 +211,13 @@ annotationPropertyRange:
 	
 
 Class:
-	IRI	{ $$.concept = get_create_atomic_concept(yytext, tbox); };
+	IRI	{ $$.concept = get_create_atomic_concept(yytext, kb->tbox); };
 
 Datatype:
 	IRI;
 
 ObjectProperty:
-	IRI	{ $$.role = get_create_atomic_role(yytext, tbox); };
+	IRI	{ $$.role = get_create_atomic_role(yytext, kb->tbox); };
 
 DataProperty:
 	IRI { 
@@ -264,7 +268,7 @@ ObjectIntersectionOf:
 	OBJECT_INTERSECTION_OF '(' ClassExpression ClassExpression classExpressions ')' {
 		cls_exps[cls_exp_count++] = $3.concept;
 		cls_exps[cls_exp_count++] = $4.concept;
-		$$.concept = get_create_conjunction(cls_exp_count, cls_exps, tbox);
+		$$.concept = get_create_conjunction(cls_exp_count, cls_exps, kb->tbox);
 		cls_exp_count = 0;
 	};
 
@@ -277,7 +281,7 @@ ObjectOneOf:
 
 ObjectSomeValuesFrom:
 	OBJECT_SOME_VALUES_FROM '(' ObjectPropertyExpression ClassExpression ')' {
-		$$.concept = get_create_exists_restriction($3.role, $4.concept, tbox);
+		$$.concept = get_create_exists_restriction($3.role, $4.concept, kb->tbox);
 	};
 
 	// TODO:
@@ -326,7 +330,7 @@ ClassAxiom:
 
 SubClassOf:
 	SUB_CLASS_OF '(' axiomAnnotations ClassExpression ClassExpression ')' {
-		add_subclass_axiom(create_subclass_axiom($4.concept, $5.concept), tbox);
+		add_subclass_axiom(create_subclass_axiom($4.concept, $5.concept), kb->tbox);
 	};
 
 EquivalentClasses:
@@ -335,7 +339,7 @@ EquivalentClasses:
 		eq_cls_exps[eq_cls_exp_count++] = $5.concept;
 		int i;
 		for (i = 0; i < eq_cls_exp_count - 1; ++i)
-			add_eqclass_axiom(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), tbox);
+			add_eqclass_axiom(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), kb->tbox);
 		eq_cls_exp_count = 0;
 	};
 
@@ -350,7 +354,7 @@ DisjointClasses:
 	DISJOINT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression disjointClassExpressions ')' {
 		disj_cls_exps[disj_cls_exp_count++] = $4.concept;
 		disj_cls_exps[disj_cls_exp_count++] = $5.concept;
-		add_disjointclasses_axiom(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), tbox);
+		add_disjointclasses_axiom(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), kb->tbox);
 		disj_cls_exp_count = 0;
 	};
 
@@ -373,7 +377,7 @@ ObjectPropertyAxiom:
 	
 SubObjectPropertyOf:
 	SUB_OBJECT_PROPERTY_OF '(' axiomAnnotations subObjectPropertyExpression superObjectPropertyExpression ')' {
-		add_subrole_axiom(create_subrole_axiom($4.role, $5.role), tbox);
+		add_subrole_axiom(create_subrole_axiom($4.role, $5.role), kb->tbox);
 	};
 
 subObjectPropertyExpression:
@@ -386,7 +390,7 @@ superObjectPropertyExpression:
 // TODO: treat axioms with multiple eqObjectPropertyExpressions!
 EquivalentObjectProperties:
 	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations ObjectPropertyExpression ObjectPropertyExpression eqObjectPropertyExpressions ')' {
-		add_eqrole_axiom(create_eqrole_axiom($4.role, $5.role), tbox);
+		add_eqrole_axiom(create_eqrole_axiom($4.role, $5.role), kb->tbox);
 	};
 	
 eqObjectPropertyExpressions:
@@ -412,7 +416,7 @@ ReflexiveObjectProperty:
 
 TransitiveObjectProperty:
 	TRANSITIVE_OBJECT_PROPERTY '(' axiomAnnotations ObjectPropertyExpression ')' {
-		add_transitive_role_axiom(create_transitive_role_axiom($4.role), tbox);
+		add_transitive_role_axiom(create_transitive_role_axiom($4.role), kb->tbox);
 	};
 
 DataPropertyAxiom:
@@ -503,12 +507,12 @@ differentIndividuals:
 
 ClassAssertion:
 	CLASS_ASSERTION '(' axiomAnnotations ClassExpression Individual ')' {
-		add_concept_assertion(create_concept_assertion($5.individual, $4.concept), abox);
+		add_concept_assertion(create_concept_assertion($5.individual, $4.concept), kb->abox);
 	};
 
 ObjectPropertyAssertion:
 	OBJECT_PROPERTY_ASSERTION '(' axiomAnnotations ObjectPropertyExpression sourceIndividual targetIndividual ')' {
-		add_role_assertion(create_role_assertion($4.role, $5.individual, $6.individual));
+		add_role_assertion(create_role_assertion($4.role, $5.individual, $6.individual), kb->abox);
 	};
 
 NegativeObjectPropertyAssertion:
@@ -533,7 +537,7 @@ Individual:
 	NamedIndividual;
 
 NamedIndividual:
-	IRI	{ $$.individual = get_create_individual(yytext, abox); };
+	IRI	{ $$.individual = get_create_individual(yytext, kb->abox); };
 
 Literal:
 	typedLiteral 
@@ -564,7 +568,7 @@ propertyExpressionChain:
 	OBJECT_PROPERTY_CHAIN '(' ObjectPropertyExpression ObjectPropertyExpression compObjectPropertyExpressions ')' {
 		comp_role_exps[comp_role_exp_count++] = $4.role;
 		comp_role_exps[comp_role_exp_count++] = $3.role;
-		$$.role = get_create_role_composition(comp_role_exp_count, comp_role_exps, tbox);
+		$$.role = get_create_role_composition(comp_role_exp_count, comp_role_exps, kb->tbox);
 		comp_role_exp_count = 0;
 	}
 
@@ -577,7 +581,8 @@ compObjectPropertyExpressions:
 
 %%
 
-void yyerror(TBox* tbox, ABox* abox, char* msg) {
+// void yyerror(TBox* tbox, ABox* abox, char* msg) {
+void yyerror(KB* kb, char* msg) {
 	fprintf(stderr, "\nline %d: %s\n", yylineno, msg);
 }
 

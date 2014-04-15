@@ -17,8 +17,8 @@
  */
 
 
-#ifndef MODEL_UTILS_H_
-#define MODEL_UTILS_H_
+#ifndef TBOX_MODEL_UTILS_H_
+#define TBOX_MODEL_UTILS_H_
 
 #include <stdint.h>
 #include "datatypes.h"

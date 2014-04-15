@@ -20,7 +20,7 @@
 #ifndef ABOX_INDEX_H_
 #define ABOX_INDEX_H_
 
-#include "../model/abox-datatypes.h"
+#include "../model/abox/datatypes.h"
 
 void index_abox(ABox* abox);
 

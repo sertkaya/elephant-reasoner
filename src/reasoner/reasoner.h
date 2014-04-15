@@ -23,6 +23,7 @@
 #include <sys/time.h>
 
 #include "../model/datatypes.h"
+#include "../model/tbox/datatypes.h"
 #include "../model/abox/datatypes.h"
 
 struct timeval tStart, tEnd;
@@ -37,10 +38,15 @@ struct timeval tStart, tEnd;
 
 // initializes the necessary fields of the TBox
 TBox* init_tbox();
+
 // initializes the necessary fields of the ABox
 ABox* init_abox();
 
-void read_kb(FILE* input_kb, TBox* tbox, ABox* abox);
+// initializes the TBox and the ABox
+KB* init_kb();
+
+// void read_kb(FILE* input_kb, TBox* tbox, ABox* abox);
+void read_kb(FILE* input_kb, KB* kb);
 
 void classify(TBox* tbox);
 

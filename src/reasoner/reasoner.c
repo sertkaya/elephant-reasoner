@@ -23,9 +23,10 @@
 #include <unistd.h>
 
 #include "../model/datatypes.h"
+#include "../model/tbox/datatypes.h"
 #include "../model/abox/datatypes.h"
 #include "../model/limits.h"
-#include "../model/model.h"
+#include "../model/tbox/model.h"
 #include "../preprocessing/preprocessing.h"
 #include "../index/index.h"
 #include "../saturation/saturation.h"
@@ -33,7 +34,8 @@
 #include "reasoner.h"
 
 // the parser
-extern int yyparse(TBox* tbox, ABox* abox);
+// extern int yyparse(TBox* tbox, ABox* abox);
+extern int yyparse(KB* kb);
 // file pointer for the parser
 extern FILE* yyin;
 
@@ -109,9 +111,19 @@ ABox* init_abox() {
 	return abox;
 }
 
+KB* init_kb() {
+	KB* kb = (KB*) malloc(sizeof(KB));
+	assert(kb != NULL);
+
+	kb->tbox = init_tbox();
+	kb->abox = init_abox();
+
+	return kb;
+}
 
 // void read_kb(char* kb_file_name, TBox* tbox) {
-void read_kb(FILE* input_kb, TBox* tbox, ABox* abox) {
+// void read_kb(FILE* input_kb, TBox* tbox, ABox* abox) {
+void read_kb(FILE* input_kb, KB* kb) {
 
 	// parser return code
 	int parser;
@@ -121,7 +133,8 @@ void read_kb(FILE* input_kb, TBox* tbox, ABox* abox) {
 	printf("Loading KB.........................:");
 	fflush(stdout);
 	START_TIMER;
-	parser = yyparse(tbox, abox);
+	// parser = yyparse(tbox, abox);
+	parser = yyparse(kb);
 	STOP_TIMER;
 	total_time += TIME_DIFF;
 	if (parser != 0) {

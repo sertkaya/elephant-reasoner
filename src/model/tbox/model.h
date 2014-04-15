@@ -17,8 +17,8 @@
  */
 
 
-#ifndef MODEL_H_
-#define MODEL_H_
+#ifndef TBOX_MODEL_H_
+#define TBOX_MODEL_H_
 
 #include "datatypes.h"
 

@@ -1,5 +1,5 @@
-#include "../model/datatypes.h"
-#include "../model/model.h"
+#include "../model/tbox/datatypes.h"
+#include "../model/tbox/model.h"
 
 // preprocess axioms that are syntactic shortcuts, like equivalent classes/roles, disjoint classes and
 // transtive roles
