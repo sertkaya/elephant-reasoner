@@ -28,7 +28,7 @@
 #include "../model/limits.h"
 #include "../model/tbox/model.h"
 #include "../preprocessing/preprocessing.h"
-#include "../index/index.h"
+#include "../index/tbox/index.h"
 #include "../saturation/saturation.h"
 #include "../hierarchy/hierarchy.h"
 #include "reasoner.h"

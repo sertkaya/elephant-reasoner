@@ -33,6 +33,8 @@ AC_CONFIG_FILES([Makefile
 	src/model/tbox/Makefile
 	src/model/abox/Makefile
 	src/index/Makefile
+	src/index/tbox/Makefile
+	src/index/abox/Makefile
 	src/saturation/Makefile
 	src/hierarchy/Makefile
 	src/reasoner/Makefile

@@ -17,8 +17,8 @@
  */
 
 
-#ifndef INDEX_UTILS_H_
-#define INDEX_UTILS_H_
+#ifndef TBOX_INDEX_UTILS_H_
+#define TBOX_INDEX_UTILS_H_
 
 /******************************************************************************
  * functions for adding subsumer/told subsumer to a concept
@@ -72,4 +72,4 @@ void add_to_negative_exists(Concept* ex, TBox* tbox);
 
 
 
-#endif /* INDEX_UTILS_H_ */
+#endif
