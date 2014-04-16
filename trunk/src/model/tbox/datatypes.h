@@ -289,6 +289,7 @@ struct tbox {
 
 	DisjointClassesAxiom** disjointclasses_axioms;
 	int disjointclasses_axiom_count;
+
 };
 
 

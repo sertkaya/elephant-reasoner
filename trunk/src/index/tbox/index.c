@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "../../model/datatypes.h"
 #include "../../model/tbox/datatypes.h"
 #include "../../model/tbox/utils.h"
 #include "utils.h"
@@ -70,10 +71,30 @@ void index_role(Role* r) {
 }
 
 
-void index_tbox(TBox* tbox) {
+/*
+ * Indexes the given TBox.
+ * Returns:
+ * 	-1: If the reasoning task is consistency check, and an atomic concept has the
+ * 	told subsumer bottom. In this case it immediately returns, i.e., the rest of
+ * 	the KB is not indexed!
+ * 	1: If the reasoning task is consistency check and bottom does not appear on the
+ * 	rhs of any axiom. This means the KB is consistent.
+ * 	0: Otherwise
+ */
+char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 	int i;
+	char bottom_appears_on_rhs = 0;
 
 	for (i = 0; i < tbox->subclass_axiom_count; i++) {
+		if (reasoning_task == CONSISTENCY)
+			// check if bottom appears on the rhs
+			if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept)
+				bottom_appears_on_rhs = 1;
+				// atomic concept subsumed by bottom, inconsistent kb
+				if (tbox->subclass_axioms[i]->lhs->type == ATOMIC_CONCEPT)
+					// return immediately since we are checking for consistency
+					return -1;
+
 		// no need to add told subsumers of bottom
 		// no need to index the bottom concept
 		if (tbox->subclass_axioms[i]->lhs == tbox->bottom_concept)
@@ -89,10 +110,15 @@ void index_tbox(TBox* tbox) {
 		index_concept(tbox->subclass_axioms[i]->lhs, tbox);
 	}
 
+	// If bottom does not appear on the rhs, the KB is consistent
+	if (reasoning_task == CONSISTENCY && bottom_appears_on_rhs == 0)
+		return 1;
+
 	for (i = 0; i < tbox->subrole_axiom_count; ++i) {
 		add_told_subsumer_role(tbox->subrole_axioms[i]->lhs, tbox->subrole_axioms[i]->rhs);
 		add_told_subsumee_role(tbox->subrole_axioms[i]->rhs, tbox->subrole_axioms[i]->lhs);
 		index_role(tbox->subrole_axioms[i]->lhs);
 	}
 
+	return 0;
 }

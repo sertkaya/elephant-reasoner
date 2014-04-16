@@ -20,9 +20,20 @@
 #ifndef INDEX_H_
 #define INDEX_H_
 
+#include "../../model/datatypes.h"
 #include "../../model/tbox/datatypes.h"
 
-void index_tbox(TBox* tbox);
+/*
+ * Indexes the given TBox.
+ * Returns:
+ * 	-1: If the reasoning task is consistency check, and an atomic concept has the
+ * 	told subsumer bottom. In this case it immediately returns, i.e., the rest of
+ * 	the KB is not indexed!
+ * 	1: If the reasoning task is consistency check and bottom does not appear on the
+ * 	rhs of any axiom. This means the KB is consistent.
+ * 	0: Otherwise
+ */
+char index_tbox(TBox* tbox, ReasoningTask reasoning_task );
 
 void index_role(Role* r);
 

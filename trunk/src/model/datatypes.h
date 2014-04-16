@@ -25,11 +25,19 @@
 
 
 typedef struct knowledge_base KB;
+typedef enum reasoning_task ReasoningTask;
+
+// reasoning tasks
+enum reasoning_task {
+	CLASSIFICATION, CONSISTENCY, REALISATION
+};
 
 // knowledge base
 struct knowledge_base {
 	TBox* tbox;
 	ABox* abox;
+	// flag for inconsistency
+	char inconsistent;
 };
 
 #endif /* DATATYPES_H_ */

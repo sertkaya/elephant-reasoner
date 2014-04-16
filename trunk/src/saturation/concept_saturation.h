@@ -21,8 +21,17 @@
 #define CONCEPT_SATURATION_H_
 
 
+#include "../model/datatypes.h"
 #include "../model/tbox/datatypes.h"
 
-void saturate_concepts(TBox* tbox);
+/*
+ * Saturates the concepts of a given TBox.
+ * Returns:
+ * 	-1: If the reasoning task is consistency check, and an atomic concept has the
+ * 	subsumer bottom. In this case it immediately returns, i.e., saturation process
+ * 	is cancelled.
+ * 	0: Otherwise
+ */
+char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task);
 
 #endif

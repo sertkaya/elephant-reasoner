@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "../model/datatypes.h"
 #include "../model/tbox/model.h"
 #include "../model/tbox/utils.h"
 #include "../model/limits.h"
@@ -43,7 +44,15 @@ ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* r
 	return ax;
 }
 
-void saturate_concepts(TBox* tbox) {
+/*
+ * Saturates the concepts of a given TBox.
+ * Returns:
+ * 	-1: If the reasoning task is consistency check, and an atomic concept has the
+ * 	subsumer bottom. In this case it immediately returns, i.e., saturation process
+ * 	is cancelled.
+ * 	0: Otherwise
+ */
+char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 	ConceptSaturationAxiom* ax;
 	Stack scheduled_axioms;
 	int unique_subsumption_count = 0, total_subsumption_count = 0;
@@ -150,6 +159,10 @@ void saturate_concepts(TBox* tbox) {
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
+					// If we are checking consistency and an atomic concept is subsumed by bottom
+					if (reasoning_task == CONSISTENCY && ax->lhs->type == ATOMIC_CONCEPT)
+						// return inconsistent immediately
+						return -1;
 					// We push the saturation axiom bottom <= ax->lhs, if we already know ax->lhs <= bottom. This way ax->lhs = bottom
 					// gets computed. The information bottom <= c is not taken into account for any other concept c.
 					push(&scheduled_axioms, create_concept_saturation_axiom(tbox->bottom_concept, ax->lhs, NULL, SUBSUMPTION_BOTTOM));
@@ -302,4 +315,6 @@ void saturate_concepts(TBox* tbox) {
 	}
 	printf("Total subsumptions:%d\nUnique subsumptions:%d\n", total_subsumption_count, unique_subsumption_count);
 	printf("Total links:%d\nUnique links:%d\n", total_link_count, unique_link_count);
+
+	return 0;
 }

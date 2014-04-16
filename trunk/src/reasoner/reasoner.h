@@ -37,10 +37,10 @@ struct timeval tStart, tEnd;
 // TBox* tbox;
 
 // initializes the necessary fields of the TBox
-TBox* init_tbox();
+// TBox* init_tbox();
 
 // initializes the necessary fields of the ABox
-ABox* init_abox();
+// ABox* init_abox();
 
 // initializes the TBox and the ABox
 KB* init_kb();
@@ -49,6 +49,10 @@ KB* init_kb();
 void read_kb(FILE* input_kb, KB* kb);
 
 void classify(TBox* tbox);
+
+char check_consistency(KB* kb);
+
+void realize_kb(KB* kb);
 
 
 #endif /* REASONER_H_ */
