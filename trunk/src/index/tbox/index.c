@@ -85,15 +85,16 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 	int i;
 	char bottom_appears_on_rhs = 0;
 
-	for (i = 0; i < tbox->subclass_axiom_count; i++) {
+	for (i = 0; i < tbox->subclass_axiom_count; ++i) {
 		if (reasoning_task == CONSISTENCY)
 			// check if bottom appears on the rhs
-			if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept)
+			if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept) {
 				bottom_appears_on_rhs = 1;
 				// atomic concept subsumed by bottom, inconsistent kb
 				if (tbox->subclass_axioms[i]->lhs->type == ATOMIC_CONCEPT)
 					// return immediately since we are checking for consistency
 					return -1;
+			}
 
 		// no need to add told subsumers of bottom
 		// no need to index the bottom concept

@@ -186,6 +186,7 @@ void classify(TBox* tbox) {
 //	0: if the kb is consistent
 //	1: it it is inconsistent
 char check_consistency(KB* kb) {
+
 	printf("Preprocessing......................:");
 	fflush(stdout);
 	START_TIMER;
@@ -206,23 +207,28 @@ char check_consistency(KB* kb) {
 		kb->inconsistent = 1;
 		return 1;
 	}
-	// Return consistent if bottom does appear on the rhs of an axiom
+	// Return consistent if bottom does not appear on the rhs of an axiom
 	// (indexing returns 1 in this case)
 	else if (indexing_result == 1) {
 		return 0;
 	}
 
-	// TODO:
-	// here saturate the TBox and close the concept and role assertions under the saturated TBox
-	// check for inconsistency
 	printf("Saturating.........................:");
 	fflush(stdout);
 	START_TIMER;
 	// init_saturation(tbox);
-	saturate_tbox(kb->tbox, CONSISTENCY);
+	char saturation_result = saturate_tbox(kb->tbox, CONSISTENCY);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
+	// return inconsistent if saturation returned inconsistent
+	if (saturation_result == -1) {
+		kb->inconsistent = 1;
+		return 1;
+	}
+	// TODO:
+	// here close the concept and role assertions under the saturated TBox
+	// check for inconsistency
 
 	return 0;
 }
