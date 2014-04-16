@@ -118,11 +118,11 @@ KB* init_kb() {
 	kb->tbox = init_tbox();
 	kb->abox = init_abox();
 
+	kb->inconsistent = 0;
+
 	return kb;
 }
 
-// void read_kb(char* kb_file_name, TBox* tbox) {
-// void read_kb(FILE* input_kb, TBox* tbox, ABox* abox) {
 void read_kb(FILE* input_kb, KB* kb) {
 
 	// parser return code
@@ -157,7 +157,7 @@ void classify(TBox* tbox) {
 	printf("Indexing...........................:");
 	fflush(stdout);
 	START_TIMER;
-	index_tbox(tbox);
+	index_tbox(tbox, CLASSIFICATION);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -166,7 +166,7 @@ void classify(TBox* tbox) {
 	fflush(stdout);
 	START_TIMER;
 	// init_saturation(tbox);
-	saturate_tbox(tbox);
+	saturate_tbox(tbox, CLASSIFICATION);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -180,4 +180,53 @@ void classify(TBox* tbox) {
 	total_time += TIME_DIFF;
 
 	printf("Total time.........................:%.3f milisecs\n", total_time / 1000);
+}
+
+// Returns
+//	0: if the kb is consistent
+//	1: it it is inconsistent
+char check_consistency(KB* kb) {
+	printf("Preprocessing......................:");
+	fflush(stdout);
+	START_TIMER;
+	preprocess_tbox(kb->tbox);
+	STOP_TIMER;
+	printf("%.3f milisecs\n", TIME_DIFF / 1000);
+	total_time += TIME_DIFF;
+
+	printf("Indexing...........................:");
+	fflush(stdout);
+	START_TIMER;
+	char indexing_result = index_tbox(kb->tbox, CONSISTENCY);
+	STOP_TIMER;
+	printf("%.3f milisecs\n", TIME_DIFF / 1000);
+	total_time += TIME_DIFF;
+	// Return inconsistent if indexing returned inconsistent
+	if (indexing_result == -1) {
+		kb->inconsistent = 1;
+		return 1;
+	}
+	// Return consistent if bottom does appear on the rhs of an axiom
+	// (indexing returns 1 in this case)
+	else if (indexing_result == 1) {
+		return 0;
+	}
+
+	// TODO:
+	// here saturate the TBox and close the concept and role assertions under the saturated TBox
+	// check for inconsistency
+	printf("Saturating.........................:");
+	fflush(stdout);
+	START_TIMER;
+	// init_saturation(tbox);
+	saturate_tbox(kb->tbox, CONSISTENCY);
+	STOP_TIMER;
+	printf("%.3f milisecs\n", TIME_DIFF / 1000);
+	total_time += TIME_DIFF;
+
+	return 0;
+}
+
+void realize_kb(KB* kb) {
+
 }

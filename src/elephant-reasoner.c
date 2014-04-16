@@ -37,15 +37,8 @@ void usage(char* program) {
 
 int main(int argc, char *argv[]) {
 	FILE* input_kb;
-	FILE* output_taxonomy;
+	FILE* output;
 
-	if (argc <= 2) {
-		fprintf(stderr,"Usage: %s input_kb output_taxonomy\n", argv[0]);
-		return -1;
-	}
-
-	// extern char *optarg;
-	// extern int optind;
 	int c, reasoning_task_flag = 0, input_flag = 0, output_flag = 0, wrong_argument_flag = 0, verbose_flag = 0;
 	char *reasoning_task = "", *ontology_file = "", *output_file = "";
 	static char usage[] = "Usage: %s -i ontology -o output -r[classification|realisation|consistency]\n";
@@ -99,34 +92,37 @@ int main(int argc, char *argv[]) {
 	assert(input_kb != NULL);
 
 	// the output taxonomy file
-	output_taxonomy = fopen(output_file, "w");
-	assert(output_taxonomy != NULL);
+	output = fopen(output_file, "w");
+	assert(output != NULL);
 
-	// TBox* tbox = NULL;
-	// ABox* abox = NULL;
 	// initialize global variables, allocate space
-	// tbox = init_tbox();
-	// abox = init_abox();
 	KB* kb = init_kb();
 
 	// read and parse the kb
-	// read_kb(input_kb, tbox, abox);
 	read_kb(input_kb, kb);
 	fclose(input_kb);
 
-	// classify the kb
-	if (!strcmp(reasoning_task, "classification"))
-		// classify(tbox);
+	if (!strcmp(reasoning_task, "classification")) {
+		// classify the kb
 		classify(kb->tbox);
+		// print the concept hierarchy
+		print_concept_hierarchy(kb->tbox, output);
+	}
+	else if (!strcmp(reasoning_task, "consistency")) {
+		if (check_consistency(kb))
+			fprintf(output, "inconsistent\n");
+		else
+			fprintf(output, "consistent\n");
+	}
+	else if (!strcmp(reasoning_task, "realisation"))
+		realize_kb(kb);
+
+	fclose(output);
 
 	// display kb information
 	if (verbose_flag)
 		// print_short_stats(tbox, abox);
 		print_short_stats(kb);
-
-	// print the concept hierarchy
-	print_concept_hierarchy(kb->tbox, output_taxonomy);
-	fclose(output_taxonomy);
 
 	// free the kb
 	int freed_bytes = free_tbox(kb->tbox);
