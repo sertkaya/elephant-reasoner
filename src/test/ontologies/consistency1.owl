@@ -2,16 +2,18 @@ Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 
 Ontology(<http://www.ihtsdo.org/>
 
-DisjointClasses(<http://www.ihtsdo.org#B> <http://www.ihtsdo.org#C>)
+DisjointClasses(<http://www.ihtsdo.org#A> <http://www.ihtsdo.org#B>)
+
+SubClassOf(<http://www.ihtsdo.org#X> ObjectSomeValuesFrom(<http://www.ihtsdo.org#r>  <http://www.ihtsdo.org#C>))
 
 SubClassOf(
-	ObjectSomeValuesFrom(<http://www.ihtsdo.org#r>  <http://www.ihtsdo.org#A>)
-	<http://www.ihtsdo.org#B>)
+	ObjectSomeValuesFrom(<http://www.ihtsdo.org#r>  <http://www.ihtsdo.org#C>)
+	<http://www.ihtsdo.org#A>)
 
 ObjectPropertyAssertion(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#i1> <http://www.ihtsdo.org#i2>)
 
-ClassAssertion(<http://www.ihtsdo.org#A> <http://www.ihtsdo.org#i2>)
-ClassAssertion(<http://www.ihtsdo.org#C> <http://www.ihtsdo.org#i1>)
+ClassAssertion(<http://www.ihtsdo.org#C> <http://www.ihtsdo.org#i2>)
+ClassAssertion(<http://www.ihtsdo.org#B> <http://www.ihtsdo.org#i1>)
 
 )
 

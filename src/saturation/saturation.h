@@ -21,7 +21,6 @@
 #define SATURATION_H_
 
 #include "../model/datatypes.h"
-#include "../model/tbox/datatypes.h"
 
 /*
  * Saturates the given TBox.

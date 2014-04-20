@@ -25,10 +25,8 @@
 #include <getopt.h>
 
 #include "reasoner/reasoner.h"
-#include "model/tbox/datatypes.h"
-#include "model/abox/datatypes.h"
-#include "model/tbox/memory_utils.h"
-#include "model/abox/memory_utils.h"
+#include "model/datatypes.h"
+#include "model/memory_utils.h"
 #include "model/print_utils.h"
 
 void usage(char* program) {

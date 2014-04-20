@@ -17,12 +17,14 @@
  */
 
 
-#ifndef ROLE_SATURATION_H_
-#define ROLE_SATURATION_H_
-
+#ifndef PREPROCESSING_DATATYPES_H_
+#define PREPROCESSING_DATATYPES_H_
 
 #include "../model/datatypes.h"
 
-void saturate_roles(TBox* tbox);
+// the list of subclass axioms that are generated during
+// preprocessing
+SubClassAxiom** generated_subclass_axioms;
+int generated_subclass_axiom_count;
 
 #endif

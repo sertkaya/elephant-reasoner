@@ -23,8 +23,6 @@
 #include <sys/time.h>
 
 #include "../model/datatypes.h"
-#include "../model/tbox/datatypes.h"
-#include "../model/abox/datatypes.h"
 
 struct timeval tStart, tEnd;
 #define START_TIMER	gettimeofday(&tStart, NULL)

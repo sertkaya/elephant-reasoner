@@ -22,7 +22,6 @@
 
 
 #include "../model/datatypes.h"
-#include "../model/tbox/datatypes.h"
 
 /*
  * Saturates the concepts of a given TBox.
