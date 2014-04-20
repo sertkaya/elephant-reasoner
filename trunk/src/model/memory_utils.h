@@ -17,12 +17,13 @@
  */
 
 
-#ifndef ROLE_SATURATION_H_
-#define ROLE_SATURATION_H_
+#ifndef MEMORY_UTILS_H_
+#define MEMORY_UTILS_H_
 
+#include "datatypes.h"
 
-#include "../model/datatypes.h"
+int free_tbox(TBox* tbox);
 
-void saturate_roles(TBox* tbox);
+int free_abox(ABox* abox);
 
-#endif
+#endif /* MEMORY_UTILS_H_ */

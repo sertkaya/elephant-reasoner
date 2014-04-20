@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../model/tbox/datatypes.h"
+#include "../model/datatypes.h"
 
 // add c1 to the list of equivalent concepts of c2
 int add_equivalent_concept(Concept* c1, Concept* c2) {

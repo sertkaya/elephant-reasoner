@@ -21,9 +21,7 @@
 #include <stdlib.h>
 
 #include "datatypes.h"
-#include "tbox/datatypes.h"
-#include "abox/datatypes.h"
-#include "tbox/model.h"
+#include "model.h"
 #include "limits.h"
 #include "../hashing/key_hash_table.h"
 #include "../hashing/key_value_hash_table.h"

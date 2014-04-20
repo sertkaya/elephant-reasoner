@@ -22,7 +22,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "../model/tbox/datatypes.h"
+#include "../model/datatypes.h"
 #include "../model/limits.h"
 #include "utils.h"
 #include "../saturation/utils.h"

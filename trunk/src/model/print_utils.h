@@ -23,8 +23,6 @@
 #include <stdio.h>
 
 #include "datatypes.h"
-#include "abox/datatypes.h"
-#include "tbox/datatypes.h"
 
 // utility functions for printing concepts, axioms and statistics
 void print_exists(Exists* ex);
@@ -33,7 +31,6 @@ void print_subclass_axiom(SubClassAxiom* subclass_ax);
 void print_eqclass_axiom(EqClassAxiom* subclass_ax);
 void print_subrole_axiom(SubRoleAxiom* subrole_ax);
 void print_conjunctions(TBox* tbox);
-void print_axioms(Axiom** axioms, int count);
 void print_tbox(TBox* tbox);
 // print the computed concept hierarchy
 void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp);

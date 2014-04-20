@@ -1,5 +1,5 @@
 noinst_LIBRARIES				= libindex.a
-libindex_a_SOURCES			= index.h 
+libindex_a_SOURCES				= index.c utils.c index.h utils.h 
 
-CLEANFILES							= *.o
+CLEANFILES						= *.o
 DISTCLEANFILES					= .deps Makefile

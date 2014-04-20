@@ -23,12 +23,10 @@
 #include <unistd.h>
 
 #include "../model/datatypes.h"
-#include "../model/tbox/datatypes.h"
-#include "../model/abox/datatypes.h"
 #include "../model/limits.h"
-#include "../model/tbox/model.h"
+#include "../model/model.h"
 #include "../preprocessing/preprocessing.h"
-#include "../index/tbox/index.h"
+#include "../index/index.h"
 #include "../saturation/saturation.h"
 #include "../hierarchy/hierarchy.h"
 #include "reasoner.h"
@@ -60,6 +58,8 @@ TBox* init_tbox() {
 	tbox->exists_restriction_count = 0;
 	tbox->unique_exists_restriction_count = 0;
 	tbox->exists_restrictions = create_key_value_hash_table(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
+
+	tbox->nominals = create_key_value_hash_table(DEFAULT_NOMINALS_HASH_SIZE);
 
 	tbox->conjunction_count = 0;
 	// tbox->unique_conjunction_count = 0;
@@ -203,15 +203,15 @@ char check_consistency(KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 	// Return inconsistent if indexing returned inconsistent
-	if (indexing_result == -1) {
-		kb->inconsistent = 1;
-		return 1;
-	}
+	// if (indexing_result == -1) {
+	// 	kb->inconsistent = 1;
+	// 	return 1;
+	// }
 	// Return consistent if bottom does not appear on the rhs of an axiom
 	// (indexing returns 1 in this case)
-	else if (indexing_result == 1) {
+	// else
+	if (indexing_result == 1)
 		return 0;
-	}
 
 	printf("Saturating.........................:");
 	fflush(stdout);

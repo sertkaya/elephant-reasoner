@@ -22,10 +22,7 @@
 	#include <assert.h>
 	#include "datatypes.h"
 	#include "../model/datatypes.h"
-	#include "../model/tbox/datatypes.h"
-	#include "../model/abox/datatypes.h"
-	#include "../model/tbox/model.h"
-	#include "../model/abox/model.h"
+	#include "../model/model.h"
 	#include "../model/limits.h"
 	
 	#define YYSTYPE Expression
@@ -276,7 +273,7 @@ ObjectIntersectionOf:
 	// TODO:
 ObjectOneOf:
 	OBJECT_ONE_OF '(' Individual ')' {
-		unsupported_feature("ObjectOneOf");
+		$$.concept = get_create_nominal($3.individual, kb->tbox);
 	};
 
 ObjectSomeValuesFrom:

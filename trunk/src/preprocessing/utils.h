@@ -17,12 +17,11 @@
  */
 
 
-#ifndef ROLE_SATURATION_H_
-#define ROLE_SATURATION_H_
-
+#ifndef PREPROCESSING_UTILS_H_
+#define PREPROCESSING_UTILS_H_
 
 #include "../model/datatypes.h"
 
-void saturate_roles(TBox* tbox);
+void add_generated_subclass_axiom(SubClassAxiom** ax);
 
 #endif

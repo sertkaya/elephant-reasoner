@@ -17,7 +17,7 @@
  */
 
 #include "../model/datatypes.h"
-#include "../model/tbox/model.h"
+#include "../model/model.h"
 #include "role_saturation.h"
 #include "concept_saturation.h"
 

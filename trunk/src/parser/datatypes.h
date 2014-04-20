@@ -20,8 +20,7 @@
 #ifndef PARSER_DATATYPES_H_
 #define PARSER_DATATYPES_H_
 
-#include "../model/tbox/datatypes.h"
-#include "../model/abox/datatypes.h"
+#include "../model/datatypes.h"
 
 // for lexer and parser
 typedef union expression Expression;
