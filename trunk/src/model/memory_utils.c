@@ -289,6 +289,9 @@ int free_tbox(TBox* tbox) {
 	// free the atomic roles hash
 	total_freed_bytes += free_key_value_hash_table(tbox->atomic_roles);
 
+	// finally free the tbox itself
+	free(tbox);
+
 	return total_freed_bytes;
 }
 
@@ -321,6 +324,18 @@ int free_abox(ABox* abox) {
 	total_freed_bytes += sizeof(RoleAssertion) * abox->role_assertion_count;
 	free(abox->role_assertions);
 	total_freed_bytes += sizeof(RoleAssertion*) * abox->role_assertion_count;
+
+	// iterate over the individuals hash, free the individuals
+	Node* node = last_node(abox->individuals);
+	while (node) {
+		total_freed_bytes += free_individual((Individual*) node->value);
+		node = previous_node(node);
+	}
+	// free the individuals hash
+	total_freed_bytes += free_key_value_hash_table(abox->individuals);
+
+	// finally free the abox itself
+	free(abox);
 
 	return total_freed_bytes;
 }
