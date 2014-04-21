@@ -22,6 +22,8 @@
 
 #include "../model/datatypes.h"
 
-void add_generated_subclass_axiom(SubClassAxiom** ax);
+void add_generated_subclass_axiom(SubClassAxiom* ax);
+
+void add_generated_subrole_axiom(SubRoleAxiom* ax);
 
 #endif

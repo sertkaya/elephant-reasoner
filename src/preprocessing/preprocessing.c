@@ -9,21 +9,21 @@ void preprocess_tbox(TBox* tbox) {
 
 	// convert eqclass axioms to subclass axioms
 	for (i = 0; i < tbox->eqclass_axiom_count; ++i) {
-		add_subclass_axiom(create_subclass_axiom(tbox->eqclass_axioms[i]->lhs, tbox->eqclass_axioms[i]->rhs), tbox);
-		add_subclass_axiom(create_subclass_axiom(tbox->eqclass_axioms[i]->rhs, tbox->eqclass_axioms[i]->lhs), tbox);
+		add_generated_subclass_axiom(create_subclass_axiom(tbox->eqclass_axioms[i]->lhs, tbox->eqclass_axioms[i]->rhs));
+		add_generated_subclass_axiom(create_subclass_axiom(tbox->eqclass_axioms[i]->rhs, tbox->eqclass_axioms[i]->lhs));
 	}
 
 	// convert eqrole axioms to subrole axioms
 	for (i = 0; i < tbox->eqrole_axiom_count; ++i) {
-		add_subrole_axiom(create_subrole_axiom(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs), tbox);
-		add_subrole_axiom(create_subrole_axiom(tbox->eqrole_axioms[i]->rhs, tbox->eqrole_axioms[i]->lhs), tbox);
+		add_generated_subrole_axiom(create_subrole_axiom(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs));
+		add_generated_subrole_axiom(create_subrole_axiom(tbox->eqrole_axioms[i]->rhs, tbox->eqrole_axioms[i]->lhs));
 	}
 
 	// process the transitive role axioms
 	Role* composition;
 	for (i = 0; i < tbox->transitive_role_axiom_count; ++i) {
 		composition = get_create_role_composition_binary(tbox->transitive_role_axioms[i]->r, tbox->transitive_role_axioms[i]->r, tbox);
-		add_subrole_axiom(create_subrole_axiom(composition, tbox->transitive_role_axioms[i]->r), tbox);
+		add_generated_subrole_axiom(create_subrole_axiom(composition, tbox->transitive_role_axioms[i]->r));
 	}
 
 	// Process the disjointclasses axioms.
@@ -36,7 +36,7 @@ void preprocess_tbox(TBox* tbox) {
 		for (j = 0; j < tbox->disjointclasses_axioms[i]->concept_count - 1; ++j)
 			for (k = j + 1; k < tbox->disjointclasses_axioms[i]->concept_count ; ++k) {
 				conjunction = get_create_conjunction_binary(tbox->disjointclasses_axioms[i]->concepts[j], tbox->disjointclasses_axioms[i]->concepts[k], tbox);
-				add_subclass_axiom(create_subclass_axiom(conjunction, tbox->bottom_concept), tbox);
+				add_generated_subclass_axiom(create_subclass_axiom(conjunction, tbox->bottom_concept));
 			}
 
 }
