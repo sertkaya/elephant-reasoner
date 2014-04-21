@@ -23,6 +23,7 @@
 
 #include "../model/datatypes.h"
 #include "../model/utils.h"
+#include "../preprocessing/preprocessing.h"
 #include "utils.h"
 
 
@@ -104,18 +105,51 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 			continue;
 		}
 		add_told_subsumer_concept(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
-		// add_to_subsumer_list(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
 		index_concept(tbox->subclass_axioms[i]->lhs, tbox);
+	}
+
+	// Now index the subclass axioms generated during preprocessing
+	for (i = 0; i < generated_subclass_axiom_count; ++i) {
+		// if (reasoning_task == CONSISTENCY)
+		// 	// Check if bottom appears on the rhs. Need for consistency
+			if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept) // {
+				bottom_appears_on_rhs = 1;
+		// 		// atomic concept subsumed by bottom, inconsistent kb
+		// 		if (tbox->subclass_axioms[i]->lhs->type == ATOMIC_CONCEPT)
+		// 			// return immediately since we are checking for consistency
+		// 			return -1;
+		// 	}
+
+		// no need to add told subsumers of bottom
+		// no need to index the bottom concept
+		if (generated_subclass_axioms[i]->lhs == tbox->bottom_concept)
+			continue;
+		// no need to add top as a told subsumer
+		if (generated_subclass_axioms[i]->rhs == tbox->top_concept) {
+			// still index the lhs, but do not add top to the lhs of rhs
+			index_concept(generated_subclass_axioms[i]->lhs, tbox);
+			continue;
+		}
+		add_told_subsumer_concept(generated_subclass_axioms[i]->lhs, generated_subclass_axioms[i]->rhs);
+		index_concept(generated_subclass_axioms[i]->lhs, tbox);
 	}
 
 	// If bottom does not appear on the rhs, the KB cannot be inconcsistent, i.e., it is consistent
 	if (reasoning_task == CONSISTENCY && bottom_appears_on_rhs == 0)
 		return 1;
 
+	// Index subrole axioms
 	for (i = 0; i < tbox->subrole_axiom_count; ++i) {
 		add_told_subsumer_role(tbox->subrole_axioms[i]->lhs, tbox->subrole_axioms[i]->rhs);
 		add_told_subsumee_role(tbox->subrole_axioms[i]->rhs, tbox->subrole_axioms[i]->lhs);
 		index_role(tbox->subrole_axioms[i]->lhs);
+	}
+
+	// Index generated subrole axioms
+	for (i = 0; i < generated_subrole_axiom_count; ++i) {
+		add_told_subsumer_role(generated_subrole_axioms[i]->lhs, generated_subrole_axioms[i]->rhs);
+		add_told_subsumee_role(generated_subrole_axioms[i]->rhs, generated_subrole_axioms[i]->lhs);
+		index_role(generated_subrole_axioms[i]->lhs);
 	}
 
 	return 0;

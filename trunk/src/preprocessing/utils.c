@@ -23,14 +23,14 @@
 #include <string.h>
 
 #include "../model/datatypes.h"
-#include "datatypes.h"
+#include "preprocessing.h"
 
 
 /******************************************************************************
- * add functions for axioms
+ * Add functions for axioms
  *****************************************************************************/
 
-// add a given subclass axiom to the list of subclass axioms generated during
+// Add a given subclass axiom to the list of subclass axioms generated during
 // preprocessing
 void add_generated_subclass_axiom(SubClassAxiom* ax) {
 	SubClassAxiom** tmp;
@@ -38,5 +38,16 @@ void add_generated_subclass_axiom(SubClassAxiom* ax) {
 	assert(tmp != NULL);
 	generated_subclass_axioms = tmp;
 	generated_subclass_axioms[generated_subclass_axiom_count] = ax;
-	generated_subclass_axiom_count++;
+	++generated_subclass_axiom_count;
+}
+
+// Add a given subrole axiom the list of subclass axioms generated during
+// preprocessing
+void add_generated_subrole_axiom(SubRoleAxiom* ax) {
+	SubRoleAxiom** tmp;
+	tmp = realloc(generated_subrole_axioms, (generated_subrole_axiom_count + 1) * sizeof(SubRoleAxiom*));
+	assert(tmp != NULL);
+	generated_subrole_axioms = tmp;
+	generated_subrole_axioms[generated_subrole_axiom_count] = ax;
+	++generated_subrole_axiom_count;
 }
