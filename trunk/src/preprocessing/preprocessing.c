@@ -1,6 +1,15 @@
+#include <stdio.h>
 #include "../model/datatypes.h"
 #include "../model/model.h"
 #include "utils.h"
+
+// The list of subclass axioms that are generated during  preprocessing
+SubClassAxiom** generated_subclass_axioms = NULL;
+int generated_subclass_axiom_count = 0;
+
+// The list of subrole axioms that are generated during  preprocessing
+SubRoleAxiom** generated_subrole_axioms = NULL;
+int generated_subrole_axiom_count = 0;
 
 // preprocess axioms that are syntactic shortcuts, like equivalent classes/roles, disjoint classes and
 // transtive roles
