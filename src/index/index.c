@@ -23,10 +23,16 @@
 
 #include "../model/datatypes.h"
 #include "../model/utils.h"
-#include "../preprocessing/preprocessing.h"
+// #include "../preprocessing/preprocessing.h"
 #include "utils.h"
 
+// The list of subclass axioms that are generated during  preprocessing
+extern SubClassAxiom** generated_subclass_axioms;
+extern int generated_subclass_axiom_count;
 
+// The list of subrole axioms that are generated during  preprocessing
+extern SubRoleAxiom** generated_subrole_axioms;
+extern int generated_subrole_axiom_count;
 
 
 void index_concept(Concept* c, TBox* tbox) {

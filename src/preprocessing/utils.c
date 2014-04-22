@@ -23,8 +23,14 @@
 #include <string.h>
 
 #include "../model/datatypes.h"
-#include "preprocessing.h"
 
+// The list of subclass axioms that are generated during  preprocessing
+extern SubClassAxiom** generated_subclass_axioms;
+extern int generated_subclass_axiom_count;
+
+// The list of subrole axioms that are generated during  preprocessing
+extern SubRoleAxiom** generated_subrole_axioms;
+extern int generated_subrole_axiom_count;
 
 /******************************************************************************
  * Add functions for axioms
