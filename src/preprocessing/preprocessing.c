@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "../model/datatypes.h"
 #include "../model/model.h"
+#include "../model/limits.h"
+#include "../hashing/key_value_hash_table.h"
 #include "utils.h"
 
 // The list of subclass axioms that are generated during  preprocessing
@@ -11,24 +13,32 @@ int generated_subclass_axiom_count = 0;
 SubRoleAxiom** generated_subrole_axioms = NULL;
 int generated_subrole_axiom_count = 0;
 
-// preprocess axioms that are syntactic shortcuts, like equivalent classes/roles, disjoint classes and
-// transtive roles
+// The hash of nominals that are generated during preprocessing.
+KeyValueHashTable* generated_nominals = NULL;
+// id of the last generated nominal
+// int last_generated_nominal_id = 0;
+
+// Preprocess axioms that are syntactic shortcuts, like equivalent classes/roles, disjoint classes and
+// transtive roles. Translate them to subclass axioms for saturation.
 void preprocess_tbox(TBox* tbox) {
+	// Initialize the hash of generated nominals
+	generated_nominals = create_key_value_hash_table(DEFAULT_NOMINALS_HASH_SIZE);
+
 	int i;
 
-	// convert eqclass axioms to subclass axioms
+	// Convert equivalent classes axioms to subclass axioms
 	for (i = 0; i < tbox->eqclass_axiom_count; ++i) {
 		add_generated_subclass_axiom(create_subclass_axiom(tbox->eqclass_axioms[i]->lhs, tbox->eqclass_axioms[i]->rhs));
 		add_generated_subclass_axiom(create_subclass_axiom(tbox->eqclass_axioms[i]->rhs, tbox->eqclass_axioms[i]->lhs));
 	}
 
-	// convert eqrole axioms to subrole axioms
+	// Convert equivalent roles axioms to subrole axioms
 	for (i = 0; i < tbox->eqrole_axiom_count; ++i) {
 		add_generated_subrole_axiom(create_subrole_axiom(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs));
 		add_generated_subrole_axiom(create_subrole_axiom(tbox->eqrole_axioms[i]->rhs, tbox->eqrole_axioms[i]->lhs));
 	}
 
-	// process the transitive role axioms
+	// Process the transitive role axioms
 	Role* composition;
 	for (i = 0; i < tbox->transitive_role_axiom_count; ++i) {
 		composition = get_create_role_composition_binary(tbox->transitive_role_axioms[i]->r, tbox->transitive_role_axioms[i]->r, tbox);
@@ -47,5 +57,19 @@ void preprocess_tbox(TBox* tbox) {
 				conjunction = get_create_conjunction_binary(tbox->disjointclasses_axioms[i]->concepts[j], tbox->disjointclasses_axioms[i]->concepts[k], tbox);
 				add_generated_subclass_axiom(create_subclass_axiom(conjunction, tbox->bottom_concept));
 			}
+}
+
+// Preprocess assertions and translate them to subclass axioms for saturation. ABox individuals are translated to
+// nominals for this.
+void preprocess_abox(ABox* abox) {
+
+
+	// Translate the concept assertions to subclass axioms.
+	// Individuals translated to generated nominals.
+	int i;
+	for (i = 0; i < abox->concept_assertion_count; ++i)
+		add_generated_subclass_axiom(
+				create_subclass_axiom(
+						get_create_generated_nominal(abox->concept_assertions[i]->individual), abox->concept_assertions[i]->concept));
 
 }

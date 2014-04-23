@@ -30,6 +30,7 @@
 void print_atomic_concept(AtomicConcept* ac);
 void print_exists(Exists* exists);
 void print_conjunction(Conjunction* conjunction);
+void print_nominal(Nominal* n);
 
 void print_atomic_role(AtomicRole* ar);
 void print_role_composition(RoleComposition* rc);
@@ -44,6 +45,9 @@ void print_concept(Concept* c) {
 			break;
 		case CONJUNCTION:
 			print_conjunction(c->description.conj);
+			break;
+		case NOMINAL:
+			print_nominal(c->description.nominal);
 			break;
 		default:
 			fprintf(stderr,"unknown concept type, aborting\n");
@@ -82,6 +86,10 @@ void print_conjunction(Conjunction* conj) {
 	printf("  ");
 	print_concept(conj->conjunct2);
 	printf(")\n");
+}
+
+void print_nominal(Nominal* n) {
+	printf("{%s} ", n->individual->name);
 }
 
 void print_conjunctions(TBox* tbox) {

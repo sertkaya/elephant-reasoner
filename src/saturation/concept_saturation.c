@@ -29,6 +29,7 @@
 #include "../utils/stack.h"
 #include "../index/utils.h"
 #include "../hashing/key_hash_table.h"
+#include "../hashing/key_value_hash_table.h"
 #include "utils.h"
 
 // marks the axiom with the premise lhs and conclusion rhs as processed
@@ -82,6 +83,16 @@ char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 	}
 	*/
 
+	// The hash of nominals that are generated during preprocessing.
+	extern KeyValueHashTable* generated_nominals;
+	Node* node = last_node(generated_nominals);
+	Concept* nominal = NULL;
+	while (node) {
+		nominal = (Concept*) node->value;
+		for (j = 0; j < nominal->told_subsumer_count; ++j)
+			push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal->told_subsumers[j], NULL, SUBSUMPTION_INITIALIZATION));
+		node = previous_node(node);
+	}
 
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
@@ -100,7 +111,7 @@ char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
-				 */
+				*/
 
 				add_to_concept_subsumer_list(ax->lhs, ax->rhs);
 
@@ -155,7 +166,7 @@ char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
-				 */
+				*/
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {

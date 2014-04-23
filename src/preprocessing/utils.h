@@ -26,4 +26,6 @@ void add_generated_subclass_axiom(SubClassAxiom* ax);
 
 void add_generated_subrole_axiom(SubRoleAxiom* ax);
 
+Concept* get_create_generated_nominal(Individual* ind);
+
 #endif

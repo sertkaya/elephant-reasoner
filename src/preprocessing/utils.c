@@ -23,6 +23,8 @@
 #include <string.h>
 
 #include "../model/datatypes.h"
+#include "../model/limits.h"
+#include "../hashing/key_value_hash_table.h"
 
 // The list of subclass axioms that are generated during  preprocessing
 extern SubClassAxiom** generated_subclass_axioms;
@@ -31,6 +33,9 @@ extern int generated_subclass_axiom_count;
 // The list of subrole axioms that are generated during  preprocessing
 extern SubRoleAxiom** generated_subrole_axioms;
 extern int generated_subrole_axiom_count;
+
+// The hash of nominals that are generated during preprocessing.
+extern KeyValueHashTable* generated_nominals;
 
 /******************************************************************************
  * Add functions for axioms
@@ -56,4 +61,64 @@ void add_generated_subrole_axiom(SubRoleAxiom* ax) {
 	generated_subrole_axioms = tmp;
 	generated_subrole_axioms[generated_subrole_axiom_count] = ax;
 	++generated_subrole_axiom_count;
+}
+
+
+Concept* get_create_generated_nominal(Individual* ind) {
+	Concept* c;
+	Concept** tmp;
+
+	// check if the nominal with this individual already exists
+	if ((c = get_value(generated_nominals, ind->id)) != NULL)
+		return c;
+
+	// if a nominal with the individual does not already exist, create it
+	c = (Concept*) malloc(sizeof(Concept));
+	assert(c != NULL);
+
+	c->description.nominal = (Nominal*) malloc(sizeof(Nominal));
+	assert(c->description.nominal != NULL);
+
+	c->description.nominal->individual = ind;
+
+	c->type = NOMINAL;
+	c->id = ind->id;
+
+	c->told_subsumers = NULL;
+	c->told_subsumer_count = 0;
+
+	c->subsumer_list = NULL;
+	c->subsumer_count = 0;
+	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
+
+	c->filler_of_negative_exists = NULL;
+
+	// initialize the 2-dim dynamic predecessors array
+	c->predecessors = NULL;
+	c->predecessor_r_count = 0;
+
+	c->successors = NULL;
+	c->successor_r_count = 0;
+
+	c->first_conjunct_of_count = 0;
+	// space will be allocated in indexing
+	c->first_conjunct_of_list = NULL;
+	c->first_conjunct_of = NULL;
+
+	c->second_conjunct_of_count = 0;
+	// space will be allocated in indexing
+	c->second_conjunct_of_list = NULL;
+	c->second_conjunct_of = NULL;
+
+	insert_key_value(generated_nominals, ind->id, c);
+
+	/*
+	++tbox->nominal_count;
+	tmp = realloc(tbox->nominal_list, tbox->nominal_count * sizeof(Concept*));
+	assert(tmp != NULL);
+	tbox->nominal_list = tmp;
+	tbox->nominal_list[tbox->nominal_count - 1] = c;
+	 */
+
+	return c;
 }

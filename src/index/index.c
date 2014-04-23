@@ -39,6 +39,7 @@ void index_concept(Concept* c, TBox* tbox) {
 
 	switch (c->type) {
 	case ATOMIC_CONCEPT:
+	case NOMINAL:
 		break;
 	case CONJUNCTION:
 		index_concept(c->description.conj->conjunct1, tbox);
@@ -118,7 +119,7 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 	for (i = 0; i < generated_subclass_axiom_count; ++i) {
 		// if (reasoning_task == CONSISTENCY)
 		// 	// Check if bottom appears on the rhs. Need for consistency
-			if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept) // {
+			if (generated_subclass_axioms[i]->rhs == tbox->bottom_concept) // {
 				bottom_appears_on_rhs = 1;
 		// 		// atomic concept subsumed by bottom, inconsistent kb
 		// 		if (tbox->subclass_axioms[i]->lhs->type == ATOMIC_CONCEPT)

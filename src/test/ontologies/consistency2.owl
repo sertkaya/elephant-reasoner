@@ -6,7 +6,7 @@ DisjointClasses(<http://www.ihtsdo.org#A> <http://www.ihtsdo.org#B>)
 
 SubClassOf(<http://www.ihtsdo.org#X> <http://www.ihtsdo.org#A>)
 
-ClassAssertion(<http://www.ihtsdo.org#C> <http://www.ihtsdo.org#i2>)
+ClassAssertion(<http://www.ihtsdo.org#X> <http://www.ihtsdo.org#i1>)
 ClassAssertion(<http://www.ihtsdo.org#B> <http://www.ihtsdo.org#i1>)
 
 )
