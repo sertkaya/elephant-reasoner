@@ -46,7 +46,7 @@ KB* init_kb();
 // void read_kb(FILE* input_kb, TBox* tbox, ABox* abox);
 void read_kb(FILE* input_kb, KB* kb);
 
-void classify(TBox* tbox);
+void classify(KB* kb);
 
 char check_consistency(KB* kb);
 

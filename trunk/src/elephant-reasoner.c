@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 
 	if (!strcmp(reasoning_task, "classification")) {
 		// classify the kb
-		classify(kb->tbox);
+		classify(kb);
 		// print the concept hierarchy
 		print_concept_hierarchy(kb->tbox, output);
 	}

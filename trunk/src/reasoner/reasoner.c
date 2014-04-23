@@ -145,11 +145,12 @@ void read_kb(FILE* input_kb, KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 }
 
-void classify(TBox* tbox) {
+void classify(KB* kb) {
 	printf("Preprocessing......................:");
 	fflush(stdout);
 	START_TIMER;
-	preprocess_tbox(tbox);
+	preprocess_tbox(kb->tbox);
+	preprocess_abox(kb->abox);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -157,7 +158,7 @@ void classify(TBox* tbox) {
 	printf("Indexing...........................:");
 	fflush(stdout);
 	START_TIMER;
-	index_tbox(tbox, CLASSIFICATION);
+	index_tbox(kb->tbox, CLASSIFICATION);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -166,7 +167,7 @@ void classify(TBox* tbox) {
 	fflush(stdout);
 	START_TIMER;
 	// init_saturation(tbox);
-	saturate_tbox(tbox, CLASSIFICATION);
+	saturate_tbox(kb->tbox, CLASSIFICATION);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -174,7 +175,7 @@ void classify(TBox* tbox) {
 	printf("Computing concept hierarchy........:");
 	fflush(stdout);
 	START_TIMER;
-	compute_concept_hierarchy(tbox);
+	compute_concept_hierarchy(kb->tbox);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;

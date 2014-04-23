@@ -16,4 +16,6 @@ int generated_subrole_axiom_count = 0;
 
 void preprocess_tbox(TBox* tbox);
 
+void preprocess_abox(ABox* abox);
+
 #endif
