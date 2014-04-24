@@ -18,11 +18,22 @@ KeyValueHashTable* generated_nominals = NULL;
 // id of the last generated nominal
 // int last_generated_nominal_id = 0;
 
+// The hash of existential restrictions that are generated during preprocessing.
+// They are generated from preprocessing role assertions.
+KeyValueHashTable* generated_exists_restrictions = NULL;
+int generated_exists_restriction_count = 0;
+
 // Preprocess axioms that are syntactic shortcuts, like equivalent classes/roles, disjoint classes and
 // transtive roles. Translate them to subclass axioms for saturation.
 void preprocess_tbox(TBox* tbox) {
 	// Initialize the hash of generated nominals
+	// TODO: think about the size. maybe take the number of individuals?
 	generated_nominals = create_key_value_hash_table(DEFAULT_NOMINALS_HASH_SIZE);
+
+	// Initialize the hash of existential restrictions that are generated as a result of
+	// translating role assertions.
+	// TODO: think about the size. maybe take the number of target individuals?
+	generated_exists_restrictions = create_key_value_hash_table(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
 
 	int i;
 
@@ -72,4 +83,15 @@ void preprocess_abox(ABox* abox) {
 				create_subclass_axiom(
 						get_create_generated_nominal(abox->concept_assertions[i]->individual), abox->concept_assertions[i]->concept));
 
+	// Translate the role assertions to subclass axioms.
+	// Individuals translated to generated nominals.
+	for (i = 0; i < abox->role_assertion_count; ++i)
+		add_generated_subclass_axiom(
+				create_subclass_axiom(
+						get_create_generated_nominal(abox->role_assertions[i]->source_individual),
+						get_create_generated_exists_restriction(abox->role_assertions[i]->role,
+								get_create_generated_nominal(abox->role_assertions[i]->target_individual)
+						)
+				)
+		);
 }
