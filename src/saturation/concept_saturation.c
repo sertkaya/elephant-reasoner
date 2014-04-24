@@ -64,29 +64,16 @@ char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 
 	// push the input axioms to the stack
 	int i, j, k;
-	/*
-	for (i = 0; i < tbox->atomic_concept_count ; ++i)
-		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i], NULL, SUBSUMPTION_INITIALIZATION));
-		*/
 
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
 		for (j = 0; j < tbox->atomic_concept_list[i]->told_subsumer_count; ++j)
 			push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers[j], NULL, SUBSUMPTION_INITIALIZATION));
 
-	/*
-	for (i = 0; i < tbox->subclass_axiom_count; ++i)
-		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs, NULL, SUBSUMPTION_INITIALIZATION));
-
-	for (i = 0; i < tbox->eqclass_axiom_count; ++i) {
-		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->eqclass_axioms[i]->lhs, tbox->eqclass_axioms[i]->rhs, NULL, SUBSUMPTION_INITIALIZATION));
-		push(&scheduled_axioms, create_concept_saturation_axiom(tbox->eqclass_axioms[i]->rhs, tbox->eqclass_axioms[i]->lhs, NULL, SUBSUMPTION_INITIALIZATION));
-	}
-	*/
-
 	// The hash of nominals that are generated during preprocessing.
 	extern KeyValueHashTable* generated_nominals;
 	Node* node = last_node(generated_nominals);
 	Concept* nominal = NULL;
+	// The input axioms generated from concept and role assertions
 	while (node) {
 		nominal = (Concept*) node->value;
 		for (j = 0; j < nominal->told_subsumer_count; ++j)
@@ -131,11 +118,8 @@ char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 				}
 
 				// existential introduction
-				// int j,k;
 				Concept* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					// for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
-					// 	ex = GET_NEGATIVE_EXISTS(ax->rhs, tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_list[j]);
 					for (j = 0; j < ax->lhs->predecessors[i]->role->subsumer_count; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i]->role->subsumer_list[j]);
 						if (ex != NULL)
@@ -160,13 +144,11 @@ char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 
 				add_to_concept_subsumer_list(ax->lhs, ax->rhs);
 
-				/*
 				printf("SUBS:");
 				print_concept(ax->lhs);
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
-				*/
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -218,8 +200,6 @@ char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 				int j,k;
 				Concept* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					// for (j = 0; j < tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_count; ++j) {
-					// 	ex = GET_NEGATIVE_EXISTS(ax->rhs, tbox->role_list[ax->lhs->predecessors[i]->role->id]->subsumer_list[j]);
 					for (j = 0; j < ax->lhs->predecessors[i]->role->subsumer_count; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i]->role->subsumer_list[j]);
 						if (ex != NULL)
