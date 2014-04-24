@@ -25,6 +25,7 @@
 #include "../model/datatypes.h"
 #include "../model/limits.h"
 #include "../hashing/key_value_hash_table.h"
+#include "../hashing/utils.h"
 
 // The list of subclass axioms that are generated during  preprocessing
 extern SubClassAxiom** generated_subclass_axioms;
@@ -36,6 +37,11 @@ extern int generated_subrole_axiom_count;
 
 // The hash of nominals that are generated during preprocessing.
 extern KeyValueHashTable* generated_nominals;
+
+// The hash of existential restrictions that are generated during preprocessing.
+// They are generated from preprocessing role assertions.
+extern KeyValueHashTable* generated_exists_restrictions;
+extern int generated_exists_restriction_count;
 
 /******************************************************************************
  * Add functions for axioms
@@ -119,6 +125,58 @@ Concept* get_create_generated_nominal(Individual* ind) {
 	tbox->nominal_list = tmp;
 	tbox->nominal_list[tbox->nominal_count - 1] = c;
 	 */
+
+	return c;
+}
+
+
+// get or create generated the existential restriction with role r and filler f
+Concept* get_create_generated_exists_restriction(Role* r, Concept* f) {
+	Concept* c;
+
+	// first check if we already created an existential
+	// restriction with the same role and filler
+	if ((c = get_value(generated_exists_restrictions, HASH_INTEGERS(r->id, f->id))) != NULL)
+		return c;
+
+	// if it does not already exist, create it
+	c = (Concept*) malloc(sizeof(Concept));
+	assert(c != NULL);
+
+	c->type = EXISTENTIAL_RESTRICTION;
+	c->description.exists = (Exists*) malloc(sizeof(Exists));
+	assert(c->description.exists != NULL);
+	c->description.exists->role = r;
+	c->description.exists->filler = f;
+	c->id = generated_exists_restriction_count++;
+
+	c->told_subsumers = NULL;
+	c->told_subsumer_count = 0;
+
+	c->subsumer_list = NULL;
+	c->subsumer_count = 0;
+	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
+
+	c->filler_of_negative_exists = NULL;
+
+	// initialize the 2-dim dynamic predecessors array
+	c->predecessors = NULL;
+	c->predecessor_r_count = 0;
+
+	c->successors = NULL;
+	c->successor_r_count = 0;
+
+	c->first_conjunct_of_count = 0;
+	// space will be allocated in indexing
+	c->first_conjunct_of_list = NULL;
+	c->first_conjunct_of = NULL;
+
+	c->second_conjunct_of_count = 0;
+	// space will be allocated in indexing
+	c->second_conjunct_of_list = NULL;
+	c->second_conjunct_of = NULL;
+
+	insert_key_value(generated_exists_restrictions, HASH_INTEGERS(r->id, f->id), c);
 
 	return c;
 }

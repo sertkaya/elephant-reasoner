@@ -28,4 +28,6 @@ void add_generated_subrole_axiom(SubRoleAxiom* ax);
 
 Concept* get_create_generated_nominal(Individual* ind);
 
+Concept* get_create_generated_exists_restriction(Role* r, Concept* f);
+
 #endif
