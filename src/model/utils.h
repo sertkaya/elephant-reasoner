@@ -22,20 +22,25 @@
 
 #include <stdint.h>
 
+#include "../hashing/utils.h"
 #include "datatypes.h"
 
 // returns the atomic concept with the given name if it exists
 // NULL if it does not exist
-Concept* get_atomic_concept(unsigned char* name, TBox* tbox);
+// Concept* get_atomic_concept(unsigned char* name, TBox* tbox);
+#define GET_ATOMIC_CONCEPT(name, tbox)		get_value(tbox->atomic_concepts, hash_string(name))
 
 // inserts the atomic concept with the given name to the hash
-void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox);
+// void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox);
+#define PUT_ATOMIC_CONCEPT(name, c, tbox)	insert_key_value(tbox->atomic_concepts, hash_string(name), c)
 
 // get the existential restriction with role r and filler f from hash
-Concept* get_exists_restriction(int role_id, uint32_t filler_id, TBox* tbox);
+// Concept* get_exists_restriction(int role_id, uint32_t filler_id, TBox* tbox);
+#define GET_EXISTS_RESTRICTION(role_id, filler_id, tbox)		get_value(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id))
 
 // put the existential restriction with role r and filler f into hash
-void put_exists_restriction(int role_id, uint32_t filler_id, Concept* c, TBox* tbox);
+// void put_exists_restriction(int role_id, uint32_t filler_id, Concept* c, TBox* tbox);
+#define PUT_EXISTS_RESTRICTION(role_id, filler_id, c, tbox)		insert_key_value(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id), c)
 
 // get the (binary) conjunction with the first conjunct c1 and second conjunct c2
 Concept* get_conjunction(Concept* c1, Concept* c2, TBox* tbox);

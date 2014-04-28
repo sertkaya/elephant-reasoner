@@ -23,10 +23,12 @@
 
 // return the atomic concept with the given name if it exists
 // NULL if it does not exist
+/*
 inline Concept* get_atomic_concept(unsigned char* name, TBox* tbox) {
 	return get_value(tbox->atomic_concepts,
 			hash_string(name));
 }
+
 
 // insert the atomic concept with the given name
 inline void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox) {
@@ -34,6 +36,7 @@ inline void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox) {
 			hash_string(name),
 			c);
 }
+*/
 
 // get the existential restriction with role r and filler f from hash
 Concept* get_exists_restriction(uint32_t role_id, uint32_t filler_id, TBox* tbox) {
