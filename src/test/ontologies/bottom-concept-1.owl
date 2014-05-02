@@ -3,9 +3,7 @@ Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 Ontology(<http://www.ihtsdo.org/>
 
 
-ClassAssertion(<http://www.ihtsdo.org#B> owl:Nothing)
-
-
+ClassAssertion(owl:Nothing <http://www.ihtsdo.org#B>)
 
 )
 
