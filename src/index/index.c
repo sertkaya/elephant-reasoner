@@ -93,7 +93,8 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 	for (i = 0; i < tbox->subclass_axiom_count; ++i) {
 		// Check if bottom appears on the rhs. Needed for consistency
 		if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept) {
-			bottom_appears_on_rhs = 1;
+			if (tbox->subclass_axioms[i]->lhs != tbox->bottom_concept)
+				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
 			if (tbox->subclass_axioms[i]->lhs->type == NOMINAL || tbox->subclass_axioms[i]->lhs == tbox->top_concept)
 				// return inconsistent immediately
@@ -119,7 +120,8 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 
 		// Check if bottom appears on the rhs. Needed for consistency
 		if (generated_subclass_axioms[i]->rhs == tbox->bottom_concept)  {
-			bottom_appears_on_rhs = 1;
+			if (generated_subclass_axioms[i]->lhs != tbox->bottom_concept)
+				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
 			if (generated_subclass_axioms[i]->lhs->type == NOMINAL || generated_subclass_axioms[i]->lhs == tbox->top_concept)
 				// return inconsistent immediately
