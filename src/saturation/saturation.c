@@ -30,11 +30,11 @@
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_tbox(TBox* tbox, ReasoningTask reasoning_task) {
+char saturate_tbox(TBox* tbox) {
 	char saturation_result = 0;
 
 	saturate_roles(tbox);
-	saturation_result = saturate_concepts(tbox, reasoning_task);
+	saturation_result = saturate_concepts(tbox);
 
 	return saturation_result;
 }

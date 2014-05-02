@@ -30,7 +30,7 @@
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_tbox(TBox* tbox, ReasoningTask reasoning_task);
+char saturate_tbox(TBox* tbox);
 
 
 #endif /* SATURATION_H_ */
