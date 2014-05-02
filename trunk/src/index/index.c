@@ -91,15 +91,13 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 	char bottom_appears_on_rhs = 0;
 
 	for (i = 0; i < tbox->subclass_axiom_count; ++i) {
-		// if (reasoning_task == CONSISTENCY)
-		// 	// Check if bottom appears on the rhs. Need for consistency
+			// Check if bottom appears on the rhs. Needed for consistency
 			if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept) // {
 				bottom_appears_on_rhs = 1;
-		// 		// atomic concept subsumed by bottom, inconsistent kb
-		// 		if (tbox->subclass_axioms[i]->lhs->type == ATOMIC_CONCEPT)
-		// 			// return immediately since we are checking for consistency
-		// 			return -1;
-		// 	}
+				// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
+				if (tbox->subclass_axioms[i]->lhs->type == NOMINAL || tbox->subclass_axioms[i]->lhs == tbox->top_concept)
+					// return inconsistent immediately
+					return -1;
 
 		// no need to add told subsumers of bottom
 		// no need to index the bottom concept
@@ -117,15 +115,13 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 
 	// Now index the subclass axioms generated during preprocessing
 	for (i = 0; i < generated_subclass_axiom_count; ++i) {
-		// if (reasoning_task == CONSISTENCY)
-		// 	// Check if bottom appears on the rhs. Need for consistency
+			// Check if bottom appears on the rhs. Needed for consistency
 			if (generated_subclass_axioms[i]->rhs == tbox->bottom_concept) // {
 				bottom_appears_on_rhs = 1;
-		// 		// atomic concept subsumed by bottom, inconsistent kb
-		// 		if (tbox->subclass_axioms[i]->lhs->type == ATOMIC_CONCEPT)
-		// 			// return immediately since we are checking for consistency
-		// 			return -1;
-		// 	}
+				// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
+				if (generated_subclass_axioms[i]->lhs->type == NOMINAL || generated_subclass_axioms[i]->lhs == tbox->top_concept)
+					// return inconsistent immediately
+					return -1;
 
 		// no need to add told subsumers of bottom
 		// no need to index the bottom concept

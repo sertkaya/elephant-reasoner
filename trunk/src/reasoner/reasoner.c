@@ -167,7 +167,7 @@ void classify(KB* kb) {
 	fflush(stdout);
 	START_TIMER;
 	// init_saturation(tbox);
-	saturate_tbox(kb->tbox, CLASSIFICATION);
+	saturate_tbox(kb->tbox);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -204,21 +204,21 @@ char check_consistency(KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 	// Return inconsistent if indexing returned inconsistent
-	// if (indexing_result == -1) {
-	// 	kb->inconsistent = 1;
-	// 	return 1;
-	// }
+	if (indexing_result == -1) {
+		kb->inconsistent = 1;
+		return 1;
+	}
 	// Return consistent if bottom does not appear on the rhs of an axiom
 	// (indexing returns 1 in this case)
-	// else
 	if (indexing_result == 1)
 		return 0;
 
+	// Indexing did not provide enough information for checking consistency.
+	// Saturate the KB.
 	printf("Saturating.........................:");
 	fflush(stdout);
 	START_TIMER;
-	// init_saturation(tbox);
-	char saturation_result = saturate_tbox(kb->tbox, CONSISTENCY);
+	char saturation_result = saturate_tbox(kb->tbox);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -227,9 +227,6 @@ char check_consistency(KB* kb) {
 		kb->inconsistent = 1;
 		return 1;
 	}
-	// TODO:
-	// here close the concept and role assertions under the saturated TBox
-	// check for inconsistency
 
 	return 0;
 }

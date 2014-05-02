@@ -48,12 +48,11 @@ ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* r
 /*
  * Saturates the concepts of a given TBox.
  * Returns:
- * 	-1: If the reasoning task is consistency check, and an atomic concept has the
- * 	subsumer bottom. In this case it immediately returns, i.e., saturation process
+ * 	-1: If the KB is inconsistent. In this case it immediately returns, i.e., saturation process
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
+char saturate_concepts(TBox* tbox) {
 	ConceptSaturationAxiom* ax;
 	Stack scheduled_axioms;
 	int unique_subsumption_count = 0, total_subsumption_count = 0;
@@ -144,16 +143,18 @@ char saturate_concepts(TBox* tbox, ReasoningTask reasoning_task) {
 
 				add_to_concept_subsumer_list(ax->lhs, ax->rhs);
 
+				/*
 				printf("SUBS:");
 				print_concept(ax->lhs);
 				printf("->");
 				print_concept(ax->rhs);
 				printf("\n");
+				*/
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
-					// If we are checking consistency and an atomic concept is subsumed by bottom
-					if (reasoning_task == CONSISTENCY && ax->lhs->type == ATOMIC_CONCEPT)
+					// If the top concept or a nominal is subsumed by bottom, the kb is inconsistent
+					if (ax->lhs->type == NOMINAL || ax->lhs == tbox->top_concept)
 						// return inconsistent immediately
 						return -1;
 					// We push the saturation axiom bottom <= ax->lhs, if we already know ax->lhs <= bottom. This way ax->lhs = bottom
