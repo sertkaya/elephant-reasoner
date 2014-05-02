@@ -166,11 +166,13 @@ void classify(KB* kb) {
 	printf("Saturating.........................:");
 	fflush(stdout);
 	START_TIMER;
-	// init_saturation(tbox);
-	saturate_tbox(kb->tbox);
+	char saturation_result = saturate_tbox(kb->tbox);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
+	// return inconsistent if saturation returned inconsistent
+	if (saturation_result == -1)
+		kb->inconsistent = 1;
 
 	printf("Computing concept hierarchy........:");
 	fflush(stdout);
@@ -192,6 +194,8 @@ char check_consistency(KB* kb) {
 	fflush(stdout);
 	START_TIMER;
 	preprocess_tbox(kb->tbox);
+	preprocess_abox(kb->abox);
+	STOP_TIMER;
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
