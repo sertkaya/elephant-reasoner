@@ -32,6 +32,10 @@
 #include "../hashing/key_value_hash_table.h"
 #include "utils.h"
 
+// for statistics
+int saturation_unique_subsumption_count = 0, saturation_total_subsumption_count = 0;
+int saturation_unique_link_count = 0, saturation_total_link_count = 0;
+
 // marks the axiom with the premise lhs and conclusion rhs as processed
 #define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		insert_key(ax->lhs->subsumers, ax->rhs->id)
 
@@ -55,8 +59,6 @@ ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* r
 char saturate_concepts(TBox* tbox) {
 	ConceptSaturationAxiom* ax;
 	Stack scheduled_axioms;
-	int unique_subsumption_count = 0, total_subsumption_count = 0;
-	int unique_link_count = 0, total_link_count = 0;
 
 	// initialize the stack
 	init_stack(&scheduled_axioms);
@@ -86,10 +88,10 @@ char saturate_concepts(TBox* tbox) {
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
-			++total_subsumption_count;
+			++saturation_total_subsumption_count;
 			// no conjunction decomposition, no existential decomposition and no bottom rule here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
-				++unique_subsumption_count;
+				++saturation_unique_subsumption_count;
 
 				/*
 				printf("SUBS:");
@@ -136,10 +138,10 @@ char saturate_concepts(TBox* tbox) {
 		case SUBSUMPTION_CONJUNCTION_DECOMPOSITION:
 		case SUBSUMPTION_TOLD_SUBSUMER:
 		case SUBSUMPTION_BOTTOM:
-			++total_subsumption_count;
+			++saturation_total_subsumption_count;
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
-				++unique_subsumption_count;
+				++saturation_unique_subsumption_count;
 
 				add_to_concept_subsumer_list(ax->lhs, ax->rhs);
 
@@ -215,10 +217,10 @@ char saturate_concepts(TBox* tbox) {
 			}
 			break;
 		case LINK:
-			++total_link_count;
+			++saturation_total_link_count;
 			if (add_successor(ax->lhs, ax->role, ax->rhs, tbox)) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
-				++unique_link_count;
+				++saturation_unique_link_count;
 
 				/*
 				printf("LINK:");
@@ -305,8 +307,8 @@ char saturate_concepts(TBox* tbox) {
 		free(ax);
 		ax = pop(&scheduled_axioms);
 	}
-	printf("Total subsumptions:%d\nUnique subsumptions:%d\n", total_subsumption_count, unique_subsumption_count);
-	printf("Total links:%d\nUnique links:%d\n", total_link_count, unique_link_count);
+	// printf("Total subsumptions:%d\nUnique subsumptions:%d\n", saturation_total_subsumption_count, saturation_unique_subsumption_count);
+	// printf("Total links:%d\nUnique links:%d\n", saturation_total_link_count, saturation_unique_link_count);
 
 	return 0;
 }
