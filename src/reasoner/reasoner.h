@@ -31,19 +31,13 @@ struct timeval tStart, tEnd;
 		(double)tEnd.tv_usec) - \
 		((double)tStart.tv_sec * 1000000.0 + (double)tStart.tv_usec) )
 
-// the TBox
-// TBox* tbox;
-
-// initializes the necessary fields of the TBox
-// TBox* init_tbox();
-
-// initializes the necessary fields of the ABox
-// ABox* init_abox();
+// for saturation statistics
+extern int saturation_unique_subsumption_count, saturation_total_subsumption_count;
+extern int saturation_unique_link_count, saturation_total_link_count;
 
 // initializes the TBox and the ABox
 KB* init_kb();
 
-// void read_kb(FILE* input_kb, TBox* tbox, ABox* abox);
 void read_kb(FILE* input_kb, KB* kb);
 
 void classify(KB* kb);
@@ -53,4 +47,4 @@ char check_consistency(KB* kb);
 void realize_kb(KB* kb);
 
 
-#endif /* REASONER_H_ */
+#endif

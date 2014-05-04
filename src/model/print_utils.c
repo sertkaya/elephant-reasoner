@@ -201,26 +201,26 @@ void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
 // void print_short_stats(TBox* tbox, ABox* abox) {
 void print_short_stats(KB* kb) {
 	printf("\n---------- KB statistics ----------\n");
-	printf("atomic concepts: %d\n"
-			"atomic roles: %d\n"
-			"existential restrictions: %d\n"
-			"unique existential restrictions: %d\n"
-			"conjunctions: %d\n"
+	printf( "Atomic concepts....................: %d\n"
+			"Atomic roles.......................: %d\n"
+			"Existential restrictions...........: %d\n"
+			"Unique existential restrictions....: %d\n"
+			"Conjunction........................: %d\n"
 			// "unique conjunctions: %d\n"
-			"binary conjunctions: %d\n"
-			"unique binary conjunctions: %d\n"
-			"role compositions: %d\n"
-			"binary role compositions: %d\n"
-			"unique binary role compositions: %d\n"
-			"subclass ax: %d\n"
-			"eqclass ax: %d\n"
-			"disjointness ax: %d\n"
-			"subrole ax: %d\n"
-			"eqrole ax: %d\n"
-			"transitive role ax: %d\n"
-			"individuals: %d\n"
-			"concept assertions: %d\n"
-			"role assertions: %d\n",
+			"Binary conjunctions................: %d\n"
+			"Unique binary conjunctions.........: %d\n"
+			"Role compositions..................: %d\n"
+			"Binary role compositions...........: %d\n"
+			"Unique binary role compositions....: %d\n"
+			"SubClass axioms....................: %d\n"
+			"EquivalentClass axioms.............: %d\n"
+			"Disjointness axioms................: %d\n"
+			"SubObjectProperty axioms...........: %d\n"
+			"EquivalentObjectProperty axioms....: %d\n"
+			"TransitiveObjectProperty axioms....: %d\n"
+			"Individuals........................: %d\n"
+			"Concept assertions.................: %d\n"
+			"Role assertions....................: %d\n",
 			kb->tbox->atomic_concept_count,
 			kb->tbox->atomic_role_count,
 			kb->tbox->exists_restriction_count,
