@@ -72,7 +72,6 @@ void add_generated_subrole_axiom(SubRoleAxiom* ax) {
 
 Concept* get_create_generated_nominal(Individual* ind) {
 	Concept* c;
-	Concept** tmp;
 
 	// check if the nominal with this individual already exists
 	if ((c = get_value(generated_nominals, ind->id)) != NULL)

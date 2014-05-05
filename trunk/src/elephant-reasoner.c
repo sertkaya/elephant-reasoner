@@ -118,14 +118,24 @@ int main(int argc, char *argv[]) {
 	fclose(output);
 
 	// display kb information
-	if (verbose_flag)
-		// print_short_stats(tbox, abox);
+	if (verbose_flag) {
 		print_short_stats(kb);
+		printf("\n------ Saturation statistics ------\n");
+		printf( "Total subsumptions.................: %d\n"
+				"Unique subsumptions................: %d\n",
+				saturation_total_subsumption_count,
+				saturation_unique_subsumption_count);
+		printf( "Total links........................: %d\n"
+				"Unique links.......................: %d\n",
+				saturation_total_link_count,
+				saturation_unique_link_count);
+	}
 
 	// free the kb
-	int freed_bytes = free_tbox(kb->tbox);
-	freed_bytes += free_abox(kb->abox);
-	printf("Freed bytes:%d\n", freed_bytes);
+	// TODO: commented out for the competition
+	// int freed_bytes = free_tbox(kb->tbox);
+	// freed_bytes += free_abox(kb->abox);
+	// printf("Freed bytes:%d\n", freed_bytes);
 
 	return 0;
 }

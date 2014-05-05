@@ -23,7 +23,7 @@ inline uint64_t hash_string(unsigned char* key) {
 	uint64_t hash_value = 5381;
 	int c;
 
-	while (c = *key++)
+	while ((c = *key++))
 		// hash_value = ((hash_value << 5) + hash_value) + c; /* hash * 33 + c */
 		hash_value = ((hash_value << 5) - hash_value) + c; /* hash * 31 + c */
 

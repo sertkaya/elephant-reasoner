@@ -24,6 +24,8 @@
 #include "../model/datatypes.h"
 #include "../model/model.h"
 #include "../model/limits.h"
+#include "../index/index.h"
+#include "../index/utils.h"
 #include "../hashing/key_value_hash_table.h"
 #include "../utils/stack.h"
 #include "utils.h"
@@ -90,7 +92,6 @@ void saturate_roles(TBox* tbox) {
 	}
 
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
-	int i;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
