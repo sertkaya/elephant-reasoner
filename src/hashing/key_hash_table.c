@@ -60,7 +60,7 @@ inline char insert_key(KeyHashTable* hash_table, uint32_t key) {
 		if (hash_table->buckets[hash_value][i] == key)
 			return 0;
 
-	int *tmp = realloc(hash_table->buckets[hash_value], (chain_size + 1) * sizeof(int));
+	unsigned int *tmp = (unsigned int*) realloc(hash_table->buckets[hash_value], (chain_size + 1) * sizeof(int));
 	assert(tmp != NULL);
 	hash_table->buckets[hash_value] = tmp;
 	hash_table->buckets[hash_value][chain_size] = key;
@@ -106,7 +106,7 @@ inline char remove_key(KeyHashTable* hash_table, uint32_t key) {
 		hash_table->buckets[hash_value][j] = hash_table->buckets[hash_value][j + 1];
 
 	// shrink the chain
-	int* tmp = realloc(hash_table->buckets[hash_value], (chain_size - 1) * sizeof(int));
+	unsigned int* tmp = (unsigned int*) realloc(hash_table->buckets[hash_value], (chain_size - 1) * sizeof(int));
 	if(chain_size > 1)
 		assert(tmp != NULL);
 	hash_table->buckets[hash_value] = tmp;

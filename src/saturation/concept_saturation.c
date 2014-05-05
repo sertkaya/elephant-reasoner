@@ -170,7 +170,6 @@ char saturate_concepts(TBox* tbox) {
 
 				// conjunction introduction
 				// the first conjunct
-				int lhs_is_subsumed_by_other_conjunct;
 				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
 					// check if lhs is subsumed by the second conjunct as well
 					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2))

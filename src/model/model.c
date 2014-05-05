@@ -38,7 +38,7 @@ Concept* get_create_atomic_concept(char* name, TBox* tbox) {
 
 	// check if the atomic concept with this name already exists
 	// if ((c = get_atomic_concept((unsigned char*) name, tbox)) != NULL)
-	if ((c = GET_ATOMIC_CONCEPT(name, tbox)) != NULL)
+	if ((c = GET_ATOMIC_CONCEPT((unsigned char*) name, tbox)) != NULL)
 		return c;
 
 	// if an atomic concept with the name does not already exist, create it
@@ -90,7 +90,7 @@ Concept* get_create_atomic_concept(char* name, TBox* tbox) {
 	c->second_conjunct_of = NULL;
 
 	// put_atomic_concept((unsigned char*) c->description.atomic->name, c, tbox);
-	PUT_ATOMIC_CONCEPT(c->description.atomic->name, c, tbox);
+	PUT_ATOMIC_CONCEPT((unsigned char*) c->description.atomic->name, c, tbox);
 	tbox->atomic_concept_count++;
 	tmp = realloc(tbox->atomic_concept_list, tbox->atomic_concept_count * sizeof(Concept*));
 	assert(tmp != NULL);
@@ -237,9 +237,9 @@ Concept* get_create_conjunction(int size, Concept** conjuncts, TBox* tbox) {
 	return conjunction;
 }
 
+// get or create the nominal for a given individual
 Concept* get_create_nominal(Individual* ind, TBox* tbox) {
 	Concept* c;
-	Concept** tmp;
 
 	// check if the nominal with this individual already exists
 	if ((c = GET_NOMINAL(ind, tbox)) != NULL)
@@ -544,7 +544,6 @@ void add_eqrole_axiom(EqRoleAxiom* ax, TBox* tbox) {
 // TODO: stub implementation!
 Individual* get_create_individual(char* name, ABox* abox) {
 	Individual* i;
-	Individual** tmp;
 
 	// check if an individual with this name already exists in the ABox
 	if ((i = (Individual*) GET_INDIVIDUAL((unsigned char*) name, abox)) != NULL)
@@ -560,7 +559,7 @@ Individual* get_create_individual(char* name, ABox* abox) {
 	assert(i->name != NULL);
 	strcpy(i->name, name);
 
-	PUT_INDIVIDUAL(i->name, i, abox);
+	PUT_INDIVIDUAL((unsigned char*) i->name, i, abox);
 
 	++abox->individual_count;
 

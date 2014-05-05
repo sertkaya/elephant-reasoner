@@ -25,6 +25,7 @@
 #include "../model/datatypes.h"
 #include "../model/limits.h"
 #include "../model/model.h"
+#include "../model/print_utils.h"
 #include "../preprocessing/preprocessing.h"
 #include "../index/index.h"
 #include "../saturation/saturation.h"
@@ -130,7 +131,7 @@ void read_kb(FILE* input_kb, KB* kb) {
 
 	yyin = input_kb;
 
-	printf("Loading KB.........................:");
+	printf("Loading KB.........................: ");
 	fflush(stdout);
 	START_TIMER;
 	// parser = yyparse(tbox, abox);
@@ -138,7 +139,7 @@ void read_kb(FILE* input_kb, KB* kb) {
 	STOP_TIMER;
 	total_time += TIME_DIFF;
 	if (parser != 0) {
-		print_short_stats();
+		print_short_stats(kb);
 		fprintf(stderr,"aborting\n");
 		exit(-1);
 	}
@@ -146,7 +147,7 @@ void read_kb(FILE* input_kb, KB* kb) {
 }
 
 void classify(KB* kb) {
-	printf("Preprocessing......................:");
+	printf("Preprocessing......................: ");
 	fflush(stdout);
 	START_TIMER;
 	preprocess_tbox(kb->tbox);
@@ -155,7 +156,7 @@ void classify(KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 
-	printf("Indexing...........................:");
+	printf("Indexing...........................: ");
 	fflush(stdout);
 	START_TIMER;
 	index_tbox(kb->tbox, CLASSIFICATION);
@@ -163,7 +164,7 @@ void classify(KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 
-	printf("Saturating.........................:");
+	printf("Saturating.........................: ");
 	fflush(stdout);
 	START_TIMER;
 	char saturation_result = saturate_tbox(kb->tbox);
@@ -174,7 +175,7 @@ void classify(KB* kb) {
 	if (saturation_result == -1)
 		kb->inconsistent = 1;
 
-	printf("Computing concept hierarchy........:");
+	printf("Computing concept hierarchy........: ");
 	fflush(stdout);
 	START_TIMER;
 	compute_concept_hierarchy(kb->tbox);
@@ -182,7 +183,7 @@ void classify(KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 
-	printf("Total time.........................:%.3f milisecs\n", total_time / 1000);
+	printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 }
 
 // Returns
@@ -190,7 +191,7 @@ void classify(KB* kb) {
 //	1: it it is inconsistent
 char check_consistency(KB* kb) {
 
-	printf("Preprocessing......................:");
+	printf("Preprocessing......................: ");
 	fflush(stdout);
 	START_TIMER;
 	preprocess_tbox(kb->tbox);
@@ -200,7 +201,7 @@ char check_consistency(KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 
-	printf("Indexing...........................:");
+	printf("Indexing...........................: ");
 	fflush(stdout);
 	START_TIMER;
 	char indexing_result = index_tbox(kb->tbox, CONSISTENCY);
@@ -219,7 +220,7 @@ char check_consistency(KB* kb) {
 
 	// Indexing did not provide enough information for checking consistency.
 	// Saturate the KB.
-	printf("Saturating.........................:");
+	printf("Saturating.........................: ");
 	fflush(stdout);
 	START_TIMER;
 	char saturation_result = saturate_tbox(kb->tbox);

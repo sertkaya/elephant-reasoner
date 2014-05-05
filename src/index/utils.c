@@ -195,7 +195,6 @@ void add_role_to_first_component_of_list(Role* role, Role* composition) {
 // add 'composition' to the list of compositions whose second component is 'role'
 // (see the note for the function add_role_to_second_component_of_list above)
 void add_role_to_second_component_of_list(Role* role, Role* composition) {
-	int added_to_component_of_list;
 	Role** tmp;
 
 	if (insert_key(role->second_component_of, composition->id)) {

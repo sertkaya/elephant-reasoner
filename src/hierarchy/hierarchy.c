@@ -32,7 +32,6 @@
 void compute_concept_hierarchy(TBox* tbox) {
 
 	int is_direct_subsumer;
-	int is_direct_subsumer_list_nonempty;
 
 	int i, j;
 	for (i = 0; i < tbox->atomic_concept_count; ++i) {
@@ -47,7 +46,7 @@ void compute_concept_hierarchy(TBox* tbox) {
 			}
 			else {
 				is_direct_subsumer = 1;
-				int k,l;
+				int k;
 
 				// make a temporary copy of the direct_subsumer_list since we are going to iterate on it and
 				// simultaneously remove elements from it.
