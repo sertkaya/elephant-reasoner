@@ -104,13 +104,13 @@ int main(int argc, char *argv[]) {
 		// classify the kb
 		classify(kb);
 		// print the concept hierarchy
-		print_concept_hierarchy(kb->tbox, output);
+		print_concept_hierarchy(kb, output);
 	}
 	else if (!strcmp(reasoning_task, "consistency")) {
 		if (check_consistency(kb))
-			fprintf(output, "inconsistent\n");
+			fprintf(output, "false\n");
 		else
-			fprintf(output, "consistent\n");
+			fprintf(output, "true\n");
 	}
 	else if (!strcmp(reasoning_task, "realisation"))
 		realize_kb(kb);
