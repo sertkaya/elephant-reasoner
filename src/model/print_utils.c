@@ -165,31 +165,36 @@ void print_direct_subsumers(TBox* tbox, Concept* c, FILE* taxonomy_fp) {
 				c->description.atomic->direct_subsumer_list[i]->description.atomic->name);
 }
 
-void print_concept_hierarchy(TBox* tbox, FILE* taxonomy_fp) {
-	// for keeping track of already printed equivalence classes
-	// Pvoid_t printed = (Pvoid_t) NULL;
-	KeyHashTable* printed = create_key_hash_table(10);
+void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
+
+	if (kb->inconsistent) {
+		fprintf(taxonomy_fp, "EquivalentClasses(owl:Thing owl:Nothing)\n");
+		return;
+	}
 
 	int i;
-	for (i = 0; i < tbox->atomic_concept_count; ++i) {
+	// for keeping track of already printed equivalence classes
+	KeyHashTable* printed = create_key_hash_table(10);
+
+	for (i = 0; i < kb->tbox->atomic_concept_count; ++i) {
 		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
 		// check if the equivalence class is already printed
-		if (!contains_key(printed, tbox->atomic_concept_list[i]->id)) {
+		if (!contains_key(printed, kb->tbox->atomic_concept_list[i]->id)) {
 			// do not print the direct subsumers of bottom
-			if (tbox->atomic_concept_list[i] != tbox->bottom_concept)
-				print_direct_subsumers(tbox, tbox->atomic_concept_list[i], taxonomy_fp);
+			if (kb->tbox->atomic_concept_list[i] != kb->tbox->bottom_concept)
+				print_direct_subsumers(kb->tbox, kb->tbox->atomic_concept_list[i], taxonomy_fp);
 
 			char printing_equivalents = 0;
-			if (tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count > 0) {
-				fprintf(taxonomy_fp, "EquivalentClasses(%s", tbox->atomic_concept_list[i]->description.atomic->name);
+			if (kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count > 0) {
+				fprintf(taxonomy_fp, "EquivalentClasses(%s", kb->tbox->atomic_concept_list[i]->description.atomic->name);
 				printing_equivalents = 1;
 			}
 			int j;
-			for (j = 0; j < tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count; ++j ) {
+			for (j = 0; j < kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count; ++j ) {
 				// mark the concepts in the equivalent classes as already printed
-				insert_key(printed, tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->id);
+				insert_key(printed, kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->id);
 				// now print it
-				fprintf(taxonomy_fp, " %s", tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->description.atomic->name);
+				fprintf(taxonomy_fp, " %s", kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->description.atomic->name);
 			}
 			if (printing_equivalents)
 				fprintf(taxonomy_fp, ")\n");
