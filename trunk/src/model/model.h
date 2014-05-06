@@ -27,6 +27,9 @@
 #define OWL_THING	"owl:Thing"
 #define OWL_NOTHING	"owl:Nothing"
 
+// create ontology prefix if it does not already exist
+void create_prefix(char* prefix_name, char* prefix, KB* kb);
+
 /******************************************************************************
  * get/create functions for concepts
  *****************************************************************************/

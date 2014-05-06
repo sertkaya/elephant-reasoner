@@ -121,6 +121,8 @@ KB* init_kb() {
 
 	kb->inconsistent = 0;
 
+	kb->prefixes = create_key_value_hash_table(DEFAULT_PREFIXES_HASH_SIZE);
+
 	return kb;
 }
 

@@ -339,3 +339,22 @@ int free_abox(ABox* abox) {
 
 	return total_freed_bytes;
 }
+
+int free_kb(KB* kb) {
+	int total_freed_bytes = 0;
+
+	total_freed_bytes += free_tbox(kb->tbox);
+	total_freed_bytes += free_abox(kb->abox);
+
+	// iterate over the prefixes hash, free the prefixes
+	Node* node = last_node(kb->prefixes);
+	while (node) {
+		total_freed_bytes += strlen((char*) node->value);
+		free((char*) node->value);
+		node = previous_node(node);
+	}
+	// free the prefixes hash
+	total_freed_bytes += free_key_value_hash_table(kb->prefixes);
+
+	return total_freed_bytes;
+}

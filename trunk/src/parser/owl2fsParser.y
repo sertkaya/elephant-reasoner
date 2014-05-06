@@ -20,6 +20,7 @@
 %{
 	#include <stdio.h>
 	#include <assert.h>
+	#include <string.h>
 	#include "datatypes.h"
 	#include "../model/datatypes.h"
 	#include "../model/model.h"
@@ -105,10 +106,14 @@ nodeID:
 	BLANK_NODE_LABEL;	
 
 fullIRI:
-	IRI_REF;	
+	IRI_REF { 
+		$$.text = strdup(yytext); 
+	};	
 	
 prefixName:
-	PNAME_NS;
+	PNAME_NS { 
+		$$.text = strdup(yytext); 
+	};
 	
 abbreviatedIRI:
 	PNAME_LN;
@@ -123,7 +128,12 @@ ontologyDocument:
 	prefixDeclaration ontology;
 	
 prefixDeclaration:
-	| prefixDeclaration PREFIX '(' prefixName '=' fullIRI ')';
+	| prefixDeclaration PREFIX '(' prefixName '=' fullIRI ')' {
+		create_prefix($4.text, $6.text, kb);
+		// free the name, no need to keep it in the hash of prefixes
+		// do not free the prefix itself, we need to store it in the hash
+		free($4.text);
+	};
 	
 ontology:
 	ONTOLOGY '(' ontologyIRI versionIRI directlyImportsDocuments ontologyAnnotations axioms ')' 

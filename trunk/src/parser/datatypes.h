@@ -21,6 +21,7 @@
 #define PARSER_DATATYPES_H_
 
 #include "../model/datatypes.h"
+#include "../model/limits.h"
 
 // for lexer and parser
 typedef union expression Expression;
@@ -28,6 +29,7 @@ union expression {
 	Concept* concept;
 	Role* role;
 	Individual* individual;
+	char* text;
 };
 
 

@@ -359,6 +359,7 @@ struct knowledge_base {
 	ABox* abox;
 	// flag for inconsistency
 	char inconsistent;
+	KeyValueHashTable* prefixes;
 };
 
 #endif

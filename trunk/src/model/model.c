@@ -28,6 +28,14 @@
 #include "utils.h"
 #include "limits.h"
 
+// create ontology prefix if it does not already exist
+void create_prefix(char* prefix_name, char* prefix, KB* kb) {
+	if (GET_PREFIX((unsigned char*) prefix_name, kb) != NULL)
+		return;
+
+	PUT_PREFIX((unsigned char*) prefix_name, prefix, kb);
+}
+
 /******************************************************************************
  * get/create functions for concepts
  *****************************************************************************/
