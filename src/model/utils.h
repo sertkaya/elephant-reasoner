@@ -25,6 +25,13 @@
 #include "../hashing/utils.h"
 #include "datatypes.h"
 
+// returns the ontology prefix with the given name if it exists
+// NULL if it does not exist
+#define GET_PREFIX(name, kb)				get_value(kb->prefixes, hash_string(name))
+
+// inserts the ontology prefix with the given name into the hash
+#define PUT_PREFIX(name, prefix, kb)		insert_key_value(kb->prefixes, hash_string(name), prefix)
+
 // returns the atomic concept with the given name if it exists
 // NULL if it does not exist
 // Concept* get_atomic_concept(unsigned char* name, TBox* tbox);

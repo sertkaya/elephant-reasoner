@@ -26,4 +26,6 @@ int free_tbox(TBox* tbox);
 
 int free_abox(ABox* abox);
 
+int free_kb(KB* kb);
+
 #endif /* MEMORY_UTILS_H_ */
