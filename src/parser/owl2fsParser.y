@@ -130,9 +130,11 @@ ontologyDocument:
 prefixDeclaration:
 	| prefixDeclaration PREFIX '(' prefixName '=' fullIRI ')' {
 		create_prefix($4.text, $6.text, kb);
+		/*
 		// free the name, no need to keep it in the hash of prefixes
 		// do not free the prefix itself, we need to store it in the hash
 		free($4.text);
+		*/
 	};
 	
 ontology:
