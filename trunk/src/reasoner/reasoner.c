@@ -242,5 +242,33 @@ char check_consistency(KB* kb) {
 }
 
 void realize_kb(KB* kb) {
+	printf("Preprocessing......................: ");
+	fflush(stdout);
+	START_TIMER;
+	preprocess_tbox(kb->tbox);
+	preprocess_abox(kb->abox);
+	STOP_TIMER;
+	printf("%.3f milisecs\n", TIME_DIFF / 1000);
+	total_time += TIME_DIFF;
 
+	printf("Indexing...........................: ");
+	fflush(stdout);
+	START_TIMER;
+	index_tbox(kb->tbox, REALISATION);
+	STOP_TIMER;
+	printf("%.3f milisecs\n", TIME_DIFF / 1000);
+	total_time += TIME_DIFF;
+
+	printf("Saturating.........................: ");
+	fflush(stdout);
+	START_TIMER;
+	char saturation_result = saturate_tbox(kb->tbox);
+	STOP_TIMER;
+	printf("%.3f milisecs\n", TIME_DIFF / 1000);
+	total_time += TIME_DIFF;
+	// return inconsistent if saturation returned inconsistent
+	if (saturation_result == -1)
+		kb->inconsistent = 1;
+
+	printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 }
