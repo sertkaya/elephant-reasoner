@@ -1,4 +1,5 @@
 Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+Prefix(owl1:=<http://www.w3.org/2002/07/owl1#>)
 
 Ontology(<http://www.ihtsdo.org/>
 

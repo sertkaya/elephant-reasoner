@@ -346,6 +346,7 @@ int free_kb(KB* kb) {
 	total_freed_bytes += free_tbox(kb->tbox);
 	total_freed_bytes += free_abox(kb->abox);
 
+	/*
 	// iterate over the prefixes hash, free the prefixes
 	Node* node = last_node(kb->prefixes);
 	while (node) {
@@ -355,6 +356,24 @@ int free_kb(KB* kb) {
 	}
 	// free the prefixes hash
 	total_freed_bytes += free_key_value_hash_table(kb->prefixes);
+	*/
+
+	// iterate through the prefixes and prefix names list,
+	// free each of them
+	int i;
+	for (i = 0; i < kb->prefix_count; ++i) {
+		total_freed_bytes += strlen(kb->prefix_names_list[i]);
+		free(kb->prefix_names_list[i]);
+		total_freed_bytes += strlen(kb->prefix_list[i]);
+		free(kb->prefix_list[i]);
+	}
+	// free the list of prefix names
+	free(kb->prefix_names_list);
+	total_freed_bytes += kb->prefix_count * sizeof(char*);
+
+	// free the list of prefixes
+	free(kb->prefix_list);
+	total_freed_bytes += kb->prefix_count * sizeof(char*);
 
 	return total_freed_bytes;
 }

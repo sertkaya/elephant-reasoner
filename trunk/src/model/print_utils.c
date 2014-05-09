@@ -167,12 +167,22 @@ void print_direct_subsumers(TBox* tbox, Concept* c, FILE* taxonomy_fp) {
 
 void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 
+	// the prefixes
+	int i;
+	for (i = 0; i < kb->prefix_count; ++i)
+		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", kb->prefix_names_list[i], kb->prefix_list[i]);
+
+	// the ontology tag
+	fprintf(taxonomy_fp, "\nOntology(\n");
+
+
 	if (kb->inconsistent) {
 		fprintf(taxonomy_fp, "EquivalentClasses(owl:Thing owl:Nothing)\n");
+		// the closing parentheses for the ontology tag
+		fprintf(taxonomy_fp, ")\n");
 		return;
 	}
 
-	int i;
 	// for keeping track of already printed equivalence classes
 	KeyHashTable* printed = create_key_hash_table(10);
 
@@ -201,6 +211,11 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 		}
 	}
 	free_key_hash_table(printed);
+
+	// the closing parentheses for the ontology tag
+	fprintf(taxonomy_fp, ")\n");
+
+	return;
 }
 
 // void print_short_stats(TBox* tbox, ABox* abox) {
