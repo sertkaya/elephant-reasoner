@@ -38,8 +38,6 @@ extern int yyparse(KB* kb);
 // file pointer for the parser
 extern FILE* yyin;
 
-// total runtime
-double total_time = 0.0;
 
 TBox* init_tbox() {
 
@@ -142,7 +140,7 @@ void read_kb(FILE* input_kb, KB* kb) {
 	// parser = yyparse(tbox, abox);
 	parser = yyparse(kb);
 	STOP_TIMER;
-	total_time += TIME_DIFF;
+	// total_time += TIME_DIFF;
 	if (parser != 0) {
 		print_short_stats(kb);
 		fprintf(stderr,"aborting\n");
@@ -152,6 +150,10 @@ void read_kb(FILE* input_kb, KB* kb) {
 }
 
 void classify(KB* kb) {
+
+	// total runtime
+	double total_time = 0.0;
+
 	printf("Preprocessing......................: ");
 	fflush(stdout);
 	START_TIMER;
@@ -195,13 +197,14 @@ void classify(KB* kb) {
 //	0: if the kb is consistent
 //	1: it it is inconsistent
 char check_consistency(KB* kb) {
+	// total runtime
+	double total_time = 0.0;
 
 	printf("Preprocessing......................: ");
 	fflush(stdout);
 	START_TIMER;
 	preprocess_tbox(kb->tbox);
 	preprocess_abox(kb->abox);
-	STOP_TIMER;
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -216,12 +219,15 @@ char check_consistency(KB* kb) {
 	// Return inconsistent if indexing returned inconsistent
 	if (indexing_result == -1) {
 		kb->inconsistent = 1;
+		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 		return 1;
 	}
 	// Return consistent if bottom does not appear on the rhs of an axiom
 	// (indexing returns 1 in this case)
-	if (indexing_result == 1)
+	if (indexing_result == 1) {
+		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 		return 0;
+	}
 
 	// Indexing did not provide enough information for checking consistency.
 	// Saturate the KB.
@@ -232,6 +238,7 @@ char check_consistency(KB* kb) {
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
+	printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 	// return inconsistent if saturation returned inconsistent
 	if (saturation_result == -1) {
 		kb->inconsistent = 1;
@@ -242,6 +249,9 @@ char check_consistency(KB* kb) {
 }
 
 void realize_kb(KB* kb) {
+	// total runtime
+	double total_time = 0.0;
+
 	printf("Preprocessing......................: ");
 	fflush(stdout);
 	START_TIMER;
