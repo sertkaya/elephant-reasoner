@@ -375,5 +375,37 @@ int free_kb(KB* kb) {
 	free(kb->prefix_list);
 	total_freed_bytes += kb->prefix_count * sizeof(char*);
 
+	// free the generated subclass axioms
+	for (i = 0; i < kb->generated_subclass_axiom_count; ++i)
+		free(kb->generated_subclass_axioms[i]);
+	total_freed_bytes += sizeof(SubClassAxiom) * kb->generated_subclass_axiom_count;
+	free(kb->generated_subclass_axioms);
+	total_freed_bytes += sizeof(SubClassAxiom*) * kb->generated_subclass_axiom_count;
+
+	// free the generated subrole axioms
+	for (i = 0; i < kb->generated_subrole_axiom_count; ++i)
+		free(kb->generated_subrole_axioms[i]);
+	total_freed_bytes += sizeof(SubRoleAxiom) * kb->generated_subrole_axiom_count;
+	free(kb->generated_subrole_axioms);
+	total_freed_bytes += sizeof(SubRoleAxiom*) * kb->generated_subrole_axiom_count;
+
+	// iterate over the generated nominals hash, free the nominals
+	Node* node = last_node(kb->generated_nominals);
+	while (node) {
+		total_freed_bytes += free_concept((Concept*) node->value, kb->tbox);
+		node = previous_node(node);
+	}
+	// free the generated nominals hash
+	total_freed_bytes += free_key_value_hash_table(kb->generated_nominals);
+
+	// iterate over the generated existential restrictions hash, free them
+	node = last_node(kb->generated_exists_restrictions);
+	while (node) {
+		total_freed_bytes += free_concept((Concept*) node->value, kb->tbox);
+		node = previous_node(node);
+	}
+	// free the generated nominals hash
+	total_freed_bytes += free_key_value_hash_table(kb->generated_exists_restrictions);
+
 	return total_freed_bytes;
 }
