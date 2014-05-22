@@ -40,11 +40,11 @@ KB* init_kb();
 
 void read_kb(FILE* input_kb, KB* kb);
 
-void classify(KB* kb);
+char classify(KB* kb);
 
 char check_consistency(KB* kb);
 
-void realize_kb(KB* kb);
+char realize_kb(KB* kb);
 
 
 #endif

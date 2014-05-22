@@ -112,8 +112,12 @@ int main(int argc, char *argv[]) {
 		else
 			fprintf(output, "true\n");
 	}
-	else if (!strcmp(reasoning_task, "realisation"))
+	else if (!strcmp(reasoning_task, "realisation")) {
+		// realize the kb
 		realize_kb(kb);
+		// print the individual types
+		print_individual_types(kb, output);
+	}
 
 	fclose(output);
 

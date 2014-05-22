@@ -72,7 +72,7 @@ char saturate_concepts(KB* kb) {
 		for (j = 0; j < tbox->atomic_concept_list[i]->told_subsumer_count; ++j)
 			push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers[j], NULL, SUBSUMPTION_INITIALIZATION));
 
-	// The hash of nominals that are generated during preprocessing.
+	// Traverse the hash of nominals that are generated during preprocessing.
 	Node* node = last_node(kb->generated_nominals);
 	Concept* nominal = NULL;
 	// The input axioms generated from concept and role assertions
