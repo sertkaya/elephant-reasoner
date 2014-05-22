@@ -218,6 +218,42 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	return;
 }
 
+void print_individual_types(KB* kb, FILE* taxonomy_fp) {
+
+	// the prefixes
+	int i;
+	for (i = 0; i < kb->prefix_count; ++i)
+		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", kb->prefix_names_list[i], kb->prefix_list[i]);
+
+	// the ontology tag
+	fprintf(taxonomy_fp, "\nOntology(\n");
+
+	if (kb->inconsistent) {
+		fprintf(taxonomy_fp, "EquivalentClasses(owl:Thing owl:Nothing)\n");
+		// the closing parentheses for the ontology tag
+		fprintf(taxonomy_fp, ")\n");
+		return;
+	}
+
+	// Traverse the hash of nominals that are generated during preprocessing.
+	Node* node = last_node(kb->generated_nominals);
+	Concept* nominal = NULL;
+	while (node) {
+		nominal = (Concept*) node->value;
+		for (i = 0; i < nominal->subsumer_count; ++i)
+			if (nominal->subsumer_list[i]->type == ATOMIC_CONCEPT)
+				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n",
+						nominal->subsumer_list[i]->description.atomic->name,
+						nominal->description.nominal->individual->name);
+		node = previous_node(node);
+	}
+
+	// the closing parentheses for the ontology tag
+	fprintf(taxonomy_fp, ")\n");
+
+	return;
+}
+
 // void print_short_stats(TBox* tbox, ABox* abox) {
 void print_short_stats(KB* kb) {
 	printf("\n---------- KB statistics ----------\n");

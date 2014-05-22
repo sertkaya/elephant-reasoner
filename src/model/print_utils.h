@@ -34,6 +34,8 @@ void print_conjunctions(TBox* tbox);
 void print_tbox(TBox* tbox);
 // print the computed concept hierarchy
 void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp);
+// print the computed individual types
+void print_individual_types(KB* kb, FILE* taxonomy_fp);
 
 // void print_short_stats(TBox* tbox, ABox* abox);
 void print_short_stats(KB* kb);

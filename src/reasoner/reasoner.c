@@ -158,7 +158,10 @@ void read_kb(FILE* input_kb, KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 }
 
-void classify(KB* kb) {
+// Returns
+//	0: if the kb is consistent
+//	1: it it is inconsistent
+char classify(KB* kb) {
 
 	// total runtime
 	double total_time = 0.0;
@@ -174,10 +177,16 @@ void classify(KB* kb) {
 	printf("Indexing...........................: ");
 	fflush(stdout);
 	START_TIMER;
-	index_kb(kb, CLASSIFICATION);
+	char indexing_result = index_kb(kb, CLASSIFICATION);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
+	// Return inconsistent if indexing returned inconsistent
+	if (indexing_result == -1) {
+		kb->inconsistent = 1;
+		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
+		return 1;
+	}
 
 	printf("Saturating.........................: ");
 	fflush(stdout);
@@ -187,8 +196,11 @@ void classify(KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 	// return inconsistent if saturation returned inconsistent
-	if (saturation_result == -1)
+	if (saturation_result == -1){
 		kb->inconsistent = 1;
+		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
+		return 1;
+	}
 
 	printf("Computing concept hierarchy........: ");
 	fflush(stdout);
@@ -199,6 +211,8 @@ void classify(KB* kb) {
 	total_time += TIME_DIFF;
 
 	printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
+
+	return 0;
 }
 
 // Returns
@@ -255,7 +269,10 @@ char check_consistency(KB* kb) {
 	return 0;
 }
 
-void realize_kb(KB* kb) {
+// Returns
+//	0: if the kb is consistent
+//	1: it it is inconsistent
+char realize_kb(KB* kb) {
 	// total runtime
 	double total_time = 0.0;
 
@@ -270,10 +287,16 @@ void realize_kb(KB* kb) {
 	printf("Indexing...........................: ");
 	fflush(stdout);
 	START_TIMER;
-	index_kb(kb, REALISATION);
+	char indexing_result = index_kb(kb, REALISATION);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
+	// Return inconsistent if indexing returned inconsistent
+	if (indexing_result == -1) {
+		kb->inconsistent = 1;
+		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
+		return 1;
+	}
 
 	printf("Saturating.........................: ");
 	fflush(stdout);
@@ -283,8 +306,13 @@ void realize_kb(KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
 	// return inconsistent if saturation returned inconsistent
-	if (saturation_result == -1)
+	if (saturation_result == -1) {
+		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 		kb->inconsistent = 1;
+		return 1;
+	}
 
 	printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
+
+	return 0;
 }
