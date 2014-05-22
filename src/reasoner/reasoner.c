@@ -124,6 +124,15 @@ KB* init_kb() {
 	kb->prefix_names_list = NULL;
 	kb->prefix_list = NULL;
 
+	// init the generated axioms, nominals and exists restrictions
+	kb->generated_exists_restriction_count = 0;
+	kb->generated_exists_restrictions = create_key_value_hash_table(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
+	kb->generated_nominals = create_key_value_hash_table(DEFAULT_NOMINALS_HASH_SIZE);
+	kb->generated_subclass_axiom_count = 0;
+	kb->generated_subclass_axioms = NULL;
+	kb->generated_subrole_axiom_count = 0;
+	kb->generated_subrole_axioms = NULL;
+
 	return kb;
 }
 
@@ -157,8 +166,7 @@ void classify(KB* kb) {
 	printf("Preprocessing......................: ");
 	fflush(stdout);
 	START_TIMER;
-	preprocess_tbox(kb->tbox);
-	preprocess_abox(kb->abox);
+	preprocess_kb(kb);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -166,7 +174,7 @@ void classify(KB* kb) {
 	printf("Indexing...........................: ");
 	fflush(stdout);
 	START_TIMER;
-	index_tbox(kb->tbox, CLASSIFICATION);
+	index_kb(kb, CLASSIFICATION);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -174,7 +182,7 @@ void classify(KB* kb) {
 	printf("Saturating.........................: ");
 	fflush(stdout);
 	START_TIMER;
-	char saturation_result = saturate_tbox(kb->tbox);
+	char saturation_result = saturate_tbox(kb);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -203,8 +211,7 @@ char check_consistency(KB* kb) {
 	printf("Preprocessing......................: ");
 	fflush(stdout);
 	START_TIMER;
-	preprocess_tbox(kb->tbox);
-	preprocess_abox(kb->abox);
+	preprocess_kb(kb);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -212,7 +219,7 @@ char check_consistency(KB* kb) {
 	printf("Indexing...........................: ");
 	fflush(stdout);
 	START_TIMER;
-	char indexing_result = index_tbox(kb->tbox, CONSISTENCY);
+	char indexing_result = index_kb(kb, CONSISTENCY);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -234,7 +241,7 @@ char check_consistency(KB* kb) {
 	printf("Saturating.........................: ");
 	fflush(stdout);
 	START_TIMER;
-	char saturation_result = saturate_tbox(kb->tbox);
+	char saturation_result = saturate_tbox(kb);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -255,8 +262,7 @@ void realize_kb(KB* kb) {
 	printf("Preprocessing......................: ");
 	fflush(stdout);
 	START_TIMER;
-	preprocess_tbox(kb->tbox);
-	preprocess_abox(kb->abox);
+	preprocess_kb(kb);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -264,7 +270,7 @@ void realize_kb(KB* kb) {
 	printf("Indexing...........................: ");
 	fflush(stdout);
 	START_TIMER;
-	index_tbox(kb->tbox, REALISATION);
+	index_kb(kb, REALISATION);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;
@@ -272,7 +278,7 @@ void realize_kb(KB* kb) {
 	printf("Saturating.........................: ");
 	fflush(stdout);
 	START_TIMER;
-	char saturation_result = saturate_tbox(kb->tbox);
+	char saturation_result = saturate_tbox(kb);
 	STOP_TIMER;
 	printf("%.3f milisecs\n", TIME_DIFF / 1000);
 	total_time += TIME_DIFF;

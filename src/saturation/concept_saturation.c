@@ -56,7 +56,9 @@ ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* r
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_concepts(TBox* tbox) {
+char saturate_concepts(KB* kb) {
+	TBox* tbox = kb->tbox;
+
 	ConceptSaturationAxiom* ax;
 	Stack scheduled_axioms;
 
@@ -71,8 +73,7 @@ char saturate_concepts(TBox* tbox) {
 			push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers[j], NULL, SUBSUMPTION_INITIALIZATION));
 
 	// The hash of nominals that are generated during preprocessing.
-	extern KeyValueHashTable* generated_nominals;
-	Node* node = last_node(generated_nominals);
+	Node* node = last_node(kb->generated_nominals);
 	Concept* nominal = NULL;
 	// The input axioms generated from concept and role assertions
 	while (node) {

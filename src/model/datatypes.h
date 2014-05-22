@@ -363,6 +363,24 @@ struct knowledge_base {
 	int prefix_count;
 	char** prefix_names_list;
 	char** prefix_list;
+
+
+	// The list of subclass axioms that result from converting syntactic
+	// shortcuts (disjointness axioms, etc.) to subclass axioms. They are generated in preprocessing.
+	SubClassAxiom** generated_subclass_axioms;
+	int generated_subclass_axiom_count;
+
+	// The list of subrole axioms that are generated during  preprocessing
+	SubRoleAxiom** generated_subrole_axioms;
+	int generated_subrole_axiom_count;
+
+	// The hash of nominals that are generated during preprocessing.
+	KeyValueHashTable* generated_nominals;
+
+	// The hash of existential restrictions that are generated during preprocessing.
+	// They are generated from preprocessing role assertions.
+	KeyValueHashTable* generated_exists_restrictions;
+	int generated_exists_restriction_count;
 };
 
 #endif

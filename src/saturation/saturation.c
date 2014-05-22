@@ -30,11 +30,11 @@
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_tbox(TBox* tbox) {
+char saturate_tbox(KB* kb) {
 	char saturation_result = 0;
 
-	saturate_roles(tbox);
-	saturation_result = saturate_concepts(tbox);
+	saturate_roles(kb->tbox);
+	saturation_result = saturate_concepts(kb);
 
 	return saturation_result;
 }
