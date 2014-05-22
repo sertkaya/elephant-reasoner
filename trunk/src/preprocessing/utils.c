@@ -27,6 +27,7 @@
 #include "../hashing/key_value_hash_table.h"
 #include "../hashing/utils.h"
 
+/*
 // The list of subclass axioms that are generated during  preprocessing
 extern SubClassAxiom** generated_subclass_axioms;
 extern int generated_subclass_axiom_count;
@@ -42,6 +43,7 @@ extern KeyValueHashTable* generated_nominals;
 // They are generated from preprocessing role assertions.
 extern KeyValueHashTable* generated_exists_restrictions;
 extern int generated_exists_restriction_count;
+*/
 
 /******************************************************************************
  * Add functions for axioms
@@ -49,32 +51,32 @@ extern int generated_exists_restriction_count;
 
 // Add a given subclass axiom to the list of subclass axioms generated during
 // preprocessing
-void add_generated_subclass_axiom(SubClassAxiom* ax) {
+void add_generated_subclass_axiom(KB* kb, SubClassAxiom* ax) {
 	SubClassAxiom** tmp;
-	tmp = realloc(generated_subclass_axioms, (generated_subclass_axiom_count + 1) * sizeof(SubClassAxiom*));
+	tmp = realloc(kb->generated_subclass_axioms, (kb->generated_subclass_axiom_count + 1) * sizeof(SubClassAxiom*));
 	assert(tmp != NULL);
-	generated_subclass_axioms = tmp;
-	generated_subclass_axioms[generated_subclass_axiom_count] = ax;
-	++generated_subclass_axiom_count;
+	kb->generated_subclass_axioms = tmp;
+	kb->generated_subclass_axioms[kb->generated_subclass_axiom_count] = ax;
+	++(kb->generated_subclass_axiom_count);
 }
 
 // Add a given subrole axiom the list of subclass axioms generated during
 // preprocessing
-void add_generated_subrole_axiom(SubRoleAxiom* ax) {
+void add_generated_subrole_axiom(KB* kb, SubRoleAxiom* ax) {
 	SubRoleAxiom** tmp;
-	tmp = realloc(generated_subrole_axioms, (generated_subrole_axiom_count + 1) * sizeof(SubRoleAxiom*));
+	tmp = realloc(kb->generated_subrole_axioms, (kb->generated_subrole_axiom_count + 1) * sizeof(SubRoleAxiom*));
 	assert(tmp != NULL);
-	generated_subrole_axioms = tmp;
-	generated_subrole_axioms[generated_subrole_axiom_count] = ax;
-	++generated_subrole_axiom_count;
+	kb->generated_subrole_axioms = tmp;
+	kb->generated_subrole_axioms[kb->generated_subrole_axiom_count] = ax;
+	++(kb->generated_subrole_axiom_count);
 }
 
 
-Concept* get_create_generated_nominal(Individual* ind) {
+Concept* get_create_generated_nominal(KB* kb, Individual* ind) {
 	Concept* c;
 
 	// check if the nominal with this individual already exists
-	if ((c = get_value(generated_nominals, ind->id)) != NULL)
+	if ((c = get_value(kb->generated_nominals, ind->id)) != NULL)
 		return c;
 
 	// if a nominal with the individual does not already exist, create it
@@ -115,7 +117,7 @@ Concept* get_create_generated_nominal(Individual* ind) {
 	c->second_conjunct_of_list = NULL;
 	c->second_conjunct_of = NULL;
 
-	insert_key_value(generated_nominals, ind->id, c);
+	insert_key_value(kb->generated_nominals, ind->id, c);
 
 	/*
 	++tbox->nominal_count;
@@ -130,12 +132,12 @@ Concept* get_create_generated_nominal(Individual* ind) {
 
 
 // get or create generated the existential restriction with role r and filler f
-Concept* get_create_generated_exists_restriction(Role* r, Concept* f) {
+Concept* get_create_generated_exists_restriction(KB* kb, Role* r, Concept* f) {
 	Concept* c;
 
 	// first check if we already created an existential
 	// restriction with the same role and filler
-	if ((c = get_value(generated_exists_restrictions, HASH_INTEGERS(r->id, f->id))) != NULL)
+	if ((c = get_value(kb->generated_exists_restrictions, HASH_INTEGERS(r->id, f->id))) != NULL)
 		return c;
 
 	// if it does not already exist, create it
@@ -147,7 +149,7 @@ Concept* get_create_generated_exists_restriction(Role* r, Concept* f) {
 	assert(c->description.exists != NULL);
 	c->description.exists->role = r;
 	c->description.exists->filler = f;
-	c->id = generated_exists_restriction_count++;
+	c->id = (kb->generated_exists_restriction_count)++;
 
 	c->told_subsumers = NULL;
 	c->told_subsumer_count = 0;
@@ -175,7 +177,7 @@ Concept* get_create_generated_exists_restriction(Role* r, Concept* f) {
 	c->second_conjunct_of_list = NULL;
 	c->second_conjunct_of = NULL;
 
-	insert_key_value(generated_exists_restrictions, HASH_INTEGERS(r->id, f->id), c);
+	insert_key_value(kb->generated_exists_restrictions, HASH_INTEGERS(r->id, f->id), c);
 
 	return c;
 }

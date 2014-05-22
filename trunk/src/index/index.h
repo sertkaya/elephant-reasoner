@@ -32,11 +32,12 @@
  * 	rhs of any axiom. This means the KB is consistent.
  * 	0: Otherwise
  */
-char index_tbox(TBox* tbox, ReasoningTask reasoning_task );
+// char index_tbox(TBox* tbox, ReasoningTask reasoning_task );
 
 void index_role(Role* r);
 
-void index_abox(ABox* abox);
+// void index_abox(ABox* abox);
 
+char index_kb(KB* kb, ReasoningTask reasoning_task);
 
 #endif /* INDEX_H_ */

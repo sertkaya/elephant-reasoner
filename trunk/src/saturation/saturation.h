@@ -30,7 +30,7 @@
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_tbox(TBox* tbox);
+char saturate_tbox(KB* kb);
 
 
 #endif /* SATURATION_H_ */

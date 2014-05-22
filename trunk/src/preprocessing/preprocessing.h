@@ -14,8 +14,10 @@ SubRoleAxiom** generated_subrole_axioms = NULL;
 int generated_subrole_axiom_count = 0;
 */
 
-void preprocess_tbox(TBox* tbox);
+void preprocess_kb(KB* kb);
 
-void preprocess_abox(ABox* abox);
+// void preprocess_tbox(TBox* tbox);
+
+// void preprocess_abox(ABox* abox);
 
 #endif

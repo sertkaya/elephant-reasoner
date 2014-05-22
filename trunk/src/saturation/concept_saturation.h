@@ -31,6 +31,6 @@
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_concepts(TBox* tbox);
+char saturate_concepts(KB* kb);
 
 #endif

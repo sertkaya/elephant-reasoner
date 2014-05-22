@@ -23,9 +23,9 @@
 
 #include "../model/datatypes.h"
 #include "../model/utils.h"
-// #include "../preprocessing/preprocessing.h"
 #include "utils.h"
 
+/*
 // The list of subclass axioms that are generated during  preprocessing
 extern SubClassAxiom** generated_subclass_axioms;
 extern int generated_subclass_axiom_count;
@@ -33,6 +33,7 @@ extern int generated_subclass_axiom_count;
 // The list of subrole axioms that are generated during  preprocessing
 extern SubRoleAxiom** generated_subrole_axioms;
 extern int generated_subrole_axiom_count;
+*/
 
 
 void index_concept(Concept* c, TBox* tbox) {
@@ -86,10 +87,12 @@ void index_role(Role* r) {
  * 	rhs of any axiom. This means the KB is consistent.
  * 	0: Otherwise
  */
-char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
-	int i;
+char index_tbox(KB* kb, ReasoningTask reasoning_task) {
+
+	TBox* tbox = kb->tbox;
 	char bottom_appears_on_rhs = 0;
 
+	int i;
 	for (i = 0; i < tbox->subclass_axiom_count; ++i) {
 		// Check if bottom appears on the rhs. Needed for consistency
 		if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept) {
@@ -116,30 +119,30 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 	}
 
 	// Now index the subclass axioms generated during preprocessing
-	for (i = 0; i < generated_subclass_axiom_count; ++i) {
+	for (i = 0; i < kb->generated_subclass_axiom_count; ++i) {
 
 		// Check if bottom appears on the rhs. Needed for consistency
-		if (generated_subclass_axioms[i]->rhs == tbox->bottom_concept)  {
-			if (generated_subclass_axioms[i]->lhs != tbox->bottom_concept)
+		if (kb->generated_subclass_axioms[i]->rhs == tbox->bottom_concept)  {
+			if (kb->generated_subclass_axioms[i]->lhs != tbox->bottom_concept)
 				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
-			if (generated_subclass_axioms[i]->lhs->type == NOMINAL || generated_subclass_axioms[i]->lhs == tbox->top_concept)
+			if (kb->generated_subclass_axioms[i]->lhs->type == NOMINAL || kb->generated_subclass_axioms[i]->lhs == tbox->top_concept)
 				// return inconsistent immediately
 				return -1;
 		}
 
 		// no need to add told subsumers of bottom
 		// no need to index the bottom concept
-		if (generated_subclass_axioms[i]->lhs == tbox->bottom_concept)
+		if (kb->generated_subclass_axioms[i]->lhs == tbox->bottom_concept)
 			continue;
 		// no need to add top as a told subsumer
-		if (generated_subclass_axioms[i]->rhs == tbox->top_concept) {
+		if (kb->generated_subclass_axioms[i]->rhs == tbox->top_concept) {
 			// still index the lhs, but do not add top to the lhs of rhs
-			index_concept(generated_subclass_axioms[i]->lhs, tbox);
+			index_concept(kb->generated_subclass_axioms[i]->lhs, tbox);
 			continue;
 		}
-		add_told_subsumer_concept(generated_subclass_axioms[i]->lhs, generated_subclass_axioms[i]->rhs);
-		index_concept(generated_subclass_axioms[i]->lhs, tbox);
+		add_told_subsumer_concept(kb->generated_subclass_axioms[i]->lhs, kb->generated_subclass_axioms[i]->rhs);
+		index_concept(kb->generated_subclass_axioms[i]->lhs, tbox);
 	}
 
 	// If bottom does not appear on the rhs, the KB cannot be inconcsistent, i.e., it is consistent
@@ -154,15 +157,16 @@ char index_tbox(TBox* tbox, ReasoningTask reasoning_task) {
 	}
 
 	// Index generated subrole axioms
-	for (i = 0; i < generated_subrole_axiom_count; ++i) {
-		add_told_subsumer_role(generated_subrole_axioms[i]->lhs, generated_subrole_axioms[i]->rhs);
-		add_told_subsumee_role(generated_subrole_axioms[i]->rhs, generated_subrole_axioms[i]->lhs);
-		index_role(generated_subrole_axioms[i]->lhs);
+	for (i = 0; i < kb->generated_subrole_axiom_count; ++i) {
+		add_told_subsumer_role(kb->generated_subrole_axioms[i]->lhs, kb->generated_subrole_axioms[i]->rhs);
+		add_told_subsumee_role(kb->generated_subrole_axioms[i]->rhs, kb->generated_subrole_axioms[i]->lhs);
+		index_role(kb->generated_subrole_axioms[i]->lhs);
 	}
 
 	return 0;
 }
 
+// TODO
 void index_abox(ABox* abox) {
 	int i;
 
@@ -175,4 +179,8 @@ void index_abox(ABox* abox) {
 	for (i = 0; i < abox->role_assertion_count; i++) {
 		// TODO
 	}
+}
+
+char index_kb(KB* kb, ReasoningTask reasoning_task) {
+	return index_tbox(kb, reasoning_task);
 }
