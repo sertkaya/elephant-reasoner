@@ -44,8 +44,8 @@ TBox* init_tbox() {
 	TBox* tbox = (TBox*) malloc(sizeof(TBox));
 	assert(tbox != NULL);
 
-	tbox->last_concept_id = 0;
-	tbox->last_role_id = 0;
+	tbox->last_concept_id = 1;
+	tbox->last_role_id = 1;
 
 	tbox->atomic_concept_count = 0;
 	tbox->atomic_concept_list = NULL;
@@ -96,7 +96,7 @@ ABox* init_abox() {
 	ABox* abox = (ABox*) malloc(sizeof(ABox));
 	assert(abox != NULL);
 
-	abox->last_individual_id = 0;
+	abox->last_individual_id = 1;
 	abox->individual_count = 0;
 	abox->individuals = create_key_value_hash_table(DEFAULT_INDIVIDUALS_HASH_SIZE);
 	// abox->individual_list = NULL;
