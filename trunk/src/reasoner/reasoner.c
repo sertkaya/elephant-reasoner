@@ -45,7 +45,7 @@ TBox* init_tbox() {
 	assert(tbox != NULL);
 
 	tbox->last_concept_id = 1;
-	tbox->last_role_id = 1;
+	tbox->last_role_id = 0;
 
 	tbox->atomic_concept_count = 0;
 	tbox->atomic_concept_list = NULL;
