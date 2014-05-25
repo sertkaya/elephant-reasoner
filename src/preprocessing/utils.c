@@ -89,7 +89,8 @@ Concept* get_create_generated_nominal(KB* kb, Individual* ind) {
 	c->description.nominal->individual = ind;
 
 	c->type = NOMINAL;
-	c->id = ind->id;
+	// c->id = ind->id;
+	c->id = kb->tbox->last_concept_id++;
 
 	c->told_subsumers = NULL;
 	c->told_subsumer_count = 0;
@@ -149,7 +150,8 @@ Concept* get_create_generated_exists_restriction(KB* kb, Role* r, Concept* f) {
 	assert(c->description.exists != NULL);
 	c->description.exists->role = r;
 	c->description.exists->filler = f;
-	c->id = (kb->generated_exists_restriction_count)++;
+	// c->id = (kb->generated_exists_restriction_count)++;
+	c->id = kb->tbox->last_concept_id++;
 
 	c->told_subsumers = NULL;
 	c->told_subsumer_count = 0;
@@ -176,6 +178,8 @@ Concept* get_create_generated_exists_restriction(KB* kb, Role* r, Concept* f) {
 	// space will be allocated in indexing
 	c->second_conjunct_of_list = NULL;
 	c->second_conjunct_of = NULL;
+
+	++kb->generated_exists_restriction_count;
 
 	insert_key_value(kb->generated_exists_restrictions, HASH_INTEGERS(r->id, f->id), c);
 
