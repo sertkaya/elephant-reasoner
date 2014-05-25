@@ -44,7 +44,7 @@ TBox* init_tbox() {
 	TBox* tbox = (TBox*) malloc(sizeof(TBox));
 	assert(tbox != NULL);
 
-	tbox->last_concept_id = 1;
+	tbox->last_concept_id = 0;
 	tbox->last_role_id = 0;
 
 	tbox->atomic_concept_count = 0;
