@@ -1,5 +1,5 @@
 /*
- * The Elephant Reasoner
+ * The ELepHant Reasoner
  *
  * Copyright (C) Baris Sertkaya (sertkaya.baris@gmail.com)
  *
