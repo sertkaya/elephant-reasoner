@@ -27,11 +27,13 @@
 
 int main(int argc, char *argv[]) {
 	struct timeval start_time, stop_time;
-	uint64_t i;
+	// uint64_t i;
+	size_t i;
 	int test_size = atoi(argv[1]);
 	int hash_map_size = atoi(argv[2]);
 
-	uint64_t* tmp = malloc(test_size * sizeof(int));
+	// uint64_t* tmp = malloc(test_size * sizeof(int));
+	size_t* tmp = malloc(test_size * sizeof(int));
 	assert(tmp != NULL);
 
 	HashMap* hash_map = hash_map_create(hash_map_size);
