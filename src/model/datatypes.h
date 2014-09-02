@@ -20,17 +20,19 @@
 #ifndef DATATYPES_H_
 #define DATATYPES_H_
 
-#include "../hashing/key_hash_table.h"
-#include "../hashing/key_value_hash_table.h"
+#include "../utils/set.h"
+#include "../utils/list.h"
+#include "../hashing/hash_table.h"
+#include "../hashing/hash_map.h"
 
 
-// Concepts, concept constructors
-typedef struct atomic_concept AtomicConcept;
-typedef struct conjunction Conjunction;
-typedef struct existential_restriction Exists;
-typedef struct nominal Nominal;
-typedef union concept_description ConceptDescription;
-typedef struct concept Concept;
+// Class constructors
+typedef struct class Class;
+typedef struct object_intersection_of ObjectIntersectionOf;
+typedef struct object_some_values_from ObjectSomeValuesFrom;
+typedef struct object_one_of ObjectOneOf;
+typedef union class_description ClassDescription;
+typedef struct class_expression ClassExpression;
 // Datatype for successor and predecessors
 typedef struct link Link;
 
@@ -68,64 +70,57 @@ typedef enum reasoning_task ReasoningTask;
 /*****************************************************************************/
 // Concept description types
 enum concept_description_type {
-	ATOMIC_CONCEPT, CONJUNCTION, EXISTENTIAL_RESTRICTION, NOMINAL
+	CLASS_TYPE, OBJECT_INTERSECTION_OF_TYPE, OBJECT_SOME_VALUES_FROM_TYPE, OBJECT_ONE_OF_TYPE
 };
 
 // Atomic concept
-struct atomic_concept {
-	char* name;
+struct class {
+	char* IRI;
 
-	Concept** equivalent_concepts_list;
-	int equivalent_concepts_count;
-	KeyHashTable* direct_subsumers;
-	Concept** direct_subsumer_list;
-	int direct_subsumer_count;
+	List* equivalent_classes;
+	Set* direct_subsumers;
 };
 
 
 // Conjunction
-struct conjunction {
-	Concept* conjunct1;
-	Concept* conjunct2;
+struct object_intersection_of {
+	ClassExpression* conjunct1;
+	ClassExpression* conjunct2;
 };
 
 
 // Existential restriction
-struct existential_restriction {
+struct object_some_values_from {
 	Role* role;
-	Concept* filler;
+	ClassExpression* filler;
 };
 
 // Nominal
-struct nominal {
+struct object_one_of {
 	Individual* individual;
 };
 
 // Concept description
-union concept_description {
-	AtomicConcept* atomic;
-	Conjunction* conj;
-	Exists* exists;
-	Nominal* nominal;
+union class_description {
+	Class* atomic;
+	ObjectIntersectionOf* conj;
+	ObjectSomeValuesFrom* exists;
+	ObjectOneOf* nominal;
 }; 
 	
 
 // Concept description
-struct concept {
+struct class_expression {
 	// Unique concept id.
 	// 32-bit unsigned integer, needed for hashing.
 	uint32_t id;
 
 	enum concept_description_type type;
-	ConceptDescription description;
+	ClassDescription description;
 
-	Concept** told_subsumers;
-	int told_subsumer_count;
+	List* told_subsumers;
 
-	Concept** subsumer_list;
-	int subsumer_count;
-
-	KeyHashTable* subsumers;
+	Set* subsumers;
 
 	// 2-dimensional dynamic array for storing predecessors.
 	Link** predecessors;
@@ -138,24 +133,24 @@ struct concept {
 	int successor_r_count;
 
 	// list of negative existentials whose filler is this concept
-	Concept** filler_of_negative_exists;
+	ClassExpression** filler_of_negative_exists;
 
 	// list of conjunctions where this concept is the first/second conjunct
-	Concept** first_conjunct_of_list;
+	ClassExpression** first_conjunct_of_list;
 	int first_conjunct_of_count;
-	Concept** second_conjunct_of_list;
+	ClassExpression** second_conjunct_of_list;
 	int second_conjunct_of_count;
 
 	// same as above. the reason is performance in saturation.
-	KeyHashTable* first_conjunct_of;
-	KeyHashTable* second_conjunct_of;
+	HashTable* first_conjunct_of;
+	HashTable* second_conjunct_of;
 
 };
 
 // For keeping successors and predecessors of a  concept
 struct link {
 	Role* role;
-	Concept** fillers;
+	ClassExpression** fillers;
 	int filler_count;
 };
 
@@ -191,16 +186,16 @@ struct role {
 	enum role_description_type type;
 	RoleDescription description;
 
-	KeyValueHashTable* told_subsumers;
-	KeyValueHashTable* told_subsumees;
+	HashMap* told_subsumers;
+	HashMap* told_subsumees;
 
-	KeyHashTable* subsumers;
+	HashTable* subsumers;
 	Role** subsumer_list;
 	int subsumer_count;
 
 	// Only necessary for optimizing the processing of role compositions
 	// For that we need to access the subsumees
-	KeyHashTable* subsumees;
+	HashTable* subsumees;
 	Role** subsumee_list;
 	int subsumee_count;
 
@@ -211,27 +206,27 @@ struct role {
 	int second_component_of_count;
 
 	// Same as above. The reason is performance in saturation.
-	KeyHashTable* first_component_of;
-	KeyHashTable* second_component_of;
+	HashTable* first_component_of;
+	HashTable* second_component_of;
 };
 
 /******************************************************************************/
 // SubClass axiom
 struct subclass_axiom {
-	Concept* lhs;
-	Concept* rhs;
+	ClassExpression* lhs;
+	ClassExpression* rhs;
 };
 
 // EquivalentClasses axiom
 struct eqclass_axiom {
-	Concept* lhs;
-	Concept* rhs;
+	ClassExpression* lhs;
+	ClassExpression* rhs;
 };
 
 // DisjointClasses axiom
 struct disjointclasses_axiom {
 	int concept_count;
-	Concept **concepts;
+	ClassExpression **concepts;
 };
 
 // RI
@@ -254,36 +249,36 @@ struct eqrole_axiom {
 // TBox
 struct tbox {
 	// Top concept
-	Concept* top_concept;
+	ClassExpression* top_concept;
 	// Bottom concept
-	Concept* bottom_concept;
+	ClassExpression* bottom_concept;
 
 	// Atomic concepts hash
-	KeyValueHashTable* atomic_concepts;
-	Concept** atomic_concept_list;
+	HashMap* atomic_concepts;
+	ClassExpression** atomic_concept_list;
 	int atomic_concept_count;
 
-	// Exists restictions hash
+	// Exists restictions hash map
 	// The key is role id_filler id
-	KeyValueHashTable* exists_restrictions;
+	HashMap* exists_restrictions;
 	int exists_restriction_count;
 	int unique_exists_restriction_count;
 
 	// Hash for conjunctions
 	// Key: id of conjuct1_id of conjunct2
 	// where conjuct ids are sorted
-	KeyValueHashTable* conjunctions;
+	HashMap* conjunctions;
 	int conjunction_count;
 	int binary_conjunction_count;
 	int unique_binary_conjunction_count;
 
 	// Nominals
-	KeyValueHashTable* nominals;
+	HashMap* nominals;
 
-	KeyValueHashTable* atomic_roles;
+	HashMap* atomic_roles;
 	int atomic_role_count;
 
-	KeyValueHashTable* role_compositions;
+	HashMap* role_compositions;
 	int role_composition_count;
 	int binary_role_composition_count;
 	int unique_binary_role_composition_count;
@@ -321,7 +316,7 @@ struct individual {
 // Concept assertion
 struct concept_assertion {
 	Individual* individual;
-	Concept* concept;
+	ClassExpression* concept;
 };
 
 // Role assertion
@@ -338,7 +333,7 @@ struct abox {
 	int individual_count;
 	// Individual** individual_list;
 
-	KeyValueHashTable* individuals;
+	HashMap* individuals;
 
 	int concept_assertion_count;
 	ConceptAssertion** concept_assertions;
@@ -375,11 +370,11 @@ struct knowledge_base {
 	int generated_subrole_axiom_count;
 
 	// The hash of nominals that are generated during preprocessing.
-	KeyValueHashTable* generated_nominals;
+	HashMap* generated_nominals;
 
 	// The hash of existential restrictions that are generated during preprocessing.
 	// They are generated from preprocessing role assertions.
-	KeyValueHashTable* generated_exists_restrictions;
+	HashMap* generated_exists_restrictions;
 	int generated_exists_restriction_count;
 };
 

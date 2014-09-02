@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include "../model/datatypes.h"
 #include "../model/limits.h"
@@ -30,6 +31,7 @@
 #include "../index/index.h"
 #include "../saturation/saturation.h"
 #include "../hierarchy/hierarchy.h"
+#include "../utils/timer.h"
 #include "reasoner.h"
 
 // the parser
@@ -49,27 +51,27 @@ TBox* init_tbox() {
 
 	tbox->atomic_concept_count = 0;
 	tbox->atomic_concept_list = NULL;
-	tbox->atomic_concepts = create_key_value_hash_table(DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
+	tbox->atomic_concepts = hash_map_create(DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
 	tbox->atomic_role_count = 0;
-	tbox->atomic_roles = create_key_value_hash_table(DEFAULT_ATOMIC_ROLES_HASH_SIZE);
+	tbox->atomic_roles = hash_map_create(DEFAULT_ATOMIC_ROLES_HASH_SIZE);
 
 	tbox->exists_restriction_count = 0;
 	tbox->unique_exists_restriction_count = 0;
-	tbox->exists_restrictions = create_key_value_hash_table(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
+	tbox->exists_restrictions = hash_map_create(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
 
-	tbox->nominals = create_key_value_hash_table(DEFAULT_NOMINALS_HASH_SIZE);
+	tbox->nominals = hash_map_create(DEFAULT_NOMINALS_HASH_SIZE);
 
 	tbox->conjunction_count = 0;
 	// tbox->unique_conjunction_count = 0;
 	tbox->binary_conjunction_count = 0;
 	tbox->unique_binary_conjunction_count = 0;
-	tbox->conjunctions = create_key_value_hash_table(DEFAULT_CONJUNCTIONS_HASH_SIZE);
+	tbox->conjunctions = hash_map_create(DEFAULT_CONJUNCTIONS_HASH_SIZE);
 
 	tbox->role_composition_count = 0;
 	tbox->binary_role_composition_count = 0;
 	tbox->unique_binary_role_composition_count = 0;
-	tbox->role_compositions = create_key_value_hash_table(DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
+	tbox->role_compositions = hash_map_create(DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
 
 	tbox->subclass_axioms = NULL;
 	tbox->subclass_axiom_count = 0;
@@ -98,7 +100,7 @@ ABox* init_abox() {
 
 	abox->last_individual_id = 1;
 	abox->individual_count = 0;
-	abox->individuals = create_key_value_hash_table(DEFAULT_INDIVIDUALS_HASH_SIZE);
+	abox->individuals = hash_map_create(DEFAULT_INDIVIDUALS_HASH_SIZE);
 	// abox->individual_list = NULL;
 
 	abox->concept_assertion_count = 0;
@@ -126,8 +128,8 @@ KB* init_kb() {
 
 	// init the generated axioms, nominals and exists restrictions
 	kb->generated_exists_restriction_count = 0;
-	kb->generated_exists_restrictions = create_key_value_hash_table(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
-	kb->generated_nominals = create_key_value_hash_table(DEFAULT_NOMINALS_HASH_SIZE);
+	kb->generated_exists_restrictions = hash_map_create(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
+	kb->generated_nominals = hash_map_create(DEFAULT_NOMINALS_HASH_SIZE);
 	kb->generated_subclass_axiom_count = 0;
 	kb->generated_subclass_axioms = NULL;
 	kb->generated_subrole_axiom_count = 0;
@@ -137,6 +139,7 @@ KB* init_kb() {
 }
 
 void read_kb(FILE* input_kb, KB* kb) {
+	struct timeval start_time, stop_time;
 
 	// parser return code
 	int parser;
@@ -145,42 +148,43 @@ void read_kb(FILE* input_kb, KB* kb) {
 
 	printf("Loading KB.........................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	// parser = yyparse(tbox, abox);
 	parser = yyparse(kb);
-	STOP_TIMER;
-	// total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	// total_time += TIME_DIFF(start_time, stop_time);
 	if (parser != 0) {
 		print_short_stats(kb);
 		fprintf(stderr,"aborting\n");
 		exit(-1);
 	}
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 }
 
 // Returns
 //	0: if the kb is consistent
 //	1: it it is inconsistent
 char classify(KB* kb) {
+	struct timeval start_time, stop_time;
 
 	// total runtime
 	double total_time = 0.0;
 
 	printf("Preprocessing......................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	preprocess_kb(kb);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 
 	printf("Indexing...........................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	char indexing_result = index_kb(kb, CLASSIFICATION);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 	// Return inconsistent if indexing returned inconsistent
 	if (indexing_result == -1) {
 		kb->inconsistent = 1;
@@ -190,11 +194,11 @@ char classify(KB* kb) {
 
 	printf("Saturating.........................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	char saturation_result = saturate_tbox(kb);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 	// return inconsistent if saturation returned inconsistent
 	if (saturation_result == -1){
 		kb->inconsistent = 1;
@@ -204,11 +208,11 @@ char classify(KB* kb) {
 
 	printf("Computing concept hierarchy........: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	compute_concept_hierarchy(kb->tbox);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 
 	printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 
@@ -219,24 +223,25 @@ char classify(KB* kb) {
 //	0: if the kb is consistent
 //	1: it it is inconsistent
 char check_consistency(KB* kb) {
+	struct timeval start_time, stop_time;
 	// total runtime
 	double total_time = 0.0;
 
 	printf("Preprocessing......................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	preprocess_kb(kb);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 
 	printf("Indexing...........................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	char indexing_result = index_kb(kb, CONSISTENCY);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 	// Return inconsistent if indexing returned inconsistent
 	if (indexing_result == -1) {
 		kb->inconsistent = 1;
@@ -254,11 +259,11 @@ char check_consistency(KB* kb) {
 	// Saturate the KB.
 	printf("Saturating.........................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	char saturation_result = saturate_tbox(kb);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 	printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 	// return inconsistent if saturation returned inconsistent
 	if (saturation_result == -1) {
@@ -273,24 +278,25 @@ char check_consistency(KB* kb) {
 //	0: if the kb is consistent
 //	1: it it is inconsistent
 char realize_kb(KB* kb) {
+	struct timeval start_time, stop_time;
 	// total runtime
 	double total_time = 0.0;
 
 	printf("Preprocessing......................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	preprocess_kb(kb);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 
 	printf("Indexing...........................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	char indexing_result = index_kb(kb, REALISATION);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 	// Return inconsistent if indexing returned inconsistent
 	if (indexing_result == -1) {
 		kb->inconsistent = 1;
@@ -300,11 +306,11 @@ char realize_kb(KB* kb) {
 
 	printf("Saturating.........................: ");
 	fflush(stdout);
-	START_TIMER;
+	START_TIMER(start_time);
 	char saturation_result = saturate_tbox(kb);
-	STOP_TIMER;
-	printf("%.3f milisecs\n", TIME_DIFF / 1000);
-	total_time += TIME_DIFF;
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	total_time += TIME_DIFF(start_time, stop_time);
 	// return inconsistent if saturation returned inconsistent
 	if (saturation_result == -1) {
 		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);

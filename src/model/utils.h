@@ -23,66 +23,56 @@
 #include <stdint.h>
 
 #include "../hashing/utils.h"
+#include "../hashing/hash_map.h"
 #include "datatypes.h"
-
-// returns the ontology prefix with the given name if it exists
-// NULL if it does not exist
-#define GET_PREFIX(name, kb)				get_value(kb->prefixes, hash_string(name))
-
-// inserts the ontology prefix with the given name into the hash
-#define PUT_PREFIX(name, prefix, kb)		insert_key_value(kb->prefixes, hash_string(name), prefix)
 
 // returns the atomic concept with the given name if it exists
 // NULL if it does not exist
-// Concept* get_atomic_concept(unsigned char* name, TBox* tbox);
-#define GET_ATOMIC_CONCEPT(name, tbox)		get_value(tbox->atomic_concepts, hash_string(name))
+#define GET_ATOMIC_CONCEPT(IRI, tbox)		hash_map_get(tbox->atomic_concepts, hash_string(IRI))
 
 // inserts the atomic concept with the given name to the hash
-// void put_atomic_concept(unsigned char* name, Concept* c, TBox* tbox);
-#define PUT_ATOMIC_CONCEPT(name, c, tbox)	insert_key_value(tbox->atomic_concepts, hash_string(name), c)
+#define PUT_ATOMIC_CONCEPT(IRI, c, tbox)	hash_map_put(tbox->atomic_concepts, hash_string(IRI), c)
 
 // get the existential restriction with role r and filler f from hash
-// Concept* get_exists_restriction(int role_id, uint32_t filler_id, TBox* tbox);
-#define GET_EXISTS_RESTRICTION(role_id, filler_id, tbox)		get_value(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id))
+#define GET_EXISTS_RESTRICTION(role_id, filler_id, tbox)		hash_map_get(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id))
 
 // put the existential restriction with role r and filler f into hash
-// void put_exists_restriction(int role_id, uint32_t filler_id, Concept* c, TBox* tbox);
-#define PUT_EXISTS_RESTRICTION(role_id, filler_id, c, tbox)		insert_key_value(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id), c)
+#define PUT_EXISTS_RESTRICTION(role_id, filler_id, c, tbox)		hash_map_put(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id), c)
 
 // get the (binary) conjunction with the first conjunct c1 and second conjunct c2
-Concept* get_conjunction(Concept* c1, Concept* c2, TBox* tbox);
+#define GET_CONJUNCTION(c1, c2, tbox)		(c1->id <= c2->id) ? hash_map_get(tbox->conjunctions, HASH_INTEGERS(c1->id, c2->id)) : hash_map_get(tbox->conjunctions, HASH_INTEGERS(c2->id, c1->id))
 
 // put the (binary) conjunction
-void put_conjunction(Concept* c, TBox* tbox);
+#define PUT_CONJUNCTION(c, tbox)			(c->description.conj->conjunct1->id <= c->description.conj->conjunct2->id) ? hash_map_put(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id), c) : hash_map_put(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct2->id, c->description.conj->conjunct1->id), c)
 
 // return the nominal with the given individual if it exists
 // NULL if it does not exist
-#define GET_NOMINAL(individual, tbox)		get_value(tbox->nominals, individual->id)
+#define GET_NOMINAL(individual, tbox)		hash_map_get(tbox->nominals, individual->id)
 
 // insert the nominal with the given individual
-#define PUT_NOMINAL(n, tbox)			insert_key_value(tbox->nominals, n->description.nominal->individual->id, n)
+#define PUT_NOMINAL(n, tbox)				hash_map_put(tbox->nominals, n->description.nominal->individual->id, n)
 
 // return the atomic role with the given name if it exists
 // NULL if it does not exist
-Role* get_atomic_role(unsigned char* name, TBox* tbox);
+#define GET_ATOMIC_ROLE(IRI, tbox)			hash_map_get(tbox->atomic_roles, hash_string(IRI))
 
 // insert the atomic role with the given name to the hash
-void put_atomic_role(unsigned char* name, Role* c, TBox* tbox);
+#define PUT_ATOMIC_ROLE(IRI, r, tbox)		hash_map_put(tbox->atomic_roles, hash_string(IRI), r)
 
 
 // get the role compoisiton with the given roles
-Role* get_role_composition(Role* r1, Role* r2, TBox* tbox);
+#define GET_ROLE_COMPOSITION(r1, r2, tbox)	(r1->id <= r2->id) ? hash_map_get(tbox->role_compositions, HASH_INTEGERS(r1->id, r2->id)) : hash_map_get(tbox->role_compositions, HASH_INTEGERS(r2->id, r1->id))
 
 // put the role composition with the given roles into the role compositions hash
-void put_role_composition(Role* r, TBox* tbox);
+#define PUT_ROLE_COMPOSITION(r, tbox)		(r->description.role_composition->role1->id <= r->description.role_composition->role2->id) ? hash_map_put(tbox->role_compositions, HASH_INTEGERS(r->description.role_composition->role1->id, r->description.role_composition->role2->id), r) : hash_map_put(tbox->role_compositions, HASH_INTEGERS(r->description.role_composition->role2->id, r->description.role_composition->role1->id), r)
 
 /******************************************************************************/
 // Returns the individual with the given name if it exists
 // NULL if it does not exist
-#define GET_INDIVIDUAL(name, abox)			get_value(abox->individuals, hash_string(name))
+#define GET_INDIVIDUAL(IRI, abox)			hash_map_get(abox->individuals, hash_string(IRI))
 
 // Inserts the given individual into the hash of individuals.
 // Individual name is the key.
-#define PUT_INDIVIDUAL(name, i, abox)		insert_key_value(abox->individuals, hash_string(name), i)
+#define PUT_INDIVIDUAL(IRI, i, abox)		hash_map_put(abox->individuals, hash_string(IRI), i)
 
 #endif

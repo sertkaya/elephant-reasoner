@@ -26,7 +26,7 @@
 
 // add p to the predecessors hash of c
 // the key of the predecessors hash is r
-int add_predecessor(Concept* c, Role* r, Concept* p, TBox* tbox) {
+int add_predecessor(ClassExpression* c, Role* r, ClassExpression* p, TBox* tbox) {
 
 	// first check if we already have a link for role r
 	int i, j;
@@ -38,9 +38,9 @@ int add_predecessor(Concept* c, Role* r, Concept* p, TBox* tbox) {
 				if (c->predecessors[i]->fillers[j] == p)
 					return 0;
 			// no we do not have p in this list, add it
-			tmp = realloc(c->predecessors[i]->fillers, (c->predecessors[i]->filler_count + 1) * sizeof(Concept*));
+			tmp = realloc(c->predecessors[i]->fillers, (c->predecessors[i]->filler_count + 1) * sizeof(ClassExpression*));
 			assert(tmp != NULL);
-			c->predecessors[i]->fillers = (Concept**) tmp;
+			c->predecessors[i]->fillers = (ClassExpression**) tmp;
 			c->predecessors[i]->fillers[c->predecessors[i]->filler_count] = p;
 			++c->predecessors[i]->filler_count;
 			return 1;
@@ -55,7 +55,7 @@ int add_predecessor(Concept* c, Role* r, Concept* p, TBox* tbox) {
 	assert(c->predecessors[c->predecessor_r_count] != NULL);
 	// 3) fill the fields of the new link
 	c->predecessors[c->predecessor_r_count]->role = r;
-	c->predecessors[c->predecessor_r_count]->fillers = calloc(1, sizeof(Concept*));
+	c->predecessors[c->predecessor_r_count]->fillers = calloc(1, sizeof(ClassExpression*));
 	assert(c->predecessors[c->predecessor_r_count]->fillers != NULL);
 	c->predecessors[c->predecessor_r_count]->fillers[0] = p;
 	c->predecessors[c->predecessor_r_count]->filler_count = 1;
@@ -67,7 +67,7 @@ int add_predecessor(Concept* c, Role* r, Concept* p, TBox* tbox) {
 }
 
 
-int add_successor(Concept* c, Role* r, Concept* p, TBox* tbox) {
+int add_successor(ClassExpression* c, Role* r, ClassExpression* p, TBox* tbox) {
 
 	// first check if we already have a link for role r
 	int i, j;
@@ -79,9 +79,9 @@ int add_successor(Concept* c, Role* r, Concept* p, TBox* tbox) {
 				if (c->successors[i]->fillers[j] == p)
 					return 0;
 			// no we do not have p in this list, add it
-			tmp = realloc(c->successors[i]->fillers, (c->successors[i]->filler_count + 1) * sizeof(Concept*));
+			tmp = realloc(c->successors[i]->fillers, (c->successors[i]->filler_count + 1) * sizeof(ClassExpression*));
 			assert(tmp != NULL);
-			c->successors[i]->fillers = (Concept**) tmp;
+			c->successors[i]->fillers = (ClassExpression**) tmp;
 			c->successors[i]->fillers[c->successors[i]->filler_count] = p;
 			++c->successors[i]->filler_count;
 			return 1;
@@ -96,7 +96,7 @@ int add_successor(Concept* c, Role* r, Concept* p, TBox* tbox) {
 	assert(c->successors[c->successor_r_count] != NULL);
 	// 3) fill the fields of the new link
 	c->successors[c->successor_r_count]->role = r;
-	c->successors[c->successor_r_count]->fillers = calloc(1, sizeof(Concept*));
+	c->successors[c->successor_r_count]->fillers = calloc(1, sizeof(ClassExpression*));
 	assert(c->successors[c->successor_r_count]->fillers != NULL);
 	c->successors[c->successor_r_count]->fillers[0] = p;
 	c->successors[c->successor_r_count]->filler_count = 1;

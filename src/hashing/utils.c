@@ -20,8 +20,8 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "key_hash_table.h"
-#include "key_value_hash_table.h"
+#include "hash_table.h"
+#include "hash_map.h"
 
 /* Round up to the next highest power of 2 */
 /* from http://www-graphics.stanford.edu/~seander/bithacks.html */

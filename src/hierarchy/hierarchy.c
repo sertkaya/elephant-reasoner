@@ -26,57 +26,59 @@
 #include "../model/limits.h"
 #include "utils.h"
 #include "../saturation/utils.h"
-#include "../hashing/key_hash_table.h"
+#include "../hashing/hash_table.h"
 
 
 void compute_concept_hierarchy(TBox* tbox) {
-
 	int is_direct_subsumer;
 
-	int i, j;
+	int i;
 	for (i = 0; i < tbox->atomic_concept_count; ++i) {
-		for (j = 0; j < tbox->atomic_concept_list[i]->subsumer_count; ++j) {
-			if (tbox->atomic_concept_list[i]->subsumer_list[j]->type != ATOMIC_CONCEPT)
+		SetIterator* subsumers_iterator = SET_ITERATOR_CREATE(tbox->atomic_concept_list[i]->subsumers);
+		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+		while (subsumer != NULL) {
+
+			if (subsumer->type != CLASS_TYPE) {
+				subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
 				continue;
-			// check if tbox->atomic_concept_list[i] is a subsumer of tbox->atomic_concept_list[i]->subsumer_list[j]
+			}
+			// check if tbox->atomic_concept_list[i] is a subsumer of the 'subsumer'
 			// if yes, then they are equivalent
-			if (IS_SUBSUMED_BY(tbox->atomic_concept_list[i]->subsumer_list[j], tbox->atomic_concept_list[i])) {
-				if (tbox->atomic_concept_list[i]->subsumer_list[j] != tbox->atomic_concept_list[i])
-					add_equivalent_concept(tbox->atomic_concept_list[i]->subsumer_list[j], tbox->atomic_concept_list[i]);
+			if (IS_SUBSUMED_BY(subsumer, tbox->atomic_concept_list[i])) {
+				if (subsumer != tbox->atomic_concept_list[i])
+					ADD_EQUIVALENT_CLASS(subsumer, tbox->atomic_concept_list[i]);
 			}
 			else {
 				is_direct_subsumer = 1;
-				int k;
+				SetIterator* direct_subsumers_iterator = SET_ITERATOR_CREATE(tbox->atomic_concept_list[i]->description.atomic->direct_subsumers);
+				void* direct_subsumer = SET_ITERATOR_NEXT(direct_subsumers_iterator);
 
-				// make a temporary copy of the direct_subsumer_list since we are going to iterate on it and
-				// simultaneously remove elements from it.
-				int original_direct_subsumer_count = tbox->atomic_concept_list[i]->description.atomic->direct_subsumer_count;
-				Concept** tmp = malloc(original_direct_subsumer_count * sizeof(Concept*));
-				assert(tmp != NULL);
-				memcpy(tmp, tbox->atomic_concept_list[i]->description.atomic->direct_subsumer_list, original_direct_subsumer_count * sizeof(Concept*));
-
-				for (k = 0; k < original_direct_subsumer_count; ++k) {
-					// check if tbox->atomic_concept_list[i]->subsumer_list[j] is a subsumer of the direct_subsumer
-					// if yes, then tbox->atomic_concept_list[i]->subsumer_list[j] is not a direct subsumer of tbox->atomic_concept_list[i]
-					if (IS_SUBSUMED_BY(tmp[k], tbox->atomic_concept_list[i]->subsumer_list[j])) {
+				while (direct_subsumer != NULL) {
+					// check if the 'subsumer' is a subsumer of the 'direct_subsumer'
+					// if yes, then the 'subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]
+					if (IS_SUBSUMED_BY(((ClassExpression*) direct_subsumer), subsumer)) {
 						is_direct_subsumer = 0;
 						break;
 					}
-					// now check if direct_subsumer is a subsumer of tbox->atomic_concept_list[i]->subsumer_list[j]
-					// if yes, then direct_subsumer_index is not a direct subsumer of tbox->atomic_concept_list[i]
+					// now check if the 'direct_subsumer' is a subsumer of the 'subsumer'
+					// if yes, then the 'direct_subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]
 					// remove it from the list of direct subsumers
-					if (IS_SUBSUMED_BY(tbox->atomic_concept_list[i]->subsumer_list[j], tmp[k]))
-						remove_direct_subsumer(tmp[k],
-								tbox->atomic_concept_list[i]);
+					if (IS_SUBSUMED_BY(subsumer, direct_subsumer))
+						REMOVE_DIRECT_SUBSUMER(direct_subsumer, tbox->atomic_concept_list[i]);
+
+					direct_subsumer = SET_ITERATOR_NEXT(direct_subsumers_iterator);
 				}
-				// free the temporary copy
-				free(tmp);
+				SET_ITERATOR_FREE(direct_subsumers_iterator);
+
 
 				if (is_direct_subsumer)
-					add_direct_subsumer(tbox->atomic_concept_list[i]->subsumer_list[j], tbox->atomic_concept_list[i]);
+					ADD_DIRECT_SUBSUMER(subsumer, tbox->atomic_concept_list[i]);
 			}
+			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
 		}
+		SET_ITERATOR_FREE(subsumers_iterator);
 	}
+
 }
 
 

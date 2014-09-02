@@ -16,36 +16,40 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include "stack.h"
+#include "../utils/set.h"
 
-void init_stack(Stack* s) {
-	s->size = 0;
-	s->elements = NULL;
+int main(int argc, char *argv[]) {
+
+	Set* set = SET_CREATE(20);
+
+	int i;
+	void* tmp[100];
+	for (i = 0; i < 100; ++i) {
+		tmp[i] = malloc(sizeof(void));
+		assert(tmp[i] != NULL);
+		SET_ADD(tmp[i], set);
+	}
+
+	SET_REMOVE(tmp[10], set);
+
+
+	for (i = 0; i < 100; ++i)
+		if (!SET_CONTAINS(tmp[i], set))
+			printf("%d: not found!\n", i);
+
+	SetIterator* it = SET_ITERATOR_CREATE(set);
+	void* e = SET_ITERATOR_NEXT(it);
+	while (e != NULL) {
+		printf("%p\n", e);
+		e = SET_ITERATOR_NEXT(it);
+	}
+	SET_ITERATOR_FREE(it);
+
+	return 1;
 }
 
-inline void push(Stack* s, void* e) {
-	void** tmp = realloc(s->elements, (s->size + 1) * sizeof(void*));
-	assert(tmp != NULL);
-	s->elements = tmp;
-	s->elements[s->size] = e;
-	++s->size;
-}
 
-inline void* pop(Stack* s) {
-	void* e;
-	void** tmp;
-
-	if (s->size == 0)
-		return NULL;
-
-	--s->size;
-	e = s->elements[s->size];
-	tmp = realloc(s->elements, (s->size) * sizeof(void*));
-	assert(tmp != NULL || s->size == 0);
-	s->elements = tmp;
-
-	return e;
-}

@@ -26,7 +26,7 @@
 #include "../model/limits.h"
 #include "../index/index.h"
 #include "../index/utils.h"
-#include "../hashing/key_value_hash_table.h"
+#include "../hashing/hash_map.h"
 #include "../utils/stack.h"
 #include "utils.h"
 
@@ -61,15 +61,15 @@ void saturate_roles(TBox* tbox) {
 
 	// push the input axioms to the stack
     // first the atomic roles
-	Node* node = last_node(tbox->atomic_roles);
+	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->atomic_roles);
 	while (node) {
 		push(&scheduled_axioms, create_role_saturation_axiom((Role*) node->value, (Role*) node->value));
-		node = previous_node(node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
     // for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
     // 	push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
     // Now the role compositions.
-	Node* composition = last_node(tbox->role_compositions);
+	HashMapElement* composition = HASH_MAP_LAST_ELEMENT(tbox->role_compositions);
 	while (composition) {
 		push(&scheduled_axioms, create_role_saturation_axiom((Role*) composition->value, (Role*) composition->value));
 		/*
@@ -88,7 +88,7 @@ void saturate_roles(TBox* tbox) {
 			told_subsumee1 = previous_node(told_subsumee1);
 		}
 		*/
-		composition = previous_node(composition);
+		composition = HASH_MAP_PREVIOUS_ELEMENT(composition);
 	}
 
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
@@ -98,14 +98,14 @@ void saturate_roles(TBox* tbox) {
 			// told subsumers
 			// for (i = 0; i < ax->rhs->told_subsumer_count; ++i)
 			// 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i]));
-			Node* told_subsumer = last_node(ax->rhs->told_subsumers);
+			HashMapElement* told_subsumer = HASH_MAP_LAST_ELEMENT(ax->rhs->told_subsumers);
 			while (told_subsumer) {
 			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (Role*) told_subsumer->value));
 
 			 	if (ax->lhs->type == ROLE_COMPOSITION) {
-			 		Node* told_subsumee1 = last_node(ax->lhs->description.role_composition->role1->told_subsumees);
+			 		HashMapElement* told_subsumee1 = HASH_MAP_LAST_ELEMENT(ax->lhs->description.role_composition->role1->told_subsumees);
 			 		while (told_subsumee1) {
-			 			Node* told_subsumee2 = last_node(ax->lhs->description.role_composition->role2->told_subsumees);
+			 			HashMapElement* told_subsumee2 = HASH_MAP_LAST_ELEMENT(ax->lhs->description.role_composition->role2->told_subsumees);
 			 			while (told_subsumee2) {
 			 				Role* composition = get_create_role_composition_binary(
 			 						(Role*) told_subsumee1->value,
@@ -113,13 +113,13 @@ void saturate_roles(TBox* tbox) {
 			 						tbox);
 			 				index_role(composition);
 			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (Role*) told_subsumer->value));
-			 				told_subsumee2 = previous_node(told_subsumee2);
+			 				told_subsumee2 = HASH_MAP_PREVIOUS_ELEMENT(told_subsumee2);
 			 			}
-			 			told_subsumee1 = previous_node(told_subsumee1);
+			 			told_subsumee1 = HASH_MAP_PREVIOUS_ELEMENT(told_subsumee1);
 			 		}
 			 	}
 
-			 	told_subsumer = previous_node(told_subsumer);
+			 	told_subsumer = HASH_MAP_PREVIOUS_ELEMENT(told_subsumer);
 			}
 
 		}

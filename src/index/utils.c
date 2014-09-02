@@ -23,65 +23,23 @@
 
 #include "../model/datatypes.h"
 #include "../model/limits.h"
-#include "../hashing/key_value_hash_table.h"
+#include "../hashing/hash_map.h"
 
-
-
-/******************************************************************************
- * functions for adding subsumer/told subsumer to a concept
- *****************************************************************************/
-// TODO: what about multiple occurrences? Performance?
-// add s to the told subsumer list of c
-// note that multiple occurrence of s is allowed!
-void add_told_subsumer_concept(Concept* c, Concept* s) {
-	Concept** tmp;
-
-	tmp = realloc(c->told_subsumers, (c->told_subsumer_count + 1) * sizeof(Concept*));
-	assert(tmp != NULL);
-	c->told_subsumers = tmp;
-	c->told_subsumers[c->told_subsumer_count] = s;
-	c->told_subsumer_count++;
-}
-
-// add concept s to the subsumer list of concept c
-// returns 1 if added, 0 otherwise
-// note that it maintains both the array and the judy array
-// of subsumers. the reason for keeping the subsumers twice
-// is performance in saturation
-// int add_to_concept_subsumer_list(Concept* c, Concept* s) {
-void add_to_concept_subsumer_list(Concept* c, Concept* s) {
-	Concept** tmp;
-
-	tmp = realloc(c->subsumer_list, (c->subsumer_count + 1) * sizeof(Concept*));
-	assert(tmp != NULL);
-	c->subsumer_list = tmp;
-	c->subsumer_list[c->subsumer_count] = s;
-	c->subsumer_count++;
-}
 
 
 /******************************************************************************
  * functions for adding subsumer/told subsumer to a role
  *****************************************************************************/
-// TODO: what about multiple occurrences? Performance?
+// TODO: Use Set datatype instead, make it a macro
 // add s to the told subsumer list of c
-// note that multiple occurrence of s is allowed!
 void add_told_subsumer_role(Role* r, Role* s) {
-	/*
-	Role** tmp;
-
-	tmp = realloc(r->told_subsumers, (r->told_subsumer_count + 1) * sizeof(Role*));
-	assert(tmp != NULL);
-	r->told_subsumers = tmp;
-	r->told_subsumers[r->told_subsumer_count] = s;
-	r->told_subsumer_count++;
-	*/
-	insert_key_value(r->told_subsumers, s->id, s);
+	hash_map_put(r->told_subsumers, s->id, s);
 }
 
+// TODO: Use Set datatype instead, make it a macro
 // add role s to the subsumee list of  r
 void add_told_subsumee_role(Role* r, Role* s) {
-	insert_key_value(r->told_subsumees, s->id, s);
+	hash_map_put(r->told_subsumees, s->id, s);
 }
 
 // add role s to the subsumer list of r
@@ -92,7 +50,7 @@ void add_told_subsumee_role(Role* r, Role* s) {
 int add_to_role_subsumer_list(Role* r, Role* s) {
 	Role** tmp;
 
-	if (insert_key(r->subsumers, s->id)) {
+	if (hash_table_insert(r->subsumers, s)) {
 		tmp = realloc(r->subsumer_list, (r->subsumer_count + 1) * sizeof(Role*));
 		assert(tmp != NULL);
 		r->subsumer_list = tmp;
@@ -108,7 +66,7 @@ int add_to_role_subsumer_list(Role* r, Role* s) {
 int add_to_role_subsumee_list(Role*r, Role* s) {
 	Role** tmp;
 
-	if (insert_key(r->subsumees, s->id)) {
+	if (hash_table_insert(r->subsumees, s)) {
 		tmp = realloc(r->subsumee_list, (r->subsumee_count + 1) * sizeof(Role*));
 		assert(tmp != NULL);
 		r->subsumee_list = tmp;
@@ -130,15 +88,15 @@ int add_to_role_subsumee_list(Role*r, Role* s) {
 // during saturation, the usual array is for iteration on the elements. the memory
 // overhead is worth the performance gain.
 
-void add_to_first_conjunct_of_list(Concept* concept, Concept* conjunction) {
-	Concept** tmp;
+void add_to_first_conjunct_of_list(ClassExpression* concept, ClassExpression* conjunction) {
+	ClassExpression** tmp;
 
 	// create the hash if we are adding it for the first time
 	if (concept->first_conjunct_of == NULL)
-		concept->first_conjunct_of = create_key_hash_table(DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
+		concept->first_conjunct_of = hash_table_create(DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
-	if (insert_key(concept->first_conjunct_of, conjunction->id)) {
-		tmp = realloc(concept->first_conjunct_of_list, (concept->first_conjunct_of_count + 1) * sizeof(Concept*));
+	if (hash_table_insert(concept->first_conjunct_of, conjunction)) {
+		tmp = realloc(concept->first_conjunct_of_list, (concept->first_conjunct_of_count + 1) * sizeof(ClassExpression*));
 		assert(tmp != NULL);
 		concept->first_conjunct_of_list = tmp;
 		concept->first_conjunct_of_list[concept->first_conjunct_of_count] = conjunction;
@@ -148,15 +106,15 @@ void add_to_first_conjunct_of_list(Concept* concept, Concept* conjunction) {
 
 // add 'conjunction' to the list of conjunctions whose second conjunct is 'concept'
 // (see the note for the function add_to_first_conjunct_of_list above)
-void add_to_second_conjunct_of_list(Concept* concept, Concept* conjunction) {
-	Concept** tmp;
+void add_to_second_conjunct_of_list(ClassExpression* concept, ClassExpression* conjunction) {
+	ClassExpression** tmp;
 
 	// create the hash if we are adding it for the first time
 	if (concept->second_conjunct_of == NULL)
-		concept->second_conjunct_of = create_key_hash_table(DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
+		concept->second_conjunct_of = hash_table_create(DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
-	if (insert_key(concept->second_conjunct_of, conjunction->id)) {
-		tmp = realloc(concept->second_conjunct_of_list, (concept->second_conjunct_of_count + 1) * sizeof(Concept*));
+	if (hash_table_insert(concept->second_conjunct_of, conjunction)) {
+		tmp = realloc(concept->second_conjunct_of_list, (concept->second_conjunct_of_count + 1) * sizeof(ClassExpression*));
 		assert(tmp != NULL);
 		concept->second_conjunct_of_list = tmp;
 		concept->second_conjunct_of_list[concept->second_conjunct_of_count] = conjunction;
@@ -165,11 +123,11 @@ void add_to_second_conjunct_of_list(Concept* concept, Concept* conjunction) {
 }
 
 // add ex to the filler_of_negative_exists hash of the filler of ex.
-void add_to_negative_exists(Concept* ex, TBox* tbox) {
+void add_to_negative_exists(ClassExpression* ex, TBox* tbox) {
 	// We allocate the space here (in indexing)
 	if (ex->description.exists->filler->filler_of_negative_exists == NULL) {
 		ex->description.exists->filler->filler_of_negative_exists =
-				(Concept**) calloc(tbox->atomic_role_count + tbox->unique_binary_role_composition_count, sizeof(Concept*));
+				(ClassExpression**) calloc(tbox->atomic_role_count + tbox->unique_binary_role_composition_count, sizeof(ClassExpression*));
 		assert(ex->description.exists->filler->filler_of_negative_exists != NULL);
 	}
 	ex->description.exists->filler->filler_of_negative_exists[ex->description.exists->role->id] = ex;
@@ -183,7 +141,7 @@ void add_to_negative_exists(Concept* ex, TBox* tbox) {
 void add_role_to_first_component_of_list(Role* role, Role* composition) {
 	Role** tmp;
 
-	if (insert_key(role->first_component_of, composition->id)) {
+	if (hash_table_insert(role->first_component_of, composition)) {
 		tmp = realloc(role->first_component_of_list, (role->first_component_of_count + 1) * sizeof(Role*));
 		assert(tmp != NULL);
 		role->first_component_of_list = tmp;
@@ -197,8 +155,8 @@ void add_role_to_first_component_of_list(Role* role, Role* composition) {
 void add_role_to_second_component_of_list(Role* role, Role* composition) {
 	Role** tmp;
 
-	if (insert_key(role->second_component_of, composition->id)) {
-		tmp = realloc(role->second_component_of_list, (role->second_component_of_count + 1) * sizeof(Concept*));
+	if (hash_table_insert(role->second_component_of, composition)) {
+		tmp = realloc(role->second_component_of_list, (role->second_component_of_count + 1) * sizeof(ClassExpression*));
 		assert(tmp != NULL);
 		role->second_component_of_list = tmp;
 		role->second_component_of_list[role->second_component_of_count] = composition;

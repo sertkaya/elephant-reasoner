@@ -36,19 +36,19 @@ void create_prefix(char* prefix_name, char* prefix, KB* kb);
 
 // returns the atomic concept with given name or creates if it does not
 // already exist
-Concept* get_create_atomic_concept(char* name, TBox* tbox);
+ClassExpression* get_create_atomic_concept(char* name, TBox* tbox);
 
 // get or create the existential restriction with role r and filler f
-Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox);
+ClassExpression* get_create_exists_restriction(Role* r, ClassExpression* f, TBox* tbox);
 
 // get or create the existential restriction with the given conjuncts
-Concept* get_create_conjunction(int conjunct_count, Concept** conjuncts, TBox* tbox);
+ClassExpression* get_create_conjunction(int conjunct_count, ClassExpression** conjuncts, TBox* tbox);
 
 // get or create the binary existential restriction with the given conjuncts
-Concept* get_create_conjunction_binary(Concept* conjunct1, Concept* conjunct2, TBox* tbox);
+ClassExpression* get_create_conjunction_binary(ClassExpression* conjunct1, ClassExpression* conjunct2, TBox* tbox);
 
 // get or create the nominal for a given individual
-Concept* get_create_nominal(Individual* ind, TBox* tbox);
+ClassExpression* get_create_nominal(Individual* ind, TBox* tbox);
 
 /******************************************************************************
  * get/create functions for roles
@@ -66,13 +66,13 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox);
  * create functions for axioms
  *****************************************************************************/
 // create the subclass axiom with the given concept descriptions
-SubClassAxiom* create_subclass_axiom(Concept* lhs, Concept* rhs);
+SubClassAxiom* create_subclass_axiom(ClassExpression* lhs, ClassExpression* rhs);
 
 // create the equivalent class axiom with the given concept descriptions
-EqClassAxiom* create_eqclass_axiom(Concept* lhs, Concept* rhs);
+EqClassAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpression* rhs);
 
 // create disjoint classes axiom
-DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, Concept** classes);
+DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpression** classes);
 
 // create the subrole axiom with the given role descriptions
 SubRoleAxiom* create_subrole_axiom(Role* lhs, Role* rhs);
@@ -115,7 +115,7 @@ Individual* get_create_individual(char* name, ABox* abox);
  * Create functions for ABox assertions
  *****************************************************************************/
 // create the concept assertion axiom with the given concept description and individual
-ConceptAssertion* create_concept_assertion(Individual* individual, Concept* concept);
+ConceptAssertion* create_concept_assertion(Individual* individual, ClassExpression* concept);
 
 // create the role assertion with the given role and individuals
 RoleAssertion* create_role_assertion(Role* role, Individual* source_ind, Individual* target_ind);

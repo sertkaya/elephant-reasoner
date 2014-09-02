@@ -26,8 +26,8 @@ void add_generated_subclass_axiom(KB* kb, SubClassAxiom* ax);
 
 void add_generated_subrole_axiom(KB* kb, SubRoleAxiom* ax);
 
-Concept* get_create_generated_nominal(KB* kb, Individual* ind);
+ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind);
 
-Concept* get_create_generated_exists_restriction(KB* kb, Role* r, Concept* f);
+ClassExpression* get_create_generated_exists_restriction(KB* kb, Role* r, ClassExpression* f);
 
 #endif

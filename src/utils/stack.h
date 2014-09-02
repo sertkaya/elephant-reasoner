@@ -28,7 +28,7 @@ struct stack {
 };
 
 void init_stack(Stack* s);
-void push(Stack*s, void* e);
-void* pop(Stack* s);
+inline void push(Stack*s, void* e);
+inline void* pop(Stack* s);
 
 #endif /* STACK_H_ */

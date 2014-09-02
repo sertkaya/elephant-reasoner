@@ -21,21 +21,25 @@
 #define _HIERARCHY_UTILS_H_
 
 // Add concept c1 to the list of equivalent concepts of c2
-int add_equivalent_concept(Concept* c1, Concept* c2);
-
-// Add concept c1 to the list of direct subsumers of c2
-int add_direct_subsumer(Concept* c1, Concept* c2);
-// #define ADD_DIRECT_SUBSUMER(c1,c2)			insert_key(c2->description.atomic->direct_subsumers, c1->id)
-
-// returns 1 if c1 is a direct subsumer of c2, otherwise 0
-int is_direct_subsumer_of(Concept* c1, Concept* c2);
+int add_equivalent_concept(ClassExpression* c1, ClassExpression* c2);
 
 // returns 1 if c1 is a subsumer of c2, otherwise 0
-int is_subsumer_of(Concept* c1, Concept* c2);
+int is_subsumer_of(ClassExpression* c1, ClassExpression* c2);
 
-// remove c1 from the list of direct subsumers of c2
-int remove_direct_subsumer(Concept* c1, Concept* c2);
-// #define REMOVE_DIRECT_SUBSUMER(c1,c2)		remove_key(c2->description.atomic->direct_subsumers, c1->id)
+/**
+ * Add class expression c1 to the equivalent classes of class expression c2.
+ */
+#define ADD_EQUIVALENT_CLASS(c1, c2)	list_add(c1, c2->description.atomic->equivalent_classes)
+
+/**
+ * Add class expression c1 to the direct subsumers of c2
+ */
+#define ADD_DIRECT_SUBSUMER(c1, c2)		SET_ADD(c1, c2->description.atomic->direct_subsumers)
+
+/**
+ * Remove class expression c1 from the direct subsumers of class expression c2
+ */
+#define REMOVE_DIRECT_SUBSUMER(c1, c2)	SET_REMOVE(c1, c2->description.atomic->direct_subsumers)
 
 
 #endif /* _HIERARCHY_UTILS_H_ */

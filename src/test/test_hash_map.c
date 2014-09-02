@@ -16,36 +16,34 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
-#include "stack.h"
+#include "../hashing/hash_map.h"
 
-void init_stack(Stack* s) {
-	s->size = 0;
-	s->elements = NULL;
+int main(int argc, char *argv[]) {
+
+	HashMap* hash_table = hash_map_create(20);
+
+	/*
+	size_t i;
+	int tmp[100];
+	for (i = 0; i < 100; ++i) {
+		tmp[i] = i;
+		hash_map_put(hash_table,  i, (void*) tmp[i]);
+	}
+
+	tmp[21] = -1;
+
+	for (i = 0; i < 100; ++i) {
+		int val = (int) hash_map_get(hash_table,  i);
+		if (val != tmp[i])
+			printf("%d different!\n", i);
+	}
+	*/
+
+	return 1;
 }
 
-inline void push(Stack* s, void* e) {
-	void** tmp = realloc(s->elements, (s->size + 1) * sizeof(void*));
-	assert(tmp != NULL);
-	s->elements = tmp;
-	s->elements[s->size] = e;
-	++s->size;
-}
 
-inline void* pop(Stack* s) {
-	void* e;
-	void** tmp;
-
-	if (s->size == 0)
-		return NULL;
-
-	--s->size;
-	e = s->elements[s->size];
-	tmp = realloc(s->elements, (s->size) * sizeof(void*));
-	assert(tmp != NULL || s->size == 0);
-	s->elements = tmp;
-
-	return e;
-}

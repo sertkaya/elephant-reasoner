@@ -22,25 +22,25 @@
 
 // configuration parameters
 
-// max number of conjuncts for a conjunction
+// Max number of conjuncts that can occur in an ObjectIntersectionOf expression
 #define MAX_CONJUNCT_COUNT				1024
 
-// max number of class expressions that can occur in an EquivalentClasses axiom
+// Max number of class expressions that can occur in an EquivalentClasses axiom
 #define MAX_EQ_CLASS_EXP_COUNT			1024
 
-// max number of role expressions that can occur in an EquivalentObjectProperties axiom
+// Max number of role expressions that can occur in an EquivalentObjectProperties axiom
 #define MAX_EQ_ROLE_EXP_COUNT			1024
 
-// max size of a role composition
+// Max size of a role composition
 #define MAX_ROLE_COMPOSITION_SIZE		1024
 
 #define MAX_CONCEPT_NAME_LENGTH			1024
 #define MAX_ROLE_NAME_LENGTH			1024
 
-// max number of disjoint classes
+// Max number of disjoint classes in a DisjointClasses axiom
 #define MAX_DISJ_CLASS_EXP_COUNT		1024
 
-// default size of hash tables
+// Default size of hash tables
 #define DEFAULT_PREFIXES_HASH_SIZE				200
 #define DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE		150000
 #define DEFAULT_ATOMIC_ROLES_HASH_SIZE			200
@@ -51,8 +51,8 @@
 
 #define DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE		10
 #define DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE	10
-#define DEFAULT_SUBSUMERS_HASH_SIZE				100
-#define DEFAULT_DIRECT_SUBSUMERS_HASH_SIZE		10
+#define DEFAULT_SUBSUMERS_HASH_SIZE				128
+#define DEFAULT_DIRECT_SUBSUMERS_SET_SIZE		64
 #define DEFAULT_EQUIVALENT_CONCEPTS_HASH_SIZE	10
 
 #define DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE	10

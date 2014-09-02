@@ -22,7 +22,8 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../hashing/key_hash_table.h"
+#include "../hashing/hash_table.h"
+#include "../utils/set.h"
 #include "datatypes.h"
 #include "model.h"
 #include "utils.h"
@@ -57,43 +58,37 @@ void create_prefix(char* prefix_name, char* prefix, KB* kb) {
  * get/create functions for concepts
  *****************************************************************************/
 
-Concept* get_create_atomic_concept(char* name, TBox* tbox) {
-	Concept* c;
-	Concept** tmp;
+ClassExpression* get_create_atomic_concept(char* name, TBox* tbox) {
+	ClassExpression* c;
+	ClassExpression** tmp;
 
 	// check if the atomic concept with this name already exists
 	// if ((c = get_atomic_concept((unsigned char*) name, tbox)) != NULL)
-	if ((c = GET_ATOMIC_CONCEPT((unsigned char*) name, tbox)) != NULL)
+	if ((c = GET_ATOMIC_CONCEPT(name, tbox)) != NULL)
 		return c;
 
 	// if an atomic concept with the name does not already exist, create it
-	c = (Concept*) malloc(sizeof(Concept));
+	c = (ClassExpression*) malloc(sizeof(ClassExpression));
 	assert(c != NULL);
 
-	c->description.atomic = (AtomicConcept*) malloc(sizeof(AtomicConcept));
+	c->description.atomic = (Class*) malloc(sizeof(Class));
 	assert(c->description.atomic != NULL);
 
-	c->description.atomic->name = (char*) malloc((strlen(name) + 1) * sizeof(char));
-	assert(c->description.atomic->name != NULL);
+	c->description.atomic->IRI = (char*) malloc((strlen(name) + 1) * sizeof(char));
+	assert(c->description.atomic->IRI != NULL);
 
-	strcpy(c->description.atomic->name, name);
+	strcpy(c->description.atomic->IRI, name);
 
-	c->description.atomic->direct_subsumers = create_key_hash_table(DEFAULT_DIRECT_SUBSUMERS_HASH_SIZE);
-	c->description.atomic->direct_subsumer_list = NULL;
-	c->description.atomic->direct_subsumer_count = 0;
+	c->description.atomic->direct_subsumers = SET_CREATE(DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
 
-	c->description.atomic->equivalent_concepts_list = NULL;
-	c->description.atomic->equivalent_concepts_count = 0;
+	c->description.atomic->equivalent_classes = list_create();
 
-	c->type = ATOMIC_CONCEPT;
+	c->type = CLASS_TYPE;
 	c->id = tbox->last_concept_id++;
 
-	c->told_subsumers = NULL;
-	c->told_subsumer_count = 0;
+	c->told_subsumers = list_create();
 
-	c->subsumer_list = NULL;
-	c->subsumer_count = 0;
-	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
+	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 
@@ -114,10 +109,9 @@ Concept* get_create_atomic_concept(char* name, TBox* tbox) {
 	c->second_conjunct_of_list = NULL;
 	c->second_conjunct_of = NULL;
 
-	// put_atomic_concept((unsigned char*) c->description.atomic->name, c, tbox);
-	PUT_ATOMIC_CONCEPT((unsigned char*) c->description.atomic->name, c, tbox);
+	PUT_ATOMIC_CONCEPT(c->description.atomic->IRI, c, tbox);
 	tbox->atomic_concept_count++;
-	tmp = realloc(tbox->atomic_concept_list, tbox->atomic_concept_count * sizeof(Concept*));
+	tmp = realloc(tbox->atomic_concept_list, tbox->atomic_concept_count * sizeof(ClassExpression*));
 	assert(tmp != NULL);
 	tbox->atomic_concept_list = tmp;
 	tbox->atomic_concept_list[tbox->atomic_concept_count - 1] = c;
@@ -126,8 +120,8 @@ Concept* get_create_atomic_concept(char* name, TBox* tbox) {
 }
 
 // get or create the existential restriction with role r and filler f
-Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox) {
-	Concept* c;
+ClassExpression* get_create_exists_restriction(Role* r, ClassExpression* f, TBox* tbox) {
+	ClassExpression* c;
 
 	tbox->exists_restriction_count++;
 	// first check if we already created an existential
@@ -137,22 +131,19 @@ Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox) {
 		return c;
 
 	// if it does not already exist, create it
-	c = (Concept*) malloc(sizeof(Concept));
+	c = (ClassExpression*) malloc(sizeof(ClassExpression));
 	assert(c != NULL);
 
-	c->type = EXISTENTIAL_RESTRICTION;
-	c->description.exists = (Exists*) malloc(sizeof(Exists));
+	c->type = OBJECT_SOME_VALUES_FROM_TYPE;
+	c->description.exists = (ObjectSomeValuesFrom*) malloc(sizeof(ObjectSomeValuesFrom));
 	assert(c->description.exists != NULL);
 	c->description.exists->role = r;
 	c->description.exists->filler = f;
 	c->id = tbox->last_concept_id++;
 
-	c->told_subsumers = NULL;
-	c->told_subsumer_count = 0;
+	c->told_subsumers = list_create();
 
-	c->subsumer_list = NULL;
-	c->subsumer_count = 0;
-	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
+	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 
@@ -180,18 +171,18 @@ Concept* get_create_exists_restriction(Role* r, Concept* f, TBox* tbox) {
 	return c;
 }
 
-Concept* get_create_conjunction_binary(Concept* c1, Concept* c2, TBox* tbox) {
-	Concept* c;
+ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpression* c2, TBox* tbox) {
+	ClassExpression* c;
 
 	tbox->binary_conjunction_count++;
-	if ((c = get_conjunction(c1, c2, tbox)) != NULL)
+	if ((c = GET_CONJUNCTION(c1, c2, tbox)) != NULL)
 		return c;
 
-	c = (Concept*) malloc(sizeof(Concept));
+	c = (ClassExpression*) malloc(sizeof(ClassExpression));
 	assert(c != NULL);
 
-	c->type = CONJUNCTION;
-	c->description.conj = (Conjunction*) malloc(sizeof(Conjunction));
+	c->type = OBJECT_INTERSECTION_OF_TYPE;
+	c->description.conj = (ObjectIntersectionOf*) malloc(sizeof(ObjectIntersectionOf));
 	assert(c->description.conj != NULL);
 
 	// we order the conjuncts!
@@ -205,12 +196,9 @@ Concept* get_create_conjunction_binary(Concept* c1, Concept* c2, TBox* tbox) {
 	}
 	c->id = tbox->last_concept_id++;
 
-	c->told_subsumers = NULL;
-	c->told_subsumer_count = 0;
+	c->told_subsumers = list_create();
 
-	c->subsumer_list = NULL;
-	c->subsumer_count = 0;
-	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
+	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 
@@ -231,7 +219,7 @@ Concept* get_create_conjunction_binary(Concept* c1, Concept* c2, TBox* tbox) {
 	c->second_conjunct_of_list = NULL;
 	c->second_conjunct_of = NULL;
 
-	put_conjunction(c, tbox);
+	PUT_CONJUNCTION(c, tbox);
 	tbox->unique_binary_conjunction_count++;
 	// tbox->unique_conjunction_count++;
 
@@ -240,21 +228,21 @@ Concept* get_create_conjunction_binary(Concept* c1, Concept* c2, TBox* tbox) {
 
 // comparison function for qsorting conjucts based on ids
 static int compare_conjunct(const void* c1, const void* c2) {
-	if (((Concept*) c1)->id < ((Concept*) c2)->id)
+	if (((ClassExpression*) c1)->id < ((ClassExpression*) c2)->id)
 		return -1;
-	if (((Concept*) c1)->id == ((Concept*) c2)->id)
+	if (((ClassExpression*) c1)->id == ((ClassExpression*) c2)->id)
 		return 0;
 	return 1;
 }
 
 // returns a binary conjunction from a given list of conjuncts.
 // called by the parser.
-Concept* get_create_conjunction(int size, Concept** conjuncts, TBox* tbox) {
+ClassExpression* get_create_conjunction(int size, ClassExpression** conjuncts, TBox* tbox) {
 	int i;
-	Concept* conjunction = NULL;
+	ClassExpression* conjunction = NULL;
 
 	tbox->conjunction_count++;
-	qsort(conjuncts, size, sizeof(Concept*), compare_conjunct);
+	qsort(conjuncts, size, sizeof(ClassExpression*), compare_conjunct);
 	conjunction = get_create_conjunction_binary(conjuncts[0], conjuncts[1], tbox);
 	for (i = 2; i < size; i++)
 		conjunction = get_create_conjunction_binary(conjunction, conjuncts[i], tbox);
@@ -263,31 +251,28 @@ Concept* get_create_conjunction(int size, Concept** conjuncts, TBox* tbox) {
 }
 
 // get or create the nominal for a given individual
-Concept* get_create_nominal(Individual* ind, TBox* tbox) {
-	Concept* c;
+ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
+	ClassExpression* c;
 
 	// check if the nominal with this individual already exists
 	if ((c = GET_NOMINAL(ind, tbox)) != NULL)
 		return c;
 
 	// if a nominal with the individual does not already exist, create it
-	c = (Concept*) malloc(sizeof(Concept));
+	c = (ClassExpression*) malloc(sizeof(ClassExpression));
 	assert(c != NULL);
 
-	c->description.nominal = (Nominal*) malloc(sizeof(Nominal));
+	c->description.nominal = (ObjectOneOf*) malloc(sizeof(ObjectOneOf));
 	assert(c->description.nominal != NULL);
 
 	c->description.nominal->individual = ind;
 
-	c->type = NOMINAL;
+	c->type = OBJECT_ONE_OF_TYPE;
 	c->id = tbox->last_concept_id++;
 
-	c->told_subsumers = NULL;
-	c->told_subsumer_count = 0;
+	c->told_subsumers = list_create();
 
-	c->subsumer_list = NULL;
-	c->subsumer_count = 0;
-	c->subsumers = create_key_hash_table(DEFAULT_SUBSUMERS_HASH_SIZE);
+	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 
@@ -328,7 +313,7 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	Role* r;
 
 	// check if the atomic role already exists
-	if ((r = get_atomic_role((unsigned char*) name, tbox)) != NULL)
+	if ((r = GET_ATOMIC_ROLE(name, tbox)) != NULL)
 		return r;
 
 	// if it does not already exist, create it
@@ -342,27 +327,27 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	strcpy(r->description.atomic->name, name);
 	r->id = tbox->last_role_id++;
 
-	r->told_subsumers = create_key_value_hash_table(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
+	r->told_subsumers = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
 	// r->told_subsumer_count = 0;
-	r->told_subsumees = create_key_value_hash_table(DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
+	r->told_subsumees = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
-	r->subsumers = create_key_hash_table(DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
+	r->subsumers = hash_table_create(DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
 
 	r->subsumee_list = NULL;
 	r->subsumee_count = 0;
-	r->subsumees = create_key_hash_table(DEFAULT_ROLE_SUBSUMEES_HASH_SIZE);
+	r->subsumees = hash_table_create(DEFAULT_ROLE_SUBSUMEES_HASH_SIZE);
 
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
-	r->first_component_of = create_key_hash_table(DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
+	r->first_component_of = hash_table_create(DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
 
 	r->second_component_of_count = 0;
 	r->second_component_of_list = NULL;
-	r->second_component_of = create_key_hash_table(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
+	r->second_component_of = hash_table_create(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
-	put_atomic_role((unsigned char*) r->description.atomic->name, r, tbox);
+	PUT_ATOMIC_ROLE(r->description.atomic->name, r, tbox);
 	tbox->atomic_role_count++;
 
 	return r;
@@ -374,7 +359,7 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 	Role* r;
 
 	tbox->binary_role_composition_count++;
-	if ((r = get_role_composition(r1, r2, tbox)) != NULL)
+	if ((r = GET_ROLE_COMPOSITION(r1, r2, tbox)) != NULL)
 		return r;
 
 	r = (Role*) malloc(sizeof(Role));
@@ -388,28 +373,28 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 	r->description.role_composition->role2 = r2;
 	r->id = tbox->last_role_id++;
 
-	r->told_subsumers = create_key_value_hash_table(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
+	r->told_subsumers = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
 	// r->told_subsumers = NULL;
 	// r->told_subsumer_count = 0;
-	r->told_subsumees = create_key_value_hash_table(DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
+	r->told_subsumees = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
-	r->subsumers = create_key_hash_table(DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
+	r->subsumers = hash_table_create(DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
 
 	r->subsumee_list = NULL;
 	r->subsumee_count = 0;
-	r->subsumees = create_key_hash_table(DEFAULT_ROLE_SUBSUMEES_HASH_SIZE);
+	r->subsumees = hash_table_create(DEFAULT_ROLE_SUBSUMEES_HASH_SIZE);
 
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
-	r->first_component_of = create_key_hash_table(DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
+	r->first_component_of = hash_table_create(DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
 
 	r->second_component_of_count = 0;
 	r->second_component_of_list = NULL;
-	r->second_component_of = create_key_hash_table(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
+	r->second_component_of = hash_table_create(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
-	put_role_composition(r, tbox);
+	PUT_ROLE_COMPOSITION(r, tbox);
 	tbox->unique_binary_role_composition_count++;
 
 	return r;
@@ -435,7 +420,7 @@ Role* get_create_role_composition(int size, Role** roles, TBox* tbox) {
  * create functions for axioms
  *****************************************************************************/
 // create the subclass axiom with the given concept descriptions
-SubClassAxiom* create_subclass_axiom(Concept* lhs, Concept* rhs) {
+SubClassAxiom* create_subclass_axiom(ClassExpression* lhs, ClassExpression* rhs) {
 	SubClassAxiom* ax = (SubClassAxiom*) malloc(sizeof(SubClassAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
@@ -444,7 +429,7 @@ SubClassAxiom* create_subclass_axiom(Concept* lhs, Concept* rhs) {
 }
 
 // create the equivalent classes axiom with the given concept descriptions
-EqClassAxiom* create_eqclass_axiom(Concept* lhs, Concept* rhs) {
+EqClassAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpression* rhs) {
 	/*
 	if (lhs->type != ATOMIC_CONCEPT) {
 		fprintf(stderr,"the lhs of an equivalent classes axiom must be an atomic concept, aborting\n");
@@ -459,10 +444,10 @@ EqClassAxiom* create_eqclass_axiom(Concept* lhs, Concept* rhs) {
 }
 
 // create the disjointclasses axiom with the given concept descriptions
-DisjointClassesAxiom* create_disjointclasses_axiom(int concept_count, Concept** concepts) {
+DisjointClassesAxiom* create_disjointclasses_axiom(int concept_count, ClassExpression** concepts) {
 	DisjointClassesAxiom* ax = (DisjointClassesAxiom*) calloc(1, sizeof(DisjointClassesAxiom));
 	assert(ax != NULL);
-	ax->concepts = (Concept**) calloc(concept_count, sizeof(Concept*));
+	ax->concepts = (ClassExpression**) calloc(concept_count, sizeof(ClassExpression*));
 	assert(ax->concepts != NULL);
 	ax->concept_count = concept_count;
 	int i;
@@ -571,7 +556,7 @@ Individual* get_create_individual(char* name, ABox* abox) {
 	Individual* i;
 
 	// check if an individual with this name already exists in the ABox
-	if ((i = (Individual*) GET_INDIVIDUAL((unsigned char*) name, abox)) != NULL)
+	if ((i = (Individual*) GET_INDIVIDUAL(name, abox)) != NULL)
 		return i;
 
 	// if an individual with the name does not already exist, create it
@@ -584,7 +569,7 @@ Individual* get_create_individual(char* name, ABox* abox) {
 	assert(i->name != NULL);
 	strcpy(i->name, name);
 
-	PUT_INDIVIDUAL((unsigned char*) i->name, i, abox);
+	PUT_INDIVIDUAL(i->name, i, abox);
 
 	++abox->individual_count;
 
@@ -595,7 +580,7 @@ Individual* get_create_individual(char* name, ABox* abox) {
  * create functions for assertions
  *****************************************************************************/
 // create the concept assertion with the given individual and concept
-ConceptAssertion* create_concept_assertion(Individual* ind, Concept* c) {
+ConceptAssertion* create_concept_assertion(Individual* ind, ClassExpression* c) {
 	ConceptAssertion* as = (ConceptAssertion*) malloc(sizeof(ConceptAssertion));
 	assert(as != NULL);
 	as->individual = ind;

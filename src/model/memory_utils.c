@@ -23,43 +23,39 @@
 
 #include "datatypes.h"
 #include "limits.h"
-#include "../hashing/key_value_hash_table.h"
+#include "../utils/set.h"
+#include "../hashing/hash_map.h"
 
 
 
-int free_concept(Concept* c, TBox* tbox) {
+int free_concept(ClassExpression* c, TBox* tbox) {
 	int total_freed_bytes = 0;
 
 	// free the 3 different description types
 	switch (c->type) {
-	case ATOMIC_CONCEPT:
+	case CLASS_TYPE:
 		// free the equivalent concepts list
-		total_freed_bytes += sizeof(Concept*) * c->description.atomic->equivalent_concepts_count;
-		free(c->description.atomic->equivalent_concepts_list);
+		total_freed_bytes += list_free(c->description.atomic->equivalent_classes);
 
-		// free the direct subsumers hash
-		total_freed_bytes += free_key_hash_table(c->description.atomic->direct_subsumers);
+		// free the direct subsumers set
+		total_freed_bytes += set_free(c->description.atomic->direct_subsumers);
 
-		// now the direct subsumers list
-		total_freed_bytes += sizeof(Concept*) * c->description.atomic->direct_subsumer_count;
-		free(c->description.atomic->direct_subsumer_list);
+		total_freed_bytes += sizeof(char) * strlen(c->description.atomic->IRI);
+		free(c->description.atomic->IRI);
 
-		total_freed_bytes += sizeof(char) * strlen(c->description.atomic->name);
-		free(c->description.atomic->name);
-
-		total_freed_bytes += sizeof(AtomicConcept);
+		total_freed_bytes += sizeof(Class);
 		free(c->description.atomic);
 		break;
-	case CONJUNCTION:
-		total_freed_bytes += sizeof(Conjunction);
+	case OBJECT_INTERSECTION_OF_TYPE:
+		total_freed_bytes += sizeof(ObjectIntersectionOf);
 		free(c->description.conj);
 		break;
-	case EXISTENTIAL_RESTRICTION:
-		total_freed_bytes += sizeof(Exists);
+	case OBJECT_SOME_VALUES_FROM_TYPE:
+		total_freed_bytes += sizeof(ObjectSomeValuesFrom);
 		free(c->description.exists);
 		break;
-	case NOMINAL:
-		total_freed_bytes += sizeof(Nominal);
+	case OBJECT_ONE_OF_TYPE:
+		total_freed_bytes += sizeof(ObjectOneOf);
 		free(c->description.nominal);
 		break;
 	default:
@@ -67,22 +63,17 @@ int free_concept(Concept* c, TBox* tbox) {
 		exit(-1);
 	}
 
-	// free the told subsumers hash
-	total_freed_bytes += sizeof(Concept*) * c->told_subsumer_count;
-	free(c->told_subsumers);
-
-	// free the subsumers list
-	total_freed_bytes += sizeof(Concept*) * c->subsumer_count;
-	free(c->subsumer_list);
+	// free the told subsumers list
+	total_freed_bytes += list_free(c->told_subsumers);
 
 	// free the subsumers hash
-	total_freed_bytes += free_key_hash_table(c->subsumers);
+	total_freed_bytes += SET_FREE(c->subsumers);
 
 	// free the predecessors matrix.
 	int i;
 	for (i = 0; i < c->predecessor_r_count; ++i) {
 		free(c->predecessors[i]->fillers);
-		total_freed_bytes += c->predecessors[i]->filler_count * sizeof(Concept*);
+		total_freed_bytes += c->predecessors[i]->filler_count * sizeof(ClassExpression*);
 		free(c->predecessors[i]);
 		total_freed_bytes += sizeof(Link);
 	}
@@ -92,7 +83,7 @@ int free_concept(Concept* c, TBox* tbox) {
 	// similarly free the successors hash.
 	for (i = 0; i < c->successor_r_count; ++i) {
 		free(c->successors[i]->fillers);
-		total_freed_bytes += c->successors[i]->filler_count * sizeof(Concept*);
+		total_freed_bytes += c->successors[i]->filler_count * sizeof(ClassExpression*);
 		free(c->successors[i]);
 		total_freed_bytes += sizeof(Link);
 	}
@@ -101,24 +92,24 @@ int free_concept(Concept* c, TBox* tbox) {
 
 	// free the filler of negative existentials hash
 	free(c->filler_of_negative_exists);
-	total_freed_bytes += (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(Concept*);
+	total_freed_bytes += (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(ClassExpression*);
 
 	// free the list of conjunctions where this concept occurs
 	free(c->first_conjunct_of_list);
-	total_freed_bytes += sizeof(Concept*) * c->first_conjunct_of_count;
+	total_freed_bytes += sizeof(ClassExpression*) * c->first_conjunct_of_count;
 	// free it if the first_conjunct_of hash exists
 	if (c->first_conjunct_of != NULL)
 		total_freed_bytes += free_key_hash_table(c->first_conjunct_of);
 
 	// now for the second conjunct
 	free(c->second_conjunct_of_list);
-	total_freed_bytes += sizeof(Concept*) * c->second_conjunct_of_count;
+	total_freed_bytes += sizeof(ClassExpression*) * c->second_conjunct_of_count;
 	// free it if the second_conjunct_of hash exists
 	if (c->second_conjunct_of != NULL)
 		total_freed_bytes += free_key_hash_table(c->second_conjunct_of);
 
 	// finally free this concept
-	total_freed_bytes += sizeof(Concept);
+	total_freed_bytes += sizeof(ClassExpression);
 	free(c);
 
 	return total_freed_bytes;
@@ -143,9 +134,9 @@ int free_role(Role* r) {
 	// free the told subsumers list
 	// total_freed_bytes += sizeof(Role*) * r->told_subsumer_count;
 	// free(r->told_subsumers);
-	total_freed_bytes += free_key_value_hash_table(r->told_subsumers);
+	total_freed_bytes += hash_map_free(r->told_subsumers);
 
-	total_freed_bytes += free_key_value_hash_table(r->told_subsumees);
+	total_freed_bytes += hash_map_free(r->told_subsumees);
 
 	// free the  subsumers list
 	total_freed_bytes += sizeof(Role*) * r->subsumer_count;
@@ -200,7 +191,7 @@ int free_tbox(TBox* tbox) {
 	// free the disjoint classes axioms
 	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i) {
 		free(tbox->disjointclasses_axioms[i]->concepts);
-		total_freed_bytes += tbox->disjointclasses_axioms[i]->concept_count * sizeof(Concept*);
+		total_freed_bytes += tbox->disjointclasses_axioms[i]->concept_count * sizeof(ClassExpression*);
 		free(tbox->disjointclasses_axioms[i]);
 	}
 	total_freed_bytes += tbox->disjointclasses_axiom_count * sizeof(DisjointClassesAxiom);
@@ -229,65 +220,65 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += sizeof(TransitiveRoleAxiom*) * tbox->transitive_role_axiom_count;
 
 	// iterate over the existentials hash, free the existentials
-	Node* node = last_node(tbox->exists_restrictions);
+	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->exists_restrictions);
 	while (node) {
-		total_freed_bytes += free_concept((Concept*) node->value, tbox);
-		node = previous_node(node);
+		total_freed_bytes += free_concept((ClassExpression*) node->value, tbox);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the existentials hash
-	total_freed_bytes += free_key_value_hash_table(tbox->exists_restrictions);
+	total_freed_bytes += hash_map_free(tbox->exists_restrictions);
 
 	// iterate over the conjunctions hash, free the conjunctions
-	node = last_node(tbox->conjunctions);
+	node = HASH_MAP_LAST_ELEMENT(tbox->conjunctions);
 	while (node) {
-		total_freed_bytes += free_concept((Concept*) node->value, tbox);
-		node = previous_node(node);
+		total_freed_bytes += free_concept((ClassExpression*) node->value, tbox);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the conjunctions hash
-	total_freed_bytes += free_key_value_hash_table(tbox->conjunctions);
+	total_freed_bytes += hash_map_free(tbox->conjunctions);
 
 	// iterate over the nominals hash, free the nominals
-	node = last_node(tbox->nominals);
+	node = HASH_MAP_LAST_ELEMENT(tbox->nominals);
 	while (node) {
-		total_freed_bytes += free_concept((Concept*) node->value, tbox);
-		node = previous_node(node);
+		total_freed_bytes += free_concept((ClassExpression*) node->value, tbox);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the nominals hash
-	total_freed_bytes += free_key_value_hash_table(tbox->nominals);
+	total_freed_bytes += hash_map_free(tbox->nominals);
 
 	// iterate over the atomic concepts hash, free the atomic concepts
-	node = last_node(tbox->atomic_concepts);
+	node = HASH_MAP_LAST_ELEMENT(tbox->atomic_concepts);
 	while (node) {
-		total_freed_bytes += free_concept((Concept*) node->value, tbox);
-		node = previous_node(node);
+		total_freed_bytes += free_concept((ClassExpression*) node->value, tbox);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the atomic concepts hash
-	total_freed_bytes += free_key_value_hash_table(tbox->atomic_concepts);
+	total_freed_bytes += hash_map_free(tbox->atomic_concepts);
 
 	// free the atomic concepts list
 	// this is the list kept for efficiently traversing over atomic concepts
 	// in hierarchy computation. the actual place for keeping atomic concepts
 	// is the atomic_concepts hash.
 	free(tbox->atomic_concept_list);
-	total_freed_bytes += sizeof(Concept*) * tbox->atomic_concept_count;
+	total_freed_bytes += sizeof(ClassExpression*) * tbox->atomic_concept_count;
 
 	// iterate over the role_compositions hash, free the role compositions
-	node = last_node(tbox->role_compositions);
+	node = HASH_MAP_LAST_ELEMENT(tbox->role_compositions);
 	while (node) {
 		total_freed_bytes += free_role((Role*) node->value);
-		node = previous_node(node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the role compositions hash
-	total_freed_bytes += free_key_value_hash_table(tbox->role_compositions);
+	total_freed_bytes += hash_map_free(tbox->role_compositions);
 
 	// iterate over atomic roles, free them
-	node = last_node(tbox->atomic_roles);
+	node = HASH_MAP_LAST_ELEMENT(tbox->atomic_roles);
 	while (node) {
 		total_freed_bytes += free_role((Role*) node->value);
-		node = previous_node(node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the atomic roles hash
-	total_freed_bytes += free_key_value_hash_table(tbox->atomic_roles);
+	total_freed_bytes += hash_map_free(tbox->atomic_roles);
 
 	// finally free the tbox itself
 	free(tbox);
@@ -326,13 +317,13 @@ int free_abox(ABox* abox) {
 	total_freed_bytes += sizeof(RoleAssertion*) * abox->role_assertion_count;
 
 	// iterate over the individuals hash, free the individuals
-	Node* node = last_node(abox->individuals);
+	HashMapElement* node = HASH_MAP_LAST_ELEMENT(abox->individuals);
 	while (node) {
 		total_freed_bytes += free_individual((Individual*) node->value);
-		node = previous_node(node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the individuals hash
-	total_freed_bytes += free_key_value_hash_table(abox->individuals);
+	total_freed_bytes += hash_map_free(abox->individuals);
 
 	// finally free the abox itself
 	free(abox);
@@ -390,22 +381,22 @@ int free_kb(KB* kb) {
 	total_freed_bytes += sizeof(SubRoleAxiom*) * kb->generated_subrole_axiom_count;
 
 	// iterate over the generated nominals hash, free the nominals
-	Node* node = last_node(kb->generated_nominals);
+	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);
 	while (node) {
-		total_freed_bytes += free_concept((Concept*) node->value, kb->tbox);
-		node = previous_node(node);
+		total_freed_bytes += free_concept((ClassExpression*) node->value, kb->tbox);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the generated nominals hash
-	total_freed_bytes += free_key_value_hash_table(kb->generated_nominals);
+	total_freed_bytes += hash_map_free(kb->generated_nominals);
 
 	// iterate over the generated existential restrictions hash, free them
-	node = last_node(kb->generated_exists_restrictions);
+	node = HASH_MAP_LAST_ELEMENT(kb->generated_exists_restrictions);
 	while (node) {
-		total_freed_bytes += free_concept((Concept*) node->value, kb->tbox);
-		node = previous_node(node);
+		total_freed_bytes += free_concept((ClassExpression*) node->value, kb->tbox);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the generated nominals hash
-	total_freed_bytes += free_key_value_hash_table(kb->generated_exists_restrictions);
+	total_freed_bytes += hash_map_free(kb->generated_exists_restrictions);
 
 	return total_freed_bytes;
 }

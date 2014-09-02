@@ -31,8 +31,8 @@ enum saturation_axiom_type {
 };
 
 struct concept_saturation_axiom {
-	Concept* lhs;
-	Concept* rhs;
+	ClassExpression* lhs;
+	ClassExpression* rhs;
 	Role* role;
 	enum saturation_axiom_type type;
 };

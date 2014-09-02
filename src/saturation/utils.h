@@ -22,10 +22,10 @@
 
 #include "datatypes.h"
 #include "../model/utils.h"
-#include "../hashing/key_hash_table.h"
+#include "../hashing/hash_table.h"
 
 
-#define IS_SUBSUMED_BY(c1,c2)						contains_key(c1->subsumers, c2->id)
+#define IS_SUBSUMED_BY(c1,c2)						SET_CONTAINS(c2, c1->subsumers)
 
 // unsigned long hash_it(int x, int y);
 // long long hash_it(int x, int y);
@@ -34,10 +34,10 @@
 
 // int add_predecessor(Concept* c, Concept* ex);
 // add r-predecessor p to c
-int add_predecessor(Concept* c, Role* r, Concept* p, TBox* tbox);
+int add_predecessor(ClassExpression* c, Role* r, ClassExpression* p, TBox* tbox);
 
 // int add_successor(Concept* c, Concept* ex);
 // add r-successor s to c
-int add_successor(Concept* c, Role* r, Concept* s, TBox* tbox);
+int add_successor(ClassExpression* c, Role* r, ClassExpression* s, TBox* tbox);
 
 #endif /* SATURATION_UTILS_H_ */

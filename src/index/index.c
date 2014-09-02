@@ -36,19 +36,19 @@ extern int generated_subrole_axiom_count;
 */
 
 
-void index_concept(Concept* c, TBox* tbox) {
+void index_concept(ClassExpression* c, TBox* tbox) {
 
 	switch (c->type) {
-	case ATOMIC_CONCEPT:
-	case NOMINAL:
+	case CLASS_TYPE:
+	case OBJECT_ONE_OF_TYPE:
 		break;
-	case CONJUNCTION:
+	case OBJECT_INTERSECTION_OF_TYPE:
 		index_concept(c->description.conj->conjunct1, tbox);
 		index_concept(c->description.conj->conjunct2, tbox);
 		add_to_first_conjunct_of_list(c->description.conj->conjunct1, c);
 		add_to_second_conjunct_of_list(c->description.conj->conjunct2, c);
 		break;
-	case EXISTENTIAL_RESTRICTION:
+	case OBJECT_SOME_VALUES_FROM_TYPE:
 		// add_to_filler_of_list(c->description.exists->filler, c);
 		add_to_negative_exists(c, tbox);
 		index_concept(c->description.exists->filler, tbox);
@@ -99,7 +99,7 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 			if (tbox->subclass_axioms[i]->lhs != tbox->bottom_concept)
 				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
-			if (tbox->subclass_axioms[i]->lhs->type == NOMINAL || tbox->subclass_axioms[i]->lhs == tbox->top_concept)
+			if (tbox->subclass_axioms[i]->lhs->type == OBJECT_ONE_OF_TYPE || tbox->subclass_axioms[i]->lhs == tbox->top_concept)
 				// return inconsistent immediately
 				return -1;
 		}
@@ -114,7 +114,7 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 			index_concept(tbox->subclass_axioms[i]->lhs, tbox);
 			continue;
 		}
-		add_told_subsumer_concept(tbox->subclass_axioms[i]->lhs, tbox->subclass_axioms[i]->rhs);
+		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(tbox->subclass_axioms[i]->rhs, tbox->subclass_axioms[i]->lhs);
 		index_concept(tbox->subclass_axioms[i]->lhs, tbox);
 	}
 
@@ -126,7 +126,7 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 			if (kb->generated_subclass_axioms[i]->lhs != tbox->bottom_concept)
 				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
-			if (kb->generated_subclass_axioms[i]->lhs->type == NOMINAL || kb->generated_subclass_axioms[i]->lhs == tbox->top_concept)
+			if (kb->generated_subclass_axioms[i]->lhs->type == OBJECT_ONE_OF_TYPE || kb->generated_subclass_axioms[i]->lhs == tbox->top_concept)
 				// return inconsistent immediately
 				return -1;
 		}
@@ -141,7 +141,7 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 			index_concept(kb->generated_subclass_axioms[i]->lhs, tbox);
 			continue;
 		}
-		add_told_subsumer_concept(kb->generated_subclass_axioms[i]->lhs, kb->generated_subclass_axioms[i]->rhs);
+		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(kb->generated_subclass_axioms[i]->rhs, kb->generated_subclass_axioms[i]->lhs);
 		index_concept(kb->generated_subclass_axioms[i]->lhs, tbox);
 	}
 
