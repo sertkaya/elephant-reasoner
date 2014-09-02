@@ -19,36 +19,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <sys/time.h>
 
 #include "../hashing/hash_table.h"
+#include "../utils/timer.h"
+
 
 int main(int argc, char *argv[]) {
+	struct timeval start_time, stop_time;
+	size_t i;
+	int test_size = atoi(argv[1]);
+	int hash_table_size = atoi(argv[2]);
 
-	HashTable* hash_table = hash_table_create(20);
+	int* tmp = malloc(test_size * sizeof(int));
+	assert(tmp != NULL);
 
-	int i;
-	void* tmp[100];
-	for (i = 0; i < 100; ++i) {
-		tmp[i] = malloc(sizeof(void));
-		assert(tmp[i] != NULL);
-		hash_table_insert(hash_table, tmp[i]);
+	HashTable* hash_table = hash_table_create(hash_table_size);
+	printf("%d put operations .........................: ", test_size);
+	fflush(stdout);
+	START_TIMER(start_time);
+	for (i = 0; i < test_size; ++i) {
+		tmp[i] = i+1;
+		hash_table_insert(hash_table, (void*) tmp[i]);
 	}
+	STOP_TIMER(stop_time);
+	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 
-	hash_table_remove(hash_table, tmp[10]);
-
-
-	/*
-	for (i = 0; i < 100; ++i)
-		if (!hash_table_contains(hash_table, tmp[i]))
-			printf("%d: not found!\n", i);
-			*/
-
+	printf("Iterating .........................: ");
+	fflush(stdout);
+	START_TIMER(start_time);
 	HashTableIterator* it = hash_table_iterator_create(hash_table);
 	void* e = hash_table_iterator_next(it);
-	while (e != NULL) {
-		printf("%p\n", e);
+	while (e) {
 		e = hash_table_iterator_next(it);
 	}
+	STOP_TIMER(stop_time);
+	printf("done in %.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 
 	return 1;
 }

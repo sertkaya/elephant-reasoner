@@ -23,30 +23,30 @@
 #include "datatypes.h"
 #include "model.h"
 #include "limits.h"
-#include "../hashing/key_hash_table.h"
-#include "../hashing/key_value_hash_table.h"
+#include "../hashing/hash_table.h"
+#include "../hashing/hash_map.h"
 
 
-void print_atomic_concept(AtomicConcept* ac);
-void print_exists(Exists* exists);
-void print_conjunction(Conjunction* conjunction);
-void print_nominal(Nominal* n);
+void print_atomic_concept(Class* ac);
+void print_exists(ObjectSomeValuesFrom* exists);
+void print_conjunction(ObjectIntersectionOf* conjunction);
+void print_nominal(ObjectOneOf* n);
 
 void print_atomic_role(AtomicRole* ar);
 void print_role_composition(RoleComposition* rc);
 
-void print_concept(Concept* c) {
+void print_concept(ClassExpression* c) {
 	switch (c->type) {
-		case ATOMIC_CONCEPT:
+		case CLASS_TYPE:
 			print_atomic_concept(c->description.atomic);
 			break;
-		case EXISTENTIAL_RESTRICTION:
+		case OBJECT_SOME_VALUES_FROM_TYPE:
 			print_exists(c->description.exists);
 			break;
-		case CONJUNCTION:
+		case OBJECT_INTERSECTION_OF_TYPE:
 			print_conjunction(c->description.conj);
 			break;
-		case NOMINAL:
+		case OBJECT_ONE_OF_TYPE:
 			print_nominal(c->description.nominal);
 			break;
 		default:
@@ -69,18 +69,18 @@ void print_role(Role* r) {
 	}
 }
 	
-void print_atomic_concept(AtomicConcept* ac) {
-	printf("%s ", ac->name);
+void print_atomic_concept(Class* ac) {
+	printf("%s ", ac->IRI);
 }
 
-void print_exists(Exists* ex) {
+void print_exists(ObjectSomeValuesFrom* ex) {
 	printf("(Some ");
 	print_role(ex->role);
 	print_concept(ex->filler);
 	printf(")");
 }
 
-void print_conjunction(Conjunction* conj) {
+void print_conjunction(ObjectIntersectionOf* conj) {
 	printf("(And  ");
 	print_concept(conj->conjunct1);
 	printf("  ");
@@ -88,16 +88,16 @@ void print_conjunction(Conjunction* conj) {
 	printf(")\n");
 }
 
-void print_nominal(Nominal* n) {
+void print_nominal(ObjectOneOf* n) {
 	printf("{%s} ", n->individual->name);
 }
 
 void print_conjunctions(TBox* tbox) {
 
-	Node* node = last_node(tbox->conjunctions);
+	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->conjunctions);
 	while (node) {
-		print_conjunction(((Concept*) node->value)->description.conj);
-		node = previous_node(node);
+		print_conjunction(((ClassExpression*) node->value)->description.conj);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 }
 
@@ -148,21 +148,16 @@ void print_tbox(TBox* tbox) {
 	}
 }
 
-void print_equivalent_concepts(Concept* c, FILE* taxonomy_fp) {
-	int i;
+void print_direct_subsumers(TBox* tbox, ClassExpression* c, FILE* taxonomy_fp) {
+	SetIterator* direct_subsumers_iterator = SET_ITERATOR_CREATE(c->description.atomic->direct_subsumers);
+	void* direct_subsumer = SET_ITERATOR_NEXT(direct_subsumers_iterator);
 
-	for (i = 0; i < c->description.atomic->equivalent_concepts_count; ++i)
-		if (c != c->description.atomic->equivalent_concepts_list[i]) // to avoid EquivalentConcepts(c,c)
-			fprintf(taxonomy_fp, "EquivalentConcepts(%s, %s)\n", c->description.atomic->name,
-					c->description.atomic->equivalent_concepts_list[i]->description.atomic->name);
-}
-
-void print_direct_subsumers(TBox* tbox, Concept* c, FILE* taxonomy_fp) {
-	int i;
-
-	for (i = 0; i < c->description.atomic->direct_subsumer_count; ++i)
-		fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", c->description.atomic->name,
-				c->description.atomic->direct_subsumer_list[i]->description.atomic->name);
+	while (direct_subsumer != NULL) {
+		fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", c->description.atomic->IRI,
+				((ClassExpression*) direct_subsumer)->description.atomic->IRI);
+		direct_subsumer = SET_ITERATOR_NEXT(direct_subsumers_iterator);
+	}
+	SET_ITERATOR_FREE(direct_subsumers_iterator);
 }
 
 void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
@@ -184,33 +179,35 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	}
 
 	// for keeping track of already printed equivalence classes
-	KeyHashTable* printed = create_key_hash_table(10);
+	Set* printed = SET_CREATE(10);
 
 	for (i = 0; i < kb->tbox->atomic_concept_count; ++i) {
 		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
 		// check if the equivalence class is already printed
-		if (!contains_key(printed, kb->tbox->atomic_concept_list[i]->id)) {
+		if (!SET_CONTAINS(kb->tbox->atomic_concept_list[i], printed)) {
 			// do not print the direct subsumers of bottom
 			if (kb->tbox->atomic_concept_list[i] != kb->tbox->bottom_concept)
 				print_direct_subsumers(kb->tbox, kb->tbox->atomic_concept_list[i], taxonomy_fp);
 
 			char printing_equivalents = 0;
-			if (kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count > 0) {
-				fprintf(taxonomy_fp, "EquivalentClasses(%s", kb->tbox->atomic_concept_list[i]->description.atomic->name);
+			if (kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_classes->size > 0) {
+				fprintf(taxonomy_fp, "EquivalentClasses(%s", kb->tbox->atomic_concept_list[i]->description.atomic->IRI);
 				printing_equivalents = 1;
 			}
-			int j;
-			for (j = 0; j < kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_count; ++j ) {
+			ListIterator* equivalents_iterator = list_iterator_create(kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_classes);
+			ClassExpression* equivalent_class = (ClassExpression*) list_iterator_next(equivalents_iterator);
+			while (equivalent_class != NULL) {
 				// mark the concepts in the equivalent classes as already printed
-				insert_key(printed, kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->id);
+				SET_ADD(equivalent_class, printed);
 				// now print it
-				fprintf(taxonomy_fp, " %s", kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_concepts_list[j]->description.atomic->name);
+				fprintf(taxonomy_fp, " %s", equivalent_class->description.atomic->IRI);
+				equivalent_class = (ClassExpression*) list_iterator_next(equivalents_iterator);
 			}
 			if (printing_equivalents)
 				fprintf(taxonomy_fp, ")\n");
 		}
 	}
-	free_key_hash_table(printed);
+	SET_FREE(printed);
 
 	// the closing parentheses for the ontology tag
 	fprintf(taxonomy_fp, ")\n");
@@ -236,16 +233,31 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 	}
 
 	// Traverse the hash of nominals that are generated during preprocessing.
-	Node* node = last_node(kb->generated_nominals);
-	Concept* nominal = NULL;
+	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);
+	ClassExpression* nominal = NULL;
 	while (node) {
-		nominal = (Concept*) node->value;
+		nominal = (ClassExpression*) node->value;
+
+
+		SetIterator* subsumers_iterator = SET_ITERATOR_CREATE(nominal->subsumers);
+		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+		while (subsumer != NULL) {
+			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+			if (subsumer->type == CLASS_TYPE)
+				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n",
+						subsumer->description.atomic->IRI,
+						nominal->description.nominal->individual->name);
+		}
+		SET_ITERATOR_FREE(subsumers_iterator);
+
+		/*
 		for (i = 0; i < nominal->subsumer_count; ++i)
 			if (nominal->subsumer_list[i]->type == ATOMIC_CONCEPT)
 				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n",
 						nominal->subsumer_list[i]->description.atomic->name,
 						nominal->description.nominal->individual->name);
-		node = previous_node(node);
+		*/
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 
 	// the closing parentheses for the ontology tag

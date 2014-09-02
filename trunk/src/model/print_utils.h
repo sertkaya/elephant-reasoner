@@ -25,8 +25,8 @@
 #include "datatypes.h"
 
 // utility functions for printing concepts, axioms and statistics
-void print_exists(Exists* ex);
-void print_concept(Concept* c);
+void print_exists(ObjectSomeValuesFrom* ex);
+void print_concept(ClassExpression* c);
 void print_subclass_axiom(SubClassAxiom* subclass_ax);
 void print_eqclass_axiom(EqClassAxiom* subclass_ax);
 void print_subrole_axiom(SubRoleAxiom* subrole_ax);

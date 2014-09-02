@@ -28,8 +28,8 @@
 #include "../model/limits.h"
 #include "../utils/stack.h"
 #include "../index/utils.h"
-#include "../hashing/key_hash_table.h"
-#include "../hashing/key_value_hash_table.h"
+#include "../hashing/hash_table.h"
+#include "../hashing/hash_map.h"
 #include "utils.h"
 
 // for statistics
@@ -37,9 +37,9 @@ int saturation_unique_subsumption_count = 0, saturation_total_subsumption_count 
 int saturation_unique_link_count = 0, saturation_total_link_count = 0;
 
 // marks the axiom with the premise lhs and conclusion rhs as processed
-#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		insert_key(ax->lhs->subsumers, ax->rhs->id)
+#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		SET_ADD(ax->rhs, ax->lhs->subsumers)
 
-ConceptSaturationAxiom* create_concept_saturation_axiom(Concept* lhs, Concept* rhs, Role* role, enum saturation_axiom_type type) {
+static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpression* lhs, ClassExpression* rhs, Role* role, enum saturation_axiom_type type) {
 	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
@@ -69,18 +69,18 @@ char saturate_concepts(KB* kb) {
 	int i, j, k;
 
 	for (i = 0; i < tbox->atomic_concept_count ; ++i)
-		for (j = 0; j < tbox->atomic_concept_list[i]->told_subsumer_count; ++j)
-			push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers[j], NULL, SUBSUMPTION_INITIALIZATION));
+		for (j = 0; j < tbox->atomic_concept_list[i]->told_subsumers->size; ++j)
+			push(&scheduled_axioms, create_concept_saturation_axiom(tbox->atomic_concept_list[i], tbox->atomic_concept_list[i]->told_subsumers->elements[j], NULL, SUBSUMPTION_INITIALIZATION));
 
 	// Traverse the hash of nominals that are generated during preprocessing.
-	Node* node = last_node(kb->generated_nominals);
-	Concept* nominal = NULL;
+	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);
+	ClassExpression* nominal = NULL;
 	// The input axioms generated from concept and role assertions
 	while (node) {
-		nominal = (Concept*) node->value;
-		for (j = 0; j < nominal->told_subsumer_count; ++j)
-			push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal->told_subsumers[j], NULL, SUBSUMPTION_INITIALIZATION));
-		node = previous_node(node);
+		nominal = (ClassExpression*) node->value;
+		for (j = 0; j < nominal->told_subsumers->size; ++j)
+			push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal->told_subsumers->elements[j], NULL, SUBSUMPTION_INITIALIZATION));
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 
 	ax = pop(&scheduled_axioms);
@@ -102,8 +102,6 @@ char saturate_concepts(KB* kb) {
 				printf("\n");
 				*/
 
-				add_to_concept_subsumer_list(ax->lhs, ax->rhs);
-
 				// conjunction introduction
 				// the first conjunct
 				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
@@ -120,7 +118,7 @@ char saturate_concepts(KB* kb) {
 				}
 
 				// existential introduction
-				Concept* ex;
+				ClassExpression* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
 					for (j = 0; j < ax->lhs->predecessors[i]->role->subsumer_count; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i]->role->subsumer_list[j]);
@@ -131,8 +129,8 @@ char saturate_concepts(KB* kb) {
 
 
 				// told subsumers
-				for (i = 0; i < ax->rhs->told_subsumer_count; i++)
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i], NULL, SUBSUMPTION_TOLD_SUBSUMER));
+				for (i = 0; i < ax->rhs->told_subsumers->size; ++i)
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->told_subsumers->elements[i], NULL, SUBSUMPTION_TOLD_SUBSUMER));
 			}
 			break;
 		case SUBSUMPTION_INITIALIZATION:
@@ -143,8 +141,6 @@ char saturate_concepts(KB* kb) {
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
-
-				add_to_concept_subsumer_list(ax->lhs, ax->rhs);
 
 				/*
 				printf("SUBS:");
@@ -157,7 +153,7 @@ char saturate_concepts(KB* kb) {
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
 					// If the top concept or a nominal is subsumed by bottom, the kb is inconsistent
-					if (ax->lhs->type == NOMINAL || ax->lhs == tbox->top_concept)
+					if (ax->lhs->type == OBJECT_ONE_OF_TYPE || ax->lhs == tbox->top_concept)
 						// return inconsistent immediately
 						return -1;
 					// We push the saturation axiom bottom <= ax->lhs, if we already know ax->lhs <= bottom. This way ax->lhs = bottom
@@ -185,7 +181,7 @@ char saturate_concepts(KB* kb) {
 				}
 
 				switch (ax->rhs->type) {
-				case CONJUNCTION:
+				case OBJECT_INTERSECTION_OF_TYPE:
 					// conjunction decomposition
 					// conjunct 1 as rhs
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj->conjunct1, NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
@@ -193,7 +189,7 @@ char saturate_concepts(KB* kb) {
 					// conjunct 2 as rhs
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj->conjunct2, NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
 					break;
-				case EXISTENTIAL_RESTRICTION:
+				case OBJECT_SOME_VALUES_FROM_TYPE:
 					// existential decomposition
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.exists->filler, ax->rhs->description.exists->role, LINK));
 					break;
@@ -201,7 +197,7 @@ char saturate_concepts(KB* kb) {
 
 				// existential introduction
 				int j,k;
-				Concept* ex;
+				ClassExpression* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
 					for (j = 0; j < ax->lhs->predecessors[i]->role->subsumer_count; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i]->role->subsumer_list[j]);
@@ -212,8 +208,8 @@ char saturate_concepts(KB* kb) {
 
 
 				// told subsumers
-				for (i = 0; i < ax->rhs->told_subsumer_count; i++)
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i], NULL, SUBSUMPTION_TOLD_SUBSUMER));
+				for (i = 0; i < ax->rhs->told_subsumers->size; ++i)
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->told_subsumers->elements[i], NULL, SUBSUMPTION_TOLD_SUBSUMER));
 			}
 			break;
 		case LINK:
@@ -240,13 +236,17 @@ char saturate_concepts(KB* kb) {
 
 
 				// existential introduction
-				for (i = 0; i < ax->rhs->subsumer_count; ++i)
+				SetIterator* subsumers_iterator = SET_ITERATOR_CREATE(ax->rhs->subsumers);
+				ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+				while (subsumer != NULL) {
 					for (j = 0; j < ax->role->subsumer_count; ++j) {
-						Concept* ex = GET_NEGATIVE_EXISTS(ax->rhs->subsumer_list[i], ax->role->subsumer_list[j]);
+						ClassExpression* ex = GET_NEGATIVE_EXISTS(subsumer, ax->role->subsumer_list[j]);
 						if (ex != NULL)
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
-
+					subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+				}
+				SET_ITERATOR_FREE(subsumers_iterator);
 
 				// the role chain rule
 				// the role composition where this role appears as the second component

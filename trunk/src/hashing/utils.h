@@ -19,13 +19,21 @@
 #ifndef HASHING_UTILS_H_
 #define HASHING_UTILS_H_
 
-#include "key_hash_table.h"
-#include "key_value_hash_table.h"
+/**
+ * Hash function for hashing a pointer.
+ * TODO: temporary implementation!
+ */
+// #define HASH_POINTER(key)									(((size_t) key << 5) - (size_t) key)
+#define HASH_POINTER(key)									((size_t) key) >> 3	// for 64 bit
+// #define HASH_POINTER(key)									((unsigned int) key) >> 3	// for 64 bit
+// #define HASH_POINTER(key)									((unsigned int) key) 	// for 64 bit
+// #define HASH_POINTER(key)									(size_t)((13 * (size_t) key) ^ ((size_t) key >> 15))
 
 /**
- * Simple hash function for hashing an unsigned integer
+ * Simple hash function for hashing an unsigned integer.
  */
-#define HASH_UNSIGNED(hash_table_bucket_count,key)			(((key << 5) - key) & (hash_table_bucket_count - 1))
+// #define HASH_UNSIGNED(hash_table_bucket_count,key)			(((key << 5) - key) & (hash_table_bucket_count - 1))
+#define HASH_UNSIGNED(key)									((key << 3) - key)
 
 /**
  * Hash two 32-bit unsigned integers into a 64-bit unsigned integer.
@@ -42,4 +50,4 @@ inline uint32_t roundup_pow2(uint32_t value);
  */
 inline uint64_t hash_string(unsigned char* key);
 
-#endif /* UTILS_H_ */
+#endif

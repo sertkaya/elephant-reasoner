@@ -28,11 +28,16 @@
 // note that it maintains both the array and the judy array
 // of subsumers. the reason for keeping the subsumers twice
 // is performance in saturation
-int add_to_concept_subsumer_list(Concept* c, Concept* s);
+int add_to_concept_subsumer_list(ClassExpression* c, ClassExpression* s);
 
 // add s to the told subsumer list of c
 // note that multiple occurrence of s is allowed!
-void add_told_subsumer_concept(Concept* c, Concept* s);
+// void add_told_subsumer_concept(ClassExpression* c, ClassExpression* s);
+
+// TODO: what about multiple occurrences? Performance?
+// add s to the told subsumer list of c
+// note that multiple occurrence of s is allowed!
+#define ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(s, c)	list_add(s, c->told_subsumers)
 
 
 
@@ -57,17 +62,17 @@ void add_told_subsumee_role(Role* r, Role* s);
  * functions for adding ...
  *****************************************************************************/
 // add ex to the list of existential restrictions that f is a filler of
-void add_to_filler_of_list(Concept* f, Concept* ex);
+void add_to_filler_of_list(ClassExpression* f, ClassExpression* ex);
 
 // add 'conjunction' to the list of conjunctions whose first conjunct is 'concept'
-void add_to_first_conjunct_of_list(Concept* concept, Concept* conjunction);
+void add_to_first_conjunct_of_list(ClassExpression* concept, ClassExpression* conjunction);
 
 // add 'conjunction' to the list of conjunctions whose second conjunct is 'concept'
-void add_to_second_conjunct_of_list(Concept* concept, Concept* conjunction);
+void add_to_second_conjunct_of_list(ClassExpression* concept, ClassExpression* conjunction);
 
 // add ex to the filler_of_negative_exists hash of the filler of ex.
 // key of the hash is ex->description.exists->role, the value is ex.
-void add_to_negative_exists(Concept* ex, TBox* tbox);
+void add_to_negative_exists(ClassExpression* ex, TBox* tbox);
 // #define ADD_TO_NEGATIVE_EXISTS(ex)		insert_key_value(ex->description.exists->filler->filler_of_negative_exists, ex->description.exists->role->id, ex)
 
 // return the negative existential restriction whose role is r and filler is c

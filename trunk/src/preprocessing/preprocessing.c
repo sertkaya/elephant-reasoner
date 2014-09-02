@@ -20,7 +20,7 @@
 #include "../model/datatypes.h"
 #include "../model/model.h"
 #include "../model/limits.h"
-#include "../hashing/key_value_hash_table.h"
+#include "../hashing/hash_map.h"
 #include "utils.h"
 
 /*
@@ -50,12 +50,12 @@ void preprocess_tbox(KB* kb) {
 
 	// Initialize the hash of generated nominals
 	// TODO: think about the size. maybe take the number of individuals?
-	kb->generated_nominals = create_key_value_hash_table(DEFAULT_NOMINALS_HASH_SIZE);
+	kb->generated_nominals = hash_map_create(DEFAULT_NOMINALS_HASH_SIZE);
 
 	// Initialize the hash of existential restrictions that are generated as a result of
 	// translating role assertions.
 	// TODO: think about the size. maybe take the number of target individuals?
-	kb->generated_exists_restrictions = create_key_value_hash_table(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
+	kb->generated_exists_restrictions = hash_map_create(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
 
 	int i;
 
@@ -83,7 +83,7 @@ void preprocess_tbox(KB* kb) {
 	// Note that this generates n^2 new subclass axioms for a disjointness axiom with n concepts.
 	// TODO: optimize!
 	int j, k;
-	Concept* conjunction;
+	ClassExpression* conjunction;
 	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i)
 		for (j = 0; j < tbox->disjointclasses_axioms[i]->concept_count - 1; ++j)
 			for (k = j + 1; k < tbox->disjointclasses_axioms[i]->concept_count ; ++k) {

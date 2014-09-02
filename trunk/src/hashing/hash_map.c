@@ -21,13 +21,13 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
-#include "key_value_hash_table.h"
+#include "hash_map.h"
 #include "utils.h"
 
 
-inline KeyValueHashTable* create_key_value_hash_table(unsigned size) {
+inline HashMap* hash_map_create(unsigned int size) {
 
-	KeyValueHashTable* hash_table = (KeyValueHashTable*) malloc(sizeof(KeyValueHashTable));
+	HashMap* hash_table = (HashMap*) malloc(sizeof(HashMap));
 	assert(hash_table != NULL);
 
 	if (size < 16)
@@ -36,11 +36,11 @@ inline KeyValueHashTable* create_key_value_hash_table(unsigned size) {
 		size = roundup_pow2(size);
 
 	// allocate space for the buckets
-	hash_table->buckets = (Node***) calloc(size, sizeof(Node**));
+	hash_table->buckets = (HashMapElement***) calloc(size, sizeof(HashMapElement**));
 	assert(hash_table->buckets != NULL);
 
 	// allocate space for the chain sizes
-	hash_table->chain_sizes = (unsigned*) calloc(size, sizeof(unsigned));
+	hash_table->chain_sizes = (unsigned*) calloc(size, sizeof(unsigned int));
 	assert(hash_table->buckets != NULL);
 
 	hash_table->bucket_count = size;
@@ -50,7 +50,7 @@ inline KeyValueHashTable* create_key_value_hash_table(unsigned size) {
 	return hash_table;
 }
 
-int free_key_value_hash_table(KeyValueHashTable* hash_table) {
+int hash_map_free(HashMap* hash_table) {
 	int freed_bytes = 0;
 
 	int i;
@@ -61,58 +61,59 @@ int free_key_value_hash_table(KeyValueHashTable* hash_table) {
 				// note that we only free the node.
 				// the space allocated for  node->value is not freed!
 				free(hash_table->buckets[i][j]);
-				freed_bytes += sizeof(Node);
+				freed_bytes += sizeof(HashMapElement);
 			}
 
 			free(hash_table->buckets[i]);
-			freed_bytes += hash_table->chain_sizes[i] * sizeof(Node*);
+			freed_bytes += hash_table->chain_sizes[i] * sizeof(HashMapElement*);
 		}
 	}
 	free(hash_table->buckets);
-	freed_bytes += hash_table->bucket_count * sizeof(Node***);
+	freed_bytes += hash_table->bucket_count * sizeof(HashMapElement***);
 
 	free(hash_table->chain_sizes);
-	freed_bytes += hash_table->bucket_count * sizeof(unsigned);
+	freed_bytes += hash_table->bucket_count * sizeof(unsigned int);
 
 	free(hash_table);
-	freed_bytes += sizeof(KeyValueHashTable);
+	freed_bytes += sizeof(HashMap);
 
 	return freed_bytes;
 }
 
-inline char insert_key_value(KeyValueHashTable* hash_table,
+inline char hash_map_put(HashMap* hash_table,
 		uint64_t key,
 		void* value) {
 
-	int bucket_index = key & (hash_table->bucket_count - 1);
-	Node** bucket = hash_table->buckets[bucket_index];
-	int chain_size = hash_table->chain_sizes[bucket_index];
+	int hash_value = key & (hash_table->bucket_count - 1);
+	// int hash_value = HASH_UNSIGNED(key) & (hash_table->bucket_count - 1);
+	HashMapElement** bucket = hash_table->buckets[hash_value];
+	int chain_size = hash_table->chain_sizes[hash_value];
 
 	int i;
 	for (i = 0; i < chain_size; i++)
-		// if (hash_table->buckets[hash_value][i]->key == key)
-		if (key == bucket[i]->key)
+		if (bucket[i]->key == key)
 			return 0;
 
-	Node** tmp = realloc(bucket, (chain_size + 1) * sizeof(Node*));
+	HashMapElement** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement*));
 	assert(tmp != NULL);
-	bucket = hash_table->buckets[bucket_index] = tmp;
+	bucket = hash_table->buckets[hash_value] = tmp;
 
-	bucket[chain_size] = calloc(1, sizeof(Node));
+	bucket[chain_size] = malloc(sizeof(HashMapElement));
 	assert(bucket[chain_size] != NULL);
 	bucket[chain_size]->key = key;
 	bucket[chain_size]->value = value;
 	bucket[chain_size]->previous = hash_table->tail;
 
 	hash_table->tail = bucket[chain_size];
-	++hash_table->chain_sizes[bucket_index];
+
+	++hash_table->chain_sizes[hash_value];
 
 	return 1;
 }
 
-inline void* get_value(KeyValueHashTable* hash_table, uint64_t key) {
+inline void* hash_map_get(HashMap* hash_table, uint64_t key) {
 	int bucket_index = key & (hash_table->bucket_count - 1);
-	Node** bucket = hash_table->buckets[bucket_index];
+	HashMapElement** bucket = hash_table->buckets[bucket_index];
 	int chain_size = hash_table->chain_sizes[bucket_index];
 
 	int i;
@@ -122,11 +123,12 @@ inline void* get_value(KeyValueHashTable* hash_table, uint64_t key) {
 
 	return NULL;
 }
-
-inline Node* last_node(KeyValueHashTable* hash_table) {
+/*
+inline HashMapElement* hash_map_last_element(HashMap* hash_table) {
 	return hash_table->tail;
 }
 
-inline Node* previous_node(Node* current_node) {
+inline HashMapElement* hash_map_previous_element(HashMapElement* current_node) {
 	return current_node->previous;
 }
+*/
