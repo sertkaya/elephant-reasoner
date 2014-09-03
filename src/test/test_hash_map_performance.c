@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 	int hash_map_size = atoi(argv[2]);
 
 	// uint64_t* tmp = malloc(test_size * sizeof(int));
-	size_t* tmp = malloc(test_size * sizeof(int));
+	size_t* tmp = malloc(test_size * sizeof(size_t));
 	assert(tmp != NULL);
 
 	HashMap* hash_map = hash_map_create(hash_map_size);

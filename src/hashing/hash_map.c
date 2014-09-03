@@ -99,11 +99,16 @@ inline char hash_map_put(HashMap* hash_table,
 	assert(tmp != NULL);
 	bucket = hash_table->buckets[hash_value] = tmp;
 
+	/*
 	((HashMapElement*) (&bucket[chain_size]))->key = key;
 	((HashMapElement*) (&bucket[chain_size]))->value = value;
 	((HashMapElement*) (&bucket[chain_size]))->previous = hash_table->tail;
+	*/
+	bucket[chain_size].key = key;
+	bucket[chain_size].value = value;
+	bucket[chain_size].previous = hash_table->tail;
 
-	hash_table->tail = (HashMapElement*) &(bucket[chain_size]);
+	hash_table->tail =  &bucket[chain_size];
 
 	++hash_table->chain_sizes[hash_value];
 
