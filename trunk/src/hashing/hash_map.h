@@ -31,7 +31,7 @@ struct hash_map_element {
 };
 
 struct hash_map {
-	HashMapElement*** buckets;		// the buckets
+	HashMapElement** buckets;		// the buckets
 	unsigned int bucket_count;		// the number of buckets
 	unsigned int* chain_sizes;		// sizes of the chains
 	HashMapElement* tail;			// the last node of the hash.
