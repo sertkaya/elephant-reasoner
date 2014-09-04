@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <assert.h>
 #include <sys/time.h>
 
@@ -32,30 +33,38 @@ int main(int argc, char *argv[]) {
 	int test_size = atoi(argv[1]);
 	int hash_map_size = atoi(argv[2]);
 
-	// uint64_t* tmp = malloc(test_size * sizeof(int));
+	// uint64_t* tmp = malloc(test_size * sizeof(uint64_t));
 	size_t* tmp = malloc(test_size * sizeof(size_t));
 	assert(tmp != NULL);
 
 	HashMap* hash_map = hash_map_create(hash_map_size);
+	int put_element_count = 0;
 	printf("%d put operations .........................: ", test_size);
 	fflush(stdout);
 	START_TIMER(start_time);
 	for (i = 0; i < test_size; ++i) {
 		tmp[i] = i;
-		hash_map_put(hash_map,  i, (void*) tmp[i]);
+		// if (hash_map_put(hash_map,  i, (void*) tmp[i]))
+		if (hash_map_put(hash_map,  i, NULL))
+			++put_element_count;
 	}
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	printf("Put %d elements\n", put_element_count);
 
 	HashMapElement* e = HASH_MAP_LAST_ELEMENT(hash_map);
+	int retrieved_element_count = 0;
 	printf("Iterating .........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
 	while (e) {
+		printf("%" PRIu64 "\t%p\t%p\n", e->key, e->value, e->previous);
+		++retrieved_element_count;
 		e = HASH_MAP_PREVIOUS_ELEMENT(e);
 	}
 	STOP_TIMER(stop_time);
 	printf("done in %.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	printf("Retrieved %d elements\n", retrieved_element_count);
 
 
 	return 1;
