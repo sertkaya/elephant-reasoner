@@ -28,8 +28,8 @@
 
 inline HashMap* hash_map_create(unsigned int size) {
 
-	HashMap* hash_table = (HashMap*) malloc(sizeof(HashMap));
-	assert(hash_table != NULL);
+	HashMap* hash_map = (HashMap*) malloc(sizeof(HashMap));
+	assert(hash_map != NULL);
 
 	if (size < 8)
 		size = 8;
@@ -37,18 +37,20 @@ inline HashMap* hash_map_create(unsigned int size) {
 		size = roundup_pow2(size);
 
 	// allocate space for the buckets
-	hash_table->buckets = (HashMapElement**) calloc(size, sizeof(HashMapElement*));
-	assert(hash_table->buckets != NULL);
+	hash_map->buckets = (HashMapElement**) calloc(size, sizeof(HashMapElement*));
+	assert(hash_map->buckets != NULL);
 
 	// allocate space for the chain sizes
-	hash_table->chain_sizes = (unsigned int*) calloc(size, sizeof(unsigned int));
-	assert(hash_table->buckets != NULL);
+	hash_map->chain_sizes = (unsigned int*) calloc(size, sizeof(unsigned int));
+	assert(hash_map->buckets != NULL);
 
-	hash_table->bucket_count = size;
+	hash_map->bucket_count = size;
 
-	hash_table->tail = NULL;
+	// hash_map->tail = NULL;
+	hash_map->tail_bucket_index = 0;
+	hash_map->tail_chain_index = 0;
 
-	return hash_table;
+	return hash_map;
 }
 
 int hash_map_free(HashMap* hash_table) {
@@ -116,14 +118,19 @@ inline char hash_map_put(HashMap* hash_table,
 
 	hash_table->buckets[hash_value][chain_size].key = key;
 	hash_table->buckets[hash_value][chain_size].value = value;
-	hash_table->buckets[hash_value][chain_size].previous = hash_table->tail;
+	// hash_table->buckets[hash_value][chain_size].previous = hash_table->tail;
+	hash_table->buckets[hash_value][chain_size].previous_bucket_index = hash_table->tail_bucket_index;
+	hash_table->buckets[hash_value][chain_size].previous_chain_index = hash_table->tail_chain_index;
 
 	// hash_table->tail =  &bucket[chain_size];
-	hash_table->tail =  &(hash_table->buckets[hash_value][chain_size]);
+	// hash_table->tail =  &hash_table->buckets[hash_value][chain_size];
+	hash_table->tail_bucket_index = hash_value;
+	hash_table->tail_chain_index = chain_size;
 
-	printf("key: %" PRIu64 "\tx.key: %" PRIu64 "\n", key, hash_table->buckets[hash_value][chain_size].key);
 
 	++hash_table->chain_sizes[hash_value];
+
+	printf("key: %" PRIu64 "\tx.key: %" PRIu64 "\n", key, hash_table->buckets[hash_value][chain_size].key);
 
 	return 1;
 }
