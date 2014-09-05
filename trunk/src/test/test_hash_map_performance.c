@@ -45,23 +45,25 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < test_size; ++i) {
 		tmp[i] = i;
 		// if (hash_map_put(hash_map,  i, (void*) tmp[i]))
-		if (hash_map_put(hash_map,  i, NULL))
+		if (hash_map_put(hash_map,  i, (void*) (2 * i)))
 			++put_element_count;
 	}
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	printf("Put %d elements\n", put_element_count);
 
-	HashMapElement* e = HASH_MAP_LAST_ELEMENT(hash_map);
+	HashMapElement* e = HASH_MAP_LAST_ELEMENT_NEW(hash_map);
 	int retrieved_element_count = 0;
+
 	printf("Iterating .........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
-	while (e) {
-		printf("%" PRIu64 "\t%p\t%p\n", e->key, e->value, e->previous);
+	do {
+		printf("%" PRIu64 "\t%p\t%d\t%d\n", e->key, e->value, e->previous_bucket_index, e->previous_chain_index);
 		++retrieved_element_count;
-		e = HASH_MAP_PREVIOUS_ELEMENT(e);
-	}
+		e = HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, e);
+	} while (!IS_FIRST_ELEMENT(hash_map, e));
+
 	STOP_TIMER(stop_time);
 	printf("done in %.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	printf("Retrieved %d elements\n", retrieved_element_count);

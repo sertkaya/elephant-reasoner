@@ -28,6 +28,8 @@ struct hash_map_element {
 	uint64_t key;
 	void* value;
 	HashMapElement* previous;
+	unsigned int previous_bucket_index;
+	unsigned int previous_chain_index;
 };
 
 struct hash_map {
@@ -36,6 +38,8 @@ struct hash_map {
 	unsigned int* chain_sizes;		// sizes of the chains
 	HashMapElement* tail;			// the last node of the hash.
 									// we maintain a backward linked list.
+	unsigned int tail_bucket_index;
+	unsigned int tail_chain_index;
 };
 
 /**
@@ -67,7 +71,8 @@ inline void* hash_map_get(HashMap* hash_table, uint64_t key);
  * iteration is not relevant for our purposes.
  */
 // inline HashMapElement* hash_map_last_element(HashMap* hash_table);
-#define HASH_MAP_LAST_ELEMENT(hash_map)				hash_map->tail
+#define HASH_MAP_LAST_ELEMENT(hash_map)							hash_map->tail
+#define HASH_MAP_LAST_ELEMENT_NEW(hash_map)							&hash_map->buckets[hash_map->tail_bucket_index][hash_map->tail_chain_index]
 
 /**
  * Returns the node that comes before the current node, or NULL if
@@ -75,5 +80,8 @@ inline void* hash_map_get(HashMap* hash_table, uint64_t key);
  */
 // inline HashMapElement* hash_map_previous_element(HashMapElement* current_node);
 #define HASH_MAP_PREVIOUS_ELEMENT(current_element)	current_element->previous
+#define HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, current_element)	&hash_map->buckets[current_element->previous_bucket_index][current_element->previous_chain_index]
 
+// #define IS_FIRST_ELEMENT(hash_map, element)							(element->previous_bucket_index == 0) && (element->previous_chain_index == 0)
+#define IS_FIRST_ELEMENT(hash_map, element)							(element == (&hash_map->buckets[0][0]))
 #endif
