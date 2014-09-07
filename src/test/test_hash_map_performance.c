@@ -58,11 +58,12 @@ int main(int argc, char *argv[]) {
 	printf("Iterating .........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
-	do {
-		printf("%" PRIu64 "\t%p\t%d\t%d\n", e->key, e->value, e->previous_bucket_index, e->previous_chain_index);
+	while (e) {
+	// while (!IS_FIRST_ELEMENT(hash_map, e)) {
+		// printf("%" PRIu64 "\t%p\t%d\t%d\n", e->key, e->value, e->previous_bucket_index, e->previous_chain_index);
 		++retrieved_element_count;
 		e = HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, e);
-	} while (!IS_FIRST_ELEMENT(hash_map, e));
+	}
 
 	STOP_TIMER(stop_time);
 	printf("done in %.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);

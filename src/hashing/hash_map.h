@@ -80,7 +80,8 @@ inline void* hash_map_get(HashMap* hash_table, uint64_t key);
  */
 // inline HashMapElement* hash_map_previous_element(HashMapElement* current_node);
 #define HASH_MAP_PREVIOUS_ELEMENT(current_element)	current_element->previous
-#define HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, current_element)	&hash_map->buckets[current_element->previous_bucket_index][current_element->previous_chain_index]
+#define HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, current_element)	((current_element->previous_bucket_index == -1) ? NULL : (&hash_map->buckets[current_element->previous_bucket_index][current_element->previous_chain_index]))
+// #define HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, current_element)	(&hash_map->buckets[current_element->previous_bucket_index][current_element->previous_chain_index])
 
 // #define IS_FIRST_ELEMENT(hash_map, element)							(element->previous_bucket_index == 0) && (element->previous_chain_index == 0)
 #define IS_FIRST_ELEMENT(hash_map, element)							(element == (&hash_map->buckets[0][0]))

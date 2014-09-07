@@ -47,8 +47,8 @@ inline HashMap* hash_map_create(unsigned int size) {
 	hash_map->bucket_count = size;
 
 	// hash_map->tail = NULL;
-	hash_map->tail_bucket_index = 0;
-	hash_map->tail_chain_index = 0;
+	hash_map->tail_bucket_index = -1;
+	hash_map->tail_chain_index = -1;
 
 	return hash_map;
 }
@@ -130,7 +130,7 @@ inline char hash_map_put(HashMap* hash_table,
 
 	++hash_table->chain_sizes[hash_value];
 
-	printf("key: %" PRIu64 "\tx.key: %" PRIu64 "\n", key, hash_table->buckets[hash_value][chain_size].key);
+	// printf("key: %" PRIu64 "\tx.key: %" PRIu64 "\n", key, hash_table->buckets[hash_value][chain_size].key);
 
 	return 1;
 }
