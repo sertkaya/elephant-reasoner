@@ -64,7 +64,7 @@ void saturate_roles(TBox* tbox) {
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->atomic_roles);
 	while (node) {
 		push(&scheduled_axioms, create_role_saturation_axiom((Role*) node->value, (Role*) node->value));
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(tbox->atomic_roles, node);
 	}
     // for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
     // 	push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
@@ -88,7 +88,7 @@ void saturate_roles(TBox* tbox) {
 			told_subsumee1 = previous_node(told_subsumee1);
 		}
 		*/
-		composition = HASH_MAP_PREVIOUS_ELEMENT(composition);
+		composition = HASH_MAP_PREVIOUS_ELEMENT(tbox->role_compositions, composition);
 	}
 
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
@@ -113,13 +113,13 @@ void saturate_roles(TBox* tbox) {
 			 						tbox);
 			 				index_role(composition);
 			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (Role*) told_subsumer->value));
-			 				told_subsumee2 = HASH_MAP_PREVIOUS_ELEMENT(told_subsumee2);
+			 				told_subsumee2 = HASH_MAP_PREVIOUS_ELEMENT(ax->lhs->description.role_composition->role2->told_subsumees, told_subsumee2);
 			 			}
-			 			told_subsumee1 = HASH_MAP_PREVIOUS_ELEMENT(told_subsumee1);
+			 			told_subsumee1 = HASH_MAP_PREVIOUS_ELEMENT(ax->lhs->description.role_composition->role1->told_subsumees, told_subsumee1);
 			 		}
 			 	}
 
-			 	told_subsumer = HASH_MAP_PREVIOUS_ELEMENT(told_subsumer);
+			 	told_subsumer = HASH_MAP_PREVIOUS_ELEMENT(ax->rhs->told_subsumers, told_subsumer);
 			}
 
 		}

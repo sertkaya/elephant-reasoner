@@ -71,16 +71,16 @@ inline void* hash_map_get(HashMap* hash_table, uint64_t key);
  * iteration is not relevant for our purposes.
  */
 // inline HashMapElement* hash_map_last_element(HashMap* hash_table);
-#define HASH_MAP_LAST_ELEMENT(hash_map)							hash_map->tail
-#define HASH_MAP_LAST_ELEMENT_NEW(hash_map)							&hash_map->buckets[hash_map->tail_bucket_index][hash_map->tail_chain_index]
+// #define HASH_MAP_LAST_ELEMENT(hash_map)							hash_map->tail
+#define HASH_MAP_LAST_ELEMENT(hash_map)							&hash_map->buckets[hash_map->tail_bucket_index][hash_map->tail_chain_index]
 
 /**
  * Returns the node that comes before the current node, or NULL if
  * there is none.
  */
 // inline HashMapElement* hash_map_previous_element(HashMapElement* current_node);
-#define HASH_MAP_PREVIOUS_ELEMENT(current_element)	current_element->previous
-#define HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, current_element)	((current_element->previous_bucket_index == -1) ? NULL : (&hash_map->buckets[current_element->previous_bucket_index][current_element->previous_chain_index]))
+// #define HASH_MAP_PREVIOUS_ELEMENT(current_element)	current_element->previous
+#define HASH_MAP_PREVIOUS_ELEMENT(hash_map, current_element)	((current_element->previous_bucket_index == -1) ? NULL : (&hash_map->buckets[current_element->previous_bucket_index][current_element->previous_chain_index]))
 // #define HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, current_element)	(&hash_map->buckets[current_element->previous_bucket_index][current_element->previous_chain_index])
 
 // #define IS_FIRST_ELEMENT(hash_map, element)							(element->previous_bucket_index == 0) && (element->previous_chain_index == 0)
