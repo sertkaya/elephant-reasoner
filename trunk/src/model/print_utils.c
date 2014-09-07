@@ -97,7 +97,7 @@ void print_conjunctions(TBox* tbox) {
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->conjunctions);
 	while (node) {
 		print_conjunction(((ClassExpression*) node->value)->description.conj);
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(tbox->conjunctions, node);
 	}
 }
 
@@ -257,7 +257,7 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 						nominal->subsumer_list[i]->description.atomic->name,
 						nominal->description.nominal->individual->name);
 		*/
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(kb->generated_nominals, node);
 	}
 
 	// the closing parentheses for the ontology tag

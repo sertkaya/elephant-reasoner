@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	printf("Put %d elements\n", put_element_count);
 
-	HashMapElement* e = HASH_MAP_LAST_ELEMENT_NEW(hash_map);
+	HashMapElement* e = HASH_MAP_LAST_ELEMENT(hash_map);
 	int retrieved_element_count = 0;
 
 	printf("Iterating .........................: ");
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 	// while (!IS_FIRST_ELEMENT(hash_map, e)) {
 		// printf("%" PRIu64 "\t%p\t%d\t%d\n", e->key, e->value, e->previous_bucket_index, e->previous_chain_index);
 		++retrieved_element_count;
-		e = HASH_MAP_PREVIOUS_ELEMENT_NEW(hash_map, e);
+		e = HASH_MAP_PREVIOUS_ELEMENT(hash_map, e);
 	}
 
 	STOP_TIMER(stop_time);

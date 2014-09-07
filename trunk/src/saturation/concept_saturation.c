@@ -80,7 +80,7 @@ char saturate_concepts(KB* kb) {
 		nominal = (ClassExpression*) node->value;
 		for (j = 0; j < nominal->told_subsumers->size; ++j)
 			push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal->told_subsumers->elements[j], NULL, SUBSUMPTION_INITIALIZATION));
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(kb->generated_nominals, node);
 	}
 
 	ax = pop(&scheduled_axioms);
