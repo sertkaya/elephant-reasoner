@@ -72,7 +72,7 @@ inline void* hash_map_get(HashMap* hash_table, uint64_t key);
  */
 // inline HashMapElement* hash_map_last_element(HashMap* hash_table);
 // #define HASH_MAP_LAST_ELEMENT(hash_map)							hash_map->tail
-#define HASH_MAP_LAST_ELEMENT(hash_map)							&hash_map->buckets[hash_map->tail_bucket_index][hash_map->tail_chain_index]
+#define HASH_MAP_LAST_ELEMENT(hash_map)							hash_map->tail_bucket_index == -1 ? NULL : &hash_map->buckets[hash_map->tail_bucket_index][hash_map->tail_chain_index]
 
 /**
  * Returns the node that comes before the current node, or NULL if
