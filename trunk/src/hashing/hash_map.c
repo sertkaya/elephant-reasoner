@@ -103,11 +103,11 @@ inline char hash_map_put(HashMap* hash_table,
 
 	hash_table->buckets[hash_value][chain_size].key = key;
 	hash_table->buckets[hash_value][chain_size].value = value;
-	// hash_table->buckets[hash_value][chain_size].previous_bucket_index = hash_table->tail_bucket_index;
-	// hash_table->buckets[hash_value][chain_size].previous_chain_index = hash_table->tail_chain_index;
+	hash_table->buckets[hash_value][chain_size].previous_bucket_index = hash_table->tail_bucket_index;
+	hash_table->buckets[hash_value][chain_size].previous_chain_index = hash_table->tail_chain_index;
 
-	// hash_table->tail_bucket_index = hash_value;
-	// hash_table->tail_chain_index = chain_size;
+	hash_table->tail_bucket_index = hash_value;
+	hash_table->tail_chain_index = chain_size;
 
 
 	++hash_table->chain_sizes[hash_value];
@@ -123,7 +123,7 @@ inline void* hash_map_get(HashMap* hash_table, uint64_t key) {
 	int i;
 	for (i = 0; i < chain_size; ++i)
 		if (key == bucket[i].key)
-			return &(bucket[i]).value;
+			return bucket[i].value;
 
 	return NULL;
 }
