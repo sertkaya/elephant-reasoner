@@ -223,7 +223,7 @@ int free_tbox(TBox* tbox) {
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->exists_restrictions);
 	while (node) {
 		total_freed_bytes += free_concept((ClassExpression*) node->value, tbox);
-		node = HASH_MAP_PREVIOUS_ELEMENT(tbox->exists_restrictions, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the existentials hash
 	total_freed_bytes += hash_map_free(tbox->exists_restrictions);
@@ -232,7 +232,7 @@ int free_tbox(TBox* tbox) {
 	node = HASH_MAP_LAST_ELEMENT(tbox->conjunctions);
 	while (node) {
 		total_freed_bytes += free_concept((ClassExpression*) node->value, tbox);
-		node = HASH_MAP_PREVIOUS_ELEMENT(tbox->conjunctions, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the conjunctions hash
 	total_freed_bytes += hash_map_free(tbox->conjunctions);
@@ -241,7 +241,7 @@ int free_tbox(TBox* tbox) {
 	node = HASH_MAP_LAST_ELEMENT(tbox->nominals);
 	while (node) {
 		total_freed_bytes += free_concept((ClassExpression*) node->value, tbox);
-		node = HASH_MAP_PREVIOUS_ELEMENT(tbox->nominals, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the nominals hash
 	total_freed_bytes += hash_map_free(tbox->nominals);
@@ -250,7 +250,7 @@ int free_tbox(TBox* tbox) {
 	node = HASH_MAP_LAST_ELEMENT(tbox->atomic_concepts);
 	while (node) {
 		total_freed_bytes += free_concept((ClassExpression*) node->value, tbox);
-		node = HASH_MAP_PREVIOUS_ELEMENT(tbox->atomic_concepts, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the atomic concepts hash
 	total_freed_bytes += hash_map_free(tbox->atomic_concepts);
@@ -266,7 +266,7 @@ int free_tbox(TBox* tbox) {
 	node = HASH_MAP_LAST_ELEMENT(tbox->role_compositions);
 	while (node) {
 		total_freed_bytes += free_role((Role*) node->value);
-		node = HASH_MAP_PREVIOUS_ELEMENT(tbox->role_compositions, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the role compositions hash
 	total_freed_bytes += hash_map_free(tbox->role_compositions);
@@ -275,7 +275,7 @@ int free_tbox(TBox* tbox) {
 	node = HASH_MAP_LAST_ELEMENT(tbox->atomic_roles);
 	while (node) {
 		total_freed_bytes += free_role((Role*) node->value);
-		node = HASH_MAP_PREVIOUS_ELEMENT(tbox->atomic_roles, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the atomic roles hash
 	total_freed_bytes += hash_map_free(tbox->atomic_roles);
@@ -320,7 +320,7 @@ int free_abox(ABox* abox) {
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(abox->individuals);
 	while (node) {
 		total_freed_bytes += free_individual((Individual*) node->value);
-		node = HASH_MAP_PREVIOUS_ELEMENT(abox->individuals, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the individuals hash
 	total_freed_bytes += hash_map_free(abox->individuals);
@@ -384,7 +384,7 @@ int free_kb(KB* kb) {
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);
 	while (node) {
 		total_freed_bytes += free_concept((ClassExpression*) node->value, kb->tbox);
-		node = HASH_MAP_PREVIOUS_ELEMENT(kb->generated_nominals, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the generated nominals hash
 	total_freed_bytes += hash_map_free(kb->generated_nominals);
@@ -393,7 +393,7 @@ int free_kb(KB* kb) {
 	node = HASH_MAP_LAST_ELEMENT(kb->generated_exists_restrictions);
 	while (node) {
 		total_freed_bytes += free_concept((ClassExpression*) node->value, kb->tbox);
-		node = HASH_MAP_PREVIOUS_ELEMENT(kb->generated_exists_restrictions, node);
+		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the generated nominals hash
 	total_freed_bytes += hash_map_free(kb->generated_exists_restrictions);
