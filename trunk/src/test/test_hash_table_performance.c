@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 	assert(tmp != NULL);
 
 	HashTable* hash_table = hash_table_create(hash_table_size);
-	printf("%d insert operations: ", test_size);
+	printf("%d put operations .........................: ", test_size);
 	fflush(stdout);
 	START_TIMER(start_time);
 	for (i = 0; i < test_size; ++i) {
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 
-	printf("Iterating over the hash table: ");
+	printf("Iterating .........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
 	HashTableIterator* it = hash_table_iterator_create(hash_table);
@@ -55,16 +55,6 @@ int main(int argc, char *argv[]) {
 	}
 	STOP_TIMER(stop_time);
 	printf("done in %.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
-
-	printf("Iterating over the array: ");
-	fflush(stdout);
-	START_TIMER(start_time);
-	int j;
-	for (i = 0; i < test_size; ++i) {
-		j = tmp[i];
-	}
-	STOP_TIMER(stop_time);
-	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 
 	return 1;
 }

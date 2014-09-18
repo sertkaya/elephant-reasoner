@@ -118,12 +118,8 @@ struct class_expression {
 	enum concept_description_type type;
 	ClassDescription description;
 
-	// The list of told subsumers.
-	// Elements are of type ClassExpression*.
 	List* told_subsumers;
 
-	// The set of subsumers.
-	// Elements are of type ClassExpression*.
 	Set* subsumers;
 
 	// 2-dimensional dynamic array for storing predecessors.
