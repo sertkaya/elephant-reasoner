@@ -37,10 +37,10 @@ typedef struct class_expression ClassExpression;
 typedef struct link Link;
 
 // Roles, role constructors
-typedef struct atomic_role AtomicRole;
-typedef struct role_composition RoleComposition;
-typedef union role_description RoleDescription;
-typedef struct role Role;
+typedef struct object_property AtomicRole;
+typedef struct object_property_chain RoleComposition;
+typedef union object_property_description RoleDescription;
+typedef struct object_property_expression Role;
 
 // Axioms
 typedef struct subclass_axiom SubClassAxiom;
@@ -73,34 +73,36 @@ enum concept_description_type {
 	CLASS_TYPE, OBJECT_INTERSECTION_OF_TYPE, OBJECT_SOME_VALUES_FROM_TYPE, OBJECT_ONE_OF_TYPE
 };
 
-// Atomic concept
+// Class
 struct class {
 	char* IRI;
 
+	// List of equivalent classes. Elements are ClassExpression*
 	List* equivalent_classes;
+	// Set of direct subsumers. Elements are ClassExpression*
 	Set* direct_subsumers;
 };
 
 
-// Conjunction
+// ObjectIntersectionOf
 struct object_intersection_of {
 	ClassExpression* conjunct1;
 	ClassExpression* conjunct2;
 };
 
 
-// Existential restriction
+// ObjectSomeValuesFrom
 struct object_some_values_from {
 	Role* role;
 	ClassExpression* filler;
 };
 
-// Nominal
+// ObjectOneOf
 struct object_one_of {
 	Individual* individual;
 };
 
-// Concept description
+// Class description
 union class_description {
 	Class* atomic;
 	ObjectIntersectionOf* conj;
@@ -109,17 +111,20 @@ union class_description {
 }; 
 	
 
-// Concept description
+// ClassExpression
 struct class_expression {
-	// Unique concept id.
-	// 32-bit unsigned integer, needed for hashing.
+	// Unique id
+	// 32-bit unsigned integer. Needed for hashing.
 	uint32_t id;
 
 	enum concept_description_type type;
 	ClassDescription description;
 
+	// List of told subsumers. Elements are ClassExpression*
 	List* told_subsumers;
 
+	// Set of subsumers computed during saturation.
+	// Elements are ClassExpression*
 	Set* subsumers;
 
 	// 2-dimensional dynamic array for storing predecessors.
@@ -160,25 +165,25 @@ enum role_description_type {
 	ATOMIC_ROLE, ROLE_COMPOSITION
 };
 
-// Atomic role
-struct atomic_role {
+// ObjectProperty
+struct object_property {
 	char* name;
 };
 
-// Role description
-union role_description {
+// Object property description
+union object_property_description {
 	AtomicRole* atomic;
 	RoleComposition* role_composition;
 }; 
 	
-// Role composition
-struct role_composition {
+// Object property chain
+struct object_property_chain {
 	Role* role1;
 	Role* role2;
 };
 
-// Role
-struct role {
+// Object property expression
+struct object_property_expression {
 	// Unique role id.
 	// 32-bit unsigned integer, needed for hashing.
 	uint32_t id;
