@@ -22,12 +22,12 @@
 
 #include "../model/datatypes.h"
 
-void add_generated_subclass_axiom(KB* kb, SubClassAxiom* ax);
+void add_generated_subclass_axiom(KB* kb, SubClassOfAxiom* ax);
 
-void add_generated_subrole_axiom(KB* kb, SubRoleAxiom* ax);
+void add_generated_subrole_axiom(KB* kb, SubObjectPropertyAxiom* ax);
 
 ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind);
 
-ClassExpression* get_create_generated_exists_restriction(KB* kb, Role* r, ClassExpression* f);
+ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyExpression* r, ClassExpression* f);
 
 #endif

@@ -115,18 +115,18 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	return total_freed_bytes;
 }
 
-int free_role(Role* r) {
+int free_role(ObjectPropertyExpression* r) {
 	int total_freed_bytes = 0;
 
 	switch (r->type) {
-	case ATOMIC_ROLE:
-		total_freed_bytes += sizeof(char) * strlen(r->description.atomic->name);
-		free(r->description.atomic->name);
-		total_freed_bytes += sizeof(AtomicRole);
+	case OBJECT_PROPERTY_TYPE:
+		total_freed_bytes += sizeof(char) * strlen(r->description.atomic->IRI);
+		free(r->description.atomic->IRI);
+		total_freed_bytes += sizeof(ObjectProperty);
 		free(r->description.atomic);
 		break;
-	case ROLE_COMPOSITION:
-		total_freed_bytes += sizeof(RoleComposition);
+	case OBJECT_PROPERTY_CHAIN_TYPE:
+		total_freed_bytes += sizeof(ObjectPropertyChain);
 		free(r->description.role_composition);
 		break;
 	}
@@ -139,33 +139,33 @@ int free_role(Role* r) {
 	total_freed_bytes += hash_map_free(r->told_subsumees);
 
 	// free the  subsumers list
-	total_freed_bytes += sizeof(Role*) * r->subsumer_count;
+	total_freed_bytes += sizeof(ObjectPropertyExpression*) * r->subsumer_count;
 	free(r->subsumer_list);
 
 	// free the subsumers hash
 	total_freed_bytes += free_key_hash_table(r->subsumers);
 
 	// free the  subsumees list
-	total_freed_bytes += sizeof(Role*) * r->subsumee_count;
+	total_freed_bytes += sizeof(ObjectPropertyExpression*) * r->subsumee_count;
 	free(r->subsumee_list);
 
 	// free the subsumees hash
 	total_freed_bytes += free_key_hash_table(r->subsumees);
 
 	// free the list of role compositions where this role occurs
-	total_freed_bytes += sizeof(Role*) * r->first_component_of_count;
+	total_freed_bytes += sizeof(ObjectPropertyExpression*) * r->first_component_of_count;
 	free(r->first_component_of_list);
 
 	total_freed_bytes += free_key_hash_table(r->first_component_of);
 
 	// now for the second component
-	total_freed_bytes += sizeof(Role*) * r->second_component_of_count;
+	total_freed_bytes += sizeof(ObjectPropertyExpression*) * r->second_component_of_count;
 	free(r->second_component_of_list);
 
 	total_freed_bytes += free_key_hash_table(r->second_component_of);
 
 	// finally free this role
-	total_freed_bytes += sizeof(Role);
+	total_freed_bytes += sizeof(ObjectPropertyExpression);
 	free(r);
 
 	return total_freed_bytes;
@@ -177,16 +177,16 @@ int free_tbox(TBox* tbox) {
 	// free subclass axioms
 	for (i = 0; i < tbox->subclass_axiom_count; i++)
 		free(tbox->subclass_axioms[i]);
-	total_freed_bytes += sizeof(SubClassAxiom) * tbox->subclass_axiom_count;
+	total_freed_bytes += sizeof(SubClassOfAxiom) * tbox->subclass_axiom_count;
 	free(tbox->subclass_axioms);
-	total_freed_bytes += sizeof(SubClassAxiom*) * tbox->subclass_axiom_count;
+	total_freed_bytes += sizeof(SubClassOfAxiom*) * tbox->subclass_axiom_count;
 
 	// free equivalent class axioms
 	for  (i = 0; i < tbox->eqclass_axiom_count; i++)
 		free(tbox->eqclass_axioms[i]);
-	total_freed_bytes += sizeof(EqClassAxiom) * tbox->eqclass_axiom_count;
+	total_freed_bytes += sizeof(EquivalentClassesAxiom) * tbox->eqclass_axiom_count;
 	free(tbox->eqclass_axioms);
-	total_freed_bytes += sizeof(EqClassAxiom*) * tbox->eqclass_axiom_count;
+	total_freed_bytes += sizeof(EquivalentClassesAxiom*) * tbox->eqclass_axiom_count;
 
 	// free the disjoint classes axioms
 	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i) {
@@ -201,23 +201,23 @@ int free_tbox(TBox* tbox) {
 	// free role subrole axioms
 	for (i = 0; i < tbox->subrole_axiom_count; i++)
 		free(tbox->subrole_axioms[i]);
-	total_freed_bytes += sizeof(SubRoleAxiom) * tbox->subrole_axiom_count;
+	total_freed_bytes += sizeof(SubObjectPropertyAxiom) * tbox->subrole_axiom_count;
 	free(tbox->subrole_axioms);
-	total_freed_bytes += sizeof(SubRoleAxiom*) * tbox->subrole_axiom_count;
+	total_freed_bytes += sizeof(SubObjectPropertyAxiom*) * tbox->subrole_axiom_count;
 
 	// free equivalent role axioms
 	for  (i = 0; i < tbox->eqrole_axiom_count; i++)
 		free(tbox->eqrole_axioms[i]);
-	total_freed_bytes += sizeof(EqRoleAxiom) * tbox->eqrole_axiom_count;
+	total_freed_bytes += sizeof(EquivalentObjectPropertiesAxiom) * tbox->eqrole_axiom_count;
 	free(tbox->eqrole_axioms);
-	total_freed_bytes += sizeof(EqRoleAxiom*) * tbox->eqrole_axiom_count;
+	total_freed_bytes += sizeof(EquivalentObjectPropertiesAxiom*) * tbox->eqrole_axiom_count;
 
 	// free transitive role axioms
 	for  (i = 0; i < tbox->transitive_role_axiom_count; i++)
 		free(tbox->transitive_role_axioms[i]);
-	total_freed_bytes += sizeof(TransitiveRoleAxiom) * tbox->transitive_role_axiom_count;
+	total_freed_bytes += sizeof(TransitiveObjectPropertyAxiom) * tbox->transitive_role_axiom_count;
 	free(tbox->transitive_role_axioms);
-	total_freed_bytes += sizeof(TransitiveRoleAxiom*) * tbox->transitive_role_axiom_count;
+	total_freed_bytes += sizeof(TransitiveObjectPropertyAxiom*) * tbox->transitive_role_axiom_count;
 
 	// iterate over the existentials hash, free the existentials
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->exists_restrictions);
@@ -265,7 +265,7 @@ int free_tbox(TBox* tbox) {
 	// iterate over the role_compositions hash, free the role compositions
 	node = HASH_MAP_LAST_ELEMENT(tbox->role_compositions);
 	while (node) {
-		total_freed_bytes += free_role((Role*) node->value);
+		total_freed_bytes += free_role((ObjectPropertyExpression*) node->value);
 		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the role compositions hash
@@ -274,7 +274,7 @@ int free_tbox(TBox* tbox) {
 	// iterate over atomic roles, free them
 	node = HASH_MAP_LAST_ELEMENT(tbox->atomic_roles);
 	while (node) {
-		total_freed_bytes += free_role((Role*) node->value);
+		total_freed_bytes += free_role((ObjectPropertyExpression*) node->value);
 		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
 	// free the atomic roles hash
@@ -305,16 +305,16 @@ int free_abox(ABox* abox) {
 	// free concept assertions
 	for (i = 0; i < abox->concept_assertion_count; ++i)
 		free(abox->concept_assertions[i]);
-	total_freed_bytes += sizeof(ConceptAssertion) * abox->concept_assertion_count;
+	total_freed_bytes += sizeof(ClassAssertion) * abox->concept_assertion_count;
 	free(abox->concept_assertions);
-	total_freed_bytes += sizeof(ConceptAssertion*) * abox->concept_assertion_count;
+	total_freed_bytes += sizeof(ClassAssertion*) * abox->concept_assertion_count;
 
 	// free role assertions
 	for (i = 0; i < abox->role_assertion_count; ++i)
 		free(abox->role_assertions[i]);
-	total_freed_bytes += sizeof(RoleAssertion) * abox->role_assertion_count;
+	total_freed_bytes += sizeof(ObjectPropertyAssertion) * abox->role_assertion_count;
 	free(abox->role_assertions);
-	total_freed_bytes += sizeof(RoleAssertion*) * abox->role_assertion_count;
+	total_freed_bytes += sizeof(ObjectPropertyAssertion*) * abox->role_assertion_count;
 
 	// iterate over the individuals hash, free the individuals
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(abox->individuals);
@@ -369,16 +369,16 @@ int free_kb(KB* kb) {
 	// free the generated subclass axioms
 	for (i = 0; i < kb->generated_subclass_axiom_count; ++i)
 		free(kb->generated_subclass_axioms[i]);
-	total_freed_bytes += sizeof(SubClassAxiom) * kb->generated_subclass_axiom_count;
+	total_freed_bytes += sizeof(SubClassOfAxiom) * kb->generated_subclass_axiom_count;
 	free(kb->generated_subclass_axioms);
-	total_freed_bytes += sizeof(SubClassAxiom*) * kb->generated_subclass_axiom_count;
+	total_freed_bytes += sizeof(SubClassOfAxiom*) * kb->generated_subclass_axiom_count;
 
 	// free the generated subrole axioms
 	for (i = 0; i < kb->generated_subrole_axiom_count; ++i)
 		free(kb->generated_subrole_axioms[i]);
-	total_freed_bytes += sizeof(SubRoleAxiom) * kb->generated_subrole_axiom_count;
+	total_freed_bytes += sizeof(SubObjectPropertyAxiom) * kb->generated_subrole_axiom_count;
 	free(kb->generated_subrole_axioms);
-	total_freed_bytes += sizeof(SubRoleAxiom*) * kb->generated_subrole_axiom_count;
+	total_freed_bytes += sizeof(SubObjectPropertyAxiom*) * kb->generated_subrole_axiom_count;
 
 	// iterate over the generated nominals hash, free the nominals
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);

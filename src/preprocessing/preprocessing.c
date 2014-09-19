@@ -72,7 +72,7 @@ void preprocess_tbox(KB* kb) {
 	}
 
 	// Process the transitive role axioms
-	Role* composition;
+	ObjectPropertyExpression* composition;
 	for (i = 0; i < tbox->transitive_role_axiom_count; ++i) {
 		composition = get_create_role_composition_binary(tbox->transitive_role_axioms[i]->r, tbox->transitive_role_axioms[i]->r, tbox);
 		add_generated_subrole_axiom(kb, create_subrole_axiom(composition, tbox->transitive_role_axioms[i]->r));

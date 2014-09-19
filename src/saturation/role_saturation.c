@@ -30,7 +30,7 @@
 #include "../utils/stack.h"
 #include "utils.h"
 
-RoleSaturationAxiom* create_role_saturation_axiom(Role* lhs, Role* rhs) {
+RoleSaturationAxiom* create_role_saturation_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs) {
 	RoleSaturationAxiom* ax = (RoleSaturationAxiom*) malloc(sizeof(RoleSaturationAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
@@ -63,7 +63,7 @@ void saturate_roles(TBox* tbox) {
     // first the atomic roles
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->atomic_roles);
 	while (node) {
-		push(&scheduled_axioms, create_role_saturation_axiom((Role*) node->value, (Role*) node->value));
+		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) node->value, (ObjectPropertyExpression*) node->value));
 		node = HASH_MAP_PREVIOUS_ELEMENT(node);
 	}
     // for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
@@ -71,7 +71,7 @@ void saturate_roles(TBox* tbox) {
     // Now the role compositions.
 	HashMapElement* composition = HASH_MAP_LAST_ELEMENT(tbox->role_compositions);
 	while (composition) {
-		push(&scheduled_axioms, create_role_saturation_axiom((Role*) composition->value, (Role*) composition->value));
+		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition->value, (ObjectPropertyExpression*) composition->value));
 		/*
 		Node* told_subsumee1 = last_node(((Role*) composition->value)->description.role_composition->role1->told_subsumees);
 		while (told_subsumee1) {
@@ -100,19 +100,19 @@ void saturate_roles(TBox* tbox) {
 			// 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i]));
 			HashMapElement* told_subsumer = HASH_MAP_LAST_ELEMENT(ax->rhs->told_subsumers);
 			while (told_subsumer) {
-			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (Role*) told_subsumer->value));
+			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (ObjectPropertyExpression*) told_subsumer->value));
 
-			 	if (ax->lhs->type == ROLE_COMPOSITION) {
+			 	if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
 			 		HashMapElement* told_subsumee1 = HASH_MAP_LAST_ELEMENT(ax->lhs->description.role_composition->role1->told_subsumees);
 			 		while (told_subsumee1) {
 			 			HashMapElement* told_subsumee2 = HASH_MAP_LAST_ELEMENT(ax->lhs->description.role_composition->role2->told_subsumees);
 			 			while (told_subsumee2) {
-			 				Role* composition = get_create_role_composition_binary(
-			 						(Role*) told_subsumee1->value,
-			 						(Role*) told_subsumee2->value,
+			 				ObjectPropertyExpression* composition = get_create_role_composition_binary(
+			 						(ObjectPropertyExpression*) told_subsumee1->value,
+			 						(ObjectPropertyExpression*) told_subsumee2->value,
 			 						tbox);
 			 				index_role(composition);
-			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (Role*) told_subsumer->value));
+			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) told_subsumer->value));
 			 				told_subsumee2 = HASH_MAP_PREVIOUS_ELEMENT(told_subsumee2);
 			 			}
 			 			told_subsumee1 = HASH_MAP_PREVIOUS_ELEMENT(told_subsumee1);

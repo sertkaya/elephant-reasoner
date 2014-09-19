@@ -26,7 +26,7 @@
 
 // add p to the predecessors hash of c
 // the key of the predecessors hash is r
-int add_predecessor(ClassExpression* c, Role* r, ClassExpression* p, TBox* tbox) {
+int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* p, TBox* tbox) {
 
 	// first check if we already have a link for role r
 	int i, j;
@@ -67,7 +67,7 @@ int add_predecessor(ClassExpression* c, Role* r, ClassExpression* p, TBox* tbox)
 }
 
 
-int add_successor(ClassExpression* c, Role* r, ClassExpression* p, TBox* tbox) {
+int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* p, TBox* tbox) {
 
 	// first check if we already have a link for role r
 	int i, j;

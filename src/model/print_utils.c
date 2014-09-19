@@ -32,8 +32,8 @@ void print_exists(ObjectSomeValuesFrom* exists);
 void print_conjunction(ObjectIntersectionOf* conjunction);
 void print_nominal(ObjectOneOf* n);
 
-void print_atomic_role(AtomicRole* ar);
-void print_role_composition(RoleComposition* rc);
+void print_atomic_role(ObjectProperty* ar);
+void print_role_composition(ObjectPropertyChain* rc);
 
 void print_concept(ClassExpression* c) {
 	switch (c->type) {
@@ -55,12 +55,12 @@ void print_concept(ClassExpression* c) {
 	}
 }
 
-void print_role(Role* r) {
+void print_role(ObjectPropertyExpression* r) {
 	switch (r->type) {
-		case ATOMIC_ROLE:
+		case OBJECT_PROPERTY_TYPE:
 			print_atomic_role(r->description.atomic);
 			break;
-		case ROLE_COMPOSITION:
+		case OBJECT_PROPERTY_CHAIN_TYPE:
 			print_role_composition(r->description.role_composition);
 			break;
 		default:
@@ -101,11 +101,11 @@ void print_conjunctions(TBox* tbox) {
 	}
 }
 
-void print_atomic_role(AtomicRole* ar) {
-	printf("%s ", ar->name);
+void print_atomic_role(ObjectProperty* ar) {
+	printf("%s ", ar->IRI);
 }
 
-void print_role_composition(RoleComposition* rc) {
+void print_role_composition(ObjectPropertyChain* rc) {
 	printf("ObjectPropertyChain( ");
 	print_role(rc->role1);
 	printf(" ");
@@ -113,7 +113,7 @@ void print_role_composition(RoleComposition* rc) {
 	printf(")\n");
 }
 
-void print_subclass_axiom(SubClassAxiom* sc_ax) {
+void print_subclass_axiom(SubClassOfAxiom* sc_ax) {
 	printf("(SubClassOf ");
 	print_concept(sc_ax->lhs);
 	printf(" ");
@@ -121,7 +121,7 @@ void print_subclass_axiom(SubClassAxiom* sc_ax) {
 	printf(")\n");
 }
 
-void print_eqclass_axiom(EqClassAxiom* ec_ax) {
+void print_eqclass_axiom(EquivalentClassesAxiom* ec_ax) {
 	printf("(EquivalentClasses ");
 	print_concept(ec_ax->lhs);
 	printf(" ");
@@ -130,7 +130,7 @@ void print_eqclass_axiom(EqClassAxiom* ec_ax) {
 }
 
 // TODO
-void print_subrole_axiom(SubRoleAxiom* subrole_ax) {
+void print_subrole_axiom(SubObjectPropertyAxiom* subrole_ax) {
 	printf("(SubObjectPropertyOf ");
 	// print_role(subrole_ax->lhs);
 	printf(", ");
