@@ -34,10 +34,10 @@
 
 // int add_predecessor(Concept* c, Concept* ex);
 // add r-predecessor p to c
-int add_predecessor(ClassExpression* c, Role* r, ClassExpression* p, TBox* tbox);
+int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* p, TBox* tbox);
 
 // int add_successor(Concept* c, Concept* ex);
 // add r-successor s to c
-int add_successor(ClassExpression* c, Role* r, ClassExpression* s, TBox* tbox);
+int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* s, TBox* tbox);
 
 #endif /* SATURATION_UTILS_H_ */

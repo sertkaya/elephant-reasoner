@@ -120,7 +120,7 @@ ClassExpression* get_create_atomic_concept(char* name, TBox* tbox) {
 }
 
 // get or create the existential restriction with role r and filler f
-ClassExpression* get_create_exists_restriction(Role* r, ClassExpression* f, TBox* tbox) {
+ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, ClassExpression* f, TBox* tbox) {
 	ClassExpression* c;
 
 	tbox->exists_restriction_count++;
@@ -309,22 +309,22 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
  * get/create functions for roles
  *****************************************************************************/
 
-Role* get_create_atomic_role(char* name, TBox* tbox) {
-	Role* r;
+ObjectPropertyExpression* get_create_atomic_role(char* name, TBox* tbox) {
+	ObjectPropertyExpression* r;
 
 	// check if the atomic role already exists
 	if ((r = GET_ATOMIC_ROLE(name, tbox)) != NULL)
 		return r;
 
 	// if it does not already exist, create it
-	r = (Role*) malloc(sizeof(Role));
+	r = (ObjectPropertyExpression*) malloc(sizeof(ObjectPropertyExpression));
 	assert(r != NULL);
-	r->type = ATOMIC_ROLE;
-	r->description.atomic = (AtomicRole*) malloc(sizeof(AtomicRole));
+	r->type = OBJECT_PROPERTY_TYPE;
+	r->description.atomic = (ObjectProperty*) malloc(sizeof(ObjectProperty));
 	assert(r->description.atomic != NULL);
-	r->description.atomic->name = (char*) malloc((strlen(name) + 1) * sizeof(char));
-	assert(r->description.atomic->name != NULL);
-	strcpy(r->description.atomic->name, name);
+	r->description.atomic->IRI = (char*) malloc((strlen(name) + 1) * sizeof(char));
+	assert(r->description.atomic->IRI != NULL);
+	strcpy(r->description.atomic->IRI, name);
 	r->id = tbox->last_role_id++;
 
 	r->told_subsumers = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
@@ -347,7 +347,7 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 	r->second_component_of_list = NULL;
 	r->second_component_of = hash_table_create(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
-	PUT_ATOMIC_ROLE(r->description.atomic->name, r, tbox);
+	PUT_ATOMIC_ROLE(r->description.atomic->IRI, r, tbox);
 	tbox->atomic_role_count++;
 
 	return r;
@@ -355,18 +355,18 @@ Role* get_create_atomic_role(char* name, TBox* tbox) {
 
 
 
-Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
-	Role* r;
+ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpression *r1, ObjectPropertyExpression* r2, TBox* tbox) {
+	ObjectPropertyExpression* r;
 
 	tbox->binary_role_composition_count++;
 	if ((r = GET_ROLE_COMPOSITION(r1, r2, tbox)) != NULL)
 		return r;
 
-	r = (Role*) malloc(sizeof(Role));
+	r = (ObjectPropertyExpression*) malloc(sizeof(ObjectPropertyExpression));
 	assert(r != NULL);
 
-	r->type = ROLE_COMPOSITION;
-	r->description.role_composition = (RoleComposition*) malloc(sizeof(RoleComposition));
+	r->type = OBJECT_PROPERTY_CHAIN_TYPE;
+	r->description.role_composition = (ObjectPropertyChain*) malloc(sizeof(ObjectPropertyChain));
 	assert(r->description.role_composition != NULL);
 	// we DO assume role1 and role2 to be ordered!
 	r->description.role_composition->role1 = r1;
@@ -402,9 +402,9 @@ Role* get_create_role_composition_binary(Role *r1, Role* r2, TBox* tbox) {
 
 // get or create the role composition consisting of the given roles.
 // called by the parser.
-Role* get_create_role_composition(int size, Role** roles, TBox* tbox) {
+ObjectPropertyExpression* get_create_role_composition(int size, ObjectPropertyExpression** roles, TBox* tbox) {
 	int i;
-	Role* composition = NULL;
+	ObjectPropertyExpression* composition = NULL;
 
 	tbox->role_composition_count++;
 	// qsort(roles, size, sizeof(Role*), compare_role);
@@ -420,8 +420,8 @@ Role* get_create_role_composition(int size, Role** roles, TBox* tbox) {
  * create functions for axioms
  *****************************************************************************/
 // create the subclass axiom with the given concept descriptions
-SubClassAxiom* create_subclass_axiom(ClassExpression* lhs, ClassExpression* rhs) {
-	SubClassAxiom* ax = (SubClassAxiom*) malloc(sizeof(SubClassAxiom));
+SubClassOfAxiom* create_subclass_axiom(ClassExpression* lhs, ClassExpression* rhs) {
+	SubClassOfAxiom* ax = (SubClassOfAxiom*) malloc(sizeof(SubClassOfAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
 	ax->rhs = rhs;
@@ -429,14 +429,14 @@ SubClassAxiom* create_subclass_axiom(ClassExpression* lhs, ClassExpression* rhs)
 }
 
 // create the equivalent classes axiom with the given concept descriptions
-EqClassAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpression* rhs) {
+EquivalentClassesAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpression* rhs) {
 	/*
 	if (lhs->type != ATOMIC_CONCEPT) {
 		fprintf(stderr,"the lhs of an equivalent classes axiom must be an atomic concept, aborting\n");
 		exit(EXIT_FAILURE);
 	}
 	*/
-	EqClassAxiom* ax = (EqClassAxiom*) malloc(sizeof(EqClassAxiom));
+	EquivalentClassesAxiom* ax = (EquivalentClassesAxiom*) malloc(sizeof(EquivalentClassesAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
 	ax->rhs = rhs;
@@ -458,24 +458,24 @@ DisjointClassesAxiom* create_disjointclasses_axiom(int concept_count, ClassExpre
 }
 
 // create the subrole axiom with the given role descriptions
-SubRoleAxiom* create_subrole_axiom(Role* lhs, Role* rhs) {
-	SubRoleAxiom* ax = (SubRoleAxiom*) malloc(sizeof(SubRoleAxiom));
+SubObjectPropertyAxiom* create_subrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs) {
+	SubObjectPropertyAxiom* ax = (SubObjectPropertyAxiom*) malloc(sizeof(SubObjectPropertyAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
 	ax->rhs = rhs;
 	return ax;
 }
 
-TransitiveRoleAxiom* create_transitive_role_axiom(Role* r) {
-	TransitiveRoleAxiom* ax = (TransitiveRoleAxiom*) malloc(sizeof(TransitiveRoleAxiom));
+TransitiveObjectPropertyAxiom* create_transitive_role_axiom(ObjectPropertyExpression* r) {
+	TransitiveObjectPropertyAxiom* ax = (TransitiveObjectPropertyAxiom*) malloc(sizeof(TransitiveObjectPropertyAxiom));
 	assert(ax != NULL);
 	ax->r = r;
 	return ax;
 }
 
 // create the eqrole axiom with the given role descriptions
-EqRoleAxiom* create_eqrole_axiom(Role* lhs, Role* rhs) {
-	EqRoleAxiom* ax = (EqRoleAxiom*) malloc(sizeof(EqRoleAxiom));
+EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs) {
+	EquivalentObjectPropertiesAxiom* ax = (EquivalentObjectPropertiesAxiom*) malloc(sizeof(EquivalentObjectPropertiesAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
 	ax->rhs = rhs;
@@ -488,9 +488,9 @@ EqRoleAxiom* create_eqrole_axiom(Role* lhs, Role* rhs) {
  *****************************************************************************/
 
 // add a given subclass axiom to a given TBox
-void add_subclass_axiom(SubClassAxiom* ax, TBox* tbox) {
-	SubClassAxiom** tmp;
-	tmp = realloc(tbox->subclass_axioms, (tbox->subclass_axiom_count + 1) * sizeof(SubClassAxiom*));
+void add_subclass_axiom(SubClassOfAxiom* ax, TBox* tbox) {
+	SubClassOfAxiom** tmp;
+	tmp = realloc(tbox->subclass_axioms, (tbox->subclass_axiom_count + 1) * sizeof(SubClassOfAxiom*));
 	assert(tmp != NULL);
 	tbox->subclass_axioms = tmp;
 	tbox->subclass_axioms[tbox->subclass_axiom_count] = ax;
@@ -498,9 +498,9 @@ void add_subclass_axiom(SubClassAxiom* ax, TBox* tbox) {
 }
 
 // add a given equivalent classes axiom to a given TBox
-void add_eqclass_axiom(EqClassAxiom* ax, TBox* tbox) {
-	EqClassAxiom** tmp;
-	tmp = realloc(tbox->eqclass_axioms, (tbox->eqclass_axiom_count + 1) * sizeof(EqClassAxiom*));
+void add_eqclass_axiom(EquivalentClassesAxiom* ax, TBox* tbox) {
+	EquivalentClassesAxiom** tmp;
+	tmp = realloc(tbox->eqclass_axioms, (tbox->eqclass_axiom_count + 1) * sizeof(EquivalentClassesAxiom*));
 	assert(tmp != NULL);
 	tbox->eqclass_axioms = tmp;
 	tbox->eqclass_axioms[tbox->eqclass_axiom_count] = ax;
@@ -517,18 +517,18 @@ void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox) {
 }
 
 // add a given subrole axiom to a given TBox
-void add_subrole_axiom(SubRoleAxiom* ax, TBox* tbox) {
-	SubRoleAxiom** tmp;
-	tmp = realloc(tbox->subrole_axioms, (tbox->subrole_axiom_count + 1) * sizeof(SubRoleAxiom*));
+void add_subrole_axiom(SubObjectPropertyAxiom* ax, TBox* tbox) {
+	SubObjectPropertyAxiom** tmp;
+	tmp = realloc(tbox->subrole_axioms, (tbox->subrole_axiom_count + 1) * sizeof(SubObjectPropertyAxiom*));
 	assert(tmp != NULL);
 	tbox->subrole_axioms = tmp;
 	tbox->subrole_axioms[tbox->subrole_axiom_count] = ax;
 	++tbox->subrole_axiom_count;
 }
 
-void add_transitive_role_axiom(TransitiveRoleAxiom* ax, TBox* tbox) {
-	TransitiveRoleAxiom** tmp;
-	tmp = realloc(tbox->transitive_role_axioms, (tbox->transitive_role_axiom_count + 1) * sizeof(TransitiveRoleAxiom));
+void add_transitive_role_axiom(TransitiveObjectPropertyAxiom* ax, TBox* tbox) {
+	TransitiveObjectPropertyAxiom** tmp;
+	tmp = realloc(tbox->transitive_role_axioms, (tbox->transitive_role_axiom_count + 1) * sizeof(TransitiveObjectPropertyAxiom));
 	assert(tmp != NULL);
 	tbox->transitive_role_axioms = tmp;
 	tbox->transitive_role_axioms[tbox->transitive_role_axiom_count] = ax;
@@ -536,9 +536,9 @@ void add_transitive_role_axiom(TransitiveRoleAxiom* ax, TBox* tbox) {
 }
 
 // add a given eqrole axiom to a given TBox
-void add_eqrole_axiom(EqRoleAxiom* ax, TBox* tbox) {
-	EqRoleAxiom** tmp;
-	tmp = realloc(tbox->eqrole_axioms, (tbox->eqrole_axiom_count + 1) * sizeof(EqRoleAxiom*));
+void add_eqrole_axiom(EquivalentObjectPropertiesAxiom* ax, TBox* tbox) {
+	EquivalentObjectPropertiesAxiom** tmp;
+	tmp = realloc(tbox->eqrole_axioms, (tbox->eqrole_axiom_count + 1) * sizeof(EquivalentObjectPropertiesAxiom*));
 	assert(tmp != NULL);
 	tbox->eqrole_axioms = tmp;
 	tbox->eqrole_axioms[tbox->eqrole_axiom_count] = ax;
@@ -580,8 +580,8 @@ Individual* get_create_individual(char* name, ABox* abox) {
  * create functions for assertions
  *****************************************************************************/
 // create the concept assertion with the given individual and concept
-ConceptAssertion* create_concept_assertion(Individual* ind, ClassExpression* c) {
-	ConceptAssertion* as = (ConceptAssertion*) malloc(sizeof(ConceptAssertion));
+ClassAssertion* create_concept_assertion(Individual* ind, ClassExpression* c) {
+	ClassAssertion* as = (ClassAssertion*) malloc(sizeof(ClassAssertion));
 	assert(as != NULL);
 	as->individual = ind;
 	as->concept = c;
@@ -590,8 +590,8 @@ ConceptAssertion* create_concept_assertion(Individual* ind, ClassExpression* c) 
 }
 
 // create the role assertion with the given role and individuals
-RoleAssertion* create_role_assertion(Role* role, Individual* source_ind, Individual* target_ind) {
-	RoleAssertion* as = (RoleAssertion*) malloc(sizeof(RoleAssertion));
+ObjectPropertyAssertion* create_role_assertion(ObjectPropertyExpression* role, Individual* source_ind, Individual* target_ind) {
+	ObjectPropertyAssertion* as = (ObjectPropertyAssertion*) malloc(sizeof(ObjectPropertyAssertion));
 	assert(as != NULL);
 	as->role = role;
 	as->source_individual = source_ind;
@@ -605,9 +605,9 @@ RoleAssertion* create_role_assertion(Role* role, Individual* source_ind, Individ
  *****************************************************************************/
 
 // add a given concept assertion to a given ABox
-void add_concept_assertion(ConceptAssertion* as, ABox* abox) {
-	ConceptAssertion** tmp;
-	tmp = realloc(abox->concept_assertions, (abox->concept_assertion_count + 1) * sizeof(ConceptAssertion*));
+void add_concept_assertion(ClassAssertion* as, ABox* abox) {
+	ClassAssertion** tmp;
+	tmp = realloc(abox->concept_assertions, (abox->concept_assertion_count + 1) * sizeof(ClassAssertion*));
 	assert(tmp != NULL);
 	abox->concept_assertions = tmp;
 	abox->concept_assertions[abox->concept_assertion_count] = as;
@@ -615,9 +615,9 @@ void add_concept_assertion(ConceptAssertion* as, ABox* abox) {
 }
 
 // add a given role assertion to a given ABox
-void add_role_assertion(RoleAssertion* as, ABox* abox) {
-	RoleAssertion** tmp;
-	tmp = realloc(abox->role_assertions, (abox->role_assertion_count + 1) * sizeof(RoleAssertion*));
+void add_role_assertion(ObjectPropertyAssertion* as, ABox* abox) {
+	ObjectPropertyAssertion** tmp;
+	tmp = realloc(abox->role_assertions, (abox->role_assertion_count + 1) * sizeof(ObjectPropertyAssertion*));
 	assert(tmp != NULL);
 	abox->role_assertions = tmp;
 	abox->role_assertions[abox->role_assertion_count] = as;

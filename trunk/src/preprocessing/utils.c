@@ -51,9 +51,9 @@ extern int generated_exists_restriction_count;
 
 // Add a given subclass axiom to the list of subclass axioms generated during
 // preprocessing
-void add_generated_subclass_axiom(KB* kb, SubClassAxiom* ax) {
-	SubClassAxiom** tmp;
-	tmp = realloc(kb->generated_subclass_axioms, (kb->generated_subclass_axiom_count + 1) * sizeof(SubClassAxiom*));
+void add_generated_subclass_axiom(KB* kb, SubClassOfAxiom* ax) {
+	SubClassOfAxiom** tmp;
+	tmp = realloc(kb->generated_subclass_axioms, (kb->generated_subclass_axiom_count + 1) * sizeof(SubClassOfAxiom*));
 	assert(tmp != NULL);
 	kb->generated_subclass_axioms = tmp;
 	kb->generated_subclass_axioms[kb->generated_subclass_axiom_count] = ax;
@@ -62,9 +62,9 @@ void add_generated_subclass_axiom(KB* kb, SubClassAxiom* ax) {
 
 // Add a given subrole axiom the list of subclass axioms generated during
 // preprocessing
-void add_generated_subrole_axiom(KB* kb, SubRoleAxiom* ax) {
-	SubRoleAxiom** tmp;
-	tmp = realloc(kb->generated_subrole_axioms, (kb->generated_subrole_axiom_count + 1) * sizeof(SubRoleAxiom*));
+void add_generated_subrole_axiom(KB* kb, SubObjectPropertyAxiom* ax) {
+	SubObjectPropertyAxiom** tmp;
+	tmp = realloc(kb->generated_subrole_axioms, (kb->generated_subrole_axiom_count + 1) * sizeof(SubObjectPropertyAxiom*));
 	assert(tmp != NULL);
 	kb->generated_subrole_axioms = tmp;
 	kb->generated_subrole_axioms[kb->generated_subrole_axiom_count] = ax;
@@ -130,7 +130,7 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 
 
 // get or create generated the existential restriction with role r and filler f
-ClassExpression* get_create_generated_exists_restriction(KB* kb, Role* r, ClassExpression* f) {
+ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyExpression* r, ClassExpression* f) {
 	ClassExpression* c;
 
 	// first check if we already created an existential

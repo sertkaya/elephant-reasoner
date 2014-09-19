@@ -59,11 +59,11 @@ void index_concept(ClassExpression* c, TBox* tbox) {
 	}
 }
 
-void index_role(Role* r) {
+void index_role(ObjectPropertyExpression* r) {
 	switch (r->type) {
-	case ATOMIC_ROLE:
+	case OBJECT_PROPERTY_TYPE:
 		break;
-	case ROLE_COMPOSITION:
+	case OBJECT_PROPERTY_CHAIN_TYPE:
 		// recursive calls are necessary because role1 or role2 can also be a role comoposition
 		index_role(r->description.role_composition->role1);
 		index_role(r->description.role_composition->role2);

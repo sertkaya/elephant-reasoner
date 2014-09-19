@@ -44,18 +44,18 @@ int add_to_concept_subsumer_list(ClassExpression* c, ClassExpression* s);
 /******************************************************************************
  * functions for adding subsumer/told subsumer to a role
  *****************************************************************************/
-int add_to_role_subsumer_list(Role* r, Role* s);
+int add_to_role_subsumer_list(ObjectPropertyExpression* r, ObjectPropertyExpression* s);
 
-int add_to_role_subsumee_list(Role*r, Role* s);
+int add_to_role_subsumee_list(ObjectPropertyExpression*r, ObjectPropertyExpression* s);
 
-int add_to_role_subsumees(Role* r, Role* s);
+int add_to_role_subsumees(ObjectPropertyExpression* r, ObjectPropertyExpression* s);
 
 // TODO: check (also the other functions)
 // add s to the told subsumer list of r
 // note that multiple occurrence of s is allowed!
-void add_told_subsumer_role(Role* r, Role* s);
+void add_told_subsumer_role(ObjectPropertyExpression* r, ObjectPropertyExpression* s);
 
-void add_told_subsumee_role(Role* r, Role* s);
+void add_told_subsumee_role(ObjectPropertyExpression* r, ObjectPropertyExpression* s);
 
 
 /******************************************************************************
@@ -83,8 +83,8 @@ void add_to_negative_exists(ClassExpression* ex, TBox* tbox);
 /******************************************************************************
  * functions for adding to role ...
  *****************************************************************************/
-void add_role_to_first_component_of_list(Role* role, Role* composition);
+void add_role_to_first_component_of_list(ObjectPropertyExpression* role, ObjectPropertyExpression* composition);
 
-void add_role_to_second_component_of_list(Role* role, Role* composition);
+void add_role_to_second_component_of_list(ObjectPropertyExpression* role, ObjectPropertyExpression* composition);
 
 #endif

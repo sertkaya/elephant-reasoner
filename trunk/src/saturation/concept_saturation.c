@@ -39,7 +39,7 @@ int saturation_unique_link_count = 0, saturation_total_link_count = 0;
 // marks the axiom with the premise lhs and conclusion rhs as processed
 #define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		SET_ADD(ax->rhs, ax->lhs->subsumers)
 
-static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpression* lhs, ClassExpression* rhs, Role* role, enum saturation_axiom_type type) {
+static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpression* lhs, ClassExpression* rhs, ObjectPropertyExpression* role, enum saturation_axiom_type type) {
 	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;

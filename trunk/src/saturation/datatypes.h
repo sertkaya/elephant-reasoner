@@ -33,13 +33,13 @@ enum saturation_axiom_type {
 struct concept_saturation_axiom {
 	ClassExpression* lhs;
 	ClassExpression* rhs;
-	Role* role;
+	ObjectPropertyExpression* role;
 	enum saturation_axiom_type type;
 };
 
 struct role_saturation_axiom {
-	Role* lhs;
-	Role* rhs;
+	ObjectPropertyExpression* lhs;
+	ObjectPropertyExpression* rhs;
 };
 
 #endif /* SATURATION_DATATYPES_H_ */

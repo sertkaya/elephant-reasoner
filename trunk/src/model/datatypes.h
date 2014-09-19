@@ -36,19 +36,20 @@ typedef struct class_expression ClassExpression;
 // Datatype for successor and predecessors
 typedef struct link Link;
 
-// Roles, role constructors
-typedef struct object_property AtomicRole;
-typedef struct object_property_chain RoleComposition;
-typedef union object_property_description RoleDescription;
-typedef struct object_property_expression Role;
+// Object property constructors
+typedef struct object_property ObjectProperty;
+typedef struct object_property_chain ObjectPropertyChain;
+typedef union object_property_description ObjectPropertyDescription;
+typedef struct object_property_expression ObjectPropertyExpression;
 
 // Axioms
-typedef struct subclass_axiom SubClassAxiom;
-typedef struct eqclass_axiom EqClassAxiom;
-typedef struct disjointclasses_axiom DisjointClassesAxiom;
-typedef struct subrole_axiom SubRoleAxiom;
-typedef struct eqrole_axiom EqRoleAxiom;
-typedef struct transitive_role_axiom TransitiveRoleAxiom;
+typedef struct subclass_of_axiom SubClassOfAxiom;
+typedef struct equivalent_classes_axiom EquivalentClassesAxiom;
+typedef struct disjoint_classes_axiom DisjointClassesAxiom;
+typedef struct subobject_property_of_axiom SubObjectPropertyAxiom;
+typedef struct equivalent_object_properties_axiom EquivalentObjectPropertiesAxiom;
+typedef struct transitive_object_property_axiom TransitiveObjectPropertyAxiom;
+
 // TBox
 typedef struct tbox TBox;
 
@@ -56,8 +57,8 @@ typedef struct tbox TBox;
 typedef struct individual Individual;
 
 // ABox assertions
-typedef struct concept_assertion ConceptAssertion;
-typedef struct role_assertion RoleAssertion;
+typedef struct class_assertion ClassAssertion;
+typedef struct object_property_assertion ObjectPropertyAssertion;
 
 // ABox
 typedef struct abox ABox;
@@ -69,7 +70,7 @@ typedef struct knowledge_base KB;
 typedef enum reasoning_task ReasoningTask;
 /*****************************************************************************/
 // Concept description types
-enum concept_description_type {
+enum class_expression_type {
 	CLASS_TYPE, OBJECT_INTERSECTION_OF_TYPE, OBJECT_SOME_VALUES_FROM_TYPE, OBJECT_ONE_OF_TYPE
 };
 
@@ -93,7 +94,7 @@ struct object_intersection_of {
 
 // ObjectSomeValuesFrom
 struct object_some_values_from {
-	Role* role;
+	ObjectPropertyExpression* role;
 	ClassExpression* filler;
 };
 
@@ -117,7 +118,7 @@ struct class_expression {
 	// 32-bit unsigned integer. Needed for hashing.
 	uint32_t id;
 
-	enum concept_description_type type;
+	enum class_expression_type type;
 	ClassDescription description;
 
 	// List of told subsumers. Elements are ClassExpression*
@@ -154,32 +155,32 @@ struct class_expression {
 
 // For keeping successors and predecessors of a  concept
 struct link {
-	Role* role;
+	ObjectPropertyExpression* role;
 	ClassExpression** fillers;
 	int filler_count;
 };
 
 /*****************************************************************************/
 // Role description types
-enum role_description_type {
-	ATOMIC_ROLE, ROLE_COMPOSITION
+enum object_property_expression_type {
+	OBJECT_PROPERTY_TYPE, OBJECT_PROPERTY_CHAIN_TYPE
 };
 
 // ObjectProperty
 struct object_property {
-	char* name;
+	char* IRI;
 };
 
 // Object property description
 union object_property_description {
-	AtomicRole* atomic;
-	RoleComposition* role_composition;
+	ObjectProperty* atomic;
+	ObjectPropertyChain* role_composition;
 }; 
 	
 // Object property chain
 struct object_property_chain {
-	Role* role1;
-	Role* role2;
+	ObjectPropertyExpression* role1;
+	ObjectPropertyExpression* role2;
 };
 
 // Object property expression
@@ -188,26 +189,26 @@ struct object_property_expression {
 	// 32-bit unsigned integer, needed for hashing.
 	uint32_t id;
 
-	enum role_description_type type;
-	RoleDescription description;
+	enum object_property_expression_type type;
+	ObjectPropertyDescription description;
 
 	HashMap* told_subsumers;
 	HashMap* told_subsumees;
 
 	HashTable* subsumers;
-	Role** subsumer_list;
+	ObjectPropertyExpression** subsumer_list;
 	int subsumer_count;
 
 	// Only necessary for optimizing the processing of role compositions
 	// For that we need to access the subsumees
 	HashTable* subsumees;
-	Role** subsumee_list;
+	ObjectPropertyExpression** subsumee_list;
 	int subsumee_count;
 
 	// List of role compositions where this role is the first/second component
-	Role** first_component_of_list;
+	ObjectPropertyExpression** first_component_of_list;
 	int first_component_of_count;
-	Role** second_component_of_list;
+	ObjectPropertyExpression** second_component_of_list;
 	int second_component_of_count;
 
 	// Same as above. The reason is performance in saturation.
@@ -216,39 +217,39 @@ struct object_property_expression {
 };
 
 /******************************************************************************/
-// SubClass axiom
-struct subclass_axiom {
+// SubClassOf axiom
+struct subclass_of_axiom {
 	ClassExpression* lhs;
 	ClassExpression* rhs;
 };
 
 // EquivalentClasses axiom
-struct eqclass_axiom {
+struct equivalent_classes_axiom {
 	ClassExpression* lhs;
 	ClassExpression* rhs;
 };
 
 // DisjointClasses axiom
-struct disjointclasses_axiom {
+struct disjoint_classes_axiom {
 	int concept_count;
 	ClassExpression **concepts;
 };
 
-// RI
-struct subrole_axiom {
-	Role* lhs;
-	Role* rhs;
+// SubObjectPropertyOf axiom
+struct subobject_property_of_axiom {
+	ObjectPropertyExpression* lhs;
+	ObjectPropertyExpression* rhs;
 };
 
-// Transitive role
-struct transitive_role_axiom {
-	Role* r;
+// TransitiveObjectProperty axiom
+struct transitive_object_property_axiom {
+	ObjectPropertyExpression* r;
 };
 
-// Equivalent roles
-struct eqrole_axiom {
-	Role* lhs;
-	Role* rhs;
+// EquivalentObjectProperties axiom
+struct equivalent_object_properties_axiom {
+	ObjectPropertyExpression* lhs;
+	ObjectPropertyExpression* rhs;
 };
 
 // TBox
@@ -291,19 +292,19 @@ struct tbox {
 	uint32_t last_concept_id;
 	uint32_t last_role_id;
 
-	SubClassAxiom** subclass_axioms;
+	SubClassOfAxiom** subclass_axioms;
 	int subclass_axiom_count;
 
-	EqClassAxiom** eqclass_axioms;
+	EquivalentClassesAxiom** eqclass_axioms;
 	int eqclass_axiom_count;
 
-	SubRoleAxiom** subrole_axioms;
+	SubObjectPropertyAxiom** subrole_axioms;
 	int subrole_axiom_count;
 
-	TransitiveRoleAxiom** transitive_role_axioms;
+	TransitiveObjectPropertyAxiom** transitive_role_axioms;
 	int transitive_role_axiom_count;
 
-	EqRoleAxiom** eqrole_axioms;
+	EquivalentObjectPropertiesAxiom** eqrole_axioms;
 	int eqrole_axiom_count;
 
 	DisjointClassesAxiom** disjointclasses_axioms;
@@ -319,14 +320,14 @@ struct individual {
 };
 
 // Concept assertion
-struct concept_assertion {
+struct class_assertion {
 	Individual* individual;
 	ClassExpression* concept;
 };
 
 // Role assertion
-struct role_assertion {
-	Role* role;
+struct object_property_assertion {
+	ObjectPropertyExpression* role;
 	Individual* source_individual;
 	Individual* target_individual;
 };
@@ -341,10 +342,10 @@ struct abox {
 	HashMap* individuals;
 
 	int concept_assertion_count;
-	ConceptAssertion** concept_assertions;
+	ClassAssertion** concept_assertions;
 
 	int role_assertion_count;
-	RoleAssertion** role_assertions;
+	ObjectPropertyAssertion** role_assertions;
 };
 
 /******************************************************************************/
@@ -367,11 +368,11 @@ struct knowledge_base {
 
 	// The list of subclass axioms that result from converting syntactic
 	// shortcuts (disjointness axioms, etc.) to subclass axioms. They are generated in preprocessing.
-	SubClassAxiom** generated_subclass_axioms;
+	SubClassOfAxiom** generated_subclass_axioms;
 	int generated_subclass_axiom_count;
 
 	// The list of subrole axioms that are generated during  preprocessing
-	SubRoleAxiom** generated_subrole_axioms;
+	SubObjectPropertyAxiom** generated_subrole_axioms;
 	int generated_subrole_axiom_count;
 
 	// The hash of nominals that are generated during preprocessing.

@@ -32,13 +32,13 @@
  *****************************************************************************/
 // TODO: Use Set datatype instead, make it a macro
 // add s to the told subsumer list of c
-void add_told_subsumer_role(Role* r, Role* s) {
+void add_told_subsumer_role(ObjectPropertyExpression* r, ObjectPropertyExpression* s) {
 	hash_map_put(r->told_subsumers, s->id, s);
 }
 
 // TODO: Use Set datatype instead, make it a macro
 // add role s to the subsumee list of  r
-void add_told_subsumee_role(Role* r, Role* s) {
+void add_told_subsumee_role(ObjectPropertyExpression* r, ObjectPropertyExpression* s) {
 	hash_map_put(r->told_subsumees, s->id, s);
 }
 
@@ -47,11 +47,11 @@ void add_told_subsumee_role(Role* r, Role* s) {
 // note that it maintains both the array and the hash table
 // of subsumers. the reason for keeping the subsumers twice
 // is performance in saturation
-int add_to_role_subsumer_list(Role* r, Role* s) {
-	Role** tmp;
+int add_to_role_subsumer_list(ObjectPropertyExpression* r, ObjectPropertyExpression* s) {
+	ObjectPropertyExpression** tmp;
 
 	if (hash_table_insert(r->subsumers, s)) {
-		tmp = realloc(r->subsumer_list, (r->subsumer_count + 1) * sizeof(Role*));
+		tmp = realloc(r->subsumer_list, (r->subsumer_count + 1) * sizeof(ObjectPropertyExpression*));
 		assert(tmp != NULL);
 		r->subsumer_list = tmp;
 		r->subsumer_list[r->subsumer_count] = s;
@@ -63,11 +63,11 @@ int add_to_role_subsumer_list(Role* r, Role* s) {
 	return 0;
 }
 
-int add_to_role_subsumee_list(Role*r, Role* s) {
-	Role** tmp;
+int add_to_role_subsumee_list(ObjectPropertyExpression*r, ObjectPropertyExpression* s) {
+	ObjectPropertyExpression** tmp;
 
 	if (hash_table_insert(r->subsumees, s)) {
-		tmp = realloc(r->subsumee_list, (r->subsumee_count + 1) * sizeof(Role*));
+		tmp = realloc(r->subsumee_list, (r->subsumee_count + 1) * sizeof(ObjectPropertyExpression*));
 		assert(tmp != NULL);
 		r->subsumee_list = tmp;
 		r->subsumee_list[r->subsumee_count] = s;
@@ -138,11 +138,11 @@ void add_to_negative_exists(ClassExpression* ex, TBox* tbox) {
 // once in a hash table, once in a usual array. the hash table is for searching
 // during saturation, the usual array is for iteration on the elements. the memory
 // overhead is worth the performance gain.
-void add_role_to_first_component_of_list(Role* role, Role* composition) {
-	Role** tmp;
+void add_role_to_first_component_of_list(ObjectPropertyExpression* role, ObjectPropertyExpression* composition) {
+	ObjectPropertyExpression** tmp;
 
 	if (hash_table_insert(role->first_component_of, composition)) {
-		tmp = realloc(role->first_component_of_list, (role->first_component_of_count + 1) * sizeof(Role*));
+		tmp = realloc(role->first_component_of_list, (role->first_component_of_count + 1) * sizeof(ObjectPropertyExpression*));
 		assert(tmp != NULL);
 		role->first_component_of_list = tmp;
 		role->first_component_of_list[role->first_component_of_count] = composition;
@@ -152,8 +152,8 @@ void add_role_to_first_component_of_list(Role* role, Role* composition) {
 
 // add 'composition' to the list of compositions whose second component is 'role'
 // (see the note for the function add_role_to_second_component_of_list above)
-void add_role_to_second_component_of_list(Role* role, Role* composition) {
-	Role** tmp;
+void add_role_to_second_component_of_list(ObjectPropertyExpression* role, ObjectPropertyExpression* composition) {
+	ObjectPropertyExpression** tmp;
 
 	if (hash_table_insert(role->second_component_of, composition)) {
 		tmp = realloc(role->second_component_of_list, (role->second_component_of_count + 1) * sizeof(ClassExpression*));
