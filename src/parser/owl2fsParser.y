@@ -47,16 +47,16 @@
 	ClassExpression* eq_cls_exps[MAX_EQ_CLASS_EXP_COUNT];	/* class exps */
 	
 	// for parsing equivalent roles axioms containing more than 2 role expressions 
-	int eq_role_exp_count;										/* number of roles */
-	Role* eq_role_exps[MAX_EQ_ROLE_EXP_COUNT];					/* roles in the composition */
+	int eq_role_exp_count;														/* number of roles */
+	ObjectPropertyExpression* eq_role_exps[MAX_EQ_ROLE_EXP_COUNT];				/* roles in the composition */
 	
 	// for parsing role composition
-	int comp_role_exp_count;									/* number of roles in the role composition */
-	Role* comp_role_exps[MAX_ROLE_COMPOSITION_SIZE];			/* roles in the composition */
+	int comp_role_exp_count;													/* number of roles in the role composition */
+	ObjectPropertyExpression* comp_role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles in the composition */
 	
 	// for parsing role exps in HasKey
 	int hasKey_role_exp_count;									/* number of roles */
-	Role* hasKey_role_exps[MAX_ROLE_COMPOSITION_SIZE];			/* roles */
+	ObjectPropertyExpression* hasKey_role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles */
 	
 	int disj_cls_exp_count;										/* number of classes in a disjointclasses axiom */
 	ClassExpression* disj_cls_exps[MAX_DISJ_CLASS_EXP_COUNT];	/* the class exps in a disjointclasses axiom */

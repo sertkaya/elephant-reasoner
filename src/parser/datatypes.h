@@ -27,7 +27,7 @@
 typedef union expression Expression;
 union expression {
 	ClassExpression* concept;
-	Role* role;
+	ObjectPropertyExpression* role;
 	Individual* individual;
 	char* text;
 };
