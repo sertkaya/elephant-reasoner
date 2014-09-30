@@ -1,0 +1,17 @@
+/.autotools
+/.cproject
+/.project
+/Makefile.in
+/aclocal.m4
+/autoscan-2.68.log
+/config.h.in
+/configure
+/configure.scan
+/depcomp
+/install-sh
+/missing
+/ylwrap
+/build
+Makefile.in
+/autom4te.cache
+/.settings
