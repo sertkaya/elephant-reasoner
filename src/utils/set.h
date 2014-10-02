@@ -24,42 +24,42 @@
 #ifndef SET_H_
 #define SET_H_
 
-#include "../hashing/hash_table.h"
+#include "../hashing/dynamic_hash_table.h"
 
-typedef HashTable Set;
-typedef HashTableIterator SetIterator;
+typedef DynamicHashTable Set;
+typedef DynamicHashTableIterator SetIterator;
 
 
 /**
  * Create a set with an underlying hash table of the given size.
  * Returns the set created
  */
-#define SET_CREATE(size)		hash_table_create(size)
+#define SET_CREATE(size)		dynamic_hash_table_create(size)
 
 /**
  * Adds element e to the set s. Duplicates are not allowed.
  * Returns 1 if e is successfully added, 0 otherwise.
  */
-#define SET_ADD(e, s)			hash_table_insert(s, e)
+#define SET_ADD(e, s)			dynamic_hash_table_insert(e, s)
 
 /**
  * Removes the element e if it is present. The set stays unchanged
  * if e does not occur in s.
  * Returns 1 if e is removed, 0 otherwise.
  */
-#define SET_REMOVE(e, s)		hash_table_remove(s, e)
+#define SET_REMOVE(e, s)		dynamic_hash_table_remove(e, s)
 
 /**
  * Checks if a given element exists.
  * Returns 1 if this is the case, 0 otherwise.
  */
-#define SET_CONTAINS(e, s)		hash_table_contains(s, e)
+#define SET_CONTAINS(e, s)		dynamic_hash_table_contains(e, s)
 
 /**
  * Free the space allocated for the given set.
  * Returns the number of freed bytes.
  */
-#define SET_FREE(s)				hash_table_free(s)
+#define SET_FREE(s)				dynamic_hash_table_free(s)
 
 /**
  * Return an array containing the elements of the given set.
@@ -71,18 +71,18 @@ typedef HashTableIterator SetIterator;
  * Create an iterator for the elements of the set.
  * It is the iterator of the underlying hash table.
  */
-#define SET_ITERATOR_CREATE(s)		hash_table_iterator_create(s)
+#define SET_ITERATOR_CREATE(s)		dynamic_hash_table_iterator_create(s)
 
 /**
  * Get the next element in the set.
  * Gets the next element in the underlying hash table.
  * Elements are not necessarily returned in the order of addition.
  */
-#define SET_ITERATOR_NEXT(si)		hash_table_iterator_next(si)
+#define SET_ITERATOR_NEXT(si)		dynamic_hash_table_iterator_next(si)
 
 /**
  * Free the space for the given set iterator.
  */
-#define SET_ITERATOR_FREE(si)		hash_table_iterator_free(si)
+#define SET_ITERATOR_FREE(si)		dynamic_hash_table_iterator_free(si)
 
 #endif

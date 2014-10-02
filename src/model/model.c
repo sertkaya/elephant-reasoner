@@ -22,7 +22,6 @@
 #include <assert.h>
 #include <string.h>
 
-#include "../hashing/hash_table.h"
 #include "../utils/set.h"
 #include "datatypes.h"
 #include "model.h"

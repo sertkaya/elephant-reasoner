@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < 100; ++i) {
 		tmp[i] = malloc(sizeof(void));
 		assert(tmp[i] != NULL);
+		printf("%d: add %p\n", i, tmp[i]);
 		SET_ADD(tmp[i], set);
 	}
 
@@ -40,6 +41,8 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < 100; ++i)
 		if (!SET_CONTAINS(tmp[i], set))
 			printf("%d: not found!\n", i);
+		else
+			printf("%d: found!\n", i);
 
 	SetIterator* it = SET_ITERATOR_CREATE(set);
 	void* e = SET_ITERATOR_NEXT(it);
