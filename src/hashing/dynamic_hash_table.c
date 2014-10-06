@@ -57,8 +57,14 @@ DynamicHashTable* dynamic_hash_table_create(unsigned int size) {
 
 	hash_table->elements = (void**) calloc(size, sizeof(void*));
 	assert(hash_table->elements != NULL);
+	hash_table->end_indexes = (unsigned int*) calloc(size, sizeof(unsigned int));
+	assert(hash_table->end_indexes != NULL);
 	hash_table->size = size;
 	hash_table->element_count = 0;
+	int i;
+	for (i = 0; i < hash_table->size; ++i)
+		// each chain initially ends at its starting point
+		hash_table->end_indexes[i] = i;
 
 	return hash_table;
 }
@@ -76,6 +82,13 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 		void **tmp_elements = (void**) calloc(new_size, sizeof(void*));
 		assert(tmp_elements != NULL);
 
+		// free the end indexes, allocate and initialize new
+		free(hash_table->end_indexes);
+		hash_table->end_indexes = (unsigned int*) calloc(new_size, sizeof(unsigned int));
+		assert(hash_table->end_indexes != NULL);
+		for (i = 0; i < new_size; ++i)
+			hash_table->end_indexes[i] = i;
+
 		// re-populate
 		for (i = 0; i < hash_table->size; ++i)
 			if (hash_table->elements[i] != NULL) {
@@ -85,6 +98,7 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 						tmp_elements[j] = hash_table->elements[i];
 						break;
 					}
+				hash_table->end_indexes[start_index] = j;
 			}
 
 		// change the size
@@ -107,6 +121,8 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 			// insert the key here
 			hash_table->elements[i] = key;
 			++hash_table->element_count;
+			// mark the new end index
+			hash_table->end_indexes[start_index] = i;
 			return 1;
 		}
 	}
@@ -129,11 +145,9 @@ inline char dynamic_hash_table_contains(void* key, DynamicHashTable* hash_table)
 	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
 
 	int i;
-	for (i = start_index; ; i = (i + 1) % hash_table->size) {
+	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) % hash_table->size) {
 		if (hash_table->elements[i] == key)
 			return 1;
-		if (hash_table->elements[i] == NULL)
-			return 0;
 	}
 	return 0;
 }

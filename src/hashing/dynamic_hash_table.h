@@ -35,6 +35,7 @@ typedef struct dynamic_hash_table_iterator DynamicHashTableIterator;
  */
 struct dynamic_hash_table {
 	void** elements;			// the buckets
+	unsigned int* end_indexes;	// the end indexes of chains
 	unsigned int size;			// size of the hash table
 	unsigned int element_count;	// the number of elements
 };
