@@ -158,17 +158,14 @@ inline char dynamic_hash_table_remove(void* key, DynamicHashTable* hash_table) {
 	int i;
 	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
 
-	for (i = start_index; ; i = (i + 1) % hash_table->size) {
-		if (hash_table->elements[i] == NULL)
-			// key not found
-			return 0;
-
-		if (hash_table->elements[i] == key)
+	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) % hash_table->size) {
+		if (hash_table->elements[i] == key) {
 			// key found
-			break;
+			hash_table->elements[i] = -1;
+			return 1;
+		}
 	}
-	// TODO: here remove the element
-	return 1;
+	return 0;
 }
 
 
@@ -193,7 +190,7 @@ inline void* dynamic_hash_table_iterator_next(DynamicHashTableIterator* iterator
 
 	int i;
 	for (i = iterator->current_index; i < iterator->hash_table->size; ++i)
-		if (iterator->hash_table->elements[i] != NULL) {
+		if (iterator->hash_table->elements[i] != NULL && iterator->hash_table->elements[i] != -1) {
 			iterator->current_index = i + 1;
 			return iterator->hash_table->elements[i];
 		}
