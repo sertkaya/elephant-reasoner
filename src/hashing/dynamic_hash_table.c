@@ -142,7 +142,7 @@ int dynamic_hash_table_free(DynamicHashTable* hash_table) {
 }
 
 inline char dynamic_hash_table_contains(void* key, DynamicHashTable* hash_table) {
-	assert(key != NULL);
+	// assert(key != NULL);
 	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
 
 	int i;
