@@ -75,6 +75,22 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 
 	assert(key != NULL);
 
+	start_index = HASH_POINTER(key) & (hash_table->size - 1);
+	for (i = start_index; ; i = (i + 1) & (hash_table->size - 1)) {
+		if (hash_table->elements[i] == key)
+			// the key already exists
+			return 0;
+
+		if (hash_table->elements[i] == NULL) {
+			// insert the key here
+			hash_table->elements[i] = key;
+			++hash_table->element_count;
+			// mark the new end index
+			hash_table->end_indexes[start_index] = (i + 1) & (hash_table->size - 1);
+			break;
+		}
+	}
+
 	// check if we need to resize. load factor 0.75
 	if (hash_table->element_count * 4 >= hash_table->size * 3) {
 		// the load factor is reached, resize
@@ -93,12 +109,12 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 		for (i = 0; i < hash_table->size; ++i)
 			if (hash_table->elements[i] != NULL) {
 				start_index = HASH_POINTER(hash_table->elements[i]) & (new_size - 1);
-				for (j = start_index; ; j = (j + 1) % new_size)
+				for (j = start_index; ; j = (j + 1) & (new_size - 1))
 					if (tmp_elements[j] == NULL) {
 						tmp_elements[j] = hash_table->elements[i];
 						break;
 					}
-				hash_table->end_indexes[start_index] = (j + 1) % hash_table->size;
+				hash_table->end_indexes[start_index] = (j + 1) & (new_size - 1);
 			}
 
 		// change the size, the element count does not change
@@ -111,24 +127,8 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 		hash_table->elements = tmp_elements;
 	}
 
-	start_index = HASH_POINTER(key) & (hash_table->size - 1);
-	for (i = start_index; ; i = (i + 1) % hash_table->size) {
-		if (hash_table->elements[i] == key)
-			// the key already exists
-			return 0;
-
-		if (hash_table->elements[i] == NULL) {
-			// insert the key here
-			hash_table->elements[i] = key;
-			++hash_table->element_count;
-			// mark the new end index
-			hash_table->end_indexes[start_index] = (i + 1) % hash_table->size;
-			return 1;
-		}
-	}
-
 	// to suppress warnings
-	return 0;
+	return 1;
 }
 
 int dynamic_hash_table_free(DynamicHashTable* hash_table) {
@@ -146,7 +146,7 @@ inline char dynamic_hash_table_contains(void* key, DynamicHashTable* hash_table)
 	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
 
 	int i;
-	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) % hash_table->size) {
+	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key)
 			return 1;
 	}
@@ -159,7 +159,7 @@ inline char dynamic_hash_table_remove(void* key, DynamicHashTable* hash_table) {
 	int i;
 	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
 
-	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) % hash_table->size) {
+	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key) {
 			// key found
 			hash_table->elements[i] = (void*) -1;
