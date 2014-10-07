@@ -75,7 +75,7 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 
 	assert(key != NULL);
 
-	// check if we need to resize
+	// check if we need to resize. load factor 0.75
 	if (hash_table->element_count * 4 >= hash_table->size * 3) {
 		// the load factor is reached, resize
 		new_size = 2 * hash_table->size;
@@ -98,10 +98,10 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 						tmp_elements[j] = hash_table->elements[i];
 						break;
 					}
-				hash_table->end_indexes[start_index] = j;
+				hash_table->end_indexes[start_index] = (j + 1) % hash_table->size;
 			}
 
-		// change the size
+		// change the size, the element count does not change
 		hash_table->size = new_size;
 
 		// free the existing elements
@@ -122,11 +122,12 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 			hash_table->elements[i] = key;
 			++hash_table->element_count;
 			// mark the new end index
-			hash_table->end_indexes[start_index] = i;
+			hash_table->end_indexes[start_index] = (i + 1) % hash_table->size;
 			return 1;
 		}
 	}
 
+	// to suppress warnings
 	return 0;
 }
 
@@ -190,7 +191,7 @@ inline void* dynamic_hash_table_iterator_next(DynamicHashTableIterator* iterator
 
 	int i;
 	for (i = iterator->current_index; i < iterator->hash_table->size; ++i)
-		if (iterator->hash_table->elements[i] != NULL && iterator->hash_table->elements[i] != ((void*)-1)) {
+		if (iterator->hash_table->elements[i] != NULL && iterator->hash_table->elements[i] != ((void*) -1)) {
 			iterator->current_index = i + 1;
 			return iterator->hash_table->elements[i];
 		}

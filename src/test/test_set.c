@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	SET_REMOVE(tmp[10], set);
+	SET_REMOVE(tmp[99], set);
 
 
 	for (i = 0; i < 100; ++i)
