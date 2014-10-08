@@ -48,6 +48,7 @@ inline uint64_t hash_string(unsigned char* key) {
 	return hash_value;
 }
 
+// murmur3
 inline uint32_t hash_pointer(uint32_t key) {
 	uint32_t hash_value;
 	hash_value ^= key >> 16;

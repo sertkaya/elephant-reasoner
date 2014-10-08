@@ -75,7 +75,7 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 
 	assert(key != NULL);
 
-	start_index = hash_pointer(key) & (hash_table->size - 1);
+	start_index = HASH_POINTER(key) & (hash_table->size - 1);
 	for (i = start_index; ; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key)
 			// the key already exists
@@ -108,7 +108,7 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 		// re-populate
 		for (i = 0; i < hash_table->size; ++i)
 			if (hash_table->elements[i] != NULL) {
-				start_index = hash_pointer(hash_table->elements[i]) & (new_size - 1);
+				start_index = HASH_POINTER(hash_table->elements[i]) & (new_size - 1);
 				for (j = start_index; ; j = (j + 1) & (new_size - 1))
 					if (tmp_elements[j] == NULL) {
 						tmp_elements[j] = hash_table->elements[i];
@@ -143,7 +143,7 @@ int dynamic_hash_table_free(DynamicHashTable* hash_table) {
 
 inline char dynamic_hash_table_contains(void* key, DynamicHashTable* hash_table) {
 	// assert(key != NULL);
-	size_t start_index = hash_pointer(key) & (hash_table->size - 1);
+	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
 
 	int i;
 	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) & (hash_table->size - 1)) {
@@ -157,7 +157,7 @@ inline char dynamic_hash_table_remove(void* key, DynamicHashTable* hash_table) {
 	assert(key != NULL);
 
 	int i;
-	size_t start_index = hash_pointer(key) & (hash_table->size - 1);
+	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
 
 	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key) {
