@@ -47,3 +47,14 @@ inline uint64_t hash_string(unsigned char* key) {
 
 	return hash_value;
 }
+
+inline uint32_t hash_pointer(uint32_t key) {
+	uint32_t hash_value;
+	hash_value ^= key >> 16;
+	hash_value *= 0x85ebca6b;
+	hash_value ^= hash_value >> 13;
+	hash_value *= 0xc2b2ae35;
+	hash_value ^= hash_value >> 16;
+
+	return hash_value;
+}
