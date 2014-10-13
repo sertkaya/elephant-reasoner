@@ -17,21 +17,21 @@
  */
 
 
-DIGIT					[0-9]
-PN_CHARS_BASE			[A-Za-z]
-PN_CHARS_U				({PN_CHARS_BASE}|_)
-PN_CHARS				({PN_CHARS_U}|-|{DIGIT})
-PN_PREFIX				{PN_CHARS_BASE}(({PN_CHARS}|\.)*{PN_CHARS})?
-PN_LOCAL				({PN_CHARS_U}|{DIGIT})(({PN_CHARS}|\.)*{PN_CHARS})?
-PNAME_NS		 		{PN_PREFIX}?:
-PNAME_LN				{PNAME_NS}{PN_LOCAL}
-IRI_REF					<[^<>"{}|\^`\\ ]*>
-BLANK_NODE_LABEL		_:{PN_LOCAL}
-LANGTAG					@[A-Za-z]+(-[A-Za-z0-9]+)*
-QUOTED_STRING			\"([^\"\\]|\\\"|\\\\)*\"
-DOUBLE_CARET			"^^"
+DIGIT                           [0-9]
+PN_CHARS_BASE                   [A-Za-z]
+PN_CHARS_U                      ({PN_CHARS_BASE}|_)
+PN_CHARS                        ({PN_CHARS_U}|-|{DIGIT})
+PN_PREFIX                       {PN_CHARS_BASE}(({PN_CHARS}|\.)*{PN_CHARS})?
+PN_LOCAL                        ({PN_CHARS_U}|{DIGIT})(({PN_CHARS}|\.)*{PN_CHARS})?
+PNAME_NS                        {PN_PREFIX}?:
+PNAME_LN                        {PNAME_NS}{PN_LOCAL}
+IRI_REF                         <[^<>"{}|\^`\\ ]*>
+BLANK_NODE_LABEL                _:{PN_LOCAL}
+LANGTAG                         @[A-Za-z]+(-[A-Za-z0-9]+)*
+QUOTED_STRING                   \"([^\"\\]|\\\"|\\\\)*\"
+DOUBLE_CARET                    "^^"
 	// PrefixedName			({PNAME_LN}|{PNAME_NS})
-	// IRIref					({IRI_REF}|{PrefixedName})
+	// IRIref			({IRI_REF}|{PrefixedName})
 
 
 %{
@@ -48,80 +48,88 @@ DOUBLE_CARET			"^^"
 
 %%
 
-\n										{ ++yylineno; }
-										/* skip whitespace */
-[ \t]									;
-										/* skip comments */
+\n                              { ++yylineno; }
+                                /* skip whitespace */
+[ \t]                           ;
+	/* skip comments */
 	/* "//".*\n								;*/
 										
-[()=]									{ return *yytext; }
+[()=]                           { return *yytext; }
 
-										/* Ontology */
-Prefix									{ return PREFIX; }
-Ontology 								{ return ONTOLOGY; }
-Import									{ return IMPORT; }
+                                /* Ontology */
+Prefix                          { return PREFIX; }
+Ontology                        { return ONTOLOGY; }
+Import                          { return IMPORT; }
 
-Declaration								{ return DECLARATION; }	
-Class									{ return CLASS; }
-ObjectProperty							{ return OBJECT_PROPERTY; }
-Datatype								{ return DATATYPE; }
-DatatypeDefinition						{ return DATATYPE_DEFINITION; }
-HasKey									{ return HAS_KEY; }
-NamedIndividual							{ return NAMED_INDIVIDUAL; }
-SameIndividual							{ return SAME_INDIVIDUAL; }
-DifferentIndividuals					{ return DIFFERENT_INDIVIDUALS; }
+Declaration                     { return DECLARATION; }	
 
-ClassAssertion							{ return CLASS_ASSERTION; }
-ObjectPropertyAssertion					{ return OBJECT_PROPERTY_ASSERTION; }
-NegativeObjectPropertyAssertion			{ return NEGATIVE_OBJECT_PROPERTY_ASSERTION; }
+Class                           { return CLASS; }
+Datatype                        { return DATATYPE; }
+ObjectProperty                  { return OBJECT_PROPERTY; }
+DataProperty                    { return DATA_PROPERTY; }
+AnnotationProperty              { return ANNOTATION_PROPERTY; }
+NamedIndividual                 { return NAMED_INDIVIDUAL; }
 
-AnnotationAssertion						{ return ANNOTATION_ASSERTION; }
-Annotation								{ return ANNOTATION; }
-AnnotationProperty						{ return ANNOTATION_PROPERTY; }
-SubAnnotationPropertyOf					{ return SUB_ANNOTATION_PROPERTY_OF; }
-AnnotationPropertyDomain				{ return ANNOTATION_PROPERTY_DOMAIN; }
-AnnotationPropertyRange					{ return ANNOTATION_PROPERTY_RANGE; }
+DataIntersectionOf              { return DATA_INTERSECTION_OF; }
+DataOneOf                       { return DATA_ONE_OF; }
 
-										/* Class Expression */
-ObjectIntersectionOf					{ return OBJECT_INTERSECTION_OF; }
-ObjectSomeValuesFrom					{ return OBJECT_SOME_VALUES_FROM; }
+ObjectIntersectionOf            { return OBJECT_INTERSECTION_OF; }
+ObjectOneOf                     { return OBJECT_ONE_OF; }
+ObjectSomeValuesFrom            { return OBJECT_SOME_VALUES_FROM; }
+ObjectHasValue                  { return OBJECT_HAS_VALUE; }
+ObjectHasSelf                   { return OBJECT_HAS_SELF; }
 
-ObjectPropertyChain						{ return OBJECT_PROPERTY_CHAIN; }
+DataSomeValuesFrom              { return DATA_SOME_VALUES_FROM; }
+DataHasValue                    { return DATA_HAS_VALUE; }
 
-DataIntersectionOf						{ return DATA_INTERSECTION_OF; }
-DataOneOf								{ return DATA_ONE_OF; }
+SubClassOf                      { return SUB_CLASS_OF; }
+EquivalentClasses               { return EQUIVALENT_CLASSES; }
+DisjointClasses                 { return DISJOINT_CLASSES; }
 
-DataProperty							{ return DATA_PROPERTY; }
-DataPropertyDomain						{ return DATA_PROPERTY_DOMAIN; }
-DataPropertyRange						{ return DATA_PROPERTY_RANGE; }
-FunctionalDataProperty					{ return FUNCTIONAL_DATA_PROPERTY; }
+SubObjectPropertyOf             { return SUB_OBJECT_PROPERTY_OF; }
+ObjectPropertyChain             { return OBJECT_PROPERTY_CHAIN; }
+EquivalentObjectProperties      { return EQUIVALENT_OBJECT_PROPERTIES; }
 
-DataPropertyAssertion					{ return DATA_PROPERTY_ASSERTION; }
-NegativeDataPropertyAssertion			{ return NEGATIVE_DATA_PROPERTY_ASSERTION; }
- 
-SubDataPropertyOf						{ return SUB_DATA_PROPERTY_OF; }
-EquivalentDataProperties				{ return EQUIVALENT_DATA_PROPERTIES; }
-										/* Class Axiom */
-SubClassOf								{ return SUB_CLASS_OF; }
-EquivalentClasses						{ return EQUIVALENT_CLASSES; }
-DisjointClasses							{ return DISJOINT_CLASSES; }
-
-										/* Object Property Axiom */
-EquivalentObjectProperties				{ return EQUIVALENT_OBJECT_PROPERTIES; }
-SubObjectPropertyOf						{ return SUB_OBJECT_PROPERTY_OF; }
-ObjectPropertyDomain					{ return OBJECT_PROPERTY_DOMAIN; }
-ObjectPropertyRange						{ return OBJECT_PROPERTY_RANGE; }
-ReflexiveObjectProperty					{ return REFLEXIVE_OBJECT_PROPERTY; }
-TransitiveObjectProperty				{ return TRANSITIVE_OBJECT_PROPERTY; }
+ObjectPropertyDomain            { return OBJECT_PROPERTY_DOMAIN; }
+ObjectPropertyRange             { return OBJECT_PROPERTY_RANGE; }
+ReflexiveObjectProperty         { return REFLEXIVE_OBJECT_PROPERTY; }
+TransitiveObjectProperty        { return TRANSITIVE_OBJECT_PROPERTY; }
 
 
-{IRI_REF}								{ return IRI_REF; }
-{PNAME_NS}								{ return PNAME_NS; }
-{PNAME_LN}								{ return PNAME_LN; }
-{BLANK_NODE_LABEL}						{ return BLANK_NODE_LABEL; }
-{LANGTAG}								{ return LANGTAG; }
-{QUOTED_STRING}							{ return QUOTED_STRING; }
-{DOUBLE_CARET}							{ return DOUBLE_CARET; }
+SubDataPropertyOf               { return SUB_DATA_PROPERTY_OF; }
+EquivalentDataProperties        { return EQUIVALENT_DATA_PROPERTIES; }
+
+DataPropertyDomain              { return DATA_PROPERTY_DOMAIN; }
+DataPropertyRange               { return DATA_PROPERTY_RANGE; }
+FunctionalDataProperty          { return FUNCTIONAL_DATA_PROPERTY; }
+
+DatatypeDefinition              { return DATATYPE_DEFINITION; }
+HasKey                          { return HAS_KEY; }
+SameIndividual                  { return SAME_INDIVIDUAL; }
+DifferentIndividuals            { return DIFFERENT_INDIVIDUALS; }
+
+ClassAssertion                  { return CLASS_ASSERTION; }
+ObjectPropertyAssertion         { return OBJECT_PROPERTY_ASSERTION; }
+NegativeObjectPropertyAssertion { return NEGATIVE_OBJECT_PROPERTY_ASSERTION; }
+DataPropertyAssertion           { return DATA_PROPERTY_ASSERTION; }
+NegativeDataPropertyAssertion   { return NEGATIVE_DATA_PROPERTY_ASSERTION; }
+
+AnnotationAssertion             { return ANNOTATION_ASSERTION; }
+Annotation                      { return ANNOTATION; }
+SubAnnotationPropertyOf         { return SUB_ANNOTATION_PROPERTY_OF; }
+AnnotationPropertyDomain        { return ANNOTATION_PROPERTY_DOMAIN; }
+AnnotationPropertyRange         { return ANNOTATION_PROPERTY_RANGE; }
+
+
+
+
+{IRI_REF}                       { return IRI_REF; }
+{PNAME_NS}                      { return PNAME_NS; }
+{PNAME_LN}                      { return PNAME_LN; }
+{BLANK_NODE_LABEL}              { return BLANK_NODE_LABEL; }
+{LANGTAG}                       { return LANGTAG; }
+{QUOTED_STRING}                 { return QUOTED_STRING; }
+{DOUBLE_CARET}                  { return DOUBLE_CARET; }
 
 %%
 
