@@ -89,7 +89,7 @@ void print_conjunction(ObjectIntersectionOf* conj) {
 }
 
 void print_nominal(ObjectOneOf* n) {
-	printf("{%s} ", n->individual->name);
+	printf("{%s} ", n->individual->IRI);
 }
 
 void print_conjunctions(TBox* tbox) {
@@ -246,7 +246,7 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 			if (subsumer->type == CLASS_TYPE)
 				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n",
 						subsumer->description.atomic->IRI,
-						nominal->description.nominal->individual->name);
+						nominal->description.nominal->individual->IRI);
 		}
 		SET_ITERATOR_FREE(subsumers_iterator);
 

@@ -564,11 +564,11 @@ Individual* get_create_individual(char* name, ABox* abox) {
 
 	i->id = abox->last_individual_id++;
 
-	i->name = (char*) malloc((strlen(name) + 1) * sizeof(char));
-	assert(i->name != NULL);
-	strcpy(i->name, name);
+	i->IRI = (char*) malloc((strlen(name) + 1) * sizeof(char));
+	assert(i->IRI != NULL);
+	strcpy(i->IRI, name);
 
-	PUT_INDIVIDUAL(i->name, i, abox);
+	PUT_INDIVIDUAL(i->IRI, i, abox);
 
 	++abox->individual_count;
 

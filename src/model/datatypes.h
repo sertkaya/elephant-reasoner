@@ -316,7 +316,7 @@ struct tbox {
 // Individual
 struct individual {
 	uint32_t id;
-	char* name;
+	char* IRI;
 };
 
 // Concept assertion

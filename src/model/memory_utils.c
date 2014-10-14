@@ -289,8 +289,8 @@ int free_tbox(TBox* tbox) {
 int free_individual(Individual* ind) {
 	int total_freed_bytes = 0;
 
-	total_freed_bytes += sizeof(char) * strlen(ind->name);
-	free(ind->name);
+	total_freed_bytes += sizeof(char) * strlen(ind->IRI);
+	free(ind->IRI);
 
 	// finally free this individual
 	total_freed_bytes += sizeof(Individual);
