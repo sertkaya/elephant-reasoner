@@ -136,13 +136,16 @@ int dynamic_hash_table_free(DynamicHashTable* hash_table) {
 	int freed_bytes = 0;
 
 	free(hash_table->elements);
-	freed_bytes = hash_table->size * sizeof(void*);
+	freed_bytes += hash_table->size * sizeof(void*);
 
 	free(hash_table->end_indexes);
 	freed_bytes += hash_table->size * sizeof(unsigned int);
+<<<<<<< HEAD
 
 	free(hash_table);
 	freed_bytes += sizeof(HashTable);
+=======
+>>>>>>> master
 
 	return freed_bytes;
 }
