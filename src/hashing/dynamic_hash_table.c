@@ -140,12 +140,9 @@ int dynamic_hash_table_free(DynamicHashTable* hash_table) {
 
 	free(hash_table->end_indexes);
 	freed_bytes += hash_table->size * sizeof(unsigned int);
-<<<<<<< HEAD
 
 	free(hash_table);
-	freed_bytes += sizeof(HashTable);
-=======
->>>>>>> master
+	freed_bytes += sizeof(DynamicHashTable);
 
 	return freed_bytes;
 }
