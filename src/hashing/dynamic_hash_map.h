@@ -24,13 +24,15 @@
 typedef struct dynamic_hash_map_element DynamicHashMapElement;
 typedef struct dynamic_hash_map DynamicHashMap;
 
+#define DELETED_KEY		-1
+
 struct dynamic_hash_map_element {
 	uint64_t key;
 	void* value;
 };
 
 struct dynamic_hash_map {
-	DynamicHashMapElement** elements;	// the elements
+	DynamicHashMapElement* elements;	// the elements
 	unsigned int element_count;			// the number of elements
 	unsigned int size;					// sizes of the hash map
 	unsigned int* end_indexes;			// the end indexes of chains

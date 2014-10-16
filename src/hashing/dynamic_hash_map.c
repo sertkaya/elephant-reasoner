@@ -21,7 +21,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
-#include "hash_map.h"
+#include "dynamic_hash_map.h"
 #include "utils.h"
 
 
@@ -68,57 +68,81 @@ int dynamic_hash_map_free(DynamicHashMap* hash_map) {
 	return freed_bytes;
 }
 
-/*
-inline char hash_map_put(HashMap* hash_table,
-		uint64_t key,
-		void* value) {
+inline char dynamic_hash_map_put(DynamicHashMap* hash_map, uint64_t key, void* value) {
+	int i, j, new_size;
+	size_t start_index;
 
-	int hash_value = key & (hash_table->bucket_count - 1);
-	// int hash_value = HASH_UNSIGNED(key) & (hash_table->bucket_count - 1);
-	HashMapElement** bucket = hash_table->buckets[hash_value];
-	int chain_size = hash_table->chain_sizes[hash_value];
+	assert(key != NULL);
 
-	int i;
-	for (i = 0; i < chain_size; i++)
-		if (bucket[i]->key == key)
-			return 0;
+	start_index  = key & (hash_map->size - 1);
+	for (i = start_index; ; i = (i + 1) & (hash_map->size - 1)) {
+		if (hash_map->elements[i].key == key) {
+			// the key already exists, overwrite the value
+			hash_map->elements[i].value = value;
+			return 1;
+		}
 
-	HashMapElement** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement*));
-	assert(tmp != NULL);
-	bucket = hash_table->buckets[hash_value] = tmp;
+		if (hash_map->elements[i].key == NULL) {
+			// insert the key here
+			hash_map->elements[i].key = key;
+			++hash_map->element_count;
+			// mark the new end index
+			hash_map->end_indexes[start_index] = (i + 1) & (hash_map->size - 1);
+			break;
+		}
+	}
 
-	bucket[chain_size] = malloc(sizeof(HashMapElement));
-	assert(bucket[chain_size] != NULL);
-	bucket[chain_size]->key = key;
-	bucket[chain_size]->value = value;
-	bucket[chain_size]->previous = hash_table->tail;
+	// check if we need to resize. load factor is 0.75
+	if (hash_map->element_count * 4 >= hash_map->size * 3) {
+		// the load factor is reached, resize
+		new_size = 2 * hash_map->size;
+		DynamicHashMapElement* tmp_elements = (DynamicHashMapElement*) calloc(new_size, sizeof(DynamicHashMapElement));
+		assert(tmp_elements != NULL);
 
-	hash_table->tail = bucket[chain_size];
 
-	++hash_table->chain_sizes[hash_value];
+		// free the end indexes, allocate and initialize new
+		free(hash_map->end_indexes);
+		hash_map->end_indexes = (unsigned int*) calloc(new_size, sizeof(unsigned int));
+		assert(hash_map->end_indexes != NULL);
+		for (i = 0; i < new_size; ++i)
+			hash_map->end_indexes[i] = i;
 
+
+		// re-populate
+		for (i = 0; i < hash_map->size; ++i)
+			if (hash_map->elements[i] != NULL) {
+				start_index = hash_map->elements[i].key & (new_size - 1);
+				for (j = start_index; ; j = (j + 1) & (new_size - 1))
+					if (tmp_elements[j].key == NULL) {
+						tmp_elements[j].key = hash_map->elements[i].key;
+						tmp_elements[j].value = hash_map->elements[i].value;
+						break;
+					}
+				hash_map->end_indexes[start_index] = (j + 1) & (new_size - 1);
+			}
+
+		// change the size, the element count does not change
+		hash_map->size = new_size;
+
+		// free the existing elements
+		free(hash_map->elements);
+
+		// the new elements
+		hash_map->elements = tmp_elements;
+	}
 	return 1;
 }
 
-inline void* hash_map_get(HashMap* hash_table, uint64_t key) {
-	int bucket_index = key & (hash_table->bucket_count - 1);
-	HashMapElement** bucket = hash_table->buckets[bucket_index];
-	int chain_size = hash_table->chain_sizes[bucket_index];
+inline void* dynamic_hash_map_get(DynamicHashMap* hash_map, uint64_t key) {
+
+	assert(key != NULL);
+	size_t start_index = key & (hash_map->size - 1);
 
 	int i;
-	for (i = 0; i < chain_size; i++)
-		if (key == bucket[i]->key)
-			return bucket[i]->value;
-
+	for (i = start_index; i != hash_map->end_indexes[start_index]; i = (i + 1) & (hash_map->size - 1)) {
+		if (hash_map->elements[i].key == key)
+			return hash_map->elements[i].value;
+	}
 	return NULL;
 }
-*/
-/*
-inline HashMapElement* hash_map_last_element(HashMap* hash_table) {
-	return hash_table->tail;
-}
 
-inline HashMapElement* hash_map_previous_element(HashMapElement* current_node) {
-	return current_node->previous;
-}
-*/
