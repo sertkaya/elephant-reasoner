@@ -146,3 +146,53 @@ inline void* dynamic_hash_map_get(DynamicHashMap* hash_map, uint64_t key) {
 	return NULL;
 }
 
+inline char dynamic_hash_map_remove(uint64_t key, DynamicHashMap* hash_map) {
+	assert(key != NULL);
+
+	int i;
+	size_t start_index = key & (hash_map->size - 1);
+
+	for (i = start_index; i != hash_map->end_indexes[start_index]; i = (i + 1) & (hash_map->size - 1)) {
+		if (hash_map->elements[i].key == key) {
+			// key found
+			hash_map->elements[i].key = DELETED_KEY;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+inline DynamicHashMapIterator* dynamic_hash_map_iterator_create(DynamicHashMap* hash_map) {
+	DynamicHashMapIterator* iterator = (DynamicHashMapIterator*) malloc(sizeof(DynamicHashMapIterator));
+	assert(iterator != NULL);
+	iterator->hash_map = hash_map;
+	iterator->current_index = 0;
+
+	return iterator;
+}
+
+inline void dynamic_hash_map_iterator_init(DynamicHashMapIterator* iterator, DynamicHashMap* hash_map) {
+
+	iterator->hash_map = hash_map;
+	iterator->current_index = 0;
+
+	return;
+}
+
+inline void* dynamic_hash_map_iterator_next(DynamicHashMapIterator* iterator) {
+
+	int i;
+	for (i = iterator->current_index; i < iterator->hash_map->size; ++i)
+		if (iterator->hash_map->elements[i].key != NULL && iterator->hash_map->elements[i].key != DELETED_KEY) {
+			iterator->current_index = i + 1;
+			return iterator->hash_map->elements[i].value;
+		}
+
+	return NULL;
+}
+
+inline int dynamic_hash_map_iterator_free(DynamicHashMapIterator* iterator) {
+	free(iterator);
+
+	return sizeof(DynamicHashMapIterator);
+}

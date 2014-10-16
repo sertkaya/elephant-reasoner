@@ -23,6 +23,8 @@
 
 typedef struct dynamic_hash_map_element DynamicHashMapElement;
 typedef struct dynamic_hash_map DynamicHashMap;
+typedef struct dynamic_hash_map_iterator DynamicHashMapIterator;
+
 
 #define DELETED_KEY		-1
 
@@ -36,6 +38,14 @@ struct dynamic_hash_map {
 	unsigned int element_count;			// the number of elements
 	unsigned int size;					// sizes of the hash map
 	unsigned int* end_indexes;			// the end indexes of chains
+};
+
+/**
+ * Iterator for hash map.
+ */
+struct dynamic_hash_map_iterator {
+	DynamicHashMap* hash_map;
+	unsigned int current_index;	// index of the current element
 };
 
 /**
@@ -60,5 +70,31 @@ inline char dynamic_hash_map_put(DynamicHashMap* hash_map, uint64_t key, void* v
  */
 inline void* dynamic_hash_map_get(DynamicHashMap* hash_map, uint64_t key);
 
+/**
+ * Removes the given key (and its associated value) from the hash map.
+ * Returns 1 if removed successfully, 0 otherwise.
+ */
+inline char dynamic_hash_map_remove(uint64_t key, DynamicHashMap* hash_map);
 
+/**
+ * Create an iterator for the given hash map.
+ */
+inline DynamicHashMapIterator* dynamic_hash_map_iterator_create(DynamicHashMap* hash_map);
+
+/**
+ * Reset a given hash map iterator.
+ */
+inline void dynamic_hash_map_iterator_init(DynamicHashMapIterator* iterator, DynamicHashMap* hash_map);
+
+/**
+ * Get the next element.
+ * Returns NULL if there is no next element.
+ */
+inline void* dynamic_hash_map_iterator_next(DynamicHashMapIterator* iterator);
+
+/**
+ * Free the space allocated for a hash map iterator.
+ * Returns the number of freed bytes.
+ */
+inline int dynamic_hash_map_iterator_free(DynamicHashMapIterator* iterator);
 #endif
