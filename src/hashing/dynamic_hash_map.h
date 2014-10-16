@@ -26,7 +26,8 @@ typedef struct dynamic_hash_map DynamicHashMap;
 typedef struct dynamic_hash_map_iterator DynamicHashMapIterator;
 
 
-#define DELETED_KEY		-1
+#define HASH_MAP_DELETED_KEY		-1
+#define HASH_MAP_EMPTY_KEY			0
 
 struct dynamic_hash_map_element {
 	uint64_t key;

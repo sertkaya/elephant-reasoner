@@ -32,6 +32,7 @@
 #include "../saturation/saturation.h"
 #include "../hierarchy/hierarchy.h"
 #include "../utils/timer.h"
+#include "../utils/map.h"
 #include "reasoner.h"
 
 // the parser
@@ -49,9 +50,7 @@ TBox* init_tbox() {
 	tbox->last_concept_id = 0;
 	tbox->last_role_id = 0;
 
-	tbox->atomic_concept_count = 0;
-	tbox->atomic_concept_list = NULL;
-	tbox->atomic_concepts = hash_map_create(DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
+	MAP_INIT(&(tbox->atomic_concepts), DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
 	tbox->atomic_role_count = 0;
 	tbox->atomic_roles = hash_map_create(DEFAULT_ATOMIC_ROLES_HASH_SIZE);

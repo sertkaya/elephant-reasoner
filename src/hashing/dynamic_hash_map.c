@@ -25,6 +25,30 @@
 #include "utils.h"
 
 
+void dynamic_hash_map_init(DynamicHashMap* hash_map, unsigned int size) {
+
+	if (size < 16)
+		size = 16;
+	else
+		size = roundup_pow2(size);
+
+	hash_map->elements = (DynamicHashMapElement*) calloc(size, sizeof(DynamicHashMapElement));
+	assert(hash_map->elements != NULL);
+
+	hash_map->end_indexes = (unsigned int*) calloc(size, sizeof(unsigned int));
+	assert(hash_map->end_indexes != NULL);
+
+	hash_map->size = size;
+	hash_map->element_count = 0;
+
+	int i;
+	for (i = 0; i < hash_map->size; ++i)
+		// each chain initially ends at its starting point
+		hash_map->end_indexes[i] = i;
+
+	return;
+}
+
 inline DynamicHashMap* dynamic_hash_map_create(unsigned int size) {
 
 	if (size < 16)
@@ -38,6 +62,9 @@ inline DynamicHashMap* dynamic_hash_map_create(unsigned int size) {
 
 	hash_map->elements = (DynamicHashMapElement*) calloc(size, sizeof(DynamicHashMapElement));
 	assert(hash_map->elements != NULL);
+
+	hash_map->end_indexes = (unsigned int*) calloc(size, sizeof(unsigned int));
+	assert(hash_map->end_indexes != NULL);
 
 	hash_map->size = size;
 	hash_map->element_count = 0;
@@ -72,19 +99,20 @@ inline char dynamic_hash_map_put(DynamicHashMap* hash_map, uint64_t key, void* v
 	int i, j, new_size;
 	size_t start_index;
 
-	assert(key != NULL);
+	assert(key != HASH_MAP_EMPTY_KEY);
 
 	start_index  = key & (hash_map->size - 1);
 	for (i = start_index; ; i = (i + 1) & (hash_map->size - 1)) {
 		if (hash_map->elements[i].key == key) {
 			// the key already exists, overwrite the value
 			hash_map->elements[i].value = value;
-			return 1;
+			return 0;
 		}
 
-		if (hash_map->elements[i].key == NULL) {
+		if (hash_map->elements[i].key == HASH_MAP_EMPTY_KEY) {
 			// insert the key here
 			hash_map->elements[i].key = key;
+			hash_map->elements[i].value = value;
 			++hash_map->element_count;
 			// mark the new end index
 			hash_map->end_indexes[start_index] = (i + 1) & (hash_map->size - 1);
@@ -110,10 +138,10 @@ inline char dynamic_hash_map_put(DynamicHashMap* hash_map, uint64_t key, void* v
 
 		// re-populate
 		for (i = 0; i < hash_map->size; ++i)
-			if (hash_map->elements[i] != NULL) {
+			if (hash_map->elements[i].key != HASH_MAP_EMPTY_KEY) {
 				start_index = hash_map->elements[i].key & (new_size - 1);
 				for (j = start_index; ; j = (j + 1) & (new_size - 1))
-					if (tmp_elements[j].key == NULL) {
+					if (tmp_elements[j].key == HASH_MAP_EMPTY_KEY) {
 						tmp_elements[j].key = hash_map->elements[i].key;
 						tmp_elements[j].value = hash_map->elements[i].value;
 						break;
@@ -135,7 +163,7 @@ inline char dynamic_hash_map_put(DynamicHashMap* hash_map, uint64_t key, void* v
 
 inline void* dynamic_hash_map_get(DynamicHashMap* hash_map, uint64_t key) {
 
-	assert(key != NULL);
+	assert(key != HASH_MAP_EMPTY_KEY);
 	size_t start_index = key & (hash_map->size - 1);
 
 	int i;
@@ -147,7 +175,7 @@ inline void* dynamic_hash_map_get(DynamicHashMap* hash_map, uint64_t key) {
 }
 
 inline char dynamic_hash_map_remove(uint64_t key, DynamicHashMap* hash_map) {
-	assert(key != NULL);
+	assert(key != HASH_MAP_EMPTY_KEY);
 
 	int i;
 	size_t start_index = key & (hash_map->size - 1);
@@ -155,7 +183,7 @@ inline char dynamic_hash_map_remove(uint64_t key, DynamicHashMap* hash_map) {
 	for (i = start_index; i != hash_map->end_indexes[start_index]; i = (i + 1) & (hash_map->size - 1)) {
 		if (hash_map->elements[i].key == key) {
 			// key found
-			hash_map->elements[i].key = DELETED_KEY;
+			hash_map->elements[i].key = HASH_MAP_DELETED_KEY;
 			return 1;
 		}
 	}
@@ -183,7 +211,7 @@ inline void* dynamic_hash_map_iterator_next(DynamicHashMapIterator* iterator) {
 
 	int i;
 	for (i = iterator->current_index; i < iterator->hash_map->size; ++i)
-		if (iterator->hash_map->elements[i].key != NULL && iterator->hash_map->elements[i].key != DELETED_KEY) {
+		if (iterator->hash_map->elements[i].key != HASH_MAP_EMPTY_KEY && iterator->hash_map->elements[i].key != HASH_MAP_DELETED_KEY) {
 			iterator->current_index = i + 1;
 			return iterator->hash_map->elements[i].value;
 		}

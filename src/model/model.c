@@ -109,11 +109,6 @@ ClassExpression* get_create_atomic_concept(char* name, TBox* tbox) {
 	c->second_conjunct_of = NULL;
 
 	PUT_ATOMIC_CONCEPT(c->description.atomic->IRI, c, tbox);
-	tbox->atomic_concept_count++;
-	tmp = realloc(tbox->atomic_concept_list, tbox->atomic_concept_count * sizeof(ClassExpression*));
-	assert(tmp != NULL);
-	tbox->atomic_concept_list = tmp;
-	tbox->atomic_concept_list[tbox->atomic_concept_count - 1] = c;
 
 	return c;
 }

@@ -24,14 +24,15 @@
 
 #include "../hashing/utils.h"
 #include "../hashing/hash_map.h"
+#include "../utils/map.h"
 #include "datatypes.h"
 
 // returns the atomic concept with the given name if it exists
 // NULL if it does not exist
-#define GET_ATOMIC_CONCEPT(IRI, tbox)		hash_map_get(tbox->atomic_concepts, hash_string(IRI))
+#define GET_ATOMIC_CONCEPT(IRI, tbox)		MAP_GET(hash_string(IRI), &(tbox->atomic_concepts))
 
 // inserts the atomic concept with the given name to the hash
-#define PUT_ATOMIC_CONCEPT(IRI, c, tbox)	hash_map_put(tbox->atomic_concepts, hash_string(IRI), c)
+#define PUT_ATOMIC_CONCEPT(IRI, c, tbox)	MAP_PUT(hash_string(IRI), c, &(tbox->atomic_concepts))
 
 // get the existential restriction with role r and filler f from hash
 #define GET_EXISTS_RESTRICTION(role_id, filler_id, tbox)		hash_map_get(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id))

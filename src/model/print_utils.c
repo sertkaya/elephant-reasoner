@@ -181,20 +181,23 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	// for keeping track of already printed equivalence classes
 	Set* printed = SET_CREATE(10);
 
-	for (i = 0; i < kb->tbox->atomic_concept_count; ++i) {
+	MapIterator map_it;
+	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->atomic_concepts));
+	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
+	while (atomic_concept) {
 		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
 		// check if the equivalence class is already printed
-		if (!SET_CONTAINS(kb->tbox->atomic_concept_list[i], printed)) {
+		if (!SET_CONTAINS(((ClassExpression*) atomic_concept), printed)) {
 			// do not print the direct subsumers of bottom
-			if (kb->tbox->atomic_concept_list[i] != kb->tbox->bottom_concept)
-				print_direct_subsumers(kb->tbox, kb->tbox->atomic_concept_list[i], taxonomy_fp);
+			if ((ClassExpression*) atomic_concept != kb->tbox->bottom_concept)
+				print_direct_subsumers(kb->tbox, (ClassExpression*) atomic_concept, taxonomy_fp);
 
 			char printing_equivalents = 0;
-			if (kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_classes->size > 0) {
-				fprintf(taxonomy_fp, "EquivalentClasses(%s", kb->tbox->atomic_concept_list[i]->description.atomic->IRI);
+			if (((ClassExpression*) atomic_concept)->description.atomic->equivalent_classes->size > 0) {
+				fprintf(taxonomy_fp, "EquivalentClasses(%s", ((ClassExpression*) atomic_concept)->description.atomic->IRI);
 				printing_equivalents = 1;
 			}
-			ListIterator* equivalents_iterator = list_iterator_create(kb->tbox->atomic_concept_list[i]->description.atomic->equivalent_classes);
+			ListIterator* equivalents_iterator = list_iterator_create(((ClassExpression*) atomic_concept)->description.atomic->equivalent_classes);
 			ClassExpression* equivalent_class = (ClassExpression*) list_iterator_next(equivalents_iterator);
 			while (equivalent_class != NULL) {
 				// mark the concepts in the equivalent classes as already printed
@@ -206,6 +209,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 			if (printing_equivalents)
 				fprintf(taxonomy_fp, ")\n");
 		}
+		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	}
 	SET_FREE(printed);
 
@@ -289,7 +293,7 @@ void print_short_stats(KB* kb) {
 			"Individuals........................: %d\n"
 			"Concept assertions.................: %d\n"
 			"Role assertions....................: %d\n",
-			kb->tbox->atomic_concept_count,
+			kb->tbox->atomic_concepts.element_count,
 			kb->tbox->atomic_role_count,
 			kb->tbox->exists_restriction_count,
 			kb->tbox->unique_exists_restriction_count,

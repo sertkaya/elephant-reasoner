@@ -21,6 +21,7 @@
 #define DATATYPES_H_
 
 #include "../utils/set.h"
+#include "../utils/map.h"
 #include "../utils/list.h"
 #include "../hashing/hash_table.h"
 #include "../hashing/hash_map.h"
@@ -259,10 +260,8 @@ struct tbox {
 	// Bottom concept
 	ClassExpression* bottom_concept;
 
-	// Atomic concepts hash
-	HashMap* atomic_concepts;
-	ClassExpression** atomic_concept_list;
-	int atomic_concept_count;
+	// Atomic concepts map
+	Map atomic_concepts;
 
 	// Exists restictions hash map
 	// The key is role id_filler id
