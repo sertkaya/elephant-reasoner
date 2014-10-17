@@ -69,7 +69,7 @@ char saturate_concepts(KB* kb) {
 	int i, j, k;
 
 	MapIterator map_it;
-	MAP_ITERATOR_INIT(&map_it, &(tbox->atomic_concepts));
+	MAP_ITERATOR_INIT(&map_it, &(tbox->classes));
 	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	while (atomic_concept) {
 		for (i = 0; i < ((ClassExpression*) atomic_concept)->told_subsumers->size; ++i)

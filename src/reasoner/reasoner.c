@@ -50,22 +50,20 @@ TBox* init_tbox() {
 	tbox->last_concept_id = 0;
 	tbox->last_role_id = 0;
 
-	MAP_INIT(&(tbox->atomic_concepts), DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
+	MAP_INIT(&(tbox->classes), DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
 	tbox->atomic_role_count = 0;
 	tbox->atomic_roles = hash_map_create(DEFAULT_ATOMIC_ROLES_HASH_SIZE);
 
-	tbox->exists_restriction_count = 0;
-	tbox->unique_exists_restriction_count = 0;
-	tbox->exists_restrictions = hash_map_create(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
+	tbox->object_some_values_from_exps_count = 0;
+	MAP_INIT(&(tbox->object_some_values_from_exps), DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
 
-	tbox->nominals = hash_map_create(DEFAULT_NOMINALS_HASH_SIZE);
+	MAP_INIT(&(tbox->object_one_of_exps), DEFAULT_NOMINALS_HASH_SIZE);
 
-	tbox->conjunction_count = 0;
+	tbox->object_intersection_of_exps_count = 0;
 	// tbox->unique_conjunction_count = 0;
-	tbox->binary_conjunction_count = 0;
-	tbox->unique_binary_conjunction_count = 0;
-	tbox->conjunctions = hash_map_create(DEFAULT_CONJUNCTIONS_HASH_SIZE);
+	tbox->binary_object_intersection_of_exps_count = 0;
+	MAP_INIT(&(tbox->object_intersection_of_exps), DEFAULT_CONJUNCTIONS_HASH_SIZE);
 
 	tbox->role_composition_count = 0;
 	tbox->binary_role_composition_count = 0;

@@ -94,10 +94,12 @@ void print_nominal(ObjectOneOf* n) {
 
 void print_conjunctions(TBox* tbox) {
 
-	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->conjunctions);
-	while (node) {
-		print_conjunction(((ClassExpression*) node->value)->description.conj);
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+	MapIterator map_it;
+	MAP_ITERATOR_INIT(&map_it, &(tbox->object_intersection_of_exps));
+	void* map_element = MAP_ITERATOR_NEXT(&map_it);
+	while (map_element) {
+		print_conjunction(((ClassExpression*) map_element)->description.conj);
+		map_element = MAP_ITERATOR_NEXT(&map_it);
 	}
 }
 
@@ -182,7 +184,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	Set* printed = SET_CREATE(10);
 
 	MapIterator map_it;
-	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->atomic_concepts));
+	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
 	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	while (atomic_concept) {
 		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
@@ -293,14 +295,13 @@ void print_short_stats(KB* kb) {
 			"Individuals........................: %d\n"
 			"Concept assertions.................: %d\n"
 			"Role assertions....................: %d\n",
-			kb->tbox->atomic_concepts.element_count,
+			kb->tbox->classes.element_count,
 			kb->tbox->atomic_role_count,
-			kb->tbox->exists_restriction_count,
-			kb->tbox->unique_exists_restriction_count,
-			kb->tbox->conjunction_count,
-			// tbox->unique_conjunction_count,
-			kb->tbox->binary_conjunction_count,
-			kb->tbox->unique_binary_conjunction_count,
+			kb->tbox->object_some_values_from_exps_count,
+			kb->tbox->object_some_values_from_exps.element_count,
+			kb->tbox->object_intersection_of_exps_count,
+			kb->tbox->binary_object_intersection_of_exps_count,
+			kb->tbox->object_intersection_of_exps.element_count,
 			kb->tbox->role_composition_count,
 			kb->tbox->binary_role_composition_count,
 			kb->tbox->unique_binary_role_composition_count,

@@ -29,29 +29,29 @@
 
 // returns the atomic concept with the given name if it exists
 // NULL if it does not exist
-#define GET_ATOMIC_CONCEPT(IRI, tbox)		MAP_GET(hash_string(IRI), &(tbox->atomic_concepts))
+#define GET_ATOMIC_CONCEPT(IRI, tbox)		MAP_GET(hash_string(IRI), &(tbox->classes))
 
 // inserts the atomic concept with the given name to the hash
-#define PUT_ATOMIC_CONCEPT(IRI, c, tbox)	MAP_PUT(hash_string(IRI), c, &(tbox->atomic_concepts))
+#define PUT_ATOMIC_CONCEPT(IRI, c, tbox)	MAP_PUT(hash_string(IRI), c, &(tbox->classes))
 
 // get the existential restriction with role r and filler f from hash
-#define GET_EXISTS_RESTRICTION(role_id, filler_id, tbox)		hash_map_get(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id))
+#define GET_EXISTS_RESTRICTION(role_id, filler_id, tbox)		MAP_GET(HASH_INTEGERS(role_id, filler_id), &(tbox->object_some_values_from_exps))
 
 // put the existential restriction with role r and filler f into hash
-#define PUT_EXISTS_RESTRICTION(role_id, filler_id, c, tbox)		hash_map_put(tbox->exists_restrictions, HASH_INTEGERS(role_id, filler_id), c)
+#define PUT_EXISTS_RESTRICTION(role_id, filler_id, c, tbox)		MAP_PUT(HASH_INTEGERS(role_id, filler_id), c, &(tbox->object_some_values_from_exps))
 
 // get the (binary) conjunction with the first conjunct c1 and second conjunct c2
-#define GET_CONJUNCTION(c1, c2, tbox)		(c1->id <= c2->id) ? hash_map_get(tbox->conjunctions, HASH_INTEGERS(c1->id, c2->id)) : hash_map_get(tbox->conjunctions, HASH_INTEGERS(c2->id, c1->id))
+#define GET_CONJUNCTION(c1, c2, tbox)		(c1->id <= c2->id) ? MAP_GET(HASH_INTEGERS(c1->id, c2->id), &(tbox->object_intersection_of_exps)) : MAP_GET(HASH_INTEGERS(c2->id, c1->id), &(tbox->object_intersection_of_exps))
 
 // put the (binary) conjunction
-#define PUT_CONJUNCTION(c, tbox)			(c->description.conj->conjunct1->id <= c->description.conj->conjunct2->id) ? hash_map_put(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id), c) : hash_map_put(tbox->conjunctions, HASH_INTEGERS(c->description.conj->conjunct2->id, c->description.conj->conjunct1->id), c)
+#define PUT_CONJUNCTION(c, tbox)			(c->description.conj->conjunct1->id <= c->description.conj->conjunct2->id) ? MAP_PUT(HASH_INTEGERS(c->description.conj->conjunct1->id, c->description.conj->conjunct2->id), c, &(tbox->object_intersection_of_exps)) : MAP_PUT(HASH_INTEGERS(c->description.conj->conjunct2->id, c->description.conj->conjunct1->id), c, &(tbox->object_intersection_of_exps))
 
 // return the nominal with the given individual if it exists
 // NULL if it does not exist
-#define GET_NOMINAL(individual, tbox)		hash_map_get(tbox->nominals, individual->id)
+#define GET_NOMINAL(individual, tbox)		MAP_GET(individual->id, &(tbox->object_one_of_exps))
 
 // insert the nominal with the given individual
-#define PUT_NOMINAL(n, tbox)				hash_map_put(tbox->nominals, n->description.nominal->individual->id, n)
+#define PUT_NOMINAL(n, tbox)				MAP_PUT(n->description.nominal->individual->id, n, &(tbox->object_one_of_exps))
 
 // return the atomic role with the given name if it exists
 // NULL if it does not exist

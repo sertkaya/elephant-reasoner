@@ -33,7 +33,7 @@ void compute_concept_hierarchy(TBox* tbox) {
 	int is_direct_subsumer;
 
 	MapIterator map_it;
-	MAP_ITERATOR_INIT(&map_it, &(tbox->atomic_concepts));
+	MAP_ITERATOR_INIT(&map_it, &(tbox->classes));
 	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	while (atomic_concept) {
 		SetIterator* subsumers_iterator = SET_ITERATOR_CREATE(((ClassExpression*) atomic_concept)->subsumers);
