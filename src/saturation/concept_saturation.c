@@ -68,13 +68,13 @@ char saturate_concepts(KB* kb) {
 	// push the input axioms to the stack
 	int i, j, k;
 
-	MapIterator map_it;
-	MAP_ITERATOR_INIT(&map_it, &(tbox->classes));
-	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
-	while (atomic_concept) {
-		for (i = 0; i < ((ClassExpression*) atomic_concept)->told_subsumers->size; ++i)
-			push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) atomic_concept, ((ClassExpression*) atomic_concept)->told_subsumers->elements[i], NULL, SUBSUMPTION_INITIALIZATION));
-		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
+	MapIterator iterator;
+	MAP_ITERATOR_INIT(&iterator, &(tbox->classes));
+	void* class = MAP_ITERATOR_NEXT(&iterator);
+	while (class) {
+		for (i = 0; i < ((ClassExpression*) class)->told_subsumers->size; ++i)
+			push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, ((ClassExpression*) class)->told_subsumers->elements[i], NULL, SUBSUMPTION_INITIALIZATION));
+		class = MAP_ITERATOR_NEXT(&iterator);
 	}
 
 	// Traverse the hash of nominals that are generated during preprocessing.

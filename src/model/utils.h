@@ -55,10 +55,10 @@
 
 // return the atomic role with the given name if it exists
 // NULL if it does not exist
-#define GET_ATOMIC_ROLE(IRI, tbox)			hash_map_get(tbox->atomic_roles, hash_string(IRI))
+#define GET_ATOMIC_ROLE(IRI, tbox)			MAP_GET(hash_string(IRI), &(tbox->object_properties))
 
 // insert the atomic role with the given name to the hash
-#define PUT_ATOMIC_ROLE(IRI, r, tbox)		hash_map_put(tbox->atomic_roles, hash_string(IRI), r)
+#define PUT_ATOMIC_ROLE(IRI, r, tbox)		MAP_PUT(hash_string(IRI), r, &(tbox->object_properties))
 
 
 // get the role compoisiton with the given roles

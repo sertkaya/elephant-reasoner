@@ -61,11 +61,14 @@ void saturate_roles(TBox* tbox) {
 
 	// push the input axioms to the stack
     // first the atomic roles
-	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->atomic_roles);
-	while (node) {
-		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) node->value, (ObjectPropertyExpression*) node->value));
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+	MapIterator iterator;
+	MAP_ITERATOR_INIT(&iterator, &(tbox->object_properties));
+	void* object_property = MAP_ITERATOR_NEXT(&iterator);
+	while (object_property) {
+		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) object_property, (ObjectPropertyExpression*) object_property));
+		object_property = MAP_ITERATOR_NEXT(&iterator);
 	}
+
     // for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
     // 	push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
     // Now the role compositions.

@@ -286,8 +286,10 @@ struct tbox {
 	// Value: ClassExpression*
 	Map object_one_of_exps;
 
-	HashMap* atomic_roles;
-	int atomic_role_count;
+	// ObjectProperties
+	// Key: IRI (char*)
+	// Value: ObjectPropertyExpression*
+	Map object_properties;
 
 	HashMap* role_compositions;
 	int role_composition_count;

@@ -338,7 +338,6 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 	r->second_component_of = hash_table_create(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
 	PUT_ATOMIC_ROLE(r->description.atomic->IRI, r, tbox);
-	tbox->atomic_role_count++;
 
 	return r;
 }

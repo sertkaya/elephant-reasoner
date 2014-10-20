@@ -52,8 +52,7 @@ TBox* init_tbox() {
 
 	MAP_INIT(&(tbox->classes), DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
-	tbox->atomic_role_count = 0;
-	tbox->atomic_roles = hash_map_create(DEFAULT_ATOMIC_ROLES_HASH_SIZE);
+	MAP_INIT(&(tbox->object_properties), DEFAULT_ATOMIC_ROLES_HASH_SIZE);
 
 	tbox->object_some_values_from_exps_count = 0;
 	MAP_INIT(&(tbox->object_some_values_from_exps), DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);

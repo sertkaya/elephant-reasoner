@@ -93,7 +93,7 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 
 	// free the filler of negative existentials hash
 	free(c->filler_of_negative_exists);
-	total_freed_bytes += (tbox->atomic_role_count + tbox->unique_binary_role_composition_count) * sizeof(ClassExpression*);
+	total_freed_bytes += (tbox->object_properties.element_count + tbox->unique_binary_role_composition_count) * sizeof(ClassExpression*);
 
 	// free the list of conjunctions where this concept occurs
 	free(c->first_conjunct_of_list);
@@ -221,42 +221,42 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += sizeof(TransitiveObjectPropertyAxiom*) * tbox->transitive_role_axiom_count;
 
 	// iterate over the existentials hash, free the existentials
-	MapIterator map_it;
-	MAP_ITERATOR_INIT(&map_it, &(tbox->object_some_values_from_exps));
-	void* map_element = MAP_ITERATOR_NEXT(&map_it);
+	MapIterator iterator;
+	MAP_ITERATOR_INIT(&iterator, &(tbox->object_some_values_from_exps));
+	void* map_element = MAP_ITERATOR_NEXT(&iterator);
 	while (map_element) {
 		total_freed_bytes += free_concept((ClassExpression*) map_element, tbox);
-		map_element = MAP_ITERATOR_NEXT(&map_it);
+		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the existentials map
 	total_freed_bytes += MAP_FREE(&(tbox->object_some_values_from_exps));
 
 	// iterate over the conjunctions map, free the conjunctions
-	MAP_ITERATOR_INIT(&map_it, &(tbox->object_intersection_of_exps));
-	map_element = MAP_ITERATOR_NEXT(&map_it);
+	MAP_ITERATOR_INIT(&iterator, &(tbox->object_intersection_of_exps));
+	map_element = MAP_ITERATOR_NEXT(&iterator);
 	while (map_element) {
 		total_freed_bytes += free_concept((ClassExpression*) map_element, tbox);
-		map_element = MAP_ITERATOR_NEXT(&map_it);
+		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the conjunctions map
 	total_freed_bytes += MAP_FREE(&(tbox->object_intersection_of_exps));
 
 	// iterate over the nominals map, free the nominals
-	MAP_ITERATOR_INIT(&map_it, &(tbox->object_one_of_exps));
-	map_element = MAP_ITERATOR_NEXT(&map_it);
+	MAP_ITERATOR_INIT(&iterator, &(tbox->object_one_of_exps));
+	map_element = MAP_ITERATOR_NEXT(&iterator);
 	while (map_element) {
 		total_freed_bytes += free_concept((ClassExpression*) map_element, tbox);
-		map_element = MAP_ITERATOR_NEXT(&map_it);
+		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the nominals hash
 	total_freed_bytes += MAP_FREE(&(tbox->object_one_of_exps));
 
 	// iterate over the atomic concepts map, free the atomic concepts
-	MAP_ITERATOR_INIT(&map_it, &(tbox->classes));
-	map_element = MAP_ITERATOR_NEXT(&map_it);
+	MAP_ITERATOR_INIT(&iterator, &(tbox->classes));
+	map_element = MAP_ITERATOR_NEXT(&iterator);
 	while (map_element) {
 		total_freed_bytes += free_concept((ClassExpression*) map_element, tbox);
-		map_element = MAP_ITERATOR_NEXT(&map_it);
+		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the atomic concepts hash
 	total_freed_bytes += MAP_FREE(&(tbox->classes));
@@ -271,13 +271,14 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += hash_map_free(tbox->role_compositions);
 
 	// iterate over atomic roles, free them
-	node = HASH_MAP_LAST_ELEMENT(tbox->atomic_roles);
-	while (node) {
-		total_freed_bytes += free_role((ObjectPropertyExpression*) node->value);
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+	MAP_ITERATOR_INIT(&iterator, &(tbox->object_properties));
+	map_element = MAP_ITERATOR_NEXT(&iterator);
+	while (map_element) {
+		total_freed_bytes += free_role((ObjectPropertyExpression*) map_element);
+		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the atomic roles hash
-	total_freed_bytes += hash_map_free(tbox->atomic_roles);
+	total_freed_bytes += MAP_FREE(&(tbox->object_properties));
 
 	// finally free the tbox itself
 	free(tbox);

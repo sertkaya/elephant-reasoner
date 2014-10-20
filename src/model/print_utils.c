@@ -296,7 +296,7 @@ void print_short_stats(KB* kb) {
 			"Concept assertions.................: %d\n"
 			"Role assertions....................: %d\n",
 			kb->tbox->classes.element_count,
-			kb->tbox->atomic_role_count,
+			kb->tbox->object_properties.element_count,
 			kb->tbox->object_some_values_from_exps_count,
 			kb->tbox->object_some_values_from_exps.element_count,
 			kb->tbox->object_intersection_of_exps_count,
