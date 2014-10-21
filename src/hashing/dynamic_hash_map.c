@@ -99,7 +99,7 @@ inline char dynamic_hash_map_put(DynamicHashMap* hash_map, uint64_t key, void* v
 	int i, j, new_size;
 	size_t start_index;
 
-	assert(key != HASH_MAP_EMPTY_KEY);
+	assert(key != HASH_MAP_EMPTY_KEY && key != HASH_MAP_DELETED_KEY);
 
 	start_index  = key & (hash_map->size - 1);
 	for (i = start_index; ; i = (i + 1) & (hash_map->size - 1)) {
@@ -138,7 +138,7 @@ inline char dynamic_hash_map_put(DynamicHashMap* hash_map, uint64_t key, void* v
 
 		// re-populate
 		for (i = 0; i < hash_map->size; ++i)
-			if (hash_map->elements[i].key != HASH_MAP_EMPTY_KEY) {
+			if (hash_map->elements[i].key != HASH_MAP_EMPTY_KEY && hash_map->elements[i].key != HASH_MAP_DELETED_KEY) {
 				start_index = hash_map->elements[i].key & (new_size - 1);
 				for (j = start_index; ; j = (j + 1) & (new_size - 1))
 					if (tmp_elements[j].key == HASH_MAP_EMPTY_KEY) {
@@ -163,7 +163,7 @@ inline char dynamic_hash_map_put(DynamicHashMap* hash_map, uint64_t key, void* v
 
 inline void* dynamic_hash_map_get(DynamicHashMap* hash_map, uint64_t key) {
 
-	assert(key != HASH_MAP_EMPTY_KEY);
+	assert(key != HASH_MAP_EMPTY_KEY && key != HASH_MAP_DELETED_KEY);
 	size_t start_index = key & (hash_map->size - 1);
 
 	int i;
@@ -175,7 +175,7 @@ inline void* dynamic_hash_map_get(DynamicHashMap* hash_map, uint64_t key) {
 }
 
 inline char dynamic_hash_map_remove(uint64_t key, DynamicHashMap* hash_map) {
-	assert(key != HASH_MAP_EMPTY_KEY);
+	assert(key != HASH_MAP_EMPTY_KEY && key != HASH_MAP_DELETED_KEY);
 
 	int i;
 	size_t start_index = key & (hash_map->size - 1);
@@ -184,6 +184,7 @@ inline char dynamic_hash_map_remove(uint64_t key, DynamicHashMap* hash_map) {
 		if (hash_map->elements[i].key == key) {
 			// key found
 			hash_map->elements[i].key = HASH_MAP_DELETED_KEY;
+			--hash_map->element_count;
 			return 1;
 		}
 	}
