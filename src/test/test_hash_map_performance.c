@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	int test_size = atoi(argv[1]);
 	int hash_map_size = atoi(argv[2]);
 
-	uint64_t* tmp = malloc(test_size * sizeof(int));
+	uint64_t* tmp = malloc(test_size * sizeof(uint64_t));
 	assert(tmp != NULL);
 
 	HashMap* hash_map = hash_map_create(hash_map_size);

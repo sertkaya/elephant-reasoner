@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	int test_size = atoi(argv[1]);
 	int map_size = atoi(argv[2]);
 
-	uint64_t* tmp = malloc(test_size * sizeof(int));
+	uint64_t* tmp = malloc(test_size * sizeof(uint64_t));
 	assert(tmp != NULL);
 
 	Map map;
