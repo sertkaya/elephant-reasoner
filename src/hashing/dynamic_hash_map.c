@@ -48,7 +48,6 @@ void dynamic_hash_map_init(DynamicHashMap* hash_map, unsigned int size) {
 	hash_map->size = size;
 	hash_map->element_count = 0;
 
-	int i;
 	for (i = 0; i < hash_map->size; ++i)
 		// each chain initially ends at its starting point
 		hash_map->end_indexes[i] = i;
