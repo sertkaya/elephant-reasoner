@@ -32,9 +32,16 @@ void dynamic_hash_map_init(DynamicHashMap* hash_map, unsigned int size) {
 	else
 		size = roundup_pow2(size);
 
+	// first free the elements in case the map was already used
+	int i;
+	for (i = 0; i < hash_map->size; ++i)
+		free(hash_map->elements[i]);
+	free(hash_map->elements);
 	hash_map->elements = (DynamicHashMapElement**) calloc(size, sizeof(DynamicHashMapElement*));
 	assert(hash_map->elements != NULL);
 
+	// first free the end_indexes in case the map was already used
+	free(hash_map->end_indexes);
 	hash_map->end_indexes = (unsigned int*) calloc(size, sizeof(unsigned int));
 	assert(hash_map->end_indexes != NULL);
 

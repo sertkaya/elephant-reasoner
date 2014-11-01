@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	int test_size = atoi(argv[1]);
 	int map_size = atoi(argv[2]);
 
-	uint64_t* tmp = malloc(test_size * sizeof(int));
+	uint64_t* tmp = malloc(test_size * sizeof(uint64_t));
 	assert(tmp != NULL);
 
 	Map map;
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 	printf("%d put operations .........................: ", test_size);
 	fflush(stdout);
 	START_TIMER(start_time);
-	for (i = 1; i < test_size; ++i) {
+	for (i = 1; i < test_size + 1; ++i) {
 		tmp[i] = i;
 		MAP_PUT(i, (void*) tmp[i], &map);
 	}
@@ -52,11 +52,14 @@ int main(int argc, char *argv[]) {
 	printf("Iterating .........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
+	i = 0;
 	while (e) {
 		e = MAP_ITERATOR_NEXT(&it);
+		++i;
 	}
 	STOP_TIMER(stop_time);
 	printf("done in %.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	printf("%lu elements\n", i);
 
 
 	return 1;
