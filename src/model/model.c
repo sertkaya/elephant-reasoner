@@ -80,7 +80,7 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 
 	c->description.atomic->direct_subsumers = SET_CREATE(DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
 
-	c->description.atomic->equivalent_classes = list_create();
+	SET_INIT(&(c->description.atomic->equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
 
 	c->type = CLASS_TYPE;
 	c->id = tbox->last_concept_id++;

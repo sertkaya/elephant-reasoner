@@ -37,6 +37,11 @@ typedef DynamicHashTableIterator SetIterator;
 #define SET_CREATE(size)		dynamic_hash_table_create(size)
 
 /**
+ * Initialize a set with an underlying hash table of the given size.
+ */
+#define SET_INIT(set, size)		dynamic_hash_table_init(set, size)
+
+/**
  * Adds element e to the set s. Duplicates are not allowed.
  * Returns 1 if e is successfully added, 0 otherwise.
  */
@@ -72,6 +77,12 @@ typedef DynamicHashTableIterator SetIterator;
  * It is the iterator of the underlying hash table.
  */
 #define SET_ITERATOR_CREATE(s)		dynamic_hash_table_iterator_create(s)
+
+/**
+ * Create an iterator for the elements of the set.
+ * It is the iterator of the underlying hash table.
+ */
+#define SET_ITERATOR_INIT(it, s)	dynamic_hash_table_iterator_init(it, s)
 
 /**
  * Get the next element in the set.

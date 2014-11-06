@@ -29,7 +29,7 @@ int is_subsumer_of(ClassExpression* c1, ClassExpression* c2);
 /**
  * Add class expression c1 to the equivalent classes of class expression c2.
  */
-#define ADD_EQUIVALENT_CLASS(c1, c2)	list_add(c1, c2->description.atomic->equivalent_classes)
+#define ADD_EQUIVALENT_CLASS(c1, c2)	SET_ADD(c1, &(c2->description.atomic->equivalent_classes))
 
 /**
  * Add class expression c1 to the direct subsumers of c2

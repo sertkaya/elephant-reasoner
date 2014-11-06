@@ -83,6 +83,8 @@ inline char dynamic_hash_table_contains(void* key, DynamicHashTable* hash_table)
  */
 inline DynamicHashTableIterator* dynamic_hash_table_iterator_create(DynamicHashTable* h);
 
+inline void dynamic_hash_table_iterator_init(DynamicHashTableIterator* iterator, DynamicHashTable* hash_table);
+
 /**
  * Get the next element.
  * Returns NULL if there is no next element.

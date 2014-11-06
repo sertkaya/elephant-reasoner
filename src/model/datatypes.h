@@ -79,8 +79,8 @@ enum class_expression_type {
 struct class {
 	char* IRI;
 
-	// List of equivalent classes. Elements are ClassExpression*
-	List* equivalent_classes;
+	// Set of equivalent classes. Elements are ClassExpression*
+	Set equivalent_classes;
 	// Set of direct subsumers. Elements are ClassExpression*
 	Set* direct_subsumers;
 };

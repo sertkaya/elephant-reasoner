@@ -184,6 +184,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	Set* printed = SET_CREATE(10);
 
 	MapIterator map_it;
+	SetIterator equivalent_classes_iterator;
 	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
 	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	while (atomic_concept) {
@@ -195,18 +196,18 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 				print_direct_subsumers(kb->tbox, (ClassExpression*) atomic_concept, taxonomy_fp);
 
 			char printing_equivalents = 0;
-			if (((ClassExpression*) atomic_concept)->description.atomic->equivalent_classes->size > 0) {
+			if (((ClassExpression*) atomic_concept)->description.atomic->equivalent_classes.element_count > 0) {
 				fprintf(taxonomy_fp, "EquivalentClasses(%s", ((ClassExpression*) atomic_concept)->description.atomic->IRI);
 				printing_equivalents = 1;
 			}
-			ListIterator* equivalents_iterator = list_iterator_create(((ClassExpression*) atomic_concept)->description.atomic->equivalent_classes);
-			ClassExpression* equivalent_class = (ClassExpression*) list_iterator_next(equivalents_iterator);
+			SET_ITERATOR_INIT(&equivalent_classes_iterator, &(((ClassExpression*) atomic_concept)->description.atomic->equivalent_classes));
+			ClassExpression* equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
 			while (equivalent_class != NULL) {
 				// mark the concepts in the equivalent classes as already printed
 				SET_ADD(equivalent_class, printed);
 				// now print it
 				fprintf(taxonomy_fp, " %s", equivalent_class->description.atomic->IRI);
-				equivalent_class = (ClassExpression*) list_iterator_next(equivalents_iterator);
+				equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
 			}
 			if (printing_equivalents)
 				fprintf(taxonomy_fp, ")\n");
