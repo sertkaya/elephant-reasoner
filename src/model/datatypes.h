@@ -21,6 +21,7 @@
 #define DATATYPES_H_
 
 #include "../utils/set.h"
+#include "../utils/map.h"
 #include "../utils/list.h"
 #include "../hashing/hash_table.h"
 #include "../hashing/hash_map.h"
@@ -259,30 +260,36 @@ struct tbox {
 	// Bottom concept
 	ClassExpression* bottom_concept;
 
-	// Atomic concepts hash
-	HashMap* atomic_concepts;
-	ClassExpression** atomic_concept_list;
-	int atomic_concept_count;
+	// Classes
+	// Key: IRI (char*)
+	// Value: ClassExpression*
+	Map classes;
 
-	// Exists restictions hash map
-	// The key is role id_filler id
-	HashMap* exists_restrictions;
-	int exists_restriction_count;
-	int unique_exists_restriction_count;
+	// ObjectSomeValuesFrom expressions
+	// Key: 64-bit hash value obtained from 32-bit role and filler ids
+	// Value: ClassExpression*
+	Map object_some_values_from_exps;
+	// number of total ObjectSomeValuesFrom expressions in the ontology
+	int object_some_values_from_exps_count;
 
-	// Hash for conjunctions
-	// Key: id of conjuct1_id of conjunct2
-	// where conjuct ids are sorted
-	HashMap* conjunctions;
-	int conjunction_count;
-	int binary_conjunction_count;
-	int unique_binary_conjunction_count;
+	// ObjectIntersectionOf expressions
+	// Key: 64-bit hash value obtained from the 32-bit ids of the two conjuncts
+	// Value: ClassExpression*
+	Map object_intersection_of_exps;
+	// number of total ObjectIntersectionOf expressions in the ontology
+	int object_intersection_of_exps_count;
+	// number of resulting binary ObjectIntersectionOf expressions
+	int binary_object_intersection_of_exps_count;
 
-	// Nominals
-	HashMap* nominals;
+	// ObjectOneOf expressions
+	// Key: the 32-bit id of the underlying individual
+	// Value: ClassExpression*
+	Map object_one_of_exps;
 
-	HashMap* atomic_roles;
-	int atomic_role_count;
+	// ObjectProperties
+	// Key: IRI (char*)
+	// Value: ObjectPropertyExpression*
+	Map object_properties;
 
 	HashMap* role_compositions;
 	int role_composition_count;

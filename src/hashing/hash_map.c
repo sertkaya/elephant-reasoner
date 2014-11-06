@@ -27,8 +27,8 @@
 
 inline HashMap* hash_map_create(unsigned int size) {
 
-	HashMap* hash_table = (HashMap*) malloc(sizeof(HashMap));
-	assert(hash_table != NULL);
+	HashMap* hash_map = (HashMap*) malloc(sizeof(HashMap));
+	assert(hash_map != NULL);
 
 	if (size < 16)
 		size = 16;
@@ -36,85 +36,112 @@ inline HashMap* hash_map_create(unsigned int size) {
 		size = roundup_pow2(size);
 
 	// allocate space for the buckets
-	hash_table->buckets = (HashMapElement***) calloc(size, sizeof(HashMapElement**));
-	assert(hash_table->buckets != NULL);
+	hash_map->buckets = (HashMapElement***) calloc(size, sizeof(HashMapElement**));
+	assert(hash_map->buckets != NULL);
 
 	// allocate space for the chain sizes
-	hash_table->chain_sizes = (unsigned*) calloc(size, sizeof(unsigned int));
-	assert(hash_table->buckets != NULL);
+	hash_map->chain_sizes = (unsigned*) calloc(size, sizeof(unsigned int));
+	assert(hash_map->buckets != NULL);
 
-	hash_table->bucket_count = size;
+	hash_map->bucket_count = size;
 
-	hash_table->tail = NULL;
+	hash_map->tail = NULL;
 
-	return hash_table;
+	hash_map->element_count = 0;
+
+	return hash_map;
 }
 
-int hash_map_free(HashMap* hash_table) {
+inline void hash_map_init(HashMap* hash_map, unsigned int size) {
+
+	if (size < 16)
+		size = 16;
+	else
+		size = roundup_pow2(size);
+
+	// allocate space for the buckets
+	hash_map->buckets = (HashMapElement***) calloc(size, sizeof(HashMapElement**));
+	assert(hash_map->buckets != NULL);
+
+	// allocate space for the chain sizes
+	hash_map->chain_sizes = (unsigned*) calloc(size, sizeof(unsigned int));
+	assert(hash_map->buckets != NULL);
+
+	hash_map->bucket_count = size;
+
+	hash_map->tail = NULL;
+
+	hash_map->element_count = 0;
+}
+
+
+int hash_map_free(HashMap* hash_map) {
 	int freed_bytes = 0;
 
 	int i;
-	for (i = 0; i < hash_table->bucket_count; ++i) {
-		if (hash_table->buckets[i] != NULL) {
+	for (i = 0; i < hash_map->bucket_count; ++i) {
+		if (hash_map->buckets[i] != NULL) {
 			int j;
-			for (j = 0; j < hash_table->chain_sizes[i]; ++j) {
+			for (j = 0; j < hash_map->chain_sizes[i]; ++j) {
 				// note that we only free the node.
 				// the space allocated for  node->value is not freed!
-				free(hash_table->buckets[i][j]);
+				free(hash_map->buckets[i][j]);
 				freed_bytes += sizeof(HashMapElement);
 			}
 
-			free(hash_table->buckets[i]);
-			freed_bytes += hash_table->chain_sizes[i] * sizeof(HashMapElement*);
+			free(hash_map->buckets[i]);
+			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement*);
 		}
 	}
-	free(hash_table->buckets);
-	freed_bytes += hash_table->bucket_count * sizeof(HashMapElement***);
+	free(hash_map->buckets);
+	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement***);
 
-	free(hash_table->chain_sizes);
-	freed_bytes += hash_table->bucket_count * sizeof(unsigned int);
+	free(hash_map->chain_sizes);
+	freed_bytes += hash_map->bucket_count * sizeof(unsigned int);
 
-	free(hash_table);
+	free(hash_map);
 	freed_bytes += sizeof(HashMap);
 
 	return freed_bytes;
 }
 
-inline char hash_map_put(HashMap* hash_table,
-		uint64_t key,
-		void* value) {
+inline int hash_map_put(HashMap* hash_map, uint64_t key, void* value) {
 
-	int hash_value = key & (hash_table->bucket_count - 1);
-	// int hash_value = HASH_UNSIGNED(key) & (hash_table->bucket_count - 1);
-	HashMapElement** bucket = hash_table->buckets[hash_value];
-	int chain_size = hash_table->chain_sizes[hash_value];
+	int hash_value = key & (hash_map->bucket_count - 1);
+	// int hash_value = HASH_UNSIGNED(key) & (hash_map->bucket_count - 1);
+	HashMapElement** bucket = hash_map->buckets[hash_value];
+	int chain_size = hash_map->chain_sizes[hash_value];
 
 	int i;
 	for (i = 0; i < chain_size; i++)
-		if (bucket[i]->key == key)
+		if (bucket[i]->key == key) {
+			bucket[i]->value = value;
 			return 0;
+		}
 
 	HashMapElement** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement*));
 	assert(tmp != NULL);
-	bucket = hash_table->buckets[hash_value] = tmp;
+	bucket = hash_map->buckets[hash_value] = tmp;
 
 	bucket[chain_size] = malloc(sizeof(HashMapElement));
 	assert(bucket[chain_size] != NULL);
 	bucket[chain_size]->key = key;
 	bucket[chain_size]->value = value;
-	bucket[chain_size]->previous = hash_table->tail;
+	bucket[chain_size]->previous = hash_map->tail;
 
-	hash_table->tail = bucket[chain_size];
+	hash_map->tail = bucket[chain_size];
 
-	++hash_table->chain_sizes[hash_value];
+	++hash_map->chain_sizes[hash_value];
+
+	++hash_map->element_count;
 
 	return 1;
 }
 
-inline void* hash_map_get(HashMap* hash_table, uint64_t key) {
-	int bucket_index = key & (hash_table->bucket_count - 1);
-	HashMapElement** bucket = hash_table->buckets[bucket_index];
-	int chain_size = hash_table->chain_sizes[bucket_index];
+inline void* hash_map_get(HashMap* hash_map, uint64_t key) {
+	int bucket_index = key & (hash_map->bucket_count - 1);
+	HashMapElement** bucket = hash_map->buckets[bucket_index];
+	int chain_size = hash_map->chain_sizes[bucket_index];
 
 	int i;
 	for (i = 0; i < chain_size; i++)
@@ -123,9 +150,27 @@ inline void* hash_map_get(HashMap* hash_table, uint64_t key) {
 
 	return NULL;
 }
+
+void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map) {
+	iterator->hash_map = map;
+	HashMapElement* tmp = (HashMapElement*) calloc(1, sizeof(HashMapElement));
+	assert(tmp != NULL);
+	tmp->previous = map->tail;
+	iterator->current_element = tmp;
+}
+
+
+inline void* hash_map_iterator_next(HashMapIterator* iterator) {
+	void* next = iterator->current_element->previous;
+	iterator->current_element = iterator->current_element->previous;
+	if (!next) return NULL;
+	return ((HashMapElement*) next)->value;
+}
+
+
 /*
-inline HashMapElement* hash_map_last_element(HashMap* hash_table) {
-	return hash_table->tail;
+inline HashMapElement* hash_map_last_element(HashMap* hash_map) {
+	return hash_map->tail;
 }
 
 inline HashMapElement* hash_map_previous_element(HashMapElement* current_node) {

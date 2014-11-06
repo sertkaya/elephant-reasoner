@@ -136,9 +136,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	// free the kb
-	// TODO: commented out for the competition
-	// int freed_bytes = free_kb(kb);
-	// printf("Freed bytes:%d\n", freed_bytes);
+	int freed_bytes = free_kb(kb);
+	printf("Freed bytes:%d\n", freed_bytes);
 
 	return 0;
 }

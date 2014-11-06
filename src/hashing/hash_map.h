@@ -21,8 +21,9 @@
 
 #include <stdint.h>
 
-typedef struct hash_map_element HashMapElement;
 typedef struct hash_map HashMap;
+typedef struct hash_map_element HashMapElement;
+typedef struct hash_map_iterator HashMapIterator;
 
 struct hash_map_element {
 	uint64_t key;
@@ -34,8 +35,17 @@ struct hash_map {
 	HashMapElement*** buckets;		// the buckets
 	unsigned int bucket_count;		// the number of buckets
 	unsigned int* chain_sizes;		// sizes of the chains
+	unsigned int element_count;	// the number of elements
 	HashMapElement* tail;			// the last node of the hash.
 									// we maintain a backward linked list.
+};
+
+/**
+ * Iterator for hash map.
+ */
+struct hash_map_iterator {
+	HashMap* hash_map;
+	HashMapElement* current_element;// of the current element
 };
 
 /**
@@ -44,21 +54,37 @@ struct hash_map {
 HashMap* hash_map_create(unsigned int size);
 
 /**
+ * Initialize a hash map with the given number of buckets.
+ */
+void hash_map_init(HashMap*hash_map, unsigned int size);
+
+/**
  * Free the space allocated for the given hash map.
  */
-int hash_map_free(HashMap* hash_table);
+int hash_map_free(HashMap* hash_map);
 
 /**
  * Insert a key value pair to the hash map. If the key already exists, the given
  * value is not inserted, i.e., the existing value is not overwritten.
  * Returns 1 if the key value pair is inserted, 0 otherwise.
  */
-inline char hash_map_put(HashMap* hash_table, uint64_t key, void* value);
+inline int hash_map_put(HashMap* hash_map, uint64_t key, void* value);
 
 /**
  * Returns the value for the given key, it it exists, NULL if it does not exist.
  */
-inline void* hash_map_get(HashMap* hash_table, uint64_t key);
+inline void* hash_map_get(HashMap* hash_map, uint64_t key);
+
+/**
+ * Reset a given hash map iterator.
+ */
+void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map);
+
+/**
+ * Get the next element.
+ * Returns NULL if there is no next element.
+ */
+inline void* hash_map_iterator_next(HashMapIterator* iterator);
 
 /**
  * Returns the last node in the hash table or NULL if it is empty.
@@ -66,8 +92,8 @@ inline void* hash_map_get(HashMap* hash_table, uint64_t key);
  * of insertion, since the implementation is easier and the order of
  * iteration is not relevant for our purposes.
  */
-// inline HashMapElement* hash_map_last_element(HashMap* hash_table);
-#define HASH_MAP_LAST_ELEMENT(hash_map)				hash_map->tail
+// inline HashMapElement* hash_map_last_element(HashMap* hash_map);
+#define HASH_MAP_LAST_ELEMENT(hash_map)			hash_map->tail
 
 /**
  * Returns the node that comes before the current node, or NULL if

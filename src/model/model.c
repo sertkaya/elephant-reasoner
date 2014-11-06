@@ -57,13 +57,13 @@ void create_prefix(char* prefix_name, char* prefix, KB* kb) {
  * get/create functions for concepts
  *****************************************************************************/
 
-ClassExpression* get_create_atomic_concept(char* name, TBox* tbox) {
+ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 	ClassExpression* c;
 	ClassExpression** tmp;
 
 	// check if the atomic concept with this name already exists
 	// if ((c = get_atomic_concept((unsigned char*) name, tbox)) != NULL)
-	if ((c = GET_ATOMIC_CONCEPT(name, tbox)) != NULL)
+	if ((c = GET_ATOMIC_CONCEPT(IRI, tbox)) != NULL)
 		return c;
 
 	// if an atomic concept with the name does not already exist, create it
@@ -73,10 +73,10 @@ ClassExpression* get_create_atomic_concept(char* name, TBox* tbox) {
 	c->description.atomic = (Class*) malloc(sizeof(Class));
 	assert(c->description.atomic != NULL);
 
-	c->description.atomic->IRI = (char*) malloc((strlen(name) + 1) * sizeof(char));
+	c->description.atomic->IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
 	assert(c->description.atomic->IRI != NULL);
 
-	strcpy(c->description.atomic->IRI, name);
+	strcpy(c->description.atomic->IRI, IRI);
 
 	c->description.atomic->direct_subsumers = SET_CREATE(DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
 
@@ -109,11 +109,6 @@ ClassExpression* get_create_atomic_concept(char* name, TBox* tbox) {
 	c->second_conjunct_of = NULL;
 
 	PUT_ATOMIC_CONCEPT(c->description.atomic->IRI, c, tbox);
-	tbox->atomic_concept_count++;
-	tmp = realloc(tbox->atomic_concept_list, tbox->atomic_concept_count * sizeof(ClassExpression*));
-	assert(tmp != NULL);
-	tbox->atomic_concept_list = tmp;
-	tbox->atomic_concept_list[tbox->atomic_concept_count - 1] = c;
 
 	return c;
 }
@@ -122,7 +117,7 @@ ClassExpression* get_create_atomic_concept(char* name, TBox* tbox) {
 ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, ClassExpression* f, TBox* tbox) {
 	ClassExpression* c;
 
-	tbox->exists_restriction_count++;
+	++tbox->object_some_values_from_exps_count;
 	// first check if we already created an existential
 	// restriction with the same role and filler
 	// if ((c = get_exists_restriction(r->id, f->id, tbox)) != NULL)
@@ -163,9 +158,7 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 	c->second_conjunct_of_list = NULL;
 	c->second_conjunct_of = NULL;
 
-	// put_exists_restriction(r->id, f->id, c, tbox);
 	PUT_EXISTS_RESTRICTION(r->id, f->id, c, tbox);
-	tbox->unique_exists_restriction_count++;
 
 	return c;
 }
@@ -173,7 +166,7 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpression* c2, TBox* tbox) {
 	ClassExpression* c;
 
-	tbox->binary_conjunction_count++;
+	++tbox->binary_object_intersection_of_exps_count;
 	if ((c = GET_CONJUNCTION(c1, c2, tbox)) != NULL)
 		return c;
 
@@ -219,8 +212,6 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 	c->second_conjunct_of = NULL;
 
 	PUT_CONJUNCTION(c, tbox);
-	tbox->unique_binary_conjunction_count++;
-	// tbox->unique_conjunction_count++;
 
 	return c;
 }
@@ -240,7 +231,7 @@ ClassExpression* get_create_conjunction(int size, ClassExpression** conjuncts, T
 	int i;
 	ClassExpression* conjunction = NULL;
 
-	tbox->conjunction_count++;
+	++tbox->object_intersection_of_exps_count;
 	qsort(conjuncts, size, sizeof(ClassExpression*), compare_conjunct);
 	conjunction = get_create_conjunction_binary(conjuncts[0], conjuncts[1], tbox);
 	for (i = 2; i < size; i++)
@@ -308,11 +299,11 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
  * get/create functions for roles
  *****************************************************************************/
 
-ObjectPropertyExpression* get_create_atomic_role(char* name, TBox* tbox) {
+ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 	ObjectPropertyExpression* r;
 
 	// check if the atomic role already exists
-	if ((r = GET_ATOMIC_ROLE(name, tbox)) != NULL)
+	if ((r = GET_ATOMIC_ROLE(IRI, tbox)) != NULL)
 		return r;
 
 	// if it does not already exist, create it
@@ -321,9 +312,9 @@ ObjectPropertyExpression* get_create_atomic_role(char* name, TBox* tbox) {
 	r->type = OBJECT_PROPERTY_TYPE;
 	r->description.atomic = (ObjectProperty*) malloc(sizeof(ObjectProperty));
 	assert(r->description.atomic != NULL);
-	r->description.atomic->IRI = (char*) malloc((strlen(name) + 1) * sizeof(char));
+	r->description.atomic->IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
 	assert(r->description.atomic->IRI != NULL);
-	strcpy(r->description.atomic->IRI, name);
+	strcpy(r->description.atomic->IRI, IRI);
 	r->id = tbox->last_role_id++;
 
 	r->told_subsumers = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
@@ -347,7 +338,6 @@ ObjectPropertyExpression* get_create_atomic_role(char* name, TBox* tbox) {
 	r->second_component_of = hash_table_create(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
 	PUT_ATOMIC_ROLE(r->description.atomic->IRI, r, tbox);
-	tbox->atomic_role_count++;
 
 	return r;
 }

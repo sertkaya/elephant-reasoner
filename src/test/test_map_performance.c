@@ -21,7 +21,7 @@
 #include <assert.h>
 #include <sys/time.h>
 
-#include "../hashing/hash_map.h"
+#include "../utils/map.h"
 #include "../utils/timer.h"
 
 
@@ -29,31 +29,37 @@ int main(int argc, char *argv[]) {
 	struct timeval start_time, stop_time;
 	uint64_t i;
 	int test_size = atoi(argv[1]);
-	int hash_map_size = atoi(argv[2]);
+	int map_size = atoi(argv[2]);
 
 	uint64_t* tmp = malloc(test_size * sizeof(uint64_t));
 	assert(tmp != NULL);
 
-	HashMap* hash_map = hash_map_create(hash_map_size);
+	Map map;
+	MAP_INIT(&map, map_size);
 	printf("%d put operations .........................: ", test_size);
 	fflush(stdout);
 	START_TIMER(start_time);
-	for (i = 0; i < test_size; ++i) {
+	for (i = 1; i < test_size + 1; ++i) {
 		tmp[i] = i;
-		hash_map_put(hash_map,  i, (void*) tmp[i]);
+		MAP_PUT(i, (void*) tmp[i], &map);
 	}
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 
-	HashMapElement* e = HASH_MAP_LAST_ELEMENT(hash_map);
+	MapIterator it;
+	MAP_ITERATOR_INIT(&it, &map);
+	void* e = MAP_ITERATOR_NEXT(&it);
 	printf("Iterating .........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
+	i = 0;
 	while (e) {
-		e = HASH_MAP_PREVIOUS_ELEMENT(e);
+		e = MAP_ITERATOR_NEXT(&it);
+		++i;
 	}
 	STOP_TIMER(stop_time);
 	printf("done in %.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+	printf("%lu elements\n", i);
 
 
 	return 1;
