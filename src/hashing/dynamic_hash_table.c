@@ -41,8 +41,14 @@ void dynamic_hash_table_init(DynamicHashTable* hash_table, unsigned int size) {
 
 	hash_table->elements = (void**) calloc(size, sizeof(void*));
 	assert(hash_table->elements != NULL);
+	hash_table->end_indexes = (unsigned int*) calloc(size, sizeof(unsigned int));
+	assert(hash_table->end_indexes != NULL);
 	hash_table->size = size;
 	hash_table->element_count = 0;
+	int i;
+	for (i = 0; i < hash_table->size; ++i)
+		// each chain initially ends at its starting point
+		hash_table->end_indexes[i] = i;
 
 	return;
 }
@@ -143,6 +149,19 @@ int dynamic_hash_table_free(DynamicHashTable* hash_table) {
 
 	free(hash_table);
 	freed_bytes += sizeof(DynamicHashTable);
+
+	return freed_bytes;
+}
+
+int dynamic_hash_table_reset(DynamicHashTable* hash_table) {
+	int i;
+	int freed_bytes = 0;
+
+	free(hash_table->elements);
+	freed_bytes += hash_table->size * sizeof(void*);
+
+	free(hash_table->end_indexes);
+	freed_bytes += hash_table->size * sizeof(unsigned int);
 
 	return freed_bytes;
 }

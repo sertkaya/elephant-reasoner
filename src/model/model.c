@@ -78,7 +78,7 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 
 	strcpy(c->description.atomic->IRI, IRI);
 
-	c->description.atomic->direct_subsumers = SET_CREATE(DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
+	SET_INIT(&(c->description.atomic->direct_subsumers), DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
 
 	SET_INIT(&(c->description.atomic->equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
 
@@ -87,7 +87,7 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 
 	c->told_subsumers = list_create();
 
-	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 
@@ -137,7 +137,7 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 
 	c->told_subsumers = list_create();
 
-	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 
@@ -190,7 +190,7 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 
 	c->told_subsumers = list_create();
 
-	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 
@@ -262,7 +262,7 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 
 	c->told_subsumers = list_create();
 
-	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 

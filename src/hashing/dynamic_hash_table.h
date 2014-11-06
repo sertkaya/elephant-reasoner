@@ -61,6 +61,12 @@ void dynamic_hash_table_init(DynamicHashTable* hash_table, unsigned int size);
 int dynamic_hash_table_free(DynamicHashTable* hash_table);
 
 /**
+ * Free the space for the elements of the given hash table. Intended for
+ * hash tables that are not dynamically created, but only initialized.
+ */
+int dynamic_hash_table_reset(DynamicHashTable* hash_table);
+
+/**
  * Insert the given key into the hash table. The key cannot be NULL.
  * Returns 1 if the key is inserted, 0 if it already existed.
  */

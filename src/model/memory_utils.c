@@ -36,10 +36,10 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	switch (c->type) {
 	case CLASS_TYPE:
 		// free the equivalent concepts list
-		total_freed_bytes += SET_FREE(&(c->description.atomic->equivalent_classes));
+		total_freed_bytes += SET_RESET(&(c->description.atomic->equivalent_classes));
 
 		// free the direct subsumers set
-		total_freed_bytes += SET_FREE(c->description.atomic->direct_subsumers);
+		total_freed_bytes += SET_RESET(&(c->description.atomic->direct_subsumers));
 
 		total_freed_bytes += sizeof(char) * strlen(c->description.atomic->IRI);
 		free(c->description.atomic->IRI);
@@ -68,7 +68,7 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	total_freed_bytes += list_free(c->told_subsumers);
 
 	// free the subsumers hash
-	total_freed_bytes += SET_FREE(c->subsumers);
+	total_freed_bytes += SET_RESET(&(c->subsumers));
 
 	// free the predecessors matrix.
 	int i;

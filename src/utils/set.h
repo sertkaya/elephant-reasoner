@@ -61,10 +61,20 @@ typedef DynamicHashTableIterator SetIterator;
 #define SET_CONTAINS(e, s)		dynamic_hash_table_contains(e, s)
 
 /**
- * Free the space allocated for the given set.
+ * Free the space allocated for the elements of the given set
+ * and the set itself. Intended for freeing sets that are
+ * dynamically created.
  * Returns the number of freed bytes.
  */
 #define SET_FREE(s)				dynamic_hash_table_free(s)
+
+/**
+ * Free the space allocated for the elements of the given set.
+ * The space for the set itself is not freed. Intended for
+ * sets that are not dynamically created.
+ * Returns the number of freed bytes.
+ */
+#define SET_RESET(s)			dynamic_hash_table_reset(s)
 
 /**
  * Return an array containing the elements of the given set.

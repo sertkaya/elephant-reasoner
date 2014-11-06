@@ -94,7 +94,7 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 
 	c->told_subsumers = list_create();
 
-	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 
@@ -152,7 +152,7 @@ ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyE
 
 	c->told_subsumers = list_create();
 
-	c->subsumers = SET_CREATE(DEFAULT_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
 	c->filler_of_negative_exists = NULL;
 

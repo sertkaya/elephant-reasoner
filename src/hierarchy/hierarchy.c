@@ -33,15 +33,17 @@ void compute_concept_hierarchy(TBox* tbox) {
 	int is_direct_subsumer;
 
 	MapIterator map_it;
+	SetIterator direct_subsumers_iterator;
+	SetIterator subsumers_iterator;
 	MAP_ITERATOR_INIT(&map_it, &(tbox->classes));
 	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	while (atomic_concept) {
-		SetIterator* subsumers_iterator = SET_ITERATOR_CREATE(((ClassExpression*) atomic_concept)->subsumers);
-		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+		SET_ITERATOR_INIT(&subsumers_iterator, &(((ClassExpression*) atomic_concept)->subsumers));
+		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 		while (subsumer != NULL) {
 
 			if (subsumer->type != CLASS_TYPE) {
-				subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+				subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 				continue;
 			}
 			// check if tbox->atomic_concept_list[i] is a subsumer of the 'subsumer'
@@ -52,8 +54,8 @@ void compute_concept_hierarchy(TBox* tbox) {
 			}
 			else {
 				is_direct_subsumer = 1;
-				SetIterator* direct_subsumers_iterator = SET_ITERATOR_CREATE(((ClassExpression*) atomic_concept)->description.atomic->direct_subsumers);
-				void* direct_subsumer = SET_ITERATOR_NEXT(direct_subsumers_iterator);
+				SET_ITERATOR_INIT(&direct_subsumers_iterator,  &(((ClassExpression*) atomic_concept)->description.atomic->direct_subsumers));
+				void* direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 
 				while (direct_subsumer != NULL) {
 					// check if the 'subsumer' is a subsumer of the 'direct_subsumer'
@@ -68,18 +70,14 @@ void compute_concept_hierarchy(TBox* tbox) {
 					if (IS_SUBSUMED_BY(subsumer, direct_subsumer))
 						REMOVE_DIRECT_SUBSUMER(direct_subsumer, ((ClassExpression*) atomic_concept));
 
-					direct_subsumer = SET_ITERATOR_NEXT(direct_subsumers_iterator);
+					direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 				}
-				SET_ITERATOR_FREE(direct_subsumers_iterator);
-
 
 				if (is_direct_subsumer)
 					ADD_DIRECT_SUBSUMER(subsumer, ((ClassExpression*) atomic_concept));
 			}
-			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 		}
-		SET_ITERATOR_FREE(subsumers_iterator);
-
 		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	}
 

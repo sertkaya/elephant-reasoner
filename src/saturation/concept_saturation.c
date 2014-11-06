@@ -37,7 +37,7 @@ int saturation_unique_subsumption_count = 0, saturation_total_subsumption_count 
 int saturation_unique_link_count = 0, saturation_total_link_count = 0;
 
 // marks the axiom with the premise lhs and conclusion rhs as processed
-#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		SET_ADD(ax->rhs, ax->lhs->subsumers)
+#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		SET_ADD(ax->rhs, &(ax->lhs->subsumers))
 
 static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpression* lhs, ClassExpression* rhs, ObjectPropertyExpression* role, enum saturation_axiom_type type) {
 	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
@@ -241,17 +241,17 @@ char saturate_concepts(KB* kb) {
 
 
 				// existential introduction
-				SetIterator* subsumers_iterator = SET_ITERATOR_CREATE(ax->rhs->subsumers);
-				ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+				SetIterator subsumers_iterator;
+				SET_ITERATOR_INIT(&subsumers_iterator, &(ax->rhs->subsumers));
+				ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 				while (subsumer != NULL) {
 					for (j = 0; j < ax->role->subsumer_count; ++j) {
 						ClassExpression* ex = GET_NEGATIVE_EXISTS(subsumer, ax->role->subsumer_list[j]);
 						if (ex != NULL)
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
-					subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+					subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 				}
-				SET_ITERATOR_FREE(subsumers_iterator);
 
 				// the role chain rule
 				// the role composition where this role appears as the second component

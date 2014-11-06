@@ -151,15 +151,15 @@ void print_tbox(TBox* tbox) {
 }
 
 void print_direct_subsumers(TBox* tbox, ClassExpression* c, FILE* taxonomy_fp) {
-	SetIterator* direct_subsumers_iterator = SET_ITERATOR_CREATE(c->description.atomic->direct_subsumers);
-	void* direct_subsumer = SET_ITERATOR_NEXT(direct_subsumers_iterator);
+	SetIterator direct_subsumers_iterator;
+	SET_ITERATOR_INIT(&direct_subsumers_iterator, &(c->description.atomic->direct_subsumers));
+	void* direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 
 	while (direct_subsumer != NULL) {
 		fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", c->description.atomic->IRI,
 				((ClassExpression*) direct_subsumer)->description.atomic->IRI);
-		direct_subsumer = SET_ITERATOR_NEXT(direct_subsumers_iterator);
+		direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 	}
-	SET_ITERATOR_FREE(direct_subsumers_iterator);
 }
 
 void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
@@ -242,20 +242,20 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 	// Traverse the hash of nominals that are generated during preprocessing.
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);
 	ClassExpression* nominal = NULL;
+	SetIterator subsumers_iterator;
 	while (node) {
 		nominal = (ClassExpression*) node->value;
 
 
-		SetIterator* subsumers_iterator = SET_ITERATOR_CREATE(nominal->subsumers);
-		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
+		SET_ITERATOR_INIT(&subsumers_iterator, &(nominal->subsumers));
+		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 		while (subsumer != NULL) {
-			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(subsumers_iterator);
 			if (subsumer->type == CLASS_TYPE)
 				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n",
 						subsumer->description.atomic->IRI,
 						nominal->description.nominal->individual->IRI);
+			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 		}
-		SET_ITERATOR_FREE(subsumers_iterator);
 
 		/*
 		for (i = 0; i < nominal->subsumer_count; ++i)

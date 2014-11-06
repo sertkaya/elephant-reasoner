@@ -25,7 +25,7 @@
 #include "../hashing/hash_table.h"
 
 
-#define IS_SUBSUMED_BY(c1,c2)						SET_CONTAINS(c2, c1->subsumers)
+#define IS_SUBSUMED_BY(c1,c2)						SET_CONTAINS(c2, &(c1->subsumers))
 
 // unsigned long hash_it(int x, int y);
 // long long hash_it(int x, int y);

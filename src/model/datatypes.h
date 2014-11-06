@@ -82,7 +82,7 @@ struct class {
 	// Set of equivalent classes. Elements are ClassExpression*
 	Set equivalent_classes;
 	// Set of direct subsumers. Elements are ClassExpression*
-	Set* direct_subsumers;
+	Set direct_subsumers;
 };
 
 
@@ -127,7 +127,7 @@ struct class_expression {
 
 	// Set of subsumers computed during saturation.
 	// Elements are ClassExpression*
-	Set* subsumers;
+	Set subsumers;
 
 	// 2-dimensional dynamic array for storing predecessors.
 	Link** predecessors;
