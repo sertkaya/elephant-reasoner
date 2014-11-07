@@ -32,36 +32,16 @@
 int free_concept(ClassExpression* c, TBox* tbox) {
 	int total_freed_bytes = 0;
 
-	// free the 3 different description types
-	switch (c->type) {
-	case CLASS_TYPE:
+	// free the class
+	if (c->type == CLASS_TYPE) {
 		// free the equivalent concepts list
-		total_freed_bytes += SET_RESET(&(c->description.atomic->equivalent_classes));
+		total_freed_bytes += SET_RESET(&(c->description.atomic.equivalent_classes));
 
 		// free the direct subsumers set
-		total_freed_bytes += SET_RESET(&(c->description.atomic->direct_subsumers));
+		total_freed_bytes += SET_RESET(&(c->description.atomic.direct_subsumers));
 
-		total_freed_bytes += sizeof(char) * strlen(c->description.atomic->IRI);
-		free(c->description.atomic->IRI);
-
-		total_freed_bytes += sizeof(Class);
-		free(c->description.atomic);
-		break;
-	case OBJECT_INTERSECTION_OF_TYPE:
-		total_freed_bytes += sizeof(ObjectIntersectionOf);
-		free(c->description.conj);
-		break;
-	case OBJECT_SOME_VALUES_FROM_TYPE:
-		total_freed_bytes += sizeof(ObjectSomeValuesFrom);
-		free(c->description.exists);
-		break;
-	case OBJECT_ONE_OF_TYPE:
-		total_freed_bytes += sizeof(ObjectOneOf);
-		free(c->description.nominal);
-		break;
-	default:
-		fprintf(stderr,"unknown concept type, aborting\n");
-		exit(-1);
+		total_freed_bytes += sizeof(char) * strlen(c->description.atomic.IRI);
+		free(c->description.atomic.IRI);
 	}
 
 	// free the told subsumers list

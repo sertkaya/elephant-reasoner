@@ -43,15 +43,15 @@ void index_concept(ClassExpression* c, TBox* tbox) {
 	case OBJECT_ONE_OF_TYPE:
 		break;
 	case OBJECT_INTERSECTION_OF_TYPE:
-		index_concept(c->description.conj->conjunct1, tbox);
-		index_concept(c->description.conj->conjunct2, tbox);
-		add_to_first_conjunct_of_list(c->description.conj->conjunct1, c);
-		add_to_second_conjunct_of_list(c->description.conj->conjunct2, c);
+		index_concept(c->description.conj.conjunct1, tbox);
+		index_concept(c->description.conj.conjunct2, tbox);
+		add_to_first_conjunct_of_list(c->description.conj.conjunct1, c);
+		add_to_second_conjunct_of_list(c->description.conj.conjunct2, c);
 		break;
 	case OBJECT_SOME_VALUES_FROM_TYPE:
 		// add_to_filler_of_list(c->description.exists->filler, c);
 		add_to_negative_exists(c, tbox);
-		index_concept(c->description.exists->filler, tbox);
+		index_concept(c->description.exists.filler, tbox);
 		break;
 	default:
 		fprintf(stderr, "unknown concept type, aborting\n");

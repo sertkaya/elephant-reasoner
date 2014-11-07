@@ -38,16 +38,16 @@ void print_role_composition(ObjectPropertyChain* rc);
 void print_concept(ClassExpression* c) {
 	switch (c->type) {
 		case CLASS_TYPE:
-			print_atomic_concept(c->description.atomic);
+			print_atomic_concept(&(c->description.atomic));
 			break;
 		case OBJECT_SOME_VALUES_FROM_TYPE:
-			print_exists(c->description.exists);
+			print_exists(&(c->description.exists));
 			break;
 		case OBJECT_INTERSECTION_OF_TYPE:
-			print_conjunction(c->description.conj);
+			print_conjunction(&(c->description.conj));
 			break;
 		case OBJECT_ONE_OF_TYPE:
-			print_nominal(c->description.nominal);
+			print_nominal(&(c->description.nominal));
 			break;
 		default:
 			fprintf(stderr,"unknown concept type, aborting\n");
@@ -98,7 +98,7 @@ void print_conjunctions(TBox* tbox) {
 	MAP_ITERATOR_INIT(&map_it, &(tbox->object_intersection_of_exps));
 	void* map_element = MAP_ITERATOR_NEXT(&map_it);
 	while (map_element) {
-		print_conjunction(((ClassExpression*) map_element)->description.conj);
+		print_conjunction(&(((ClassExpression*) map_element)->description.conj));
 		map_element = MAP_ITERATOR_NEXT(&map_it);
 	}
 }
@@ -152,12 +152,12 @@ void print_tbox(TBox* tbox) {
 
 void print_direct_subsumers(TBox* tbox, ClassExpression* c, FILE* taxonomy_fp) {
 	SetIterator direct_subsumers_iterator;
-	SET_ITERATOR_INIT(&direct_subsumers_iterator, &(c->description.atomic->direct_subsumers));
+	SET_ITERATOR_INIT(&direct_subsumers_iterator, &(c->description.atomic.direct_subsumers));
 	void* direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 
 	while (direct_subsumer != NULL) {
-		fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", c->description.atomic->IRI,
-				((ClassExpression*) direct_subsumer)->description.atomic->IRI);
+		fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", c->description.atomic.IRI,
+				((ClassExpression*) direct_subsumer)->description.atomic.IRI);
 		direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 	}
 }
@@ -196,17 +196,17 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 				print_direct_subsumers(kb->tbox, (ClassExpression*) atomic_concept, taxonomy_fp);
 
 			char printing_equivalents = 0;
-			if (((ClassExpression*) atomic_concept)->description.atomic->equivalent_classes.element_count > 0) {
-				fprintf(taxonomy_fp, "EquivalentClasses(%s", ((ClassExpression*) atomic_concept)->description.atomic->IRI);
+			if (((ClassExpression*) atomic_concept)->description.atomic.equivalent_classes.element_count > 0) {
+				fprintf(taxonomy_fp, "EquivalentClasses(%s", ((ClassExpression*) atomic_concept)->description.atomic.IRI);
 				printing_equivalents = 1;
 			}
-			SET_ITERATOR_INIT(&equivalent_classes_iterator, &(((ClassExpression*) atomic_concept)->description.atomic->equivalent_classes));
+			SET_ITERATOR_INIT(&equivalent_classes_iterator, &(((ClassExpression*) atomic_concept)->description.atomic.equivalent_classes));
 			ClassExpression* equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
 			while (equivalent_class != NULL) {
 				// mark the concepts in the equivalent classes as already printed
 				SET_ADD(equivalent_class, printed);
 				// now print it
-				fprintf(taxonomy_fp, " %s", equivalent_class->description.atomic->IRI);
+				fprintf(taxonomy_fp, " %s", equivalent_class->description.atomic.IRI);
 				equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
 			}
 			if (printing_equivalents)
@@ -252,8 +252,8 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 		while (subsumer != NULL) {
 			if (subsumer->type == CLASS_TYPE)
 				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n",
-						subsumer->description.atomic->IRI,
-						nominal->description.nominal->individual->IRI);
+						subsumer->description.atomic.IRI,
+						nominal->description.nominal.individual->IRI);
 			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 		}
 

@@ -54,7 +54,7 @@ void compute_concept_hierarchy(TBox* tbox) {
 			}
 			else {
 				is_direct_subsumer = 1;
-				SET_ITERATOR_INIT(&direct_subsumers_iterator,  &(((ClassExpression*) atomic_concept)->description.atomic->direct_subsumers));
+				SET_ITERATOR_INIT(&direct_subsumers_iterator,  &(((ClassExpression*) atomic_concept)->description.atomic.direct_subsumers));
 				void* direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 
 				while (direct_subsumer != NULL) {

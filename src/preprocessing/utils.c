@@ -83,10 +83,7 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 	c = (ClassExpression*) malloc(sizeof(ClassExpression));
 	assert(c != NULL);
 
-	c->description.nominal = (ObjectOneOf*) malloc(sizeof(ObjectOneOf));
-	assert(c->description.nominal != NULL);
-
-	c->description.nominal->individual = ind;
+	c->description.nominal.individual = ind;
 
 	c->type = OBJECT_ONE_OF_TYPE;
 	// c->id = ind->id;
@@ -143,10 +140,9 @@ ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyE
 	assert(c != NULL);
 
 	c->type = OBJECT_SOME_VALUES_FROM_TYPE;
-	c->description.exists = (ObjectSomeValuesFrom*) malloc(sizeof(ObjectSomeValuesFrom));
-	assert(c->description.exists != NULL);
-	c->description.exists->role = r;
-	c->description.exists->filler = f;
+
+	c->description.exists.role = r;
+	c->description.exists.filler = f;
 	// c->id = (kb->generated_exists_restriction_count)++;
 	c->id = kb->tbox->last_concept_id++;
 

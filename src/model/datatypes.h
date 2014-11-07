@@ -106,10 +106,10 @@ struct object_one_of {
 
 // Class description
 union class_description {
-	Class* atomic;
-	ObjectIntersectionOf* conj;
-	ObjectSomeValuesFrom* exists;
-	ObjectOneOf* nominal;
+	Class atomic;
+	ObjectIntersectionOf conj;
+	ObjectSomeValuesFrom exists;
+	ObjectOneOf nominal;
 }; 
 	
 

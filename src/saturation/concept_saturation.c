@@ -111,14 +111,14 @@ char saturate_concepts(KB* kb) {
 				// the first conjunct
 				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
 					// check if lhs is subsumed by the second conjunct as well
-					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2))
+					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj.conjunct2))
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
 				// now the same for the second conjunct
 				for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
 					// check if lhs is also subsumed by the first conjunct
-					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1))
+					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->second_conjunct_of_list[i]->description.conj.conjunct1))
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
@@ -174,14 +174,14 @@ char saturate_concepts(KB* kb) {
 				// the first conjunct
 				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
 					// check if lhs is subsumed by the second conjunct as well
-					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj->conjunct2))
+					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj.conjunct2))
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
 				// now the same for the second conjunct
 				for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
 					// check if lhs is also subsumed by the first conjunct
-					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->second_conjunct_of_list[i]->description.conj->conjunct1))
+					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->second_conjunct_of_list[i]->description.conj.conjunct1))
 						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
@@ -189,14 +189,14 @@ char saturate_concepts(KB* kb) {
 				case OBJECT_INTERSECTION_OF_TYPE:
 					// conjunction decomposition
 					// conjunct 1 as rhs
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj->conjunct1, NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj.conjunct1, NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
 
 					// conjunct 2 as rhs
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj->conjunct2, NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.conj.conjunct2, NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
 					break;
 				case OBJECT_SOME_VALUES_FROM_TYPE:
 					// existential decomposition
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.exists->filler, ax->rhs->description.exists->role, LINK));
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.exists.filler, ax->rhs->description.exists.role, LINK));
 					break;
 				}
 

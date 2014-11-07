@@ -70,17 +70,14 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 	c = (ClassExpression*) malloc(sizeof(ClassExpression));
 	assert(c != NULL);
 
-	c->description.atomic = (Class*) malloc(sizeof(Class));
-	assert(c->description.atomic != NULL);
+	c->description.atomic.IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
+	assert(c->description.atomic.IRI != NULL);
 
-	c->description.atomic->IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
-	assert(c->description.atomic->IRI != NULL);
+	strcpy(c->description.atomic.IRI, IRI);
 
-	strcpy(c->description.atomic->IRI, IRI);
+	SET_INIT(&(c->description.atomic.direct_subsumers), DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
 
-	SET_INIT(&(c->description.atomic->direct_subsumers), DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
-
-	SET_INIT(&(c->description.atomic->equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
+	SET_INIT(&(c->description.atomic.equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
 
 	c->type = CLASS_TYPE;
 	c->id = tbox->last_concept_id++;
@@ -108,7 +105,7 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 	c->second_conjunct_of_list = NULL;
 	c->second_conjunct_of = NULL;
 
-	PUT_ATOMIC_CONCEPT(c->description.atomic->IRI, c, tbox);
+	PUT_ATOMIC_CONCEPT(c->description.atomic.IRI, c, tbox);
 
 	return c;
 }
@@ -129,10 +126,9 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 	assert(c != NULL);
 
 	c->type = OBJECT_SOME_VALUES_FROM_TYPE;
-	c->description.exists = (ObjectSomeValuesFrom*) malloc(sizeof(ObjectSomeValuesFrom));
-	assert(c->description.exists != NULL);
-	c->description.exists->role = r;
-	c->description.exists->filler = f;
+
+	c->description.exists.role = r;
+	c->description.exists.filler = f;
 	c->id = tbox->last_concept_id++;
 
 	c->told_subsumers = list_create();
@@ -174,17 +170,15 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 	assert(c != NULL);
 
 	c->type = OBJECT_INTERSECTION_OF_TYPE;
-	c->description.conj = (ObjectIntersectionOf*) malloc(sizeof(ObjectIntersectionOf));
-	assert(c->description.conj != NULL);
 
 	// we order the conjuncts!
 	if (c1->id < c2->id) {
-		c->description.conj->conjunct1 = c1;
-		c->description.conj->conjunct2 = c2;
+		c->description.conj.conjunct1 = c1;
+		c->description.conj.conjunct2 = c2;
 	}
 	else {
-		c->description.conj->conjunct1 = c2;
-		c->description.conj->conjunct2 = c1;
+		c->description.conj.conjunct1 = c2;
+		c->description.conj.conjunct2 = c1;
 	}
 	c->id = tbox->last_concept_id++;
 
@@ -252,10 +246,7 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 	c = (ClassExpression*) malloc(sizeof(ClassExpression));
 	assert(c != NULL);
 
-	c->description.nominal = (ObjectOneOf*) malloc(sizeof(ObjectOneOf));
-	assert(c->description.nominal != NULL);
-
-	c->description.nominal->individual = ind;
+	c->description.nominal.individual = ind;
 
 	c->type = OBJECT_ONE_OF_TYPE;
 	c->id = tbox->last_concept_id++;
