@@ -105,6 +105,36 @@ int hash_map_free(HashMap* hash_map) {
 	return freed_bytes;
 }
 
+int hash_map_reset(HashMap* hash_map) {
+	int freed_bytes = 0;
+
+	int i;
+	for (i = 0; i < hash_map->bucket_count; ++i) {
+		if (hash_map->buckets[i] != NULL) {
+			int j;
+			for (j = 0; j < hash_map->chain_sizes[i]; ++j) {
+				// note that we only free the node.
+				// the space allocated for  node->value is not freed!
+				free(hash_map->buckets[i][j]);
+				freed_bytes += sizeof(HashMapElement);
+			}
+
+			free(hash_map->buckets[i]);
+			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement*);
+		}
+	}
+	free(hash_map->buckets);
+	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement***);
+
+	free(hash_map->chain_sizes);
+	freed_bytes += hash_map->bucket_count * sizeof(unsigned int);
+
+	hash_map->bucket_count = 0;
+	hash_map->element_count = 0;
+
+	return freed_bytes;
+}
+
 inline int hash_map_put(HashMap* hash_map, uint64_t key, void* value) {
 
 	int hash_value = key & (hash_map->bucket_count - 1);

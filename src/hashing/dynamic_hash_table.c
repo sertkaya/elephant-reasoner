@@ -163,6 +163,9 @@ int dynamic_hash_table_reset(DynamicHashTable* hash_table) {
 	free(hash_table->end_indexes);
 	freed_bytes += hash_table->size * sizeof(unsigned int);
 
+	hash_table->element_count = 0;
+	hash_table->size = 0;
+
 	return freed_bytes;
 }
 

@@ -64,6 +64,12 @@ void hash_map_init(HashMap*hash_map, unsigned int size);
 int hash_map_free(HashMap* hash_map);
 
 /**
+ * Free the space allocated for the elements of a given hash map.
+ * Does not free the space allocated for the hash map itself.
+ */
+int hash_map_reset(HashMap* hash_map);
+
+/**
  * Insert a key value pair to the hash map. If the key already exists, the given
  * value is not inserted, i.e., the existing value is not overwritten.
  * Returns 1 if the key value pair is inserted, 0 otherwise.

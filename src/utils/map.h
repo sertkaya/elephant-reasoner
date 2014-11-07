@@ -67,6 +67,14 @@ typedef HashMapIterator MapIterator;
 #define MAP_FREE(map)					hash_map_free(map)
 
 /**
+ * Free the space allocated for the elements of the given map.
+ * The space for the set itself is not freed. Intended for
+ * maps that are not dynamically created.
+ * Returns the number of freed bytes.
+ */
+#define MAP_RESET(s)					hash_map_reset(s)
+
+/**
  * Create an iterator for the elements of the map.
  * It is the iterator of the underlying hash map.
  */

@@ -209,7 +209,7 @@ int free_tbox(TBox* tbox) {
 		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the existentials map
-	total_freed_bytes += MAP_FREE(&(tbox->object_some_values_from_exps));
+	total_freed_bytes += MAP_RESET(&(tbox->object_some_values_from_exps));
 
 	// iterate over the conjunctions map, free the conjunctions
 	MAP_ITERATOR_INIT(&iterator, &(tbox->object_intersection_of_exps));
@@ -219,7 +219,7 @@ int free_tbox(TBox* tbox) {
 		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the conjunctions map
-	total_freed_bytes += MAP_FREE(&(tbox->object_intersection_of_exps));
+	total_freed_bytes += MAP_RESET(&(tbox->object_intersection_of_exps));
 
 	// iterate over the nominals map, free the nominals
 	MAP_ITERATOR_INIT(&iterator, &(tbox->object_one_of_exps));
@@ -229,7 +229,7 @@ int free_tbox(TBox* tbox) {
 		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the nominals hash
-	total_freed_bytes += MAP_FREE(&(tbox->object_one_of_exps));
+	total_freed_bytes += MAP_RESET(&(tbox->object_one_of_exps));
 
 	// iterate over the atomic concepts map, free the atomic concepts
 	MAP_ITERATOR_INIT(&iterator, &(tbox->classes));
@@ -239,7 +239,7 @@ int free_tbox(TBox* tbox) {
 		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the atomic concepts hash
-	total_freed_bytes += MAP_FREE(&(tbox->classes));
+	total_freed_bytes += MAP_RESET(&(tbox->classes));
 
 	// iterate over the role_compositions hash, free the role compositions
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->role_compositions);
@@ -258,7 +258,7 @@ int free_tbox(TBox* tbox) {
 		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the atomic roles hash
-	total_freed_bytes += MAP_FREE(&(tbox->object_properties));
+	total_freed_bytes += MAP_RESET(&(tbox->object_properties));
 
 	// finally free the tbox itself
 	free(tbox);
