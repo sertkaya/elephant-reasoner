@@ -37,7 +37,7 @@ int add_to_concept_subsumer_list(ClassExpression* c, ClassExpression* s);
 // TODO: what about multiple occurrences? Performance?
 // add s to the told subsumer list of c
 // note that multiple occurrence of s is allowed!
-#define ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(s, c)	list_add(s, c->told_subsumers)
+#define ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(s, c)	list_add(s, &(c->told_subsumers))
 
 
 

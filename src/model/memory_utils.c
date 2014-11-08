@@ -45,7 +45,7 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	}
 
 	// free the told subsumers list
-	total_freed_bytes += list_free(c->told_subsumers);
+	total_freed_bytes += list_reset(&(c->told_subsumers));
 
 	// free the subsumers hash
 	total_freed_bytes += SET_RESET(&(c->subsumers));

@@ -38,10 +38,16 @@ struct list_iterator {
 };
 
 /**
- * Initialize the list size and elements.
+ * Create list.
  * Returns a pointer to the created list.
  */
 inline List* list_create();
+
+/**
+ * Initialize a given list. Intended for not dynamically created
+ * lists.
+ */
+inline void list_init(List* l);
 
 /**
  * Appends element e to list l. Does not check for duplicates.
@@ -60,6 +66,11 @@ inline char list_remove(void* e, List* l);
  * Free the space allocated for this list.
  */
 inline int list_free(List* l);
+
+/**
+ * Free the space allocated for the elements of the given list.
+ */
+inline int list_reset(List* l);
 
 /**
  * Creates an iterator for the given list.

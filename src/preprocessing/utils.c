@@ -89,7 +89,7 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 	// c->id = ind->id;
 	c->id = kb->tbox->last_concept_id++;
 
-	c->told_subsumers = list_create();
+	list_init(&(c->told_subsumers));
 
 	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
@@ -146,7 +146,7 @@ ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyE
 	// c->id = (kb->generated_exists_restriction_count)++;
 	c->id = kb->tbox->last_concept_id++;
 
-	c->told_subsumers = list_create();
+	list_init(&(c->told_subsumers));
 
 	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 

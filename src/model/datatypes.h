@@ -123,7 +123,7 @@ struct class_expression {
 	ClassDescription description;
 
 	// List of told subsumers. Elements are ClassExpression*
-	List* told_subsumers;
+	List told_subsumers;
 
 	// Set of subsumers computed during saturation.
 	// Elements are ClassExpression*

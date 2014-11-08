@@ -30,11 +30,25 @@ inline List* list_create() {
 	return l;
 }
 
+inline void list_init(List* l) {
+ 	l->size = 0;
+	l->elements = NULL;
+}
+
 inline int list_free(List* l) {
 	free(l->elements);
 	int freed_bytes = l->size * sizeof(void*);
 	free(l);
 	freed_bytes+= sizeof(List);
+
+	return freed_bytes;
+}
+
+inline int list_reset(List* l) {
+	free(l->elements);
+	int freed_bytes = l->size * sizeof(void*);
+	l->size = 0;
+	l->elements = NULL;
 
 	return freed_bytes;
 }

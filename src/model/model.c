@@ -82,7 +82,7 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 	c->type = CLASS_TYPE;
 	c->id = tbox->last_concept_id++;
 
-	c->told_subsumers = list_create();
+	list_init(&(c->told_subsumers));
 
 	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
@@ -131,7 +131,7 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 	c->description.exists.filler = f;
 	c->id = tbox->last_concept_id++;
 
-	c->told_subsumers = list_create();
+	list_init(&(c->told_subsumers));
 
 	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
@@ -182,7 +182,7 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 	}
 	c->id = tbox->last_concept_id++;
 
-	c->told_subsumers = list_create();
+	list_init(&(c->told_subsumers));
 
 	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
@@ -251,7 +251,7 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 	c->type = OBJECT_ONE_OF_TYPE;
 	c->id = tbox->last_concept_id++;
 
-	c->told_subsumers = list_create();
+	list_init(&(c->told_subsumers));
 
 	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
 
