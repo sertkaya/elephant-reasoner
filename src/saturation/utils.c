@@ -32,33 +32,30 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 	int i, j;
 	void* tmp;
 	for (i = 0; i < c->predecessor_r_count; ++i)
-		if (c->predecessors[i]->role == r) {
+		if (c->predecessors[i].role == r) {
 			// yes, we have a link for role r, now check if we already have p in its fillers list
-			for (j = 0; j < c->predecessors[i]->filler_count; ++j)
-				if (c->predecessors[i]->fillers[j] == p)
+			for (j = 0; j < c->predecessors[i].filler_count; ++j)
+				if (c->predecessors[i].fillers[j] == p)
 					return 0;
 			// no we do not have p in this list, add it
-			tmp = realloc(c->predecessors[i]->fillers, (c->predecessors[i]->filler_count + 1) * sizeof(ClassExpression*));
+			tmp = realloc(c->predecessors[i].fillers, (c->predecessors[i].filler_count + 1) * sizeof(ClassExpression*));
 			assert(tmp != NULL);
-			c->predecessors[i]->fillers = (ClassExpression**) tmp;
-			c->predecessors[i]->fillers[c->predecessors[i]->filler_count] = p;
-			++c->predecessors[i]->filler_count;
+			c->predecessors[i].fillers = (ClassExpression**) tmp;
+			c->predecessors[i].fillers[c->predecessors[i].filler_count] = p;
+			++c->predecessors[i].filler_count;
 			return 1;
 		}
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
-	tmp = realloc(c->predecessors, (c->predecessor_r_count + 1) * sizeof(Link*));
+	tmp = realloc(c->predecessors, (c->predecessor_r_count + 1) * sizeof(Link));
 	assert(tmp != NULL);
-	c->predecessors = (Link**) tmp;
-	// 2) create the the r-predecessors list of c
-	c->predecessors[c->predecessor_r_count] = calloc(1, sizeof(Link));
-	assert(c->predecessors[c->predecessor_r_count] != NULL);
-	// 3) fill the fields of the new link
-	c->predecessors[c->predecessor_r_count]->role = r;
-	c->predecessors[c->predecessor_r_count]->fillers = calloc(1, sizeof(ClassExpression*));
-	assert(c->predecessors[c->predecessor_r_count]->fillers != NULL);
-	c->predecessors[c->predecessor_r_count]->fillers[0] = p;
-	c->predecessors[c->predecessor_r_count]->filler_count = 1;
+	c->predecessors = (Link*) tmp;
+	// 2) fill the fields of the new link
+	c->predecessors[c->predecessor_r_count].role = r;
+	c->predecessors[c->predecessor_r_count].fillers = calloc(1, sizeof(ClassExpression*));
+	assert(c->predecessors[c->predecessor_r_count].fillers != NULL);
+	c->predecessors[c->predecessor_r_count].fillers[0] = p;
+	c->predecessors[c->predecessor_r_count].filler_count = 1;
 
 	// finally increment the r_count
 	++c->predecessor_r_count;

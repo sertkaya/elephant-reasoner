@@ -125,11 +125,11 @@ char saturate_concepts(KB* kb) {
 				// existential introduction
 				ClassExpression* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					for (j = 0; j < ax->lhs->predecessors[i]->role->subsumer_count; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i]->role->subsumer_list[j]);
+					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_count; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i].role->subsumer_list[j]);
 						if (ex != NULL)
-							for (k = 0; k < ax->lhs->predecessors[i]->filler_count; ++k)
-								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+							for (k = 0; k < ax->lhs->predecessors[i].filler_count; ++k)
+								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
 
 
@@ -165,8 +165,8 @@ char saturate_concepts(KB* kb) {
 					// gets computed. The information bottom <= c is not taken into account for any other concept c.
 					push(&scheduled_axioms, create_concept_saturation_axiom(tbox->bottom_concept, ax->lhs, NULL, SUBSUMPTION_BOTTOM));
 					for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-						for (j = 0; j < ax->lhs->predecessors[i]->filler_count; ++j)
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[j], tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+						for (j = 0; j < ax->lhs->predecessors[i].filler_count; ++j)
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[j], tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
 				}
 
 
@@ -204,11 +204,11 @@ char saturate_concepts(KB* kb) {
 				int j,k;
 				ClassExpression* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					for (j = 0; j < ax->lhs->predecessors[i]->role->subsumer_count; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i]->role->subsumer_list[j]);
+					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_count; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i].role->subsumer_list[j]);
 						if (ex != NULL)
-							for (k = 0; k < ax->lhs->predecessors[i]->filler_count; ++k)
-								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i]->fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+							for (k = 0; k < ax->lhs->predecessors[i].filler_count; ++k)
+								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
 
 
@@ -264,11 +264,11 @@ char saturate_concepts(KB* kb) {
 					 */
 
 					for (j = 0; j < ax->lhs->predecessor_r_count; ++j)
-						if (ax->lhs->predecessors[j]->role == ax->role->second_component_of_list[i]->description.role_composition->role1) {
-							for (k = 0; k < ax->lhs->predecessors[j]->filler_count; ++k) {
+						if (ax->lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.role_composition->role1) {
+							for (k = 0; k < ax->lhs->predecessors[j].filler_count; ++k) {
 								push(&scheduled_axioms,
 										create_concept_saturation_axiom(
-												ax->lhs->predecessors[j]->fillers[k],
+												ax->lhs->predecessors[j].fillers[k],
 												ax->rhs,
 												ax->role->second_component_of_list[i], LINK));
 

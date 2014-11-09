@@ -53,13 +53,11 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	// free the predecessors matrix.
 	int i;
 	for (i = 0; i < c->predecessor_r_count; ++i) {
-		free(c->predecessors[i]->fillers);
-		total_freed_bytes += c->predecessors[i]->filler_count * sizeof(ClassExpression*);
-		free(c->predecessors[i]);
-		total_freed_bytes += sizeof(Link);
+		free(c->predecessors[i].fillers);
+		total_freed_bytes += c->predecessors[i].filler_count * sizeof(ClassExpression*);
 	}
 	free(c->predecessors);
-	total_freed_bytes += c->predecessor_r_count  * sizeof(Link*);
+	total_freed_bytes += c->predecessor_r_count  * sizeof(Link);
 
 	// similarly free the successors hash.
 	for (i = 0; i < c->successor_r_count; ++i) {

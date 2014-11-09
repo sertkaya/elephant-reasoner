@@ -130,7 +130,7 @@ struct class_expression {
 	Set subsumers;
 
 	// 2-dimensional dynamic array for storing predecessors.
-	Link** predecessors;
+	Link* predecessors;
 	// Number of roles, for which this concept has a predecessor (the size of predecessors array)
 	int predecessor_r_count;
 
