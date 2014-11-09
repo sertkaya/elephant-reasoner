@@ -136,7 +136,7 @@ struct class_expression {
 
 	// the same data structure to store the successors.
 	// needed for implementing the role composition rule in saturation
-	Link** successors;
+	Link* successors;
 	int successor_r_count;
 
 	// list of negative existentials whose filler is this concept

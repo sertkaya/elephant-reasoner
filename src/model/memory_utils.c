@@ -61,13 +61,11 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 
 	// similarly free the successors hash.
 	for (i = 0; i < c->successor_r_count; ++i) {
-		free(c->successors[i]->fillers);
-		total_freed_bytes += c->successors[i]->filler_count * sizeof(ClassExpression*);
-		free(c->successors[i]);
-		total_freed_bytes += sizeof(Link);
+		free(c->successors[i].fillers);
+		total_freed_bytes += c->successors[i].filler_count * sizeof(ClassExpression*);
 	}
 	free(c->successors);
-	total_freed_bytes += c->successor_r_count  * sizeof(Link*);
+	total_freed_bytes += c->successor_r_count  * sizeof(Link);
 
 	// free the filler of negative existentials hash
 	free(c->filler_of_negative_exists);

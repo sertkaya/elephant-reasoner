@@ -70,33 +70,30 @@ int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpressi
 	int i, j;
 	void* tmp;
 	for (i = 0; i < c->successor_r_count; ++i)
-		if (c->successors[i]->role == r) {
+		if (c->successors[i].role == r) {
 			// yes, we have a link for role r, now check if we already have p in its fillers list
-			for (j = 0; j < c->successors[i]->filler_count; ++j)
-				if (c->successors[i]->fillers[j] == p)
+			for (j = 0; j < c->successors[i].filler_count; ++j)
+				if (c->successors[i].fillers[j] == p)
 					return 0;
 			// no we do not have p in this list, add it
-			tmp = realloc(c->successors[i]->fillers, (c->successors[i]->filler_count + 1) * sizeof(ClassExpression*));
+			tmp = realloc(c->successors[i].fillers, (c->successors[i].filler_count + 1) * sizeof(ClassExpression*));
 			assert(tmp != NULL);
-			c->successors[i]->fillers = (ClassExpression**) tmp;
-			c->successors[i]->fillers[c->successors[i]->filler_count] = p;
-			++c->successors[i]->filler_count;
+			c->successors[i].fillers = (ClassExpression**) tmp;
+			c->successors[i].fillers[c->successors[i].filler_count] = p;
+			++c->successors[i].filler_count;
 			return 1;
 		}
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
-	tmp = realloc(c->successors, (c->successor_r_count + 1) * sizeof(Link*));
+	tmp = realloc(c->successors, (c->successor_r_count + 1) * sizeof(Link));
 	assert(tmp != NULL);
-	c->successors = (Link**) tmp;
-	// 2) create the the r-successors list of c
-	c->successors[c->successor_r_count] = calloc(1, sizeof(Link));
-	assert(c->successors[c->successor_r_count] != NULL);
-	// 3) fill the fields of the new link
-	c->successors[c->successor_r_count]->role = r;
-	c->successors[c->successor_r_count]->fillers = calloc(1, sizeof(ClassExpression*));
-	assert(c->successors[c->successor_r_count]->fillers != NULL);
-	c->successors[c->successor_r_count]->fillers[0] = p;
-	c->successors[c->successor_r_count]->filler_count = 1;
+	c->successors = (Link*) tmp;
+	// 2) fill the fields of the new link
+	c->successors[c->successor_r_count].role = r;
+	c->successors[c->successor_r_count].fillers = calloc(1, sizeof(ClassExpression*));
+	assert(c->successors[c->successor_r_count].fillers != NULL);
+	c->successors[c->successor_r_count].fillers[0] = p;
+	c->successors[c->successor_r_count].filler_count = 1;
 
 	// finally increment the r_count
 	++c->successor_r_count;

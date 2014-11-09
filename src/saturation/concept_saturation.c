@@ -286,12 +286,12 @@ char saturate_concepts(KB* kb) {
 					// printf("\n");
 
 					for (j = 0; j < ax->rhs->successor_r_count; ++j)
-						if (ax->rhs->successors[j]->role == ax->role->first_component_of_list[i]->description.role_composition->role2) {
-							for (k = 0; k < ax->rhs->successors[j]->filler_count; ++k) {
+						if (ax->rhs->successors[j].role == ax->role->first_component_of_list[i]->description.role_composition->role2) {
+							for (k = 0; k < ax->rhs->successors[j].filler_count; ++k) {
 								push(&scheduled_axioms,
 										create_concept_saturation_axiom(
 												ax->lhs,
-												ax->rhs->successors[j]->fillers[k],
+												ax->rhs->successors[j].fillers[k],
 												ax->role->first_component_of_list[i], LINK));
 
 							}
