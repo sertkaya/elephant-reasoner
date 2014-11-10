@@ -149,8 +149,8 @@ struct class_expression {
 	int second_conjunct_of_count;
 
 	// same as above. the reason is performance in saturation.
-	HashTable* first_conjunct_of;
-	HashTable* second_conjunct_of;
+	Set first_conjunct_of;
+	Set second_conjunct_of;
 
 };
 

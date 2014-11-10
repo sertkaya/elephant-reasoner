@@ -98,12 +98,12 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 	c->first_conjunct_of_count = 0;
 	// space will be allocated in indexing
 	c->first_conjunct_of_list = NULL;
-	c->first_conjunct_of = NULL;
+	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
 	c->second_conjunct_of_count = 0;
 	// space will be allocated in indexing
 	c->second_conjunct_of_list = NULL;
-	c->second_conjunct_of = NULL;
+	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	PUT_ATOMIC_CONCEPT(c->description.atomic.IRI, c, tbox);
 
@@ -147,12 +147,12 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 	c->first_conjunct_of_count = 0;
 	// space will be allocated in indexing
 	c->first_conjunct_of_list = NULL;
-	c->first_conjunct_of = NULL;
+	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
 	c->second_conjunct_of_count = 0;
 	// space will be allocated in indexing
 	c->second_conjunct_of_list = NULL;
-	c->second_conjunct_of = NULL;
+	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	PUT_EXISTS_RESTRICTION(r->id, f->id, c, tbox);
 
@@ -198,12 +198,12 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 	c->first_conjunct_of_count = 0;
 	// space will be allocated in indexing
 	c->first_conjunct_of_list = NULL;
-	c->first_conjunct_of = NULL;
+	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
 	c->second_conjunct_of_count = 0;
 	// space will be allocated in indexing
 	c->second_conjunct_of_list = NULL;
-	c->second_conjunct_of = NULL;
+	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	PUT_CONJUNCTION(c, tbox);
 
@@ -267,12 +267,12 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 	c->first_conjunct_of_count = 0;
 	// space will be allocated in indexing
 	c->first_conjunct_of_list = NULL;
-	c->first_conjunct_of = NULL;
+	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
 	c->second_conjunct_of_count = 0;
 	// space will be allocated in indexing
 	c->second_conjunct_of_list = NULL;
-	c->second_conjunct_of = NULL;
+	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	PUT_NOMINAL(c, tbox);
 

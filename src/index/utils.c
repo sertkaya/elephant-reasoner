@@ -91,11 +91,7 @@ int add_to_role_subsumee_list(ObjectPropertyExpression*r, ObjectPropertyExpressi
 void add_to_first_conjunct_of_list(ClassExpression* concept, ClassExpression* conjunction) {
 	ClassExpression** tmp;
 
-	// create the hash if we are adding it for the first time
-	if (concept->first_conjunct_of == NULL)
-		concept->first_conjunct_of = hash_table_create(DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
-
-	if (hash_table_insert(concept->first_conjunct_of, conjunction)) {
+	if (SET_ADD(conjunction, &(concept->first_conjunct_of))) {
 		tmp = realloc(concept->first_conjunct_of_list, (concept->first_conjunct_of_count + 1) * sizeof(ClassExpression*));
 		assert(tmp != NULL);
 		concept->first_conjunct_of_list = tmp;
@@ -109,11 +105,7 @@ void add_to_first_conjunct_of_list(ClassExpression* concept, ClassExpression* co
 void add_to_second_conjunct_of_list(ClassExpression* concept, ClassExpression* conjunction) {
 	ClassExpression** tmp;
 
-	// create the hash if we are adding it for the first time
-	if (concept->second_conjunct_of == NULL)
-		concept->second_conjunct_of = hash_table_create(DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
-
-	if (hash_table_insert(concept->second_conjunct_of, conjunction)) {
+	if (SET_ADD(conjunction, &(concept->second_conjunct_of))) {
 		tmp = realloc(concept->second_conjunct_of_list, (concept->second_conjunct_of_count + 1) * sizeof(ClassExpression*));
 		assert(tmp != NULL);
 		concept->second_conjunct_of_list = tmp;
