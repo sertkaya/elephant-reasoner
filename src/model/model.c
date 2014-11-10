@@ -95,14 +95,10 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 	c->successors = NULL;
 	c->successor_r_count = 0;
 
-	c->first_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->first_conjunct_of_list = NULL;
+	list_init(&(c->first_conjunct_of_list));
 	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
-	c->second_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->second_conjunct_of_list = NULL;
+	list_init(&(c->second_conjunct_of_list));
 	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	PUT_ATOMIC_CONCEPT(c->description.atomic.IRI, c, tbox);
@@ -144,14 +140,10 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 	c->successors = NULL;
 	c->successor_r_count = 0;
 
-	c->first_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->first_conjunct_of_list = NULL;
+	list_init(&(c->first_conjunct_of_list));
 	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
-	c->second_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->second_conjunct_of_list = NULL;
+	list_init(&(c->second_conjunct_of_list));
 	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	PUT_EXISTS_RESTRICTION(r->id, f->id, c, tbox);
@@ -195,14 +187,10 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 	c->successors = NULL;
 	c->successor_r_count = 0;
 
-	c->first_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->first_conjunct_of_list = NULL;
+	list_init(&(c->first_conjunct_of_list));
 	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
-	c->second_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->second_conjunct_of_list = NULL;
+	list_init(&(c->second_conjunct_of_list));
 	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	PUT_CONJUNCTION(c, tbox);
@@ -264,25 +252,13 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 	c->successors = NULL;
 	c->successor_r_count = 0;
 
-	c->first_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->first_conjunct_of_list = NULL;
+	list_init(&(c->first_conjunct_of_list));
 	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
-	c->second_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->second_conjunct_of_list = NULL;
+	list_init(&(c->second_conjunct_of_list));
 	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	PUT_NOMINAL(c, tbox);
-
-	/*
-	++tbox->nominal_count;
-	tmp = realloc(tbox->nominal_list, tbox->nominal_count * sizeof(Concept*));
-	assert(tmp != NULL);
-	tbox->nominal_list = tmp;
-	tbox->nominal_list[tbox->nominal_count - 1] = c;
-	 */
 
 	return c;
 }

@@ -92,11 +92,7 @@ void add_to_first_conjunct_of_list(ClassExpression* concept, ClassExpression* co
 	ClassExpression** tmp;
 
 	if (SET_ADD(conjunction, &(concept->first_conjunct_of))) {
-		tmp = realloc(concept->first_conjunct_of_list, (concept->first_conjunct_of_count + 1) * sizeof(ClassExpression*));
-		assert(tmp != NULL);
-		concept->first_conjunct_of_list = tmp;
-		concept->first_conjunct_of_list[concept->first_conjunct_of_count] = conjunction;
-		concept->first_conjunct_of_count++;
+		list_add(conjunction, &(concept->first_conjunct_of_list));
 	}
 }
 
@@ -106,11 +102,7 @@ void add_to_second_conjunct_of_list(ClassExpression* concept, ClassExpression* c
 	ClassExpression** tmp;
 
 	if (SET_ADD(conjunction, &(concept->second_conjunct_of))) {
-		tmp = realloc(concept->second_conjunct_of_list, (concept->second_conjunct_of_count + 1) * sizeof(ClassExpression*));
-		assert(tmp != NULL);
-		concept->second_conjunct_of_list = tmp;
-		concept->second_conjunct_of_list[concept->second_conjunct_of_count] = conjunction;
-		concept->second_conjunct_of_count++;
+		list_add(conjunction, &(concept->second_conjunct_of_list));
 	}
 }
 

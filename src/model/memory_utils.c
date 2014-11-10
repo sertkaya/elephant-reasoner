@@ -72,14 +72,12 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	total_freed_bytes += (tbox->object_properties.element_count + tbox->unique_binary_role_composition_count) * sizeof(ClassExpression*);
 
 	// free the list of conjunctions where this concept occurs
-	free(c->first_conjunct_of_list);
-	total_freed_bytes += sizeof(ClassExpression*) * c->first_conjunct_of_count;
+	total_freed_bytes += list_reset(&(c->first_conjunct_of_list));
 	// free the first_conjunct_of hash
 	total_freed_bytes += SET_RESET(&(c->first_conjunct_of));
 
 	// now for the second conjunct
-	free(c->second_conjunct_of_list);
-	total_freed_bytes += sizeof(ClassExpression*) * c->second_conjunct_of_count;
+	total_freed_bytes += list_reset(&(c->second_conjunct_of_list));
 	// free the second_conjunct_of hash
 	total_freed_bytes += SET_RESET(&(c->second_conjunct_of));
 

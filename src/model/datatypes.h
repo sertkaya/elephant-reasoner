@@ -142,13 +142,14 @@ struct class_expression {
 	// list of negative existentials whose filler is this concept
 	ClassExpression** filler_of_negative_exists;
 
-	// list of conjunctions where this concept is the first/second conjunct
-	ClassExpression** first_conjunct_of_list;
-	int first_conjunct_of_count;
-	ClassExpression** second_conjunct_of_list;
-	int second_conjunct_of_count;
+	// List of conjunctions where this concept is the first/second conjunct.
+	// Elements are ClassExpression*
+	List first_conjunct_of_list;
+	List second_conjunct_of_list;
 
-	// same as above. the reason is performance in saturation.
+	// The set of conjunctions where this concept is the first/second conjunct.
+	// The reason for storing them once in a list and once in a set is performance
+	// in saturation.
 	Set first_conjunct_of;
 	Set second_conjunct_of;
 

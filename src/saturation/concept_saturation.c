@@ -109,17 +109,17 @@ char saturate_concepts(KB* kb) {
 
 				// conjunction introduction
 				// the first conjunct
-				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
+				for (i = 0; i < ax->rhs->first_conjunct_of_list.size; ++i) {
 					// check if lhs is subsumed by the second conjunct as well
-					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj.conjunct2))
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					if (IS_SUBSUMED_BY(ax->lhs, ((ClassExpression*) ax->rhs->first_conjunct_of_list.elements[i])->description.conj.conjunct2))
+						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (ClassExpression*) ax->rhs->first_conjunct_of_list.elements[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
 				// now the same for the second conjunct
-				for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
+				for (i = 0; i < ax->rhs->second_conjunct_of_list.size; ++i) {
 					// check if lhs is also subsumed by the first conjunct
-					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->second_conjunct_of_list[i]->description.conj.conjunct1))
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					if (IS_SUBSUMED_BY(ax->lhs, ((ClassExpression*) ax->rhs->second_conjunct_of_list.elements[i])->description.conj.conjunct1))
+						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (ClassExpression*) ax->rhs->second_conjunct_of_list.elements[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
 				// existential introduction
@@ -172,17 +172,17 @@ char saturate_concepts(KB* kb) {
 
 				// conjunction introduction
 				// the first conjunct
-				for (i = 0; i < ax->rhs->first_conjunct_of_count; i++) {
+				for (i = 0; i < ax->rhs->first_conjunct_of_list.size; ++i) {
 					// check if lhs is subsumed by the second conjunct as well
-					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->first_conjunct_of_list[i]->description.conj.conjunct2))
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->first_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					if (IS_SUBSUMED_BY(ax->lhs, ((ClassExpression*) ax->rhs->first_conjunct_of_list.elements[i])->description.conj.conjunct2))
+						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (ClassExpression*) ax->rhs->first_conjunct_of_list.elements[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
 				// now the same for the second conjunct
-				for (i = 0; i < ax->rhs->second_conjunct_of_count; i++) {
+				for (i = 0; i < ax->rhs->second_conjunct_of_list.size; ++i) {
 					// check if lhs is also subsumed by the first conjunct
-					if (IS_SUBSUMED_BY(ax->lhs, ax->rhs->second_conjunct_of_list[i]->description.conj.conjunct1))
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->second_conjunct_of_list[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
+					if (IS_SUBSUMED_BY(ax->lhs, ((ClassExpression*) ax->rhs->second_conjunct_of_list.elements[i])->description.conj.conjunct1))
+						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, (ClassExpression*) ax->rhs->second_conjunct_of_list.elements[i], NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
 				}
 
 				switch (ax->rhs->type) {

@@ -102,14 +102,10 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 	c->successors = NULL;
 	c->successor_r_count = 0;
 
-	c->first_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->first_conjunct_of_list = NULL;
+	list_init(&(c->first_conjunct_of_list));
 	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
-	c->second_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->second_conjunct_of_list = NULL;
+	list_init(&(c->second_conjunct_of_list));
 	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	hash_map_put(kb->generated_nominals, ind->id, c);
@@ -151,14 +147,10 @@ ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyE
 	c->successors = NULL;
 	c->successor_r_count = 0;
 
-	c->first_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->first_conjunct_of_list = NULL;
+	list_init(&(c->first_conjunct_of_list));
 	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
-	c->second_conjunct_of_count = 0;
-	// space will be allocated in indexing
-	c->second_conjunct_of_list = NULL;
+	list_init(&(c->second_conjunct_of_list));
 	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
 	++kb->generated_exists_restriction_count;
