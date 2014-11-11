@@ -30,10 +30,12 @@ inline List* list_create() {
 	return l;
 }
 
+/*
 inline void list_init(List* l) {
  	l->size = 0;
 	l->elements = NULL;
 }
+*/
 
 inline int list_free(List* l) {
 	free(l->elements);

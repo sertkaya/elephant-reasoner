@@ -47,8 +47,8 @@ inline List* list_create();
  * Initialize a given list. Intended for not dynamically created
  * lists.
  */
-inline void list_init(List* l);
-
+// inline void list_init(List* l);
+#define LIST_INIT(l)		do {((List*) l)->size=0; ((List*) l)->elements=NULL;} while(0)
 /**
  * Appends element e to list l. Does not check for duplicates.
  * Returns 1.
