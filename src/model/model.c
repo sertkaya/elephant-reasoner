@@ -96,10 +96,10 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 	c->successor_r_count = 0;
 
 	LIST_INIT(&(c->first_conjunct_of_list));
-	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
+	c->first_conjunct_of = NULL;
 
 	LIST_INIT(&(c->second_conjunct_of_list));
-	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
+	c->second_conjunct_of = NULL;
 
 	PUT_ATOMIC_CONCEPT(c->description.atomic.IRI, c, tbox);
 
@@ -141,10 +141,10 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 	c->successor_r_count = 0;
 
 	LIST_INIT(&(c->first_conjunct_of_list));
-	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
+	c->first_conjunct_of = NULL;
 
 	LIST_INIT(&(c->second_conjunct_of_list));
-	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
+	c->second_conjunct_of = NULL;
 
 	PUT_EXISTS_RESTRICTION(r->id, f->id, c, tbox);
 
@@ -188,10 +188,10 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 	c->successor_r_count = 0;
 
 	LIST_INIT(&(c->first_conjunct_of_list));
-	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
+	c->first_conjunct_of = NULL;
 
 	LIST_INIT(&(c->second_conjunct_of_list));
-	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
+	c->second_conjunct_of = NULL;
 
 	PUT_CONJUNCTION(c, tbox);
 
@@ -253,10 +253,10 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 	c->successor_r_count = 0;
 
 	LIST_INIT(&(c->first_conjunct_of_list));
-	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
+	c->first_conjunct_of = NULL;
 
 	LIST_INIT(&(c->second_conjunct_of_list));
-	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
+	c->second_conjunct_of = NULL;
 
 	PUT_NOMINAL(c, tbox);
 

@@ -103,10 +103,10 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 	c->successor_r_count = 0;
 
 	LIST_INIT(&(c->first_conjunct_of_list));
-	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
+	c->first_conjunct_of = NULL;
 
 	LIST_INIT(&(c->second_conjunct_of_list));
-	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
+	c->second_conjunct_of = NULL;
 
 	hash_map_put(kb->generated_nominals, ind->id, c);
 
@@ -148,10 +148,10 @@ ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyE
 	c->successor_r_count = 0;
 
 	LIST_INIT(&(c->first_conjunct_of_list));
-	SET_INIT(&(c->first_conjunct_of), DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
+	c->first_conjunct_of = NULL;
 
 	LIST_INIT(&(c->second_conjunct_of_list));
-	SET_INIT(&(c->second_conjunct_of), DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
+	c->second_conjunct_of = NULL;
 
 	++kb->generated_exists_restriction_count;
 

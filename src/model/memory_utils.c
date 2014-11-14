@@ -73,13 +73,15 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 
 	// free the list of conjunctions where this concept occurs
 	total_freed_bytes += list_reset(&(c->first_conjunct_of_list));
-	// free the first_conjunct_of hash
-	total_freed_bytes += SET_RESET(&(c->first_conjunct_of));
+	// free the first_conjunct_of hash, if it exists
+	if (c->first_conjunct_of != NULL)
+		total_freed_bytes += SET_FREE(c->first_conjunct_of);
 
 	// now for the second conjunct
 	total_freed_bytes += list_reset(&(c->second_conjunct_of_list));
-	// free the second_conjunct_of hash
-	total_freed_bytes += SET_RESET(&(c->second_conjunct_of));
+	// free the second_conjunct_of hash, if it exists
+	if (c->second_conjunct_of != NULL)
+		total_freed_bytes += SET_FREE(c->second_conjunct_of);
 
 	// finally free this concept
 	total_freed_bytes += sizeof(ClassExpression);

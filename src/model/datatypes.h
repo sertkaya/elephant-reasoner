@@ -150,8 +150,8 @@ struct class_expression {
 	// The set of conjunctions where this concept is the first/second conjunct.
 	// The reason for storing them once in a list and once in a set is performance
 	// in saturation.
-	Set first_conjunct_of;
-	Set second_conjunct_of;
+	Set* first_conjunct_of;
+	Set* second_conjunct_of;
 
 };
 

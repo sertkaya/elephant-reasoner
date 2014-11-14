@@ -89,9 +89,11 @@ int add_to_role_subsumee_list(ObjectPropertyExpression*r, ObjectPropertyExpressi
 // overhead is worth the performance gain.
 
 void add_to_first_conjunct_of_list(ClassExpression* concept, ClassExpression* conjunction) {
-	ClassExpression** tmp;
+	// create the hash if we are adding it for the first time
+	if (concept->first_conjunct_of == NULL)
+		concept->first_conjunct_of = SET_CREATE(DEFAULT_FIRST_CONJUNCT_OF_HASH_SIZE);
 
-	if (SET_ADD(conjunction, &(concept->first_conjunct_of))) {
+	if (SET_ADD(conjunction, concept->first_conjunct_of)) {
 		list_add(conjunction, &(concept->first_conjunct_of_list));
 	}
 }
@@ -99,9 +101,11 @@ void add_to_first_conjunct_of_list(ClassExpression* concept, ClassExpression* co
 // add 'conjunction' to the list of conjunctions whose second conjunct is 'concept'
 // (see the note for the function add_to_first_conjunct_of_list above)
 void add_to_second_conjunct_of_list(ClassExpression* concept, ClassExpression* conjunction) {
-	ClassExpression** tmp;
+	// create the hash if we are adding it for the first time
+	if (concept->second_conjunct_of == NULL)
+		concept->second_conjunct_of = SET_CREATE(DEFAULT_SECOND_CONJUNCT_OF_HASH_SIZE);
 
-	if (SET_ADD(conjunction, &(concept->second_conjunct_of))) {
+	if (SET_ADD(conjunction, concept->second_conjunct_of)) {
 		list_add(conjunction, &(concept->second_conjunct_of_list));
 	}
 }
