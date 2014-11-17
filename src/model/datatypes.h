@@ -182,7 +182,7 @@ struct object_property_chain {
 // Object property description
 union object_property_description {
 	ObjectProperty atomic;
-	ObjectPropertyChain role_composition;
+	ObjectPropertyChain object_property_chain;
 }; 
 
 // Object property expression

@@ -61,7 +61,7 @@ void print_role(ObjectPropertyExpression* r) {
 			print_atomic_role(&(r->description.atomic));
 			break;
 		case OBJECT_PROPERTY_CHAIN_TYPE:
-			print_role_composition(&(r->description.role_composition));
+			print_role_composition(&(r->description.object_property_chain));
 			break;
 		default:
 			fprintf(stderr,"unknown role type, aborting\n");

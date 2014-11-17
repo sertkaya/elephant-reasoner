@@ -65,7 +65,7 @@
 #define GET_ROLE_COMPOSITION(r1, r2, tbox)	(r1->id <= r2->id) ? hash_map_get(tbox->role_compositions, HASH_INTEGERS(r1->id, r2->id)) : hash_map_get(tbox->role_compositions, HASH_INTEGERS(r2->id, r1->id))
 
 // put the role composition with the given roles into the role compositions hash
-#define PUT_ROLE_COMPOSITION(r, tbox)		(r->description.role_composition.role1->id <= r->description.role_composition.role2->id) ? hash_map_put(tbox->role_compositions, HASH_INTEGERS(r->description.role_composition.role1->id, r->description.role_composition.role2->id), r) : hash_map_put(tbox->role_compositions, HASH_INTEGERS(r->description.role_composition.role2->id, r->description.role_composition.role1->id), r)
+#define PUT_ROLE_COMPOSITION(r, tbox)		(r->description.object_property_chain.role1->id <= r->description.object_property_chain.role2->id) ? hash_map_put(tbox->role_compositions, HASH_INTEGERS(r->description.object_property_chain.role1->id, r->description.object_property_chain.role2->id), r) : hash_map_put(tbox->role_compositions, HASH_INTEGERS(r->description.object_property_chain.role2->id, r->description.object_property_chain.role1->id), r)
 
 /******************************************************************************/
 // Returns the individual with the given name if it exists

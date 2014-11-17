@@ -65,10 +65,10 @@ void index_role(ObjectPropertyExpression* r) {
 		break;
 	case OBJECT_PROPERTY_CHAIN_TYPE:
 		// recursive calls are necessary because role1 or role2 can also be a role comoposition
-		index_role(r->description.role_composition.role1);
-		index_role(r->description.role_composition.role2);
-		add_role_to_first_component_of_list(r->description.role_composition.role1, r);
-		add_role_to_second_component_of_list(r->description.role_composition.role2, r);
+		index_role(r->description.object_property_chain.role1);
+		index_role(r->description.object_property_chain.role2);
+		add_role_to_first_component_of_list(r->description.object_property_chain.role1, r);
+		add_role_to_second_component_of_list(r->description.object_property_chain.role2, r);
 		break;
 	default:
 		fprintf(stderr, "unknown role type, aborting\n");

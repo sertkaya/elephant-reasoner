@@ -319,8 +319,8 @@ ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpre
 
 	r->type = OBJECT_PROPERTY_CHAIN_TYPE;
 	// we DO assume role1 and role2 to be ordered!
-	r->description.role_composition.role1 = r1;
-	r->description.role_composition.role2 = r2;
+	r->description.object_property_chain.role1 = r1;
+	r->description.object_property_chain.role2 = r2;
 	r->id = tbox->last_role_id++;
 
 	SET_INIT(&(r->told_subsumers), DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);

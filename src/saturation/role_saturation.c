@@ -108,10 +108,10 @@ void saturate_roles(TBox* tbox) {
 			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (ObjectPropertyExpression*) told_subsumer));
 
 			 	if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
-			 		SET_ITERATOR_INIT(&told_subsumees_iterator_1, &(ax->lhs->description.role_composition.role1->told_subsumees));
+			 		SET_ITERATOR_INIT(&told_subsumees_iterator_1, &(ax->lhs->description.object_property_chain.role1->told_subsumees));
 			 		void* told_subsumee_1 = SET_ITERATOR_NEXT(&told_subsumees_iterator_1);
 			 		while (told_subsumee_1) {
-			 			SET_ITERATOR_INIT(&told_subsumees_iterator_2, &(ax->lhs->description.role_composition.role2->told_subsumees));
+			 			SET_ITERATOR_INIT(&told_subsumees_iterator_2, &(ax->lhs->description.object_property_chain.role2->told_subsumees));
 			 			void* told_subsumee_2 = SET_ITERATOR_NEXT(&told_subsumees_iterator_2);
 			 			while (told_subsumee_2) {
 			 				ObjectPropertyExpression* composition = get_create_role_composition_binary(
