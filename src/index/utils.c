@@ -40,11 +40,7 @@ int add_to_role_subsumer_list(ObjectPropertyExpression* r, ObjectPropertyExpress
 	ObjectPropertyExpression** tmp;
 
 	if (SET_ADD(s, &(r->subsumers))) {
-		tmp = realloc(r->subsumer_list, (r->subsumer_count + 1) * sizeof(ObjectPropertyExpression*));
-		assert(tmp != NULL);
-		r->subsumer_list = tmp;
-		r->subsumer_list[r->subsumer_count] = s;
-		r->subsumer_count++;
+		list_add(s, &(r->subsumer_list));
 
 		return 1;
 	}

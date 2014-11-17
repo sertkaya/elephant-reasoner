@@ -198,8 +198,9 @@ struct object_property_expression {
 	Set told_subsumees;
 
 	Set subsumers;
-	ObjectPropertyExpression** subsumer_list;
-	int subsumer_count;
+	// List of subsumers of this object property.
+	// Elements are ObjectPropertyExpression*
+	List subsumer_list;
 
 	// Only necessary for optimizing the processing of role compositions
 	// For that we need to access the subsumees

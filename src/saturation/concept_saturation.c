@@ -125,8 +125,8 @@ char saturate_concepts(KB* kb) {
 				// existential introduction
 				ClassExpression* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_count; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i].role->subsumer_list[j]);
+					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_list.size; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) ax->lhs->predecessors[i].role->subsumer_list.elements[j]));
 						if (ex != NULL)
 							for (k = 0; k < ax->lhs->predecessors[i].filler_count; ++k)
 								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
@@ -204,8 +204,8 @@ char saturate_concepts(KB* kb) {
 				int j,k;
 				ClassExpression* ex;
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
-					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_count; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, ax->lhs->predecessors[i].role->subsumer_list[j]);
+					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_list.size; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) ax->lhs->predecessors[i].role->subsumer_list.elements[j]));
 						if (ex != NULL)
 							for (k = 0; k < ax->lhs->predecessors[i].filler_count; ++k)
 								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
@@ -245,8 +245,8 @@ char saturate_concepts(KB* kb) {
 				SET_ITERATOR_INIT(&subsumers_iterator, &(ax->rhs->subsumers));
 				ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 				while (subsumer != NULL) {
-					for (j = 0; j < ax->role->subsumer_count; ++j) {
-						ClassExpression* ex = GET_NEGATIVE_EXISTS(subsumer, ax->role->subsumer_list[j]);
+					for (j = 0; j < ax->role->subsumer_list.size; ++j) {
+						ClassExpression* ex = GET_NEGATIVE_EXISTS(subsumer, ((ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
 						if (ex != NULL)
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
