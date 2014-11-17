@@ -216,8 +216,8 @@ struct object_property_expression {
 	int second_component_of_count;
 
 	// Same as above. The reason is performance in saturation.
-	HashTable* first_component_of;
-	HashTable* second_component_of;
+	Set first_component_of;
+	Set second_component_of;
 };
 
 /******************************************************************************/

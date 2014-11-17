@@ -294,11 +294,11 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
-	r->first_component_of = hash_table_create(DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
+	SET_INIT(&(r->first_component_of), DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
 
 	r->second_component_of_count = 0;
 	r->second_component_of_list = NULL;
-	r->second_component_of = hash_table_create(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
+	SET_INIT(&(r->second_component_of), DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
 	PUT_ATOMIC_ROLE(r->description.atomic.IRI, r, tbox);
 
@@ -334,11 +334,11 @@ ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpre
 
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
-	r->first_component_of = hash_table_create(DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
+	SET_INIT(&(r->second_component_of), DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
 	r->second_component_of_count = 0;
 	r->second_component_of_list = NULL;
-	r->second_component_of = hash_table_create(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
+	SET_INIT(&(r->second_component_of), DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
 	PUT_ROLE_COMPOSITION(r, tbox);
 	tbox->unique_binary_role_composition_count++;

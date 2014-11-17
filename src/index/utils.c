@@ -110,7 +110,7 @@ void add_to_negative_exists(ClassExpression* ex, TBox* tbox) {
 void add_role_to_first_component_of_list(ObjectPropertyExpression* role, ObjectPropertyExpression* composition) {
 	ObjectPropertyExpression** tmp;
 
-	if (hash_table_insert(role->first_component_of, composition)) {
+	if (SET_ADD(composition, &(role->first_component_of))) {
 		tmp = realloc(role->first_component_of_list, (role->first_component_of_count + 1) * sizeof(ObjectPropertyExpression*));
 		assert(tmp != NULL);
 		role->first_component_of_list = tmp;
@@ -124,7 +124,7 @@ void add_role_to_first_component_of_list(ObjectPropertyExpression* role, ObjectP
 void add_role_to_second_component_of_list(ObjectPropertyExpression* role, ObjectPropertyExpression* composition) {
 	ObjectPropertyExpression** tmp;
 
-	if (hash_table_insert(role->second_component_of, composition)) {
+	if (SET_ADD(composition, &(role->second_component_of))) {
 		tmp = realloc(role->second_component_of_list, (role->second_component_of_count + 1) * sizeof(ClassExpression*));
 		assert(tmp != NULL);
 		role->second_component_of_list = tmp;

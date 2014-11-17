@@ -125,13 +125,13 @@ int free_role(ObjectPropertyExpression* r) {
 	total_freed_bytes += sizeof(ObjectPropertyExpression*) * r->first_component_of_count;
 	free(r->first_component_of_list);
 
-	total_freed_bytes += hash_table_free(r->first_component_of);
+	total_freed_bytes += SET_RESET(&(r->first_component_of));
 
 	// now for the second component
 	total_freed_bytes += sizeof(ObjectPropertyExpression*) * r->second_component_of_count;
 	free(r->second_component_of_list);
 
-	total_freed_bytes += hash_table_free(r->second_component_of);
+	total_freed_bytes += SET_RESET(&(r->second_component_of));
 
 	// finally free this role
 	total_freed_bytes += sizeof(ObjectPropertyExpression);
