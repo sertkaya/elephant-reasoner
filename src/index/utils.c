@@ -51,12 +51,8 @@ int add_to_role_subsumer_list(ObjectPropertyExpression* r, ObjectPropertyExpress
 int add_to_role_subsumee_list(ObjectPropertyExpression*r, ObjectPropertyExpression* s) {
 	ObjectPropertyExpression** tmp;
 
-	if (hash_table_insert(r->subsumees, s)) {
-		tmp = realloc(r->subsumee_list, (r->subsumee_count + 1) * sizeof(ObjectPropertyExpression*));
-		assert(tmp != NULL);
-		r->subsumee_list = tmp;
-		r->subsumee_list[r->subsumee_count] = s;
-		++r->subsumee_count;
+	if (SET_ADD(s, &(r->subsumees))) {
+		list_add(s, &(r->subsumee_list));
 
 		return 1;
 	}
