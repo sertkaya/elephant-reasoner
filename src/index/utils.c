@@ -96,7 +96,7 @@ void add_to_negative_exists(ClassExpression* ex, TBox* tbox) {
 	// We allocate the space here (in indexing)
 	if (ex->description.exists.filler->filler_of_negative_exists == NULL) {
 		ex->description.exists.filler->filler_of_negative_exists =
-				(ClassExpression**) calloc(tbox->object_properties.element_count + tbox->unique_binary_role_composition_count, sizeof(ClassExpression*));
+				(ClassExpression**) calloc(tbox->object_properties.element_count + tbox->object_property_chains.element_count, sizeof(ClassExpression*));
 		assert(ex->description.exists.filler->filler_of_negative_exists != NULL);
 	}
 	ex->description.exists.filler->filler_of_negative_exists[ex->description.exists.role->id] = ex;

@@ -69,7 +69,7 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 
 	// free the filler of negative existentials hash
 	free(c->filler_of_negative_exists);
-	total_freed_bytes += (tbox->object_properties.element_count + tbox->unique_binary_role_composition_count) * sizeof(ClassExpression*);
+	total_freed_bytes += (tbox->object_properties.element_count + tbox->object_property_chains.element_count) * sizeof(ClassExpression*);
 
 	// free the list of conjunctions where this concept occurs
 	total_freed_bytes += list_reset(&(c->first_conjunct_of_list));
@@ -230,13 +230,14 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += MAP_RESET(&(tbox->classes));
 
 	// iterate over the role_compositions hash, free the role compositions
-	HashMapElement* node = HASH_MAP_LAST_ELEMENT(tbox->role_compositions);
-	while (node) {
-		total_freed_bytes += free_role((ObjectPropertyExpression*) node->value);
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+	MAP_ITERATOR_INIT(&iterator, &(tbox->object_property_chains));
+	map_element = MAP_ITERATOR_NEXT(&iterator);
+	while (map_element) {
+		total_freed_bytes += free_role((ObjectPropertyExpression*) map_element);
+		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the role compositions hash
-	total_freed_bytes += hash_map_free(tbox->role_compositions);
+	total_freed_bytes += MAP_RESET(&(tbox->object_property_chains));
 
 	// iterate over atomic roles, free them
 	MAP_ITERATOR_INIT(&iterator, &(tbox->object_properties));

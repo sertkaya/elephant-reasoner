@@ -62,10 +62,10 @@
 
 
 // get the role compoisiton with the given roles
-#define GET_ROLE_COMPOSITION(r1, r2, tbox)	(r1->id <= r2->id) ? hash_map_get(tbox->role_compositions, HASH_INTEGERS(r1->id, r2->id)) : hash_map_get(tbox->role_compositions, HASH_INTEGERS(r2->id, r1->id))
+#define GET_ROLE_COMPOSITION(r1, r2, tbox)	(r1->id <= r2->id) ? MAP_GET(HASH_INTEGERS(r1->id, r2->id), &(tbox->object_property_chains)) : MAP_GET(HASH_INTEGERS(r2->id, r1->id), &(tbox->object_property_chains))
 
 // put the role composition with the given roles into the role compositions hash
-#define PUT_ROLE_COMPOSITION(r, tbox)		(r->description.object_property_chain.role1->id <= r->description.object_property_chain.role2->id) ? hash_map_put(tbox->role_compositions, HASH_INTEGERS(r->description.object_property_chain.role1->id, r->description.object_property_chain.role2->id), r) : hash_map_put(tbox->role_compositions, HASH_INTEGERS(r->description.object_property_chain.role2->id, r->description.object_property_chain.role1->id), r)
+#define PUT_ROLE_COMPOSITION(r, tbox)		(r->description.object_property_chain.role1->id <= r->description.object_property_chain.role2->id) ? MAP_PUT(HASH_INTEGERS(r->description.object_property_chain.role1->id, r->description.object_property_chain.role2->id), r, &(tbox->object_property_chains)) : MAP_PUT(HASH_INTEGERS(r->description.object_property_chain.role2->id, r->description.object_property_chain.role1->id), r, &(tbox->object_property_chains))
 
 /******************************************************************************/
 // Returns the individual with the given name if it exists

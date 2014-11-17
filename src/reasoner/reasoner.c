@@ -66,8 +66,7 @@ TBox* init_tbox() {
 
 	tbox->role_composition_count = 0;
 	tbox->binary_role_composition_count = 0;
-	tbox->unique_binary_role_composition_count = 0;
-	tbox->role_compositions = hash_map_create(DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
+	MAP_INIT(&(tbox->object_property_chains), DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
 
 	tbox->subclass_axioms = NULL;
 	tbox->subclass_axiom_count = 0;

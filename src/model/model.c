@@ -334,14 +334,13 @@ ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpre
 
 	r->first_component_of_count = 0;
 	r->first_component_of_list = NULL;
-	SET_INIT(&(r->second_component_of), DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
+	SET_INIT(&(r->first_component_of), DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
 
 	r->second_component_of_count = 0;
 	r->second_component_of_list = NULL;
 	SET_INIT(&(r->second_component_of), DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
 	PUT_ROLE_COMPOSITION(r, tbox);
-	tbox->unique_binary_role_composition_count++;
 
 	return r;
 }

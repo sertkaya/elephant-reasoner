@@ -294,10 +294,9 @@ struct tbox {
 	// Value: ObjectPropertyExpression*
 	Map object_properties;
 
-	HashMap* role_compositions;
+	Map object_property_chains;
 	int role_composition_count;
 	int binary_role_composition_count;
-	int unique_binary_role_composition_count;
 
 	uint32_t last_concept_id;
 	uint32_t last_role_id;

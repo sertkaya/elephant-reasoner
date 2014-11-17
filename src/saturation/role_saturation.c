@@ -69,29 +69,12 @@ void saturate_roles(TBox* tbox) {
 		object_property = MAP_ITERATOR_NEXT(&iterator);
 	}
 
-    // for (i = 0; i < tbox->atomic_role_count + tbox->unique_binary_role_composition_count; ++i)
-    // 	push(&scheduled_axioms, create_role_saturation_axiom(tbox->role_list[i], tbox->role_list[i]));
     // Now the role compositions.
-	HashMapElement* composition = HASH_MAP_LAST_ELEMENT(tbox->role_compositions);
+	MAP_ITERATOR_INIT(&iterator, &(tbox->object_property_chains));
+	void* composition = MAP_ITERATOR_NEXT(&iterator);
 	while (composition) {
-		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition->value, (ObjectPropertyExpression*) composition->value));
-		/*
-		Node* told_subsumee1 = last_node(((Role*) composition->value)->description.role_composition->role1->told_subsumees);
-		while (told_subsumee1) {
-			Node* told_subsumee2 = last_node(((Role*) composition->value)->description.role_composition->role2->told_subsumees);
-			while (told_subsumee2) {
-				Role* new_composition = get_create_role_composition_binary(
-						(Role*) told_subsumee1->value,
-						(Role*) told_subsumee2->value,
-						tbox);
-				index_role(new_composition);
-				push(&scheduled_axioms, create_role_saturation_axiom(new_composition, (Role*) composition->value));
-				told_subsumee2 = previous_node(told_subsumee2);
-			}
-			told_subsumee1 = previous_node(told_subsumee1);
-		}
-		*/
-		composition = HASH_MAP_PREVIOUS_ELEMENT(composition);
+		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition, (ObjectPropertyExpression*) composition));
+		composition = MAP_ITERATOR_NEXT(&iterator);
 	}
 
 	SetIterator told_subsumers_iterator;
