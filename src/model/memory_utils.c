@@ -114,7 +114,7 @@ int free_role(ObjectPropertyExpression* r) {
 	free(r->subsumer_list);
 
 	// free the subsumers hash
-	total_freed_bytes += hash_table_free(r->subsumers);
+	total_freed_bytes += SET_RESET(&(r->subsumers));
 
 	// free the  subsumees list
 	total_freed_bytes += sizeof(ObjectPropertyExpression*) * r->subsumee_count;

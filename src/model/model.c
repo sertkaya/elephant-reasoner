@@ -288,7 +288,7 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
-	r->subsumers = hash_table_create(DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(r->subsumers), DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
 
 	r->subsumee_list = NULL;
 	r->subsumee_count = 0;
@@ -330,7 +330,7 @@ ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpre
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
-	r->subsumers = hash_table_create(DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(r->subsumers), DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
 
 	r->subsumee_list = NULL;
 	r->subsumee_count = 0;

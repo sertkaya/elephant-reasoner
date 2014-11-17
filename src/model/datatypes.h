@@ -197,7 +197,7 @@ struct object_property_expression {
 	Set told_subsumers;
 	Set told_subsumees;
 
-	HashTable* subsumers;
+	Set subsumers;
 	ObjectPropertyExpression** subsumer_list;
 	int subsumer_count;
 
