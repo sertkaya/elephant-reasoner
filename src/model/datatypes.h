@@ -194,8 +194,8 @@ struct object_property_expression {
 	enum object_property_expression_type type;
 	ObjectPropertyDescription description;
 
-	HashMap* told_subsumers;
-	HashMap* told_subsumees;
+	Set told_subsumers;
+	Set told_subsumees;
 
 	HashTable* subsumers;
 	ObjectPropertyExpression** subsumer_list;

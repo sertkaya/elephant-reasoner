@@ -105,9 +105,9 @@ int free_role(ObjectPropertyExpression* r) {
 	// free the told subsumers list
 	// total_freed_bytes += sizeof(Role*) * r->told_subsumer_count;
 	// free(r->told_subsumers);
-	total_freed_bytes += hash_map_free(r->told_subsumers);
+	total_freed_bytes += SET_RESET(&(r->told_subsumers));
 
-	total_freed_bytes += hash_map_free(r->told_subsumees);
+	total_freed_bytes += SET_RESET(&(r->told_subsumees));
 
 	// free the  subsumers list
 	total_freed_bytes += sizeof(ObjectPropertyExpression*) * r->subsumer_count;

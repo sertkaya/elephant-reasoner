@@ -94,37 +94,39 @@ void saturate_roles(TBox* tbox) {
 		composition = HASH_MAP_PREVIOUS_ELEMENT(composition);
 	}
 
+	SetIterator told_subsumers_iterator;
+	SetIterator told_subsumees_iterator_1;
+	SetIterator told_subsumees_iterator_2;
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
 			// told subsumers
-			// for (i = 0; i < ax->rhs->told_subsumer_count; ++i)
-			// 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, ax->rhs->told_subsumers[i]));
-			HashMapElement* told_subsumer = HASH_MAP_LAST_ELEMENT(ax->rhs->told_subsumers);
+			SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->rhs->told_subsumers));
+			void* told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 			while (told_subsumer) {
-			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (ObjectPropertyExpression*) told_subsumer->value));
+			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (ObjectPropertyExpression*) told_subsumer));
 
 			 	if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
-			 		HashMapElement* told_subsumee1 = HASH_MAP_LAST_ELEMENT(ax->lhs->description.role_composition.role1->told_subsumees);
-			 		while (told_subsumee1) {
-			 			HashMapElement* told_subsumee2 = HASH_MAP_LAST_ELEMENT(ax->lhs->description.role_composition.role2->told_subsumees);
-			 			while (told_subsumee2) {
+			 		SET_ITERATOR_INIT(&told_subsumees_iterator_1, &(ax->lhs->description.role_composition.role1->told_subsumees));
+			 		void* told_subsumee_1 = SET_ITERATOR_NEXT(&told_subsumees_iterator_1);
+			 		while (told_subsumee_1) {
+			 			SET_ITERATOR_INIT(&told_subsumees_iterator_2, &(ax->lhs->description.role_composition.role2->told_subsumees));
+			 			void* told_subsumee_2 = SET_ITERATOR_NEXT(&told_subsumees_iterator_2);
+			 			while (told_subsumee_2) {
 			 				ObjectPropertyExpression* composition = get_create_role_composition_binary(
-			 						(ObjectPropertyExpression*) told_subsumee1->value,
-			 						(ObjectPropertyExpression*) told_subsumee2->value,
+			 						(ObjectPropertyExpression*) told_subsumee_1,
+			 						(ObjectPropertyExpression*) told_subsumee_2,
 			 						tbox);
 			 				index_role(composition);
-			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) told_subsumer->value));
-			 				told_subsumee2 = HASH_MAP_PREVIOUS_ELEMENT(told_subsumee2);
+			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) told_subsumer));
+			 				told_subsumee_2 = SET_ITERATOR_NEXT(&told_subsumees_iterator_2);
 			 			}
-			 			told_subsumee1 = HASH_MAP_PREVIOUS_ELEMENT(told_subsumee1);
+			 			told_subsumee_1 = SET_ITERATOR_NEXT(&told_subsumees_iterator_1);
 			 		}
 			 	}
-
-			 	told_subsumer = HASH_MAP_PREVIOUS_ELEMENT(told_subsumer);
+			 	told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 			}
-
 		}
 		free(ax);
 		ax = pop(&scheduled_axioms);

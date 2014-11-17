@@ -283,9 +283,8 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 	strcpy(r->description.atomic.IRI, IRI);
 	r->id = tbox->last_role_id++;
 
-	r->told_subsumers = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
-	// r->told_subsumer_count = 0;
-	r->told_subsumees = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
+	SET_INIT(&(r->told_subsumers), DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(r->told_subsumees), DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;
@@ -326,10 +325,8 @@ ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpre
 	r->description.role_composition.role2 = r2;
 	r->id = tbox->last_role_id++;
 
-	r->told_subsumers = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
-	// r->told_subsumers = NULL;
-	// r->told_subsumer_count = 0;
-	r->told_subsumees = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
+	SET_INIT(&(r->told_subsumers), DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
+	SET_INIT(&(r->told_subsumees), DEFAULT_ROLE_TOLD_SUBSUMEES_HASH_SIZE);
 
 	r->subsumer_list = NULL;
 	r->subsumer_count = 0;

@@ -30,17 +30,6 @@
 /******************************************************************************
  * functions for adding subsumer/told subsumer to a role
  *****************************************************************************/
-// TODO: Use Set datatype instead, make it a macro
-// add s to the told subsumer list of c
-void add_told_subsumer_role(ObjectPropertyExpression* r, ObjectPropertyExpression* s) {
-	hash_map_put(r->told_subsumers, s->id, s);
-}
-
-// TODO: Use Set datatype instead, make it a macro
-// add role s to the subsumee list of  r
-void add_told_subsumee_role(ObjectPropertyExpression* r, ObjectPropertyExpression* s) {
-	hash_map_put(r->told_subsumees, s->id, s);
-}
 
 // add role s to the subsumer list of r
 // returns 1 if added, 0 otherwise

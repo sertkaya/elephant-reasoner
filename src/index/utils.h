@@ -50,10 +50,9 @@ int add_to_role_subsumee_list(ObjectPropertyExpression*r, ObjectPropertyExpressi
 
 int add_to_role_subsumees(ObjectPropertyExpression* r, ObjectPropertyExpression* s);
 
-// TODO: check (also the other functions)
-// add s to the told subsumer list of r
-// note that multiple occurrence of s is allowed!
-void add_told_subsumer_role(ObjectPropertyExpression* r, ObjectPropertyExpression* s);
+#define ADD_TOLD_SUBSUMER_OBJECT_PROPERTY_EXPRESSION(s, r);
+
+#define ADD_TOLD_SUBSUMEE_OBJECT_PROPERTY_EXPRESSION(s, r);
 
 void add_told_subsumee_role(ObjectPropertyExpression* r, ObjectPropertyExpression* s);
 
