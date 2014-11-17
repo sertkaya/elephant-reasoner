@@ -173,17 +173,17 @@ struct object_property {
 	char* IRI;
 };
 
-// Object property description
-union object_property_description {
-	ObjectProperty atomic;
-	ObjectPropertyChain* role_composition;
-}; 
-	
 // Object property chain
 struct object_property_chain {
 	ObjectPropertyExpression* role1;
 	ObjectPropertyExpression* role2;
 };
+
+// Object property description
+union object_property_description {
+	ObjectProperty atomic;
+	ObjectPropertyChain role_composition;
+}; 
 
 // Object property expression
 struct object_property_expression {

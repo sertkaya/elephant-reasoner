@@ -321,11 +321,9 @@ ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpre
 	assert(r != NULL);
 
 	r->type = OBJECT_PROPERTY_CHAIN_TYPE;
-	r->description.role_composition = (ObjectPropertyChain*) malloc(sizeof(ObjectPropertyChain));
-	assert(r->description.role_composition != NULL);
 	// we DO assume role1 and role2 to be ordered!
-	r->description.role_composition->role1 = r1;
-	r->description.role_composition->role2 = r2;
+	r->description.role_composition.role1 = r1;
+	r->description.role_composition.role2 = r2;
 	r->id = tbox->last_role_id++;
 
 	r->told_subsumers = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);

@@ -99,8 +99,6 @@ int free_role(ObjectPropertyExpression* r) {
 		free(r->description.atomic.IRI);
 		break;
 	case OBJECT_PROPERTY_CHAIN_TYPE:
-		total_freed_bytes += sizeof(ObjectPropertyChain);
-		free(r->description.role_composition);
 		break;
 	}
 
