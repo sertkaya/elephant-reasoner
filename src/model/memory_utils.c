@@ -95,10 +95,8 @@ int free_role(ObjectPropertyExpression* r) {
 
 	switch (r->type) {
 	case OBJECT_PROPERTY_TYPE:
-		total_freed_bytes += sizeof(char) * strlen(r->description.atomic->IRI);
-		free(r->description.atomic->IRI);
-		total_freed_bytes += sizeof(ObjectProperty);
-		free(r->description.atomic);
+		total_freed_bytes += sizeof(char) * strlen(r->description.atomic.IRI);
+		free(r->description.atomic.IRI);
 		break;
 	case OBJECT_PROPERTY_CHAIN_TYPE:
 		total_freed_bytes += sizeof(ObjectPropertyChain);

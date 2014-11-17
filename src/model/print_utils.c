@@ -58,7 +58,7 @@ void print_concept(ClassExpression* c) {
 void print_role(ObjectPropertyExpression* r) {
 	switch (r->type) {
 		case OBJECT_PROPERTY_TYPE:
-			print_atomic_role(r->description.atomic);
+			print_atomic_role(&(r->description.atomic));
 			break;
 		case OBJECT_PROPERTY_CHAIN_TYPE:
 			print_role_composition(r->description.role_composition);

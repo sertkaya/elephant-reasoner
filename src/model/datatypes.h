@@ -175,7 +175,7 @@ struct object_property {
 
 // Object property description
 union object_property_description {
-	ObjectProperty* atomic;
+	ObjectProperty atomic;
 	ObjectPropertyChain* role_composition;
 }; 
 	

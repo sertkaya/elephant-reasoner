@@ -276,12 +276,11 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 	// if it does not already exist, create it
 	r = (ObjectPropertyExpression*) malloc(sizeof(ObjectPropertyExpression));
 	assert(r != NULL);
+
 	r->type = OBJECT_PROPERTY_TYPE;
-	r->description.atomic = (ObjectProperty*) malloc(sizeof(ObjectProperty));
-	assert(r->description.atomic != NULL);
-	r->description.atomic->IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
-	assert(r->description.atomic->IRI != NULL);
-	strcpy(r->description.atomic->IRI, IRI);
+	r->description.atomic.IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
+	assert(r->description.atomic.IRI != NULL);
+	strcpy(r->description.atomic.IRI, IRI);
 	r->id = tbox->last_role_id++;
 
 	r->told_subsumers = hash_map_create(DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
@@ -304,7 +303,7 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 	r->second_component_of_list = NULL;
 	r->second_component_of = hash_table_create(DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
-	PUT_ATOMIC_ROLE(r->description.atomic->IRI, r, tbox);
+	PUT_ATOMIC_ROLE(r->description.atomic.IRI, r, tbox);
 
 	return r;
 }
