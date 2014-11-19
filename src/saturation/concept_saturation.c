@@ -39,6 +39,24 @@ int saturation_unique_link_count = 0, saturation_total_link_count = 0;
 // marks the axiom with the premise lhs and conclusion rhs as processed
 #define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		SET_ADD(ax->rhs, &(ax->lhs->subsumers))
 
+static inline void print_saturation_axiom(ConceptSaturationAxiom* ax) {
+	printf("\n");
+	if (ax->type == LINK) {
+		print_concept(ax->lhs);
+		printf(" -> ");
+		print_role(ax->role);
+		printf(" -> ");
+		print_concept(ax->rhs);
+		printf("\n");
+	}
+	else {
+		print_concept(ax->lhs);
+		printf(" <= ");
+		print_concept(ax->rhs);
+		printf("\n");
+	}
+}
+
 static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpression* lhs, ClassExpression* rhs, ObjectPropertyExpression* role, enum saturation_axiom_type type) {
 	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
 	assert(ax != NULL);
@@ -99,13 +117,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				/*
-				printf("SUBS:");
-				print_concept(ax->lhs);
-				printf("->");
-				print_concept(ax->rhs);
-				printf("\n");
-				*/
+				// print_saturation_axiom(ax);
 
 				// conjunction introduction
 				// the first conjunct
@@ -147,13 +159,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				/*
-				printf("SUBS:");
-				print_concept(ax->lhs);
-				printf("->");
-				print_concept(ax->rhs);
-				printf("\n");
-				*/
+				// print_saturation_axiom(ax);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -223,15 +229,7 @@ char saturate_concepts(KB* kb) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
 				++saturation_unique_link_count;
 
-				/*
-				printf("LINK:");
-				print_concept(ax->lhs);
-				printf("->");
-				print_role(ax->role);
-				printf("->");
-				print_concept(ax->rhs);
-				printf("\n");
-				*/
+				// print_saturation_axiom(ax);
 
 				int i, j, k;
 

@@ -354,7 +354,7 @@ ObjectPropertyExpression* get_create_role_composition(int size, ObjectPropertyEx
 	tbox->role_composition_count++;
 	// qsort(roles, size, sizeof(Role*), compare_role);
 	composition = get_create_role_composition_binary(roles[size-1], roles[size-2], tbox);
-	for (i = 0 ; i < size - 2 ; ++i)
+	for (i = size - 3 ; i >= 0 ; --i)
 		composition = get_create_role_composition_binary(composition, roles[i], tbox);
 
 	return composition;
