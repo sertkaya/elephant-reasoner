@@ -117,7 +117,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				// print_saturation_axiom(ax);
+				print_saturation_axiom(ax);
 
 				// conjunction introduction
 				// the first conjunct
@@ -159,7 +159,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				// print_saturation_axiom(ax);
+				print_saturation_axiom(ax);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -229,7 +229,7 @@ char saturate_concepts(KB* kb) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
 				++saturation_unique_link_count;
 
-				// print_saturation_axiom(ax);
+				print_saturation_axiom(ax);
 
 				int i, j, k;
 
@@ -242,6 +242,7 @@ char saturate_concepts(KB* kb) {
 				SetIterator subsumers_iterator;
 				SET_ITERATOR_INIT(&subsumers_iterator, &(ax->rhs->subsumers));
 				ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+				// TODO: change the order of the loops for better performance
 				while (subsumer != NULL) {
 					for (j = 0; j < ax->role->subsumer_list.size; ++j) {
 						ClassExpression* ex = GET_NEGATIVE_EXISTS(subsumer, ((ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));

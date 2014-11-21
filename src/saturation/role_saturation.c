@@ -51,6 +51,14 @@ int mark_role_saturation_axiom_processed(RoleSaturationAxiom* ax) {
 	return added_to_subsumer_list;
 }
 
+static inline void print_saturation_axiom(RoleSaturationAxiom* ax) {
+	printf("\n");
+	print_role(ax->lhs);
+	printf(" -> ");
+	print_role(ax->rhs);
+	printf("\n");
+}
+
 
 void saturate_roles(TBox* tbox) {
 	RoleSaturationAxiom* ax;
@@ -84,6 +92,7 @@ void saturate_roles(TBox* tbox) {
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
+			print_saturation_axiom(ax);
 			// told subsumers
 			SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->rhs->told_subsumers));
 			void* told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
