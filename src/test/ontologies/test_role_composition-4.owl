@@ -1,0 +1,34 @@
+Ontology(<http://www.ihtsdo.org/>
+SubObjectPropertyOf(
+	ObjectPropertyChain(
+		<http://www.ihtsdo.org#p1> 
+		<http://www.ihtsdo.org#q1>)
+	<http://www.ihtsdo.org#r>)
+
+SubObjectPropertyOf(
+	<http://www.ihtsdo.org#p0> 
+	<http://www.ihtsdo.org#p1>)
+ 
+SubObjectPropertyOf(
+	<http://www.ihtsdo.org#q0> 
+	<http://www.ihtsdo.org#q1>)
+
+SubClassOf(
+	<http://www.ihtsdo.org#A>
+	ObjectSomeValuesFrom(
+		<http://www.ihtsdo.org#p0> 
+		<http://www.ihtsdo.org#X>))
+SubClassOf(
+	<http://www.ihtsdo.org#X>
+	ObjectSomeValuesFrom(
+		<http://www.ihtsdo.org#q0> 
+		<http://www.ihtsdo.org#Y>))
+
+
+SubClassOf(
+	ObjectSomeValuesFrom(
+		<http://www.ihtsdo.org#r> 
+		<http://www.ihtsdo.org#Y>)
+	<http://www.ihtsdo.org#B>)
+
+)
