@@ -54,7 +54,7 @@ int mark_role_saturation_axiom_processed(RoleSaturationAxiom* ax) {
 static inline void print_saturation_axiom(RoleSaturationAxiom* ax) {
 	printf("\n");
 	print_role(ax->lhs);
-	printf(" -> ");
+	printf(" <= ");
 	print_role(ax->rhs);
 	printf("\n");
 }
@@ -85,39 +85,55 @@ void saturate_roles(TBox* tbox) {
 		composition = MAP_ITERATOR_NEXT(&iterator);
 	}
 
-	SetIterator told_subsumers_iterator;
-	SetIterator told_subsumees_iterator_1;
-	SetIterator told_subsumees_iterator_2;
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
 			print_saturation_axiom(ax);
 			// told subsumers
+			SetIterator told_subsumers_iterator;
 			SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->rhs->told_subsumers));
 			void* told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 			while (told_subsumer) {
 			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (ObjectPropertyExpression*) told_subsumer));
+			 	told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
+			}
 
-			 	if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
-			 		SET_ITERATOR_INIT(&told_subsumees_iterator_1, &(ax->lhs->description.object_property_chain.role1->told_subsumees));
-			 		void* told_subsumee_1 = SET_ITERATOR_NEXT(&told_subsumees_iterator_1);
-			 		while (told_subsumee_1) {
-			 			SET_ITERATOR_INIT(&told_subsumees_iterator_2, &(ax->lhs->description.object_property_chain.role2->told_subsumees));
-			 			void* told_subsumee_2 = SET_ITERATOR_NEXT(&told_subsumees_iterator_2);
-			 			while (told_subsumee_2) {
+			/*
+			SetIterator first_component_of_iterator;
+			SET_ITERATOR_INIT(&first_component_of_iterator, &(ax->lhs->first_component_of));
+			void* composition = SET_ITERATOR_NEXT(&first_component_of_iterator);
+			while (composition) {
+				// push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition,
+				composition = SET_ITERATOR_NEXT(&first_component_of_iterator);
+			}
+			*/
+
+		 	if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
+		 		SetIterator subsumers_iterator;
+		 		SET_ITERATOR_INIT(&subsumers_iterator, &(ax->rhs->subsumers));
+		 		void* subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+		 		while (subsumer) {
+		 			SetIterator subsumees_iterator_1;
+			 		SET_ITERATOR_INIT(&subsumees_iterator_1, &(ax->lhs->description.object_property_chain.role1->subsumees));
+			 		void* subsumee_1 = SET_ITERATOR_NEXT(&subsumees_iterator_1);
+			 		while (subsumee_1) {
+			 			SetIterator subsumees_iterator_2;
+			 			SET_ITERATOR_INIT(&subsumees_iterator_2, &(ax->lhs->description.object_property_chain.role2->subsumees));
+			 			void* subsumee_2 = SET_ITERATOR_NEXT(&subsumees_iterator_2);
+			 			while (subsumee_2) {
 			 				ObjectPropertyExpression* composition = get_create_role_composition_binary(
-			 						(ObjectPropertyExpression*) told_subsumee_1,
-			 						(ObjectPropertyExpression*) told_subsumee_2,
+			 						(ObjectPropertyExpression*) subsumee_1,
+			 						(ObjectPropertyExpression*) subsumee_2,
 			 						tbox);
 			 				index_role(composition);
-			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) told_subsumer));
-			 				told_subsumee_2 = SET_ITERATOR_NEXT(&told_subsumees_iterator_2);
+			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) subsumer));
+			 				subsumee_2 = SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			 			}
-			 			told_subsumee_1 = SET_ITERATOR_NEXT(&told_subsumees_iterator_1);
+			 			subsumee_1 = SET_ITERATOR_NEXT(&subsumees_iterator_1);
 			 		}
+			 		subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 			 	}
-			 	told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 			}
 		}
 		free(ax);
