@@ -117,7 +117,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				print_saturation_axiom(ax);
+				// print_saturation_axiom(ax);
 
 				// conjunction introduction
 				// the first conjunct
@@ -159,7 +159,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				print_saturation_axiom(ax);
+				// print_saturation_axiom(ax);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -229,7 +229,7 @@ char saturate_concepts(KB* kb) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
 				++saturation_unique_link_count;
 
-				print_saturation_axiom(ax);
+				// print_saturation_axiom(ax);
 
 				int i, j, k;
 

@@ -116,8 +116,9 @@ void saturate_roles(TBox* tbox) {
 			SET_ITERATOR_INIT(&second_component_of_iterator, &(ax->rhs->second_component_of));
 			void* second_component_of = SET_ITERATOR_NEXT(&second_component_of_iterator);
 			while (second_component_of) {
-				ObjectPropertyExpression* composition = get_create_role_composition_binary(ax->lhs,
+				ObjectPropertyExpression* composition = get_create_role_composition_binary(
 						((ObjectPropertyExpression*) second_component_of)->description.object_property_chain.role1,
+						ax->lhs,
 						tbox);
 				// actually we do not need to index the composition if it already existed
 				index_role(composition);
