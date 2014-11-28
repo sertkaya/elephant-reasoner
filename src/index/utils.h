@@ -74,7 +74,7 @@ void add_to_negative_exists(ClassExpression* ex, TBox* tbox);
 
 // return the negative existential restriction whose role is r and filler is c
 // returns NULL is no such existential restriction is found
-#define GET_NEGATIVE_EXISTS(c, r)	(c->filler_of_negative_exists == NULL ? NULL : c->filler_of_negative_exists[r->id])
+#define GET_NEGATIVE_EXISTS(c, r)	(c->filler_of_negative_exists == NULL ? NULL : MAP_GET(r->id, c->filler_of_negative_exists))
 
 
 /******************************************************************************

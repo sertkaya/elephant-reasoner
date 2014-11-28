@@ -93,13 +93,10 @@ void add_to_second_conjunct_of_list(ClassExpression* concept, ClassExpression* c
 
 // add ex to the filler_of_negative_exists hash of the filler of ex.
 void add_to_negative_exists(ClassExpression* ex, TBox* tbox) {
-	// We allocate the space here (in indexing)
-	if (ex->description.exists.filler->filler_of_negative_exists == NULL) {
-		ex->description.exists.filler->filler_of_negative_exists =
-				(ClassExpression**) calloc(tbox->object_properties.element_count + tbox->object_property_chains.element_count, sizeof(ClassExpression*));
-		assert(ex->description.exists.filler->filler_of_negative_exists != NULL);
-	}
-	ex->description.exists.filler->filler_of_negative_exists[ex->description.exists.role->id] = ex;
+	// create the set if we are adding it for the first time
+	if (ex->description.exists.filler->filler_of_negative_exists == NULL)
+		ex->description.exists.filler->filler_of_negative_exists = MAP_CREATE(DEFAULT_NEGATIVE_FILLER_OF_SET_SIZE);
+	MAP_PUT(ex->description.exists.role->id, ex, ex->description.exists.filler->filler_of_negative_exists);
 }
 
 // add 'composition' to the list of compositions whose first component is 'role'

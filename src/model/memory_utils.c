@@ -67,9 +67,9 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	free(c->successors);
 	total_freed_bytes += c->successor_r_count  * sizeof(Link);
 
-	// free the filler of negative existentials hash
-	free(c->filler_of_negative_exists);
-	total_freed_bytes += (tbox->object_properties.element_count + tbox->object_property_chains.element_count) * sizeof(ClassExpression*);
+	// free the filler of negative existentials set
+	if (c->filler_of_negative_exists != NULL)
+		total_freed_bytes += MAP_FREE(c->filler_of_negative_exists);
 
 	// free the list of conjunctions where this concept occurs
 	total_freed_bytes += list_reset(&(c->first_conjunct_of_list));

@@ -139,8 +139,8 @@ struct class_expression {
 	Link* successors;
 	int successor_r_count;
 
-	// list of negative existentials whose filler is this concept
-	ClassExpression** filler_of_negative_exists;
+	// set of negative existentials whose filler is this concept
+	Map* filler_of_negative_exists;
 
 	// List of conjunctions where this concept is the first/second conjunct.
 	// Elements are ClassExpression*
