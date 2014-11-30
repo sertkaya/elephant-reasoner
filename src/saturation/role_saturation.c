@@ -127,10 +127,10 @@ void saturate_roles(TBox* tbox) {
 			}
 
 		 	if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
-		 		SetIterator subsumers_iterator;
-		 		SET_ITERATOR_INIT(&subsumers_iterator, &(ax->rhs->subsumers));
-		 		void* subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-		 		while (subsumer) {
+		 		// SetIterator subsumers_iterator;
+		 		// SET_ITERATOR_INIT(&subsumers_iterator, &(ax->rhs->subsumers));
+		 		// void* subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+		 		// while (subsumer) {
 		 			SetIterator subsumees_iterator_1;
 			 		SET_ITERATOR_INIT(&subsumees_iterator_1, &(ax->lhs->description.object_property_chain.role1->subsumees));
 			 		void* subsumee_1 = SET_ITERATOR_NEXT(&subsumees_iterator_1);
@@ -145,13 +145,14 @@ void saturate_roles(TBox* tbox) {
 			 						tbox);
 			 				// actually we do not need to index the composition if it already existed
 			 				index_role(composition);
-			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) subsumer));
+			 				// push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) subsumer));
+			 				push(&scheduled_axioms, create_role_saturation_axiom(composition, ax->rhs));
 			 				subsumee_2 = SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			 			}
 			 			subsumee_1 = SET_ITERATOR_NEXT(&subsumees_iterator_1);
 			 		}
-			 		subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-			 	}
+			 		// subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+			 	// }
 			}
 		}
 		free(ax);
