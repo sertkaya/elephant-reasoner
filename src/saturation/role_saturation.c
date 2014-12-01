@@ -91,7 +91,7 @@ void saturate_roles(TBox* tbox) {
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
-			print_saturation_axiom(ax);
+			// print_saturation_axiom(ax);
 			// told subsumers
 			SetIterator told_subsumers_iterator;
 			SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->rhs->told_subsumers));
