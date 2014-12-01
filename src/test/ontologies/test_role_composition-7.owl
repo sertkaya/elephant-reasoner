@@ -1,0 +1,8 @@
+Ontology(<http://www.ihtsdo.org/>
+SubObjectPropertyOf(
+	ObjectPropertyChain(
+		<http://www.ihtsdo.org#p> 
+		<http://www.ihtsdo.org#q>)
+	<http://www.ihtsdo.org#p>) 
+
+)

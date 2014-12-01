@@ -68,8 +68,17 @@ void saturate_roles(TBox* tbox) {
 	init_stack(&scheduled_axioms);
 
 	// push the input axioms to the stack
-    // first the atomic roles
 	MapIterator iterator;
+	// First the role compositions, since we want to saturate
+	// the atomic roles first (they should be on the top of the stack)
+	MAP_ITERATOR_INIT(&iterator, &(tbox->object_property_chains));
+	void* composition = MAP_ITERATOR_NEXT(&iterator);
+	while (composition) {
+		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition, (ObjectPropertyExpression*) composition));
+		composition = MAP_ITERATOR_NEXT(&iterator);
+	}
+
+    // now the atomic roles
 	MAP_ITERATOR_INIT(&iterator, &(tbox->object_properties));
 	void* object_property = MAP_ITERATOR_NEXT(&iterator);
 	while (object_property) {
@@ -77,13 +86,6 @@ void saturate_roles(TBox* tbox) {
 		object_property = MAP_ITERATOR_NEXT(&iterator);
 	}
 
-    // Now the role compositions.
-	MAP_ITERATOR_INIT(&iterator, &(tbox->object_property_chains));
-	void* composition = MAP_ITERATOR_NEXT(&iterator);
-	while (composition) {
-		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition, (ObjectPropertyExpression*) composition));
-		composition = MAP_ITERATOR_NEXT(&iterator);
-	}
 
     // reflexive transitive closure of role inclusion axioms and complex role inclusion axioms
 	ax = pop(&scheduled_axioms);
@@ -98,7 +100,7 @@ void saturate_roles(TBox* tbox) {
 			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (ObjectPropertyExpression*) told_subsumer));
 			 	told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 			}
-
+/*
 			SetIterator first_component_of_iterator;
 			SET_ITERATOR_INIT(&first_component_of_iterator, &(ax->rhs->first_component_of));
 			void* first_component_of = SET_ITERATOR_NEXT(&first_component_of_iterator);
@@ -125,7 +127,7 @@ void saturate_roles(TBox* tbox) {
 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) second_component_of));
 				second_component_of = SET_ITERATOR_NEXT(&second_component_of_iterator);
 			}
-
+*/
 		 	if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
 		 		// SetIterator subsumers_iterator;
 		 		// SET_ITERATOR_INIT(&subsumers_iterator, &(ax->rhs->subsumers));
