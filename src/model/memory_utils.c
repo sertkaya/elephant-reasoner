@@ -107,8 +107,6 @@ int free_role(ObjectPropertyExpression* r) {
 	// free(r->told_subsumers);
 	total_freed_bytes += SET_RESET(&(r->told_subsumers));
 
-	total_freed_bytes += SET_RESET(&(r->told_subsumees));
-
 	// free the  subsumers list
 	total_freed_bytes += list_reset(&(r->subsumer_list));
 

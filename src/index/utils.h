@@ -52,9 +52,6 @@ int add_to_role_subsumees(ObjectPropertyExpression* r, ObjectPropertyExpression*
 
 #define ADD_TOLD_SUBSUMER_OBJECT_PROPERTY_EXPRESSION(s, r)		SET_ADD(s, &(r->told_subsumers))
 
-#define ADD_TOLD_SUBSUMEE_OBJECT_PROPERTY_EXPRESSION(s, r)		SET_ADD(s, &(r->told_subsumees))
-
-
 /******************************************************************************
  * functions for adding ...
  *****************************************************************************/

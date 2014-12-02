@@ -152,14 +152,12 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 	// Index subrole axioms
 	for (i = 0; i < tbox->subrole_axiom_count; ++i) {
 		ADD_TOLD_SUBSUMER_OBJECT_PROPERTY_EXPRESSION(tbox->subrole_axioms[i]->rhs, tbox->subrole_axioms[i]->lhs);
-		ADD_TOLD_SUBSUMEE_OBJECT_PROPERTY_EXPRESSION(tbox->subrole_axioms[i]->lhs, tbox->subrole_axioms[i]->rhs);
 		index_role(tbox->subrole_axioms[i]->lhs);
 	}
 
 	// Index generated subrole axioms
 	for (i = 0; i < kb->generated_subrole_axiom_count; ++i) {
 		ADD_TOLD_SUBSUMER_OBJECT_PROPERTY_EXPRESSION(kb->generated_subrole_axioms[i]->rhs, kb->generated_subrole_axioms[i]->lhs);
-		ADD_TOLD_SUBSUMEE_OBJECT_PROPERTY_EXPRESSION(kb->generated_subrole_axioms[i]->lhs, kb->generated_subrole_axioms[i]->rhs);
 		index_role(kb->generated_subrole_axioms[i]->lhs);
 	}
 
