@@ -205,9 +205,6 @@ struct object_property_expression {
 	// Only necessary for optimizing the processing of role compositions
 	// For that we need to access the subsumees
 	Set subsumees;
-	// List of subsumers of this object property.
-	// Elements are ObjectPropertyExpression*
-	List subsumee_list;
 
 	// List of role compositions where this role is the first/second component
 	ObjectPropertyExpression** first_component_of_list;

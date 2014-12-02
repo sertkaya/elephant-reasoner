@@ -51,11 +51,8 @@ int add_to_role_subsumer_list(ObjectPropertyExpression* r, ObjectPropertyExpress
 int add_to_role_subsumee_list(ObjectPropertyExpression*r, ObjectPropertyExpression* s) {
 	ObjectPropertyExpression** tmp;
 
-	if (SET_ADD(s, &(r->subsumees))) {
-		list_add(s, &(r->subsumee_list));
-
+	if (SET_ADD(s, &(r->subsumees)))
 		return 1;
-	}
 
 	return 0;
 }

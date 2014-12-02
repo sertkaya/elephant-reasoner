@@ -289,7 +289,6 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 	LIST_INIT(&(r->subsumer_list));
 	SET_INIT(&(r->subsumers), DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
 
-	LIST_INIT(&(r->subsumee_list));
 	SET_INIT(&(r->subsumees), DEFAULT_ROLE_SUBSUMEES_HASH_SIZE);
 
 	r->first_component_of_count = 0;
@@ -329,7 +328,6 @@ ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpre
 	LIST_INIT(&(r->subsumer_list));
 	SET_INIT(&(r->subsumers), DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
 
-	LIST_INIT(&(r->subsumee_list));
 	SET_INIT(&(r->subsumees), DEFAULT_ROLE_SUBSUMEES_HASH_SIZE);
 
 	r->first_component_of_count = 0;
