@@ -195,7 +195,6 @@ struct object_property_expression {
 	ObjectPropertyDescription description;
 
 	Set told_subsumers;
-	Set told_subsumees;
 
 	Set subsumers;
 	// List of subsumers of this object property.
