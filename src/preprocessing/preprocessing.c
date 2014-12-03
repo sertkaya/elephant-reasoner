@@ -85,10 +85,12 @@ void preprocess_tbox(KB* kb) {
 	int j, k;
 	ClassExpression* conjunction;
 	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i)
-		for (j = 0; j < tbox->disjointclasses_axioms[i]->concept_count - 1; ++j)
-			for (k = j + 1; k < tbox->disjointclasses_axioms[i]->concept_count ; ++k) {
+		for (j = 0; j < tbox->disjointclasses_axioms[i]->classes.size - 1; ++j)
+			for (k = j + 1; k < tbox->disjointclasses_axioms[i]->classes.size ; ++k) {
 				// TODO: what about the conjunction created here? It modifies the model!
-				conjunction = get_create_conjunction_binary(tbox->disjointclasses_axioms[i]->concepts[j], tbox->disjointclasses_axioms[i]->concepts[k], tbox);
+				conjunction = get_create_conjunction_binary(
+						(ClassExpression*) tbox->disjointclasses_axioms[i]->classes.elements[j],
+						(ClassExpression*) tbox->disjointclasses_axioms[i]->classes.elements[k], tbox);
 				add_generated_subclass_axiom(kb, create_subclass_axiom(conjunction, tbox->bottom_concept));
 			}
 }

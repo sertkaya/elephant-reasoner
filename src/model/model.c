@@ -385,15 +385,13 @@ EquivalentClassesAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpressi
 }
 
 // create the disjointclasses axiom with the given concept descriptions
-DisjointClassesAxiom* create_disjointclasses_axiom(int concept_count, ClassExpression** concepts) {
+DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpression** classes) {
 	DisjointClassesAxiom* ax = (DisjointClassesAxiom*) calloc(1, sizeof(DisjointClassesAxiom));
 	assert(ax != NULL);
-	ax->concepts = (ClassExpression**) calloc(concept_count, sizeof(ClassExpression*));
-	assert(ax->concepts != NULL);
-	ax->concept_count = concept_count;
+	LIST_INIT(&(ax->classes));
 	int i;
-	for (i = 0; i < ax->concept_count; ++i)
-		ax->concepts[i] = concepts[i];
+	for (i = 0; i < class_count; ++i)
+		list_add(classes[i], &(ax->classes));
 
 	return ax;
 }

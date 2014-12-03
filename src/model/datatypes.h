@@ -231,8 +231,9 @@ struct equivalent_classes_axiom {
 
 // DisjointClasses axiom
 struct disjoint_classes_axiom {
-	int concept_count;
-	ClassExpression **concepts;
+	// List of classes in this axiom.
+	// Elements are of type ClassExpression*
+	List classes;
 };
 
 // SubObjectPropertyOf axiom

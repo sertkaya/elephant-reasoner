@@ -154,8 +154,7 @@ int free_tbox(TBox* tbox) {
 
 	// free the disjoint classes axioms
 	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i) {
-		free(tbox->disjointclasses_axioms[i]->concepts);
-		total_freed_bytes += tbox->disjointclasses_axioms[i]->concept_count * sizeof(ClassExpression*);
+		total_freed_bytes += list_reset(&(tbox->disjointclasses_axioms[i]->classes));
 		free(tbox->disjointclasses_axioms[i]);
 	}
 	total_freed_bytes += tbox->disjointclasses_axiom_count * sizeof(DisjointClassesAxiom);
