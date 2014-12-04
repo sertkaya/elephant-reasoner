@@ -87,7 +87,10 @@ void preprocess_tbox(KB* kb) {
 	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i)
 		for (j = 0; j < tbox->disjointclasses_axioms[i]->classes.size - 1; ++j)
 			for (k = j + 1; k < tbox->disjointclasses_axioms[i]->classes.size ; ++k) {
-				// TODO: what about the conjunction created here? It modifies the model!
+				// Possibly a new conjunction is generated here, which modifies the model.
+				// This is not a problem since the extended ontology (that is the ontology extended with the
+				// new conjunction), will be indexed after the preprocessing step. So the new conjunction
+				// will also be considered in the indexing information.
 				conjunction = get_create_conjunction_binary(
 						(ClassExpression*) tbox->disjointclasses_axioms[i]->classes.elements[j],
 						(ClassExpression*) tbox->disjointclasses_axioms[i]->classes.elements[k], tbox);
