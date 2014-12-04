@@ -23,26 +23,6 @@
 #include "../hashing/hash_map.h"
 #include "utils.h"
 
-/*
-// The list of subclass axioms that are generated during  preprocessing
-SubClassAxiom** generated_subclass_axioms = NULL;
-int generated_subclass_axiom_count = 0;
-
-// The list of subrole axioms that are generated during  preprocessing
-SubRoleAxiom** generated_subrole_axioms = NULL;
-int generated_subrole_axiom_count = 0;
-
-// The hash of nominals that are generated during preprocessing.
-KeyValueHashTable* generated_nominals = NULL;
-// id of the last generated nominal
-// int last_generated_nominal_id = 0;
-
-// The hash of existential restrictions that are generated during preprocessing.
-// They are generated from preprocessing role assertions.
-KeyValueHashTable* generated_exists_restrictions = NULL;
-int generated_exists_restriction_count = 0;
-*/
-
 // Preprocess axioms that are syntactic shortcuts, like equivalent classes/roles, disjoint classes and
 // transtive roles. Translate them to subclass axioms for saturation.
 void preprocess_tbox(KB* kb) {
