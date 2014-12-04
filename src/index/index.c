@@ -93,29 +93,33 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 	char bottom_appears_on_rhs = 0;
 
 	int i;
-	for (i = 0; i < tbox->subclass_axiom_count; ++i) {
+	SetIterator iterator;
+	SET_ITERATOR_INIT(&iterator, &(kb->tbox->subclassof_axioms));
+	SubClassOfAxiom* ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
+	while (ax) {
 		// Check if bottom appears on the rhs. Needed for consistency
-		if (tbox->subclass_axioms[i]->rhs == tbox->bottom_concept) {
-			if (tbox->subclass_axioms[i]->lhs != tbox->bottom_concept)
+		if (ax->rhs == tbox->bottom_concept) {
+			if (ax->lhs != tbox->bottom_concept)
 				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
-			if (tbox->subclass_axioms[i]->lhs->type == OBJECT_ONE_OF_TYPE || tbox->subclass_axioms[i]->lhs == tbox->top_concept)
+			if (ax->lhs->type == OBJECT_ONE_OF_TYPE || ax->lhs == tbox->top_concept)
 				// return inconsistent immediately
 				return -1;
 		}
 
 		// no need to add told subsumers of bottom
 		// no need to index the bottom concept
-		if (tbox->subclass_axioms[i]->lhs == tbox->bottom_concept)
+		if (ax->lhs == tbox->bottom_concept)
 			continue;
 		// no need to add top as a told subsumer
-		if (tbox->subclass_axioms[i]->rhs == tbox->top_concept) {
+		if (ax->rhs == tbox->top_concept) {
 			// still index the lhs, but do not add top to the lhs of rhs
-			index_concept(tbox->subclass_axioms[i]->lhs, tbox);
+			index_concept(ax->lhs, tbox);
 			continue;
 		}
-		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(tbox->subclass_axioms[i]->rhs, tbox->subclass_axioms[i]->lhs);
-		index_concept(tbox->subclass_axioms[i]->lhs, tbox);
+		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(ax->rhs, ax->lhs);
+		index_concept(ax->lhs, tbox);
+		ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 	}
 
 	// Now index the subclass axioms generated during preprocessing

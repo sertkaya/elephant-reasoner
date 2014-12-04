@@ -426,16 +426,6 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
  * add functions for axioms
  *****************************************************************************/
 
-// add a given subclass axiom to a given TBox
-void add_subclass_axiom(SubClassOfAxiom* ax, TBox* tbox) {
-	SubClassOfAxiom** tmp;
-	tmp = realloc(tbox->subclass_axioms, (tbox->subclass_axiom_count + 1) * sizeof(SubClassOfAxiom*));
-	assert(tmp != NULL);
-	tbox->subclass_axioms = tmp;
-	tbox->subclass_axioms[tbox->subclass_axiom_count] = ax;
-	tbox->subclass_axiom_count++;
-}
-
 // add a given equivalent classes axiom to a given TBox
 void add_eqclass_axiom(EquivalentClassesAxiom* ax, TBox* tbox) {
 	EquivalentClassesAxiom** tmp;

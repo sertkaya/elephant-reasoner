@@ -272,7 +272,7 @@ struct tbox {
 	// number of total ObjectSomeValuesFrom expressions in the ontology
 	int object_some_values_from_exps_count;
 
-	// ObjectIntersectionOf expressions
+	// Binary ObjectIntersectionOf expressions
 	// Key: 64-bit hash value obtained from the 32-bit ids of the two conjuncts
 	// Value: ClassExpression*
 	Map object_intersection_of_exps;
@@ -291,6 +291,9 @@ struct tbox {
 	// Value: ObjectPropertyExpression*
 	Map object_properties;
 
+	// Binary ObjectPropertyChains
+	// Key: 64-bit hash value obtained from the 32-bit ids of the two components
+	// Value: ObjectPropertyExpression*
 	Map object_property_chains;
 	int role_composition_count;
 	int binary_role_composition_count;
@@ -298,7 +301,9 @@ struct tbox {
 	uint32_t last_concept_id;
 	uint32_t last_role_id;
 
-	SubClassOfAxiom** subclass_axioms;
+	// The set of SubClassOf axioms. The members are
+	// of type SubClassOfAxiom*.
+	Set subclassof_axioms;
 	int subclass_axiom_count;
 
 	EquivalentClassesAxiom** eqclass_axioms;

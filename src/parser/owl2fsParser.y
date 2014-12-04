@@ -372,7 +372,7 @@ ClassAxiom:
 
 SubClassOf:
 	SUB_CLASS_OF '(' axiomAnnotations subClassExpression superClassExpression ')' {
-		add_subclass_axiom(create_subclass_axiom($4.concept, $5.concept), kb->tbox);
+		ADD_SUBCLASSOF_AXIOM(create_subclass_axiom($4.concept, $5.concept), kb->tbox);
 	};
 
 subClassExpression:

@@ -142,11 +142,12 @@ void print_subrole_axiom(SubObjectPropertyAxiom* subrole_ax) {
 }
 
 void print_tbox(TBox* tbox) {
-	int i;
-
-	for (i = 0; i < tbox->subclass_axiom_count; i++) {
-		printf("ax %d:",i);
-		print_subclass_axiom(tbox->subclass_axioms[i]);
+	SetIterator it;
+	SET_ITERATOR_INIT(&it, &(tbox->subclassof_axioms));
+	void* ax = SET_ITERATOR_NEXT(&it);
+	while (ax) {
+		print_subclass_axiom((SubClassOfAxiom*) ax);
+		ax = SET_ITERATOR_NEXT(&it);
 	}
 }
 
@@ -306,7 +307,7 @@ void print_short_stats(KB* kb) {
 			kb->tbox->role_composition_count,
 			kb->tbox->binary_role_composition_count,
 			kb->tbox->object_property_chains.element_count,
-			kb->tbox->subclass_axiom_count,
+			kb->tbox->subclassof_axioms.element_count,
 			kb->tbox->eqclass_axiom_count,
 			kb->tbox->disjointclasses_axiom_count,
 			kb->tbox->subrole_axiom_count,
