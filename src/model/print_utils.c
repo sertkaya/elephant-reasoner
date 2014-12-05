@@ -132,7 +132,7 @@ void print_eqclass_axiom(EquivalentClassesAxiom* ec_ax) {
 }
 
 // TODO
-void print_subrole_axiom(SubObjectPropertyAxiom* subrole_ax) {
+void print_subrole_axiom(SubObjectPropertyOfAxiom* subrole_ax) {
 	printf("(SubObjectPropertyOf ");
 	// print_role(subrole_ax->lhs);
 	printf(", ");
@@ -310,7 +310,7 @@ void print_short_stats(KB* kb) {
 			kb->tbox->subclassof_axioms.element_count,
 			kb->tbox->equivalentclasses_axioms.element_count,
 			kb->tbox->disjointclasses_axiom_count,
-			kb->tbox->subrole_axiom_count,
+			kb->tbox->subobjectpropertyof_axioms.element_count,
 			kb->tbox->eqrole_axiom_count,
 			kb->tbox->transitive_role_axiom_count,
 			kb->abox->individual_count,

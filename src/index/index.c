@@ -95,31 +95,31 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 	int i;
 	SetIterator iterator;
 	SET_ITERATOR_INIT(&iterator, &(kb->tbox->subclassof_axioms));
-	SubClassOfAxiom* ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
-	while (ax) {
+	SubClassOfAxiom* subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
+	while (subclass_ax) {
 		// Check if bottom appears on the rhs. Needed for consistency
-		if (ax->rhs == tbox->bottom_concept) {
-			if (ax->lhs != tbox->bottom_concept)
+		if (subclass_ax->rhs == tbox->bottom_concept) {
+			if (subclass_ax->lhs != tbox->bottom_concept)
 				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
-			if (ax->lhs->type == OBJECT_ONE_OF_TYPE || ax->lhs == tbox->top_concept)
+			if (subclass_ax->lhs->type == OBJECT_ONE_OF_TYPE || subclass_ax->lhs == tbox->top_concept)
 				// return inconsistent immediately
 				return -1;
 		}
 
 		// no need to add told subsumers of bottom
 		// no need to index the bottom concept
-		if (ax->lhs == tbox->bottom_concept)
+		if (subclass_ax->lhs == tbox->bottom_concept)
 			continue;
 		// no need to add top as a told subsumer
-		if (ax->rhs == tbox->top_concept) {
+		if (subclass_ax->rhs == tbox->top_concept) {
 			// still index the lhs, but do not add top to the lhs of rhs
-			index_concept(ax->lhs, tbox);
+			index_concept(subclass_ax->lhs, tbox);
 			continue;
 		}
-		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(ax->rhs, ax->lhs);
-		index_concept(ax->lhs, tbox);
-		ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
+		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(subclass_ax->rhs, subclass_ax->lhs);
+		index_concept(subclass_ax->lhs, tbox);
+		subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 	}
 
 	// Now index the subclass axioms generated during preprocessing
@@ -153,10 +153,13 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 	if (reasoning_task == CONSISTENCY && bottom_appears_on_rhs == 0)
 		return 1;
 
-	// Index subrole axioms
-	for (i = 0; i < tbox->subrole_axiom_count; ++i) {
-		ADD_TOLD_SUBSUMER_OBJECT_PROPERTY_EXPRESSION(tbox->subrole_axioms[i]->rhs, tbox->subrole_axioms[i]->lhs);
-		index_role(tbox->subrole_axioms[i]->lhs);
+	// Index subobjectpropertyof axioms
+	SET_ITERATOR_INIT(&iterator, &(kb->tbox->subobjectpropertyof_axioms));
+	SubObjectPropertyOfAxiom* subrole_ax = (SubObjectPropertyOfAxiom*) SET_ITERATOR_NEXT(&iterator);
+	while (subrole_ax) {
+		ADD_TOLD_SUBSUMER_OBJECT_PROPERTY_EXPRESSION(subrole_ax->rhs, subrole_ax->lhs);
+		index_role(subrole_ax->lhs);
+		subrole_ax = (SubObjectPropertyOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 	}
 
 	// Index generated subrole axioms

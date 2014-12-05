@@ -24,7 +24,7 @@
 
 void add_generated_subclass_axiom(KB* kb, SubClassOfAxiom* ax);
 
-void add_generated_subrole_axiom(KB* kb, SubObjectPropertyAxiom* ax);
+void add_generated_subrole_axiom(KB* kb, SubObjectPropertyOfAxiom* ax);
 
 ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind);
 

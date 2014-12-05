@@ -47,7 +47,7 @@ typedef struct object_property_expression ObjectPropertyExpression;
 typedef struct subclass_of_axiom SubClassOfAxiom;
 typedef struct equivalent_classes_axiom EquivalentClassesAxiom;
 typedef struct disjoint_classes_axiom DisjointClassesAxiom;
-typedef struct subobject_property_of_axiom SubObjectPropertyAxiom;
+typedef struct subobject_property_of_axiom SubObjectPropertyOfAxiom;
 typedef struct equivalent_object_properties_axiom EquivalentObjectPropertiesAxiom;
 typedef struct transitive_object_property_axiom TransitiveObjectPropertyAxiom;
 
@@ -309,8 +309,9 @@ struct tbox {
 	// are of type EquivalentClassesAxiom*.
 	Set equivalentclasses_axioms;
 
-	SubObjectPropertyAxiom** subrole_axioms;
-	int subrole_axiom_count;
+	// The set of SubObjectPropertyOf axioms. The members
+	// are of type SubObjectPropertyOfAxiom*.
+	Set subobjectpropertyof_axioms;
 
 	TransitiveObjectPropertyAxiom** transitive_role_axioms;
 	int transitive_role_axiom_count;
@@ -383,7 +384,7 @@ struct knowledge_base {
 	int generated_subclass_axiom_count;
 
 	// The list of subrole axioms that are generated during  preprocessing
-	SubObjectPropertyAxiom** generated_subrole_axioms;
+	SubObjectPropertyOfAxiom** generated_subrole_axioms;
 	int generated_subrole_axiom_count;
 
 	// The hash of nominals that are generated during preprocessing.

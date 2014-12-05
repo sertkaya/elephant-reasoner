@@ -75,7 +75,7 @@ EquivalentClassesAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpressi
 DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpression** classes);
 
 // create the subrole axiom with the given role descriptions
-SubObjectPropertyAxiom* create_subrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs);
+SubObjectPropertyOfAxiom* create_subrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs);
 
 // create transitive role axiom
 TransitiveObjectPropertyAxiom* create_transitive_role_axiom(ObjectPropertyExpression* r);
@@ -95,8 +95,8 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
 // add a given disjoint classes axiom to the TBox
 void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox);
 
-// add a given subrole axiom to the TBox
-void add_subrole_axiom(SubObjectPropertyAxiom* ax, TBox* tbox);
+// add a given subobjectpropertyof axiom to a given ontology
+#define ADD_SUBOBJECTPROPERTYOF_AXIOM(ax, tbox)		SET_ADD(ax, &(tbox->subobjectpropertyof_axioms))
 
 // add a given transitive role axiom to the TBox
 void add_transitive_role_axiom(TransitiveObjectPropertyAxiom* ax, TBox* tbox);

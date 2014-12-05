@@ -168,12 +168,15 @@ int free_tbox(TBox* tbox) {
 	free(tbox->disjointclasses_axioms);
 	total_freed_bytes += tbox->disjointclasses_axiom_count * sizeof(DisjointClassesAxiom*);
 
-	// free role subrole axioms
-	for (i = 0; i < tbox->subrole_axiom_count; i++)
-		free(tbox->subrole_axioms[i]);
-	total_freed_bytes += sizeof(SubObjectPropertyAxiom) * tbox->subrole_axiom_count;
-	free(tbox->subrole_axioms);
-	total_freed_bytes += sizeof(SubObjectPropertyAxiom*) * tbox->subrole_axiom_count;
+	// free role subobjectpropertyof axioms
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->subobjectpropertyof_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
+	while (ax) {
+		free(ax);
+		total_freed_bytes += sizeof(SubObjectPropertyOfAxiom);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
+	}
+	total_freed_bytes += SET_RESET(&(tbox->subobjectpropertyof_axioms));
 
 	// free equivalent role axioms
 	for  (i = 0; i < tbox->eqrole_axiom_count; i++)
@@ -346,9 +349,9 @@ int free_kb(KB* kb) {
 	// free the generated subrole axioms
 	for (i = 0; i < kb->generated_subrole_axiom_count; ++i)
 		free(kb->generated_subrole_axioms[i]);
-	total_freed_bytes += sizeof(SubObjectPropertyAxiom) * kb->generated_subrole_axiom_count;
+	total_freed_bytes += sizeof(SubObjectPropertyOfAxiom) * kb->generated_subrole_axiom_count;
 	free(kb->generated_subrole_axioms);
-	total_freed_bytes += sizeof(SubObjectPropertyAxiom*) * kb->generated_subrole_axiom_count;
+	total_freed_bytes += sizeof(SubObjectPropertyOfAxiom*) * kb->generated_subrole_axiom_count;
 
 	// iterate over the generated nominals hash, free the nominals
 	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);

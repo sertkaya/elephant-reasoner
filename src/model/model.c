@@ -397,8 +397,8 @@ DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpress
 }
 
 // create the subrole axiom with the given role descriptions
-SubObjectPropertyAxiom* create_subrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs) {
-	SubObjectPropertyAxiom* ax = (SubObjectPropertyAxiom*) malloc(sizeof(SubObjectPropertyAxiom));
+SubObjectPropertyOfAxiom* create_subrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs) {
+	SubObjectPropertyOfAxiom* ax = (SubObjectPropertyOfAxiom*) malloc(sizeof(SubObjectPropertyOfAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
 	ax->rhs = rhs;
@@ -433,16 +433,6 @@ void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox) {
 	tbox->disjointclasses_axioms = tmp;
 	tbox->disjointclasses_axioms[tbox->disjointclasses_axiom_count] = ax;
 	++tbox->disjointclasses_axiom_count;
-}
-
-// add a given subrole axiom to a given TBox
-void add_subrole_axiom(SubObjectPropertyAxiom* ax, TBox* tbox) {
-	SubObjectPropertyAxiom** tmp;
-	tmp = realloc(tbox->subrole_axioms, (tbox->subrole_axiom_count + 1) * sizeof(SubObjectPropertyAxiom*));
-	assert(tmp != NULL);
-	tbox->subrole_axioms = tmp;
-	tbox->subrole_axioms[tbox->subrole_axiom_count] = ax;
-	++tbox->subrole_axiom_count;
 }
 
 void add_transitive_role_axiom(TransitiveObjectPropertyAxiom* ax, TBox* tbox) {

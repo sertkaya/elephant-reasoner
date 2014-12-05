@@ -425,7 +425,7 @@ ObjectPropertyAxiom:
 	
 SubObjectPropertyOf:
 	SUB_OBJECT_PROPERTY_OF '(' axiomAnnotations subObjectPropertyExpression superObjectPropertyExpression ')' {
-		add_subrole_axiom(create_subrole_axiom($4.role, $5.role), kb->tbox);
+		ADD_SUBOBJECTPROPERTYOF_AXIOM(create_subrole_axiom($4.role, $5.role), kb->tbox);
 	};
 
 subObjectPropertyExpression:

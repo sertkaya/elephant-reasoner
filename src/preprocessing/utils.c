@@ -62,9 +62,9 @@ void add_generated_subclass_axiom(KB* kb, SubClassOfAxiom* ax) {
 
 // Add a given subrole axiom the list of subclass axioms generated during
 // preprocessing
-void add_generated_subrole_axiom(KB* kb, SubObjectPropertyAxiom* ax) {
-	SubObjectPropertyAxiom** tmp;
-	tmp = realloc(kb->generated_subrole_axioms, (kb->generated_subrole_axiom_count + 1) * sizeof(SubObjectPropertyAxiom*));
+void add_generated_subrole_axiom(KB* kb, SubObjectPropertyOfAxiom* ax) {
+	SubObjectPropertyOfAxiom** tmp;
+	tmp = realloc(kb->generated_subrole_axioms, (kb->generated_subrole_axiom_count + 1) * sizeof(SubObjectPropertyOfAxiom*));
 	assert(tmp != NULL);
 	kb->generated_subrole_axioms = tmp;
 	kb->generated_subrole_axioms[kb->generated_subrole_axiom_count] = ax;

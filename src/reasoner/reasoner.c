@@ -70,8 +70,7 @@ TBox* init_tbox() {
 
 	SET_INIT(&(tbox->subclassof_axioms), DEFAULT_SUBCLASSOF_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->equivalentclasses_axioms), DEFAULT_EQUIVALENTCLASSES_AXIOMS_SET_SIZE);
-	tbox->subrole_axioms = NULL;
-	tbox->subrole_axiom_count = 0;
+	SET_INIT(&(tbox->subobjectpropertyof_axioms), DEFAULT_SUBOBJECTPROPERTYOF_AXIOMS_SET_SIZE);
 	tbox->eqrole_axioms = NULL;
 	tbox->eqrole_axiom_count = 0;
 	tbox->transitive_role_axioms = NULL;

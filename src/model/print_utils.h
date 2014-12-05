@@ -29,7 +29,7 @@ void print_exists(ObjectSomeValuesFrom* ex);
 void print_concept(ClassExpression* c);
 void print_subclass_axiom(SubClassOfAxiom* subclass_ax);
 void print_eqclass_axiom(EquivalentClassesAxiom* subclass_ax);
-void print_subrole_axiom(SubObjectPropertyAxiom* subrole_ax);
+void print_subrole_axiom(SubObjectPropertyOfAxiom* subrole_ax);
 void print_conjunctions(TBox* tbox);
 void print_tbox(TBox* tbox);
 // print the computed concept hierarchy
