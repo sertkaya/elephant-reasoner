@@ -308,7 +308,7 @@ void print_short_stats(KB* kb) {
 			kb->tbox->binary_role_composition_count,
 			kb->tbox->object_property_chains.element_count,
 			kb->tbox->subclassof_axioms.element_count,
-			kb->tbox->eqclass_axiom_count,
+			kb->tbox->equivalentclasses_axioms.element_count,
 			kb->tbox->disjointclasses_axiom_count,
 			kb->tbox->subrole_axiom_count,
 			kb->tbox->eqrole_axiom_count,

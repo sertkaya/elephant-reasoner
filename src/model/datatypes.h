@@ -304,10 +304,10 @@ struct tbox {
 	// The set of SubClassOf axioms. The members are
 	// of type SubClassOfAxiom*.
 	Set subclassof_axioms;
-	int subclass_axiom_count;
 
-	EquivalentClassesAxiom** eqclass_axioms;
-	int eqclass_axiom_count;
+	// The set of EquivalentClasses axioms. The members
+	// are of type EquivalentClassesAxiom*.
+	Set equivalentclasses_axioms;
 
 	SubObjectPropertyAxiom** subrole_axioms;
 	int subrole_axiom_count;

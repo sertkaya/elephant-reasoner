@@ -69,8 +69,7 @@ TBox* init_tbox() {
 	MAP_INIT(&(tbox->object_property_chains), DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
 
 	SET_INIT(&(tbox->subclassof_axioms), DEFAULT_SUBCLASSOF_AXIOMS_SET_SIZE);
-	tbox->eqclass_axioms = NULL;
-	tbox->eqclass_axiom_count = 0;
+	SET_INIT(&(tbox->equivalentclasses_axioms), DEFAULT_EQUIVALENTCLASSES_AXIOMS_SET_SIZE);
 	tbox->subrole_axioms = NULL;
 	tbox->subrole_axiom_count = 0;
 	tbox->eqrole_axioms = NULL;

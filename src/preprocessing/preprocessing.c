@@ -40,9 +40,13 @@ void preprocess_tbox(KB* kb) {
 	int i;
 
 	// Convert equivalent classes axioms to subclass axioms
-	for (i = 0; i < tbox->eqclass_axiom_count; ++i) {
-		add_generated_subclass_axiom(kb, create_subclass_axiom(tbox->eqclass_axioms[i]->lhs, tbox->eqclass_axioms[i]->rhs));
-		add_generated_subclass_axiom(kb, create_subclass_axiom(tbox->eqclass_axioms[i]->rhs, tbox->eqclass_axioms[i]->lhs));
+	SetIterator iterator;
+	SET_ITERATOR_INIT(&iterator, &(tbox->equivalentclasses_axioms));
+	EquivalentClassesAxiom* ax = SET_ITERATOR_NEXT(&iterator);
+	while (ax) {
+		add_generated_subclass_axiom(kb, create_subclass_axiom(ax->lhs, ax->rhs));
+		add_generated_subclass_axiom(kb, create_subclass_axiom(ax->rhs, ax->lhs));
+		ax = SET_ITERATOR_NEXT(&iterator);
 	}
 
 	// Convert equivalent roles axioms to subrole axioms

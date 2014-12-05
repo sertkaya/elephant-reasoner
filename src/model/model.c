@@ -426,16 +426,6 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
  * add functions for axioms
  *****************************************************************************/
 
-// add a given equivalent classes axiom to a given TBox
-void add_eqclass_axiom(EquivalentClassesAxiom* ax, TBox* tbox) {
-	EquivalentClassesAxiom** tmp;
-	tmp = realloc(tbox->eqclass_axioms, (tbox->eqclass_axiom_count + 1) * sizeof(EquivalentClassesAxiom*));
-	assert(tmp != NULL);
-	tbox->eqclass_axioms = tmp;
-	tbox->eqclass_axioms[tbox->eqclass_axiom_count] = ax;
-	++tbox->eqclass_axiom_count;
-}
-
 void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox) {
 	DisjointClassesAxiom** tmp;
 	tmp = realloc(tbox->disjointclasses_axioms, (tbox->disjointclasses_axiom_count + 1) * sizeof(DisjointClassesAxiom*));

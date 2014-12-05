@@ -387,7 +387,7 @@ EquivalentClasses:
 		eq_cls_exps[eq_cls_exp_count++] = $5.concept;
 		int i;
 		for (i = 0; i < eq_cls_exp_count - 1; ++i)
-			add_eqclass_axiom(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), kb->tbox);
+			ADD_EQUIVALENTCLASSES_AXIOM(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), kb->tbox);
 		eq_cls_exp_count = 0;
 	};
 
