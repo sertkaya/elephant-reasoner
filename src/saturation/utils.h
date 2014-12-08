@@ -25,6 +25,8 @@
 #include "../hashing/hash_table.h"
 
 
+// Check if c1 is subsumed by c2. Used both
+// for class and object property expressions.
 #define IS_SUBSUMED_BY(c1,c2)						SET_CONTAINS(c2, &(c1->subsumers))
 
 // unsigned long hash_it(int x, int y);

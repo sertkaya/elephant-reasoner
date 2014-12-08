@@ -23,9 +23,6 @@
 // Add concept c1 to the list of equivalent concepts of c2
 int add_equivalent_concept(ClassExpression* c1, ClassExpression* c2);
 
-// returns 1 if c1 is a subsumer of c2, otherwise 0
-int is_subsumer_of(ClassExpression* c1, ClassExpression* c2);
-
 /**
  * Add class expression c1 to the equivalent classes of class expression c2.
  */

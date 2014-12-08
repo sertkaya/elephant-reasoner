@@ -9,9 +9,9 @@ SubObjectPropertyOf(
 	<http://www.ihtsdo.org#x>)
 
 SubClassOf(<http://www.ihtsdo.org#A> 
-	ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#B>))
+	ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#X>))
 
-SubClassOf(<http://www.ihtsdo.org#B> 
+SubClassOf(<http://www.ihtsdo.org#X> 
 	ObjectSomeValuesFrom(<http://www.ihtsdo.org#s> <http://www.ihtsdo.org#C>))
 
 SubClassOf(
@@ -20,6 +20,6 @@ SubClassOf(
 
 SubClassOf(
 	ObjectSomeValuesFrom(<http://www.ihtsdo.org#x> <http://www.ihtsdo.org#D>)
-	<http://www.ihtsdo.org#X>)
+	<http://www.ihtsdo.org#B>)
 
 )

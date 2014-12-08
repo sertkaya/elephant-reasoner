@@ -3,37 +3,6 @@ SubObjectPropertyOf(
 	ObjectPropertyChain(
 		<http://www.ihtsdo.org#p> 
 		<http://www.ihtsdo.org#q>)
-	<http://www.ihtsdo.org#r>) 
-
-SubObjectPropertyOf(
-	ObjectPropertyChain(
-		<http://www.ihtsdo.org#r> 
-		<http://www.ihtsdo.org#s>)
-	<http://www.ihtsdo.org#t>) 
-
-
-SubClassOf(
-	<http://www.ihtsdo.org#A> 
-	ObjectSomeValuesFrom(
-		<http://www.ihtsdo.org#p> 
-		<http://www.ihtsdo.org#X>))
-
-SubClassOf(
-	<http://www.ihtsdo.org#X> 
-	ObjectSomeValuesFrom(
-		<http://www.ihtsdo.org#q> 
-		<http://www.ihtsdo.org#Y>))
-
-SubClassOf(
-	<http://www.ihtsdo.org#Y> 
-	ObjectSomeValuesFrom(
-		<http://www.ihtsdo.org#s> 
-		<http://www.ihtsdo.org#Z>))
-
-SubClassOf(
-	ObjectSomeValuesFrom(
-		<http://www.ihtsdo.org#t> 
-		<http://www.ihtsdo.org#Z>)
-	<http://www.ihtsdo.org#B>) 
+	<http://www.ihtsdo.org#q>) 
 
 )

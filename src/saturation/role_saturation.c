@@ -68,22 +68,22 @@ void saturate_roles(TBox* tbox) {
 	init_stack(&scheduled_axioms);
 
 	// push the input axioms to the stack
-	MapIterator iterator;
-	// First the role compositions, since we want to saturate
-	// the atomic roles first (they should be on the top of the stack)
-	MAP_ITERATOR_INIT(&iterator, &(tbox->object_property_chains));
-	void* composition = MAP_ITERATOR_NEXT(&iterator);
-	while (composition) {
-		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition, (ObjectPropertyExpression*) composition));
-		composition = MAP_ITERATOR_NEXT(&iterator);
-	}
+    // the atomic roles
+	MapIterator map_iterator;
 
-    // now the atomic roles
-	MAP_ITERATOR_INIT(&iterator, &(tbox->object_properties));
-	void* object_property = MAP_ITERATOR_NEXT(&iterator);
+	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_properties));
+	void* object_property = MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property) {
 		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) object_property, (ObjectPropertyExpression*) object_property));
-		object_property = MAP_ITERATOR_NEXT(&iterator);
+		object_property = MAP_ITERATOR_NEXT(&map_iterator);
+	}
+
+	// the role compositions
+	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_property_chains));
+	void* composition = MAP_ITERATOR_NEXT(&map_iterator);
+	while (composition) {
+		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition, (ObjectPropertyExpression*) composition));
+		composition = MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
 
@@ -91,7 +91,7 @@ void saturate_roles(TBox* tbox) {
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
-			// print_saturation_axiom(ax);
+			print_saturation_axiom(ax);
 			// told subsumers
 			SetIterator told_subsumers_iterator;
 			SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->rhs->told_subsumers));
@@ -100,11 +100,12 @@ void saturate_roles(TBox* tbox) {
 			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (ObjectPropertyExpression*) told_subsumer));
 			 	told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 			}
-/*
+
 			SetIterator first_component_of_iterator;
 			SET_ITERATOR_INIT(&first_component_of_iterator, &(ax->rhs->first_component_of));
 			void* first_component_of = SET_ITERATOR_NEXT(&first_component_of_iterator);
-			while (first_component_of) {
+			while (first_component_of && !IS_SUBSUMED_BY(((ObjectPropertyExpression*) first_component_of), ax->rhs)) {
+			// while (first_component_of) {
 				ObjectPropertyExpression* composition = get_create_role_composition_binary(ax->lhs,
 						((ObjectPropertyExpression*) first_component_of)->description.object_property_chain.role2,
 						tbox);
@@ -117,7 +118,8 @@ void saturate_roles(TBox* tbox) {
 			SetIterator second_component_of_iterator;
 			SET_ITERATOR_INIT(&second_component_of_iterator, &(ax->rhs->second_component_of));
 			void* second_component_of = SET_ITERATOR_NEXT(&second_component_of_iterator);
-			while (second_component_of) {
+			while (second_component_of && !IS_SUBSUMED_BY(((ObjectPropertyExpression*) second_component_of), ax->rhs)) {
+			// while (second_component_of) {
 				ObjectPropertyExpression* composition = get_create_role_composition_binary(
 						((ObjectPropertyExpression*) second_component_of)->description.object_property_chain.role1,
 						ax->lhs,
@@ -127,7 +129,7 @@ void saturate_roles(TBox* tbox) {
 				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) second_component_of));
 				second_component_of = SET_ITERATOR_NEXT(&second_component_of_iterator);
 			}
-*/
+
 			if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
 				SetIterator subsumees_iterator_1;
 				SET_ITERATOR_INIT(&subsumees_iterator_1, &(ax->lhs->description.object_property_chain.role1->subsumees));
