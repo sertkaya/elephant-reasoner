@@ -68,15 +68,7 @@ void saturate_roles(TBox* tbox) {
 	init_stack(&scheduled_axioms);
 
 	// push the input axioms to the stack
-    // the atomic roles
 	MapIterator map_iterator;
-
-	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_properties));
-	void* object_property = MAP_ITERATOR_NEXT(&map_iterator);
-	while (object_property) {
-		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) object_property, (ObjectPropertyExpression*) object_property));
-		object_property = MAP_ITERATOR_NEXT(&map_iterator);
-	}
 
 	// the role compositions
 	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_property_chains));
@@ -84,6 +76,14 @@ void saturate_roles(TBox* tbox) {
 	while (composition) {
 		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition, (ObjectPropertyExpression*) composition));
 		composition = MAP_ITERATOR_NEXT(&map_iterator);
+	}
+
+    // the atomic roles
+	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_properties));
+	void* object_property = MAP_ITERATOR_NEXT(&map_iterator);
+	while (object_property) {
+		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) object_property, (ObjectPropertyExpression*) object_property));
+		object_property = MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
 
@@ -111,7 +111,15 @@ void saturate_roles(TBox* tbox) {
 						tbox);
 				// actually we do not need to index the composition if it already existed
 				index_role(composition);
-				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) first_component_of));
+
+				SET_ITERATOR_INIT(&told_subsumers_iterator, &(((ObjectPropertyExpression*) first_component_of)->told_subsumers));
+				told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
+				while (told_subsumer) {
+					push(&scheduled_axioms, create_role_saturation_axiom(composition, told_subsumer));
+					told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
+				}
+
+				// push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) first_component_of));
 				first_component_of = SET_ITERATOR_NEXT(&first_component_of_iterator);
 			}
 
@@ -126,7 +134,15 @@ void saturate_roles(TBox* tbox) {
 						tbox);
 				// actually we do not need to index the composition if it already existed
 				index_role(composition);
-				push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) second_component_of));
+
+				SET_ITERATOR_INIT(&told_subsumers_iterator, &(((ObjectPropertyExpression*) second_component_of)->told_subsumers));
+				told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
+				while (told_subsumer) {
+					push(&scheduled_axioms, create_role_saturation_axiom(composition, told_subsumer));
+					told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
+				}
+
+				// push(&scheduled_axioms, create_role_saturation_axiom(composition, (ObjectPropertyExpression*) second_component_of));
 				second_component_of = SET_ITERATOR_NEXT(&second_component_of_iterator);
 			}
 
