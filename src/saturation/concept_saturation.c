@@ -241,15 +241,15 @@ char saturate_concepts(KB* kb) {
 				// existential introduction
 				SetIterator subsumers_iterator;
 				SET_ITERATOR_INIT(&subsumers_iterator, &(ax->rhs->subsumers));
-				ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+				void* subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 				// TODO: change the order of the loops for better performance
 				while (subsumer != NULL) {
 					for (j = 0; j < ax->role->subsumer_list.size; ++j) {
-						ClassExpression* ex = GET_NEGATIVE_EXISTS(subsumer, ((ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
+						ClassExpression* ex = GET_NEGATIVE_EXISTS(((ClassExpression*) subsumer), ((ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
 						if (ex != NULL)
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 					}
-					subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+					subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 				}
 
 				// the role chain rule
@@ -265,11 +265,16 @@ char saturate_concepts(KB* kb) {
 					for (j = 0; j < ax->lhs->predecessor_r_count; ++j)
 						if (ax->lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
 							for (k = 0; k < ax->lhs->predecessors[j].filler_count; ++k) {
-								push(&scheduled_axioms,
-										create_concept_saturation_axiom(
-												ax->lhs->predecessors[j].fillers[k],
-												ax->rhs,
-												ax->role->second_component_of_list[i], LINK));
+								SET_ITERATOR_INIT(&subsumers_iterator, &(ax->role->second_component_of_list[i]->subsumers));
+								subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+								while (subsumer) {
+									push(&scheduled_axioms,
+											create_concept_saturation_axiom(
+													ax->lhs->predecessors[j].fillers[k],
+													ax->rhs,
+													(ObjectPropertyExpression*) subsumer, LINK));
+									subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+								}
 
 							}
 						}
@@ -287,11 +292,16 @@ char saturate_concepts(KB* kb) {
 					for (j = 0; j < ax->rhs->successor_r_count; ++j)
 						if (ax->rhs->successors[j].role == ax->role->first_component_of_list[i]->description.object_property_chain.role2) {
 							for (k = 0; k < ax->rhs->successors[j].filler_count; ++k) {
-								push(&scheduled_axioms,
-										create_concept_saturation_axiom(
-												ax->lhs,
-												ax->rhs->successors[j].fillers[k],
-												ax->role->first_component_of_list[i], LINK));
+								SET_ITERATOR_INIT(&subsumers_iterator, &(ax->role->first_component_of_list[i]->subsumers));
+								subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+								while (subsumer) {
+									push(&scheduled_axioms,
+											create_concept_saturation_axiom(
+													ax->lhs,
+													ax->rhs->successors[j].fillers[k],
+													(ObjectPropertyExpression*) subsumer, LINK));
+									subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+								}
 
 							}
 						}

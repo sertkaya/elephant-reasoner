@@ -74,7 +74,7 @@ void saturate_roles(TBox* tbox) {
 	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_property_chains));
 	ObjectPropertyExpression* composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (composition) {
-		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) composition, (ObjectPropertyExpression*) composition));
+		push(&scheduled_axioms, create_role_saturation_axiom(composition, composition));
 		composition = MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
@@ -91,7 +91,7 @@ void saturate_roles(TBox* tbox) {
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
-			print_saturation_axiom(ax);
+			// print_saturation_axiom(ax);
 			// told subsumers
 			SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->rhs->told_subsumers));
 			void* told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
@@ -104,16 +104,27 @@ void saturate_roles(TBox* tbox) {
 		ax = pop(&scheduled_axioms);
 	}
 
+	// Make a copy of the object property chains since we are going to traverse and
+	// modify it at the same time.
+	Set tmp_object_property_chains;
+	SET_INIT(&tmp_object_property_chains, 32);
 	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_property_chains));
-	composition = MAP_ITERATOR_NEXT(&map_iterator);
-	SetIterator subsumees_iterator_1, subsumees_iterator_2;
+	composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	while (composition) {
+		SET_ADD(composition, &tmp_object_property_chains);
+		composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	}
+
+	SetIterator subsumees_iterator_1, subsumees_iterator_2, tmp_object_property_chains_iterator;
 	ObjectPropertyExpression* subsumee_1;
 	ObjectPropertyExpression* subsumee_2;
+	SET_ITERATOR_INIT(&tmp_object_property_chains_iterator, &tmp_object_property_chains);
+	composition = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
 	while (composition) {
 		SET_ITERATOR_INIT(&subsumees_iterator_1, &(composition->description.object_property_chain.role1->subsumees));
 		subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		while (subsumee_1) {
-			SET_ITERATOR_INIT(&subsumees_iterator_2, &(ax->lhs->description.object_property_chain.role2->subsumees));
+			SET_ITERATOR_INIT(&subsumees_iterator_2, &(composition->description.object_property_chain.role2->subsumees));
 			subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			while (subsumee_2) {
 				ObjectPropertyExpression* new_composition = get_create_role_composition_binary(
@@ -122,16 +133,32 @@ void saturate_roles(TBox* tbox) {
 						tbox);
 				// actually we do not need to index the composition if it already existed
 				index_role(new_composition);
-				// add to the subsumer list to mark it as processed
-				add_to_role_subsumer_list(new_composition, ax->rhs);
-				// add to the subsumees hash too
-				add_to_role_subsumee_list(ax->rhs, new_composition);
+
+				SetIterator subsumers_iterator;
+				SET_ITERATOR_INIT(&subsumers_iterator, &(composition->subsumers));
+				ObjectPropertyExpression* subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+				// subsumer of composition is a subsumer of the new_composition
+				while (subsumer) {
+
+					/*
+					printf("\n");
+					print_role(new_composition);
+					printf(" <= ");
+					print_role(subsumer);
+					printf("\n");
+					*/
+
+					add_to_role_subsumer_list(new_composition, subsumer);
+					add_to_role_subsumee_list(subsumer, new_composition);
+					subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
+				}
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}
 			subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		}
-		composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+		composition = SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
 	}
 
+	// TODO: optimization via removing the redundant subsumers
 }
 
