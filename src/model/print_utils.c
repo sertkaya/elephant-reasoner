@@ -143,7 +143,7 @@ void print_subrole_axiom(SubObjectPropertyOfAxiom* subrole_ax) {
 
 void print_tbox(TBox* tbox) {
 	SetIterator it;
-	SET_ITERATOR_INIT(&it, &(tbox->subclassof_axioms));
+	SET_ITERATOR_INIT(&it, &(tbox->subclass_of_axioms));
 	void* ax = SET_ITERATOR_NEXT(&it);
 	while (ax) {
 		print_subclass_axiom((SubClassOfAxiom*) ax);
@@ -307,12 +307,12 @@ void print_short_stats(KB* kb) {
 			kb->tbox->role_composition_count,
 			kb->tbox->binary_role_composition_count,
 			kb->tbox->object_property_chains.element_count,
-			kb->tbox->subclassof_axioms.element_count,
-			kb->tbox->equivalentclasses_axioms.element_count,
+			kb->tbox->subclass_of_axioms.element_count,
+			kb->tbox->equivalent_classes_axioms.element_count,
 			kb->tbox->disjointclasses_axiom_count,
-			kb->tbox->subobjectpropertyof_axioms.element_count,
-			kb->tbox->eqrole_axiom_count,
-			kb->tbox->transitiveobjectproperty_axioms.element_count,
+			kb->tbox->subobjectproperty_of_axioms.element_count,
+			kb->tbox->equivalent_objectproperties_axioms.element_count,
+			kb->tbox->transitive_objectproperty_axioms.element_count,
 			kb->abox->individual_count,
 			kb->abox->concept_assertion_count,
 			kb->abox->role_assertion_count);

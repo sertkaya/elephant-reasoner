@@ -435,18 +435,6 @@ void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox) {
 	++tbox->disjointclasses_axiom_count;
 }
 
-// add a given eqrole axiom to a given TBox
-void add_eqrole_axiom(EquivalentObjectPropertiesAxiom* ax, TBox* tbox) {
-	EquivalentObjectPropertiesAxiom** tmp;
-	tmp = realloc(tbox->eqrole_axioms, (tbox->eqrole_axiom_count + 1) * sizeof(EquivalentObjectPropertiesAxiom*));
-	assert(tmp != NULL);
-	tbox->eqrole_axioms = tmp;
-	tbox->eqrole_axioms[tbox->eqrole_axiom_count] = ax;
-	++tbox->eqrole_axiom_count;
-}
-
-
-
 /******************************************************************************
  * get/create functions for ABox
  *****************************************************************************/

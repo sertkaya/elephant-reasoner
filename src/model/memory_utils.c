@@ -140,24 +140,24 @@ int free_tbox(TBox* tbox) {
 
 	SetIterator set_iterator;
 	// free subclass axioms
-	SET_ITERATOR_INIT(&set_iterator, &(tbox->subclassof_axioms));
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->subclass_of_axioms));
 	void* ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		free(ax);
 		total_freed_bytes += sizeof(SubClassOfAxiom);
 		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
-	total_freed_bytes += SET_RESET(&(tbox->subclassof_axioms));
+	total_freed_bytes += SET_RESET(&(tbox->subclass_of_axioms));
 
 	// free equivalent class axioms
-	SET_ITERATOR_INIT(&set_iterator, &(tbox->equivalentclasses_axioms));
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->equivalent_classes_axioms));
 	ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		free(ax);
 		total_freed_bytes += sizeof(EquivalentClassesAxiom);
 		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
-	total_freed_bytes += SET_RESET(&(tbox->equivalentclasses_axioms));
+	total_freed_bytes += SET_RESET(&(tbox->equivalent_classes_axioms));
 
 	// free the disjoint classes axioms
 	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i) {
@@ -169,31 +169,34 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += tbox->disjointclasses_axiom_count * sizeof(DisjointClassesAxiom*);
 
 	// free role subobjectpropertyof axioms
-	SET_ITERATOR_INIT(&set_iterator, &(tbox->subobjectpropertyof_axioms));
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->subobjectproperty_of_axioms));
 	ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		free(ax);
 		total_freed_bytes += sizeof(SubObjectPropertyOfAxiom);
 		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
-	total_freed_bytes += SET_RESET(&(tbox->subobjectpropertyof_axioms));
+	total_freed_bytes += SET_RESET(&(tbox->subobjectproperty_of_axioms));
 
 	// free equivalent role axioms
-	for  (i = 0; i < tbox->eqrole_axiom_count; i++)
-		free(tbox->eqrole_axioms[i]);
-	total_freed_bytes += sizeof(EquivalentObjectPropertiesAxiom) * tbox->eqrole_axiom_count;
-	free(tbox->eqrole_axioms);
-	total_freed_bytes += sizeof(EquivalentObjectPropertiesAxiom*) * tbox->eqrole_axiom_count;
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->equivalent_objectproperties_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
+	while (ax) {
+		free(ax);
+		total_freed_bytes += sizeof(EquivalentObjectPropertiesAxiom);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
+	}
+	total_freed_bytes += SET_RESET(&(tbox->equivalent_objectproperties_axioms));
 
 	// free transitive role axioms
-	SET_ITERATOR_INIT(&set_iterator, &(tbox->transitiveobjectproperty_axioms));
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->transitive_objectproperty_axioms));
 	ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		free(ax);
 		total_freed_bytes += sizeof(TransitiveObjectPropertyAxiom);
 		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
-	total_freed_bytes += SET_RESET(&(tbox->transitiveobjectproperty_axioms));
+	total_freed_bytes += SET_RESET(&(tbox->transitive_objectproperty_axioms));
 
 	// iterate over the existentials hash, free the existentials
 	MapIterator iterator;

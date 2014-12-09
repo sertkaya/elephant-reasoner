@@ -303,22 +303,23 @@ struct tbox {
 
 	// The set of SubClassOf axioms. The members are
 	// of type SubClassOfAxiom*.
-	Set subclassof_axioms;
+	Set subclass_of_axioms;
 
 	// The set of EquivalentClasses axioms. The members
 	// are of type EquivalentClassesAxiom*.
-	Set equivalentclasses_axioms;
+	Set equivalent_classes_axioms;
 
 	// The set of SubObjectPropertyOf axioms. The members
 	// are of type SubObjectPropertyOfAxiom*.
-	Set subobjectpropertyof_axioms;
+	Set subobjectproperty_of_axioms;
 
 	// The set of TransitiveObjectProperty axioms. The
 	// members are of type TransitiveObjectPropertyAxiom*.
-	Set transitiveobjectproperty_axioms;
+	Set transitive_objectproperty_axioms;
 
-	EquivalentObjectPropertiesAxiom** eqrole_axioms;
-	int eqrole_axiom_count;
+	// The set of EquivalentObjectProperties axioms. The
+	// members are of type EquivalentObjectPropertiesAxiom*.
+	Set equivalent_objectproperties_axioms;
 
 	DisjointClassesAxiom** disjointclasses_axioms;
 	int disjointclasses_axiom_count;

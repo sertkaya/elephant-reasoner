@@ -372,7 +372,7 @@ ClassAxiom:
 
 SubClassOf:
 	SUB_CLASS_OF '(' axiomAnnotations subClassExpression superClassExpression ')' {
-		ADD_SUBCLASSOF_AXIOM(create_subclass_axiom($4.concept, $5.concept), kb->tbox);
+		ADD_SUBCLASS_OF_AXIOM(create_subclass_axiom($4.concept, $5.concept), kb->tbox);
 	};
 
 subClassExpression:
@@ -387,7 +387,7 @@ EquivalentClasses:
 		eq_cls_exps[eq_cls_exp_count++] = $5.concept;
 		int i;
 		for (i = 0; i < eq_cls_exp_count - 1; ++i)
-			ADD_EQUIVALENTCLASSES_AXIOM(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), kb->tbox);
+			ADD_EQUIVALENT_CLASSES_AXIOM(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), kb->tbox);
 		eq_cls_exp_count = 0;
 	};
 
@@ -425,7 +425,7 @@ ObjectPropertyAxiom:
 	
 SubObjectPropertyOf:
 	SUB_OBJECT_PROPERTY_OF '(' axiomAnnotations subObjectPropertyExpression superObjectPropertyExpression ')' {
-		ADD_SUBOBJECTPROPERTYOF_AXIOM(create_subrole_axiom($4.role, $5.role), kb->tbox);
+		ADD_SUBOBJECTPROPERTY_OF_AXIOM(create_subrole_axiom($4.role, $5.role), kb->tbox);
 	};
 
 subObjectPropertyExpression:
@@ -451,7 +451,7 @@ superObjectPropertyExpression:
 
 EquivalentObjectProperties:
 	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations ObjectPropertyExpression ObjectPropertyExpression equivalentObjectPropertyExpressions ')' {
-		add_eqrole_axiom(create_eqrole_axiom($4.role, $5.role), kb->tbox);
+		ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(create_eqrole_axiom($4.role, $5.role), kb->tbox);
 	};
 	
 equivalentObjectPropertyExpressions:
@@ -477,7 +477,7 @@ ReflexiveObjectProperty:
 
 TransitiveObjectProperty:
 	TRANSITIVE_OBJECT_PROPERTY '(' axiomAnnotations ObjectPropertyExpression ')' {
-		ADD_TRANSITIVEOBJECTPROPERTY_AXIOM(create_transitive_role_axiom($4.role), kb->tbox);
+		ADD_TRANSITIVE_OBJECTPROPERTY_AXIOM(create_transitive_role_axiom($4.role), kb->tbox);
 	};
 
 DataPropertyAxiom:

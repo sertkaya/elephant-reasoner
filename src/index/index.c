@@ -94,7 +94,7 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 
 	int i;
 	SetIterator iterator;
-	SET_ITERATOR_INIT(&iterator, &(kb->tbox->subclassof_axioms));
+	SET_ITERATOR_INIT(&iterator, &(kb->tbox->subclass_of_axioms));
 	SubClassOfAxiom* subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 	while (subclass_ax) {
 		// Check if bottom appears on the rhs. Needed for consistency
@@ -154,7 +154,7 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 		return 1;
 
 	// Index subobjectpropertyof axioms
-	SET_ITERATOR_INIT(&iterator, &(kb->tbox->subobjectpropertyof_axioms));
+	SET_ITERATOR_INIT(&iterator, &(kb->tbox->subobjectproperty_of_axioms));
 	SubObjectPropertyOfAxiom* subrole_ax = (SubObjectPropertyOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 	while (subrole_ax) {
 		ADD_TOLD_SUBSUMER_OBJECT_PROPERTY_EXPRESSION(subrole_ax->rhs, subrole_ax->lhs);

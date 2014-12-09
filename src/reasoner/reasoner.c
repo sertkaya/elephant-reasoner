@@ -68,12 +68,11 @@ TBox* init_tbox() {
 	tbox->binary_role_composition_count = 0;
 	MAP_INIT(&(tbox->object_property_chains), DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
 
-	SET_INIT(&(tbox->subclassof_axioms), DEFAULT_SUBCLASSOF_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->equivalentclasses_axioms), DEFAULT_EQUIVALENTCLASSES_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->subobjectpropertyof_axioms), DEFAULT_SUBOBJECTPROPERTYOF_AXIOMS_SET_SIZE);
-	tbox->eqrole_axioms = NULL;
-	tbox->eqrole_axiom_count = 0;
-	SET_INIT(&(tbox->transitiveobjectproperty_axioms), DEFAULT_TRANSITIVEOBJECTPROPERTY_AXIOMS_SET_SIZE);
+	SET_INIT(&(tbox->subclass_of_axioms), DEFAULT_SUBCLASS_OF_AXIOMS_SET_SIZE);
+	SET_INIT(&(tbox->equivalent_classes_axioms), DEFAULT_EQUIVALENT_CLASSES_AXIOMS_SET_SIZE);
+	SET_INIT(&(tbox->subobjectproperty_of_axioms), DEFAULT_SUBOBJECTPROPERTY_OF_AXIOMS_SET_SIZE);
+	SET_INIT(&(tbox->equivalent_objectproperties_axioms), DEFAULT_EQUIVALENT_OBJECTPROPERTIES_AXIOMS_SET_SIZE);
+	SET_INIT(&(tbox->transitive_objectproperty_axioms), DEFAULT_TRANSITIVE_OBJECTPROPERTY_AXIOMS_SET_SIZE);
 	tbox->disjointclasses_axioms = NULL;
 	tbox->disjointclasses_axiom_count = 0;
 

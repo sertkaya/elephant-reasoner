@@ -41,7 +41,7 @@ void preprocess_tbox(KB* kb) {
 
 	// Convert equivalent classes axioms to subclass axioms
 	SetIterator iterator;
-	SET_ITERATOR_INIT(&iterator, &(tbox->equivalentclasses_axioms));
+	SET_ITERATOR_INIT(&iterator, &(tbox->equivalent_classes_axioms));
 	void* ax = SET_ITERATOR_NEXT(&iterator);
 	while (ax) {
 		add_generated_subclass_axiom(kb, create_subclass_axiom(((EquivalentClassesAxiom*) ax)->lhs, ((EquivalentClassesAxiom*) ax)->rhs));
@@ -50,14 +50,17 @@ void preprocess_tbox(KB* kb) {
 	}
 
 	// Convert equivalent roles axioms to subrole axioms
-	for (i = 0; i < tbox->eqrole_axiom_count; ++i) {
-		add_generated_subrole_axiom(kb, create_subrole_axiom(tbox->eqrole_axioms[i]->lhs, tbox->eqrole_axioms[i]->rhs));
-		add_generated_subrole_axiom(kb, create_subrole_axiom(tbox->eqrole_axioms[i]->rhs, tbox->eqrole_axioms[i]->lhs));
+	SET_ITERATOR_INIT(&iterator, &(tbox->equivalent_objectproperties_axioms));
+	ax = SET_ITERATOR_NEXT(&iterator);
+	while (ax) {
+		add_generated_subrole_axiom(kb, create_subrole_axiom(((EquivalentObjectPropertiesAxiom*) ax)->lhs, ((EquivalentObjectPropertiesAxiom*) ax)->rhs));
+		add_generated_subrole_axiom(kb, create_subrole_axiom(((EquivalentObjectPropertiesAxiom*) ax)->rhs, ((EquivalentObjectPropertiesAxiom*) ax)->lhs));
+		ax = SET_ITERATOR_NEXT(&iterator);
 	}
 
 	// Process the transitive role axioms
 	ObjectPropertyExpression* composition;
-	SET_ITERATOR_INIT(&iterator, &(tbox->transitiveobjectproperty_axioms));
+	SET_ITERATOR_INIT(&iterator, &(tbox->transitive_objectproperty_axioms));
 	ax = SET_ITERATOR_NEXT(&iterator);
 	while (ax) {
 		composition = get_create_role_composition_binary(((TransitiveObjectPropertyAxiom*) ax)->r, ((TransitiveObjectPropertyAxiom*) ax)->r, tbox);
