@@ -313,8 +313,9 @@ struct tbox {
 	// are of type SubObjectPropertyOfAxiom*.
 	Set subobjectpropertyof_axioms;
 
-	TransitiveObjectPropertyAxiom** transitive_role_axioms;
-	int transitive_role_axiom_count;
+	// The set of TransitiveObjectProperty axioms. The
+	// members are of type TransitiveObjectPropertyAxiom*.
+	Set transitiveobjectproperty_axioms;
 
 	EquivalentObjectPropertiesAxiom** eqrole_axioms;
 	int eqrole_axiom_count;

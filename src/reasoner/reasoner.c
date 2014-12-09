@@ -73,8 +73,7 @@ TBox* init_tbox() {
 	SET_INIT(&(tbox->subobjectpropertyof_axioms), DEFAULT_SUBOBJECTPROPERTYOF_AXIOMS_SET_SIZE);
 	tbox->eqrole_axioms = NULL;
 	tbox->eqrole_axiom_count = 0;
-	tbox->transitive_role_axioms = NULL;
-	tbox->transitive_role_axiom_count = 0;
+	SET_INIT(&(tbox->transitiveobjectproperty_axioms), DEFAULT_TRANSITIVEOBJECTPROPERTY_AXIOMS_SET_SIZE);
 	tbox->disjointclasses_axioms = NULL;
 	tbox->disjointclasses_axiom_count = 0;
 

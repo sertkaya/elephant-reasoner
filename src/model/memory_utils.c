@@ -186,11 +186,14 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += sizeof(EquivalentObjectPropertiesAxiom*) * tbox->eqrole_axiom_count;
 
 	// free transitive role axioms
-	for  (i = 0; i < tbox->transitive_role_axiom_count; i++)
-		free(tbox->transitive_role_axioms[i]);
-	total_freed_bytes += sizeof(TransitiveObjectPropertyAxiom) * tbox->transitive_role_axiom_count;
-	free(tbox->transitive_role_axioms);
-	total_freed_bytes += sizeof(TransitiveObjectPropertyAxiom*) * tbox->transitive_role_axiom_count;
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->transitiveobjectproperty_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
+	while (ax) {
+		free(ax);
+		total_freed_bytes += sizeof(TransitiveObjectPropertyAxiom);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
+	}
+	total_freed_bytes += SET_RESET(&(tbox->transitiveobjectproperty_axioms));
 
 	// iterate over the existentials hash, free the existentials
 	MapIterator iterator;

@@ -312,7 +312,7 @@ void print_short_stats(KB* kb) {
 			kb->tbox->disjointclasses_axiom_count,
 			kb->tbox->subobjectpropertyof_axioms.element_count,
 			kb->tbox->eqrole_axiom_count,
-			kb->tbox->transitive_role_axiom_count,
+			kb->tbox->transitiveobjectproperty_axioms.element_count,
 			kb->abox->individual_count,
 			kb->abox->concept_assertion_count,
 			kb->abox->role_assertion_count);

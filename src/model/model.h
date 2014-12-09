@@ -87,19 +87,19 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
  * add functions for axioms
 *****************************************************************************/
 // add a given subclass axiom to a given ontology
-#define ADD_SUBCLASSOF_AXIOM(ax, tbox)				SET_ADD(ax, &(tbox->subclassof_axioms))
+#define ADD_SUBCLASSOF_AXIOM(ax, tbox)					SET_ADD(ax, &(tbox->subclassof_axioms))
 
 // add a given equivalent classes axiom to a given ontology
-#define ADD_EQUIVALENTCLASSES_AXIOM(ax, tbox)		SET_ADD(ax, &(tbox->equivalentclasses_axioms))
+#define ADD_EQUIVALENTCLASSES_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->equivalentclasses_axioms))
 
 // add a given disjoint classes axiom to the TBox
 void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox);
 
 // add a given subobjectpropertyof axiom to a given ontology
-#define ADD_SUBOBJECTPROPERTYOF_AXIOM(ax, tbox)		SET_ADD(ax, &(tbox->subobjectpropertyof_axioms))
+#define ADD_SUBOBJECTPROPERTYOF_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->subobjectpropertyof_axioms))
 
-// add a given transitive role axiom to the TBox
-void add_transitive_role_axiom(TransitiveObjectPropertyAxiom* ax, TBox* tbox);
+// add a given transitive role axiom to a given ontology
+#define ADD_TRANSITIVEOBJECTPROPERTY_AXIOM(ax, tbox)	SET_ADD(ax, &(tbox->transitiveobjectproperty_axioms))
 
 // add a given eqrole axiom to a given TBox
 void add_eqrole_axiom(EquivalentObjectPropertiesAxiom* ax, TBox* tbox);

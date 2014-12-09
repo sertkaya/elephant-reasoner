@@ -435,15 +435,6 @@ void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox) {
 	++tbox->disjointclasses_axiom_count;
 }
 
-void add_transitive_role_axiom(TransitiveObjectPropertyAxiom* ax, TBox* tbox) {
-	TransitiveObjectPropertyAxiom** tmp;
-	tmp = realloc(tbox->transitive_role_axioms, (tbox->transitive_role_axiom_count + 1) * sizeof(TransitiveObjectPropertyAxiom));
-	assert(tmp != NULL);
-	tbox->transitive_role_axioms = tmp;
-	tbox->transitive_role_axioms[tbox->transitive_role_axiom_count] = ax;
-	++tbox->transitive_role_axiom_count;
-}
-
 // add a given eqrole axiom to a given TBox
 void add_eqrole_axiom(EquivalentObjectPropertiesAxiom* ax, TBox* tbox) {
 	EquivalentObjectPropertiesAxiom** tmp;

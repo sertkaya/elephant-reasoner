@@ -477,7 +477,7 @@ ReflexiveObjectProperty:
 
 TransitiveObjectProperty:
 	TRANSITIVE_OBJECT_PROPERTY '(' axiomAnnotations ObjectPropertyExpression ')' {
-		add_transitive_role_axiom(create_transitive_role_axiom($4.role), kb->tbox);
+		ADD_TRANSITIVEOBJECTPROPERTY_AXIOM(create_transitive_role_axiom($4.role), kb->tbox);
 	};
 
 DataPropertyAxiom:
