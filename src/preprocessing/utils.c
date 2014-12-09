@@ -87,7 +87,7 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 
 	c->type = OBJECT_ONE_OF_TYPE;
 	// c->id = ind->id;
-	c->id = kb->tbox->last_concept_id++;
+	c->id = kb->tbox->next_class_expression_id++;
 
 	LIST_INIT(&(c->told_subsumers));
 
@@ -132,7 +132,7 @@ ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyE
 	c->description.exists.role = r;
 	c->description.exists.filler = f;
 	// c->id = (kb->generated_exists_restriction_count)++;
-	c->id = kb->tbox->last_concept_id++;
+	c->id = kb->tbox->next_class_expression_id++;
 
 	LIST_INIT(&(c->told_subsumers));
 

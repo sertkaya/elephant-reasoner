@@ -47,8 +47,8 @@ TBox* init_tbox() {
 	TBox* tbox = (TBox*) malloc(sizeof(TBox));
 	assert(tbox != NULL);
 
-	tbox->last_concept_id = 0;
-	tbox->last_role_id = 0;
+	tbox->next_class_expression_id = 0;
+	tbox->next_objectproperty_expression_id = 0;
 
 	MAP_INIT(&(tbox->classes), DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
@@ -73,8 +73,7 @@ TBox* init_tbox() {
 	SET_INIT(&(tbox->subobjectproperty_of_axioms), DEFAULT_SUBOBJECTPROPERTY_OF_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->equivalent_objectproperties_axioms), DEFAULT_EQUIVALENT_OBJECTPROPERTIES_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->transitive_objectproperty_axioms), DEFAULT_TRANSITIVE_OBJECTPROPERTY_AXIOMS_SET_SIZE);
-	tbox->disjointclasses_axioms = NULL;
-	tbox->disjointclasses_axiom_count = 0;
+	SET_INIT(&(tbox->disjoint_classes_axioms), DEFAULT_DISJOINT_CLASSES_AXIOMS_SET_SIZE);
 
 	// add the top and bottom concepts
 	tbox->top_concept = get_create_atomic_concept(OWL_THING, tbox);

@@ -309,7 +309,7 @@ void print_short_stats(KB* kb) {
 			kb->tbox->object_property_chains.element_count,
 			kb->tbox->subclass_of_axioms.element_count,
 			kb->tbox->equivalent_classes_axioms.element_count,
-			kb->tbox->disjointclasses_axiom_count,
+			kb->tbox->disjoint_classes_axioms.element_count,
 			kb->tbox->subobjectproperty_of_axioms.element_count,
 			kb->tbox->equivalent_objectproperties_axioms.element_count,
 			kb->tbox->transitive_objectproperty_axioms.element_count,

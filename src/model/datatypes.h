@@ -255,6 +255,11 @@ struct equivalent_object_properties_axiom {
 
 // TBox
 struct tbox {
+	// Class expressions and object property expressions
+	// have unique 32-bit ids.
+	uint32_t next_class_expression_id;
+	uint32_t next_objectproperty_expression_id;
+
 	// Top concept
 	ClassExpression* top_concept;
 	// Bottom concept
@@ -298,9 +303,6 @@ struct tbox {
 	int role_composition_count;
 	int binary_role_composition_count;
 
-	uint32_t last_concept_id;
-	uint32_t last_role_id;
-
 	// The set of SubClassOf axioms. The members are
 	// of type SubClassOfAxiom*.
 	Set subclass_of_axioms;
@@ -321,8 +323,9 @@ struct tbox {
 	// members are of type EquivalentObjectPropertiesAxiom*.
 	Set equivalent_objectproperties_axioms;
 
-	DisjointClassesAxiom** disjointclasses_axioms;
-	int disjointclasses_axiom_count;
+	// The set of DisjointClasses axioms. The
+	// members are of type DisjointClassesAxiom*.
+	Set disjoint_classes_axioms;
 
 };
 

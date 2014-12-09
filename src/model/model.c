@@ -80,7 +80,7 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 	SET_INIT(&(c->description.atomic.equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
 
 	c->type = CLASS_TYPE;
-	c->id = tbox->last_concept_id++;
+	c->id = tbox->next_class_expression_id++;
 
 	LIST_INIT(&(c->told_subsumers));
 
@@ -125,7 +125,7 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 
 	c->description.exists.role = r;
 	c->description.exists.filler = f;
-	c->id = tbox->last_concept_id++;
+	c->id = tbox->next_class_expression_id++;
 
 	LIST_INIT(&(c->told_subsumers));
 
@@ -172,7 +172,7 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 		c->description.conj.conjunct1 = c2;
 		c->description.conj.conjunct2 = c1;
 	}
-	c->id = tbox->last_concept_id++;
+	c->id = tbox->next_class_expression_id++;
 
 	LIST_INIT(&(c->told_subsumers));
 
@@ -237,7 +237,7 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 	c->description.nominal.individual = ind;
 
 	c->type = OBJECT_ONE_OF_TYPE;
-	c->id = tbox->last_concept_id++;
+	c->id = tbox->next_class_expression_id++;
 
 	LIST_INIT(&(c->told_subsumers));
 
@@ -281,7 +281,7 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 	r->description.atomic.IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
 	assert(r->description.atomic.IRI != NULL);
 	strcpy(r->description.atomic.IRI, IRI);
-	r->id = tbox->last_role_id++;
+	r->id = tbox->next_objectproperty_expression_id++;
 
 	SET_INIT(&(r->told_subsumers), DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
 
@@ -319,7 +319,7 @@ ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpre
 	// we DO assume role1 and role2 to be ordered!
 	r->description.object_property_chain.role1 = r1;
 	r->description.object_property_chain.role2 = r2;
-	r->id = tbox->last_role_id++;
+	r->id = tbox->next_objectproperty_expression_id++;
 
 	SET_INIT(&(r->told_subsumers), DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
 
@@ -419,20 +419,6 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
 	ax->lhs = lhs;
 	ax->rhs = rhs;
 	return ax;
-}
-
-
-/******************************************************************************
- * add functions for axioms
- *****************************************************************************/
-
-void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox) {
-	DisjointClassesAxiom** tmp;
-	tmp = realloc(tbox->disjointclasses_axioms, (tbox->disjointclasses_axiom_count + 1) * sizeof(DisjointClassesAxiom*));
-	assert(tmp != NULL);
-	tbox->disjointclasses_axioms = tmp;
-	tbox->disjointclasses_axioms[tbox->disjointclasses_axiom_count] = ax;
-	++tbox->disjointclasses_axiom_count;
 }
 
 /******************************************************************************

@@ -74,18 +74,22 @@ void preprocess_tbox(KB* kb) {
 	// TODO: optimize!
 	int j, k;
 	ClassExpression* conjunction;
-	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i)
-		for (j = 0; j < tbox->disjointclasses_axioms[i]->classes.size - 1; ++j)
-			for (k = j + 1; k < tbox->disjointclasses_axioms[i]->classes.size ; ++k) {
+	SET_ITERATOR_INIT(&iterator, &(tbox->disjoint_classes_axioms));
+	ax = SET_ITERATOR_NEXT(&iterator);
+	while (ax) {
+		for (j = 0; j < ((DisjointClassesAxiom*) ax)->classes.size - 1; ++j)
+			for (k = j + 1; k < ((DisjointClassesAxiom*) ax)->classes.size ; ++k) {
 				// Possibly a new conjunction is generated here, which modifies the model.
 				// This is not a problem since the extended ontology (that is the ontology extended with the
 				// new conjunction), will be indexed after the preprocessing step. So the new conjunction
 				// will also be considered in the indexing information.
 				conjunction = get_create_conjunction_binary(
-						(ClassExpression*) tbox->disjointclasses_axioms[i]->classes.elements[j],
-						(ClassExpression*) tbox->disjointclasses_axioms[i]->classes.elements[k], tbox);
+						(ClassExpression*) ((DisjointClassesAxiom*) ax)->classes.elements[j],
+						(ClassExpression*) ((DisjointClassesAxiom*) ax)->classes.elements[k], tbox);
 				add_generated_subclass_axiom(kb, create_subclass_axiom(conjunction, tbox->bottom_concept));
 			}
+		ax = SET_ITERATOR_NEXT(&iterator);
+	}
 }
 
 // Preprocess assertions and translate them to subclass axioms for saturation. ABox individuals are translated to

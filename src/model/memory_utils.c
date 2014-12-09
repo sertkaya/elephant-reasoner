@@ -160,13 +160,15 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += SET_RESET(&(tbox->equivalent_classes_axioms));
 
 	// free the disjoint classes axioms
-	for (i = 0; i < tbox->disjointclasses_axiom_count; ++i) {
-		total_freed_bytes += list_reset(&(tbox->disjointclasses_axioms[i]->classes));
-		free(tbox->disjointclasses_axioms[i]);
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->disjoint_classes_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
+	while (ax) {
+		total_freed_bytes += list_reset(&(((DisjointClassesAxiom*) ax)->classes));
+		free(ax);
+		total_freed_bytes += sizeof(DisjointClassesAxiom);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
-	total_freed_bytes += tbox->disjointclasses_axiom_count * sizeof(DisjointClassesAxiom);
-	free(tbox->disjointclasses_axioms);
-	total_freed_bytes += tbox->disjointclasses_axiom_count * sizeof(DisjointClassesAxiom*);
+	total_freed_bytes += SET_RESET(&(tbox->disjoint_classes_axioms));
 
 	// free role subobjectpropertyof axioms
 	SET_ITERATOR_INIT(&set_iterator, &(tbox->subobjectproperty_of_axioms));

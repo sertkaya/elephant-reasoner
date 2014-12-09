@@ -93,7 +93,7 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
 #define ADD_EQUIVALENT_CLASSES_AXIOM(ax, tbox)				SET_ADD(ax, &(tbox->equivalent_classes_axioms))
 
 // add a given disjoint classes axiom to the TBox
-void add_disjointclasses_axiom(DisjointClassesAxiom* ax, TBox* tbox);
+#define ADD_DISJOINT_CLASSES_AXIOM(ax, tbox)				SET_ADD(ax, &(tbox->disjoint_classes_axioms))
 
 // add a given subobjectpropertyof axiom to a given ontology
 #define ADD_SUBOBJECTPROPERTY_OF_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->subobjectproperty_of_axioms))

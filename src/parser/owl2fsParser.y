@@ -402,7 +402,7 @@ DisjointClasses:
 	DISJOINT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression disjointClassExpressions ')' {
 		disj_cls_exps[disj_cls_exp_count++] = $4.concept;
 		disj_cls_exps[disj_cls_exp_count++] = $5.concept;
-		add_disjointclasses_axiom(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), kb->tbox);
+		ADD_DISJOINT_CLASSES_AXIOM(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), kb->tbox);
 		disj_cls_exp_count = 0;
 	};
 
