@@ -69,7 +69,28 @@ inline char list_add(void* e, List* l) {
  * TODO
  */
 inline char list_remove(void* e, List* l) {
+	int i;
 
+	for (i = 0; i < l->size; ++i) {
+		if (e == l->elements[i])
+			// the element is at index i
+			break;
+	}
+	// if we reached the last element and it is not e,
+	// then e does not exist in l.
+	if ((i == l->size - 1) && (l->elements[i] != e))
+		return 1;
+	// now shift the elements, overwrite index i
+	int j;
+	for (j = i; j < l->size - 1; ++j) {
+		l->elements[j] = l->elements[j + 1];
+	}
+	// shrink the allocated space
+	void** tmp = realloc(l->elements, (l->size - 1) * sizeof(void*));
+	assert(tmp != NULL);
+	l->elements = tmp;
+	// decrement the element count
+	--l->size;
 	return 0;
 }
 

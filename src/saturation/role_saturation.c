@@ -161,6 +161,7 @@ void saturate_roles(TBox* tbox) {
 					*/
 
 					add_to_role_subsumer_list(new_composition, subsumer);
+					// CAUTION!: from this point on, subsumees and subsumers are not synchronized.
 					// add_to_role_subsumee_list(subsumer, new_composition);
 					subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
 				}
@@ -172,5 +173,28 @@ void saturate_roles(TBox* tbox) {
 	}
 
 	// TODO: optimization via removing the redundant subsumers
+	// now remove the redundant subsumers
+	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_property_chains));
+	composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	SetIterator subsumers_iterator_1;
+	while (composition) {
+		SET_ITERATOR_INIT(&subsumers_iterator_1, &(composition->subsumers));
+		ObjectPropertyExpression* subsumer_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_1);
+		SetIterator subsumers_iterator_2;
+		while (subsumer_1) {
+			SET_ITERATOR_INIT(&subsumers_iterator_2, &(composition->subsumers));
+			ObjectPropertyExpression* subsumer_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_2);
+			while (subsumer_2) {
+				if (subsumer_1 != subsumer_2 && IS_SUBSUMED_BY(subsumer_1, subsumer_2)) {
+					SET_REMOVE(subsumer_2, &(composition->subsumers));
+					list_remove(subsumer_2, &(composition->subsumer_list));
+				}
+				subsumer_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_2);
+			}
+			subsumer_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_1);
+		}
+		composition = MAP_ITERATOR_NEXT(&map_iterator);
+	}
+
 }
 
