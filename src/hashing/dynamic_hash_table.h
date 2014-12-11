@@ -22,13 +22,14 @@
 #include <stdint.h>
 
 /**
- * A hash table interface for storing only stores keys, no associated values.
+ * A hash table interface for storing keys only, no associated values.
  * Keys cannot be NULL.
  */
 
 typedef struct dynamic_hash_table DynamicHashTable;
 typedef struct dynamic_hash_table_iterator DynamicHashTableIterator;
 
+#define HASH_TABLE_EMPTY_KEY		NULL
 
 /**
  * Hash table.

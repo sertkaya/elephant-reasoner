@@ -26,9 +26,11 @@
 #include "utils.h"
 
 /**
- * An dynamic hash table implementation that only stores keys, no associated values.
- * It resizes if the load factor reaches 0.75
+ * An dynamic hash table implementation for storing keys only, no associated values.
+ * The allocate space is doubled once the load factor reaches 0.75.
+ * Uses open addressing with linear probing.
  * Keys cannot be NULL.
+ * Allocated space is not shrunk after a removal.
  */
 
 
@@ -79,7 +81,7 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 	int i, j, new_size;
 	size_t start_index;
 
-	assert(key != NULL);
+	assert(key != HASH_TABLE_EMPTY_KEY);
 
 	start_index = HASH_POINTER(key) & (hash_table->size - 1);
 	for (i = start_index; ; i = (i + 1) & (hash_table->size - 1)) {
@@ -87,8 +89,8 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 			// the key already exists
 			return 0;
 
-		if (hash_table->elements[i] == NULL) {
-			// insert the key here
+		if (hash_table->elements[i] == HASH_TABLE_EMPTY_KEY) {
+			// an empty slot is found, insert the key here
 			hash_table->elements[i] = key;
 			++hash_table->element_count;
 			// mark the new end index
@@ -116,7 +118,7 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 			if (hash_table->elements[i] != NULL) {
 				start_index = HASH_POINTER(hash_table->elements[i]) & (new_size - 1);
 				for (j = start_index; ; j = (j + 1) & (new_size - 1))
-					if (tmp_elements[j] == NULL) {
+					if (tmp_elements[j] == HASH_TABLE_EMPTY_KEY) {
 						tmp_elements[j] = hash_table->elements[i];
 						break;
 					}
@@ -181,6 +183,11 @@ inline char dynamic_hash_table_contains(void* key, DynamicHashTable* hash_table)
 	return 0;
 }
 
+/**
+ * Removes a given key from the given hash table. The slot is marked as empty afterwards.
+ * We do not shrink the allocated space after a removal.
+ * Returns 1 if the key is removed, 0 otherwise.
+ */
 inline char dynamic_hash_table_remove(void* key, DynamicHashTable* hash_table) {
 	assert(key != NULL);
 
@@ -189,8 +196,10 @@ inline char dynamic_hash_table_remove(void* key, DynamicHashTable* hash_table) {
 
 	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key) {
-			// key found
-			hash_table->elements[i] = (void*) -1;
+			// key found, mark it as empty
+			hash_table->elements[i] = HASH_TABLE_EMPTY_KEY;
+			// decrement the element count
+			--hash_table->element_count;
 			return 1;
 		}
 	}

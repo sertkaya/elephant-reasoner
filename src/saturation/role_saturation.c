@@ -128,13 +128,17 @@ void saturate_roles(TBox* tbox) {
 		SET_ITERATOR_INIT(&subsumees_iterator_1, &(composition->description.object_property_chain.role1->subsumees));
 		subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		while (subsumee_1) {
-					printf("\nsubsumee_1:");
-					print_role((ObjectPropertyExpression*) subsumee_1);
+			/*
+			printf("\nsubsumee_1:");
+			print_role((ObjectPropertyExpression*) subsumee_1);
+			*/
 			SET_ITERATOR_INIT(&subsumees_iterator_2, &(composition->description.object_property_chain.role2->subsumees));
 			subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			while (subsumee_2) {
-					printf("\nsubsumee_2:");
-					print_role((ObjectPropertyExpression*) subsumee_2);
+				/*
+				printf("\nsubsumee_2:");
+				print_role((ObjectPropertyExpression*) subsumee_2);
+				*/
 				ObjectPropertyExpression* new_composition = get_create_role_composition_binary(
 						(ObjectPropertyExpression*) subsumee_1,
 						(ObjectPropertyExpression*) subsumee_2,
