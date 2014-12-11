@@ -121,12 +121,20 @@ void saturate_roles(TBox* tbox) {
 	SET_ITERATOR_INIT(&tmp_object_property_chains_iterator, &tmp_object_property_chains);
 	composition = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
 	while (composition) {
+		/*
+		printf("\ncomposition:");
+		print_role((ObjectPropertyExpression*) composition);
+		*/
 		SET_ITERATOR_INIT(&subsumees_iterator_1, &(composition->description.object_property_chain.role1->subsumees));
 		subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		while (subsumee_1) {
+					printf("\nsubsumee_1:");
+					print_role((ObjectPropertyExpression*) subsumee_1);
 			SET_ITERATOR_INIT(&subsumees_iterator_2, &(composition->description.object_property_chain.role2->subsumees));
 			subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			while (subsumee_2) {
+					printf("\nsubsumee_2:");
+					print_role((ObjectPropertyExpression*) subsumee_2);
 				ObjectPropertyExpression* new_composition = get_create_role_composition_binary(
 						(ObjectPropertyExpression*) subsumee_1,
 						(ObjectPropertyExpression*) subsumee_2,
@@ -149,7 +157,7 @@ void saturate_roles(TBox* tbox) {
 					*/
 
 					add_to_role_subsumer_list(new_composition, subsumer);
-					add_to_role_subsumee_list(subsumer, new_composition);
+					// add_to_role_subsumee_list(subsumer, new_composition);
 					subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
 				}
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
