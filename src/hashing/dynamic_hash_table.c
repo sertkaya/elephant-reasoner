@@ -228,7 +228,7 @@ inline void* dynamic_hash_table_iterator_next(DynamicHashTableIterator* iterator
 
 	int i;
 	for (i = iterator->current_index; i < iterator->hash_table->size; ++i)
-		if (iterator->hash_table->elements[i] != NULL && iterator->hash_table->elements[i] != ((void*) -1)) {
+		if (iterator->hash_table->elements[i] != HASH_TABLE_EMPTY_KEY) {
 			iterator->current_index = i + 1;
 			return iterator->hash_table->elements[i];
 		}
