@@ -150,12 +150,12 @@ void saturate_roles(TBox* tbox) {
 
 				printf("\nnew composition:");
 				print_role(new_composition);
-				/*
-				SetIterator subsumers_iterator;
-				SET_ITERATOR_INIT(&subsumers_iterator, &(composition->subsumers));
-				ObjectPropertyExpression* subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+/*
+				// SetIterator subsumers_iterator;
+				SET_ITERATOR_INIT(&told_subsumers_iterator, &(composition->told_subsumers));
+				ObjectPropertyExpression* told_subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
 				// subsumer of composition is a subsumer of the new_composition
-				while (subsumer) {
+				while (told_subsumer) {
 
 					// printf("\n");
 					// print_role(new_composition);
@@ -163,12 +163,12 @@ void saturate_roles(TBox* tbox) {
 					// print_role(subsumer);
 					// printf("\n");
 
-					add_to_role_subsumer_list(new_composition, subsumer);
+					add_to_role_subsumer_list(new_composition, told_subsumer);
 					// CAUTION!: from this point on, subsumees and subsumers are not synchronized.
 					// add_to_role_subsumee_list(subsumer, new_composition);
-					subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
+					told_subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
 				}
-				*/
+*/
 				add_to_role_subsumer_list(new_composition, composition);
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}
@@ -221,6 +221,7 @@ void saturate_roles(TBox* tbox) {
 		}
 		object_property_expression = (ObjectPropertyExpression*) pop(&scheduled_object_property_expressions);
 	}
+
 
 }
 
