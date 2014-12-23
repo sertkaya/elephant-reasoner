@@ -91,7 +91,6 @@ void saturate_roles(TBox* tbox) {
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
-			print_saturation_axiom(ax);
 			// told subsumers
 			SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->rhs->told_subsumers));
 			void* told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
@@ -115,32 +114,18 @@ void saturate_roles(TBox* tbox) {
 		composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
-	printf("=======================================================\n");
-
 	SetIterator subsumees_iterator_1, subsumees_iterator_2, tmp_object_property_chains_iterator;
 	ObjectPropertyExpression* subsumee_1;
 	ObjectPropertyExpression* subsumee_2;
 	SET_ITERATOR_INIT(&tmp_object_property_chains_iterator, &tmp_object_property_chains);
 	composition = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
 	while (composition) {
-
-		printf("\ncomposition:");
-		print_role((ObjectPropertyExpression*) composition);
-
 		SET_ITERATOR_INIT(&subsumees_iterator_1, &(composition->description.object_property_chain.role1->subsumees));
 		subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		while (subsumee_1) {
-
-			printf("\nsubsumee_1:");
-			print_role((ObjectPropertyExpression*) subsumee_1);
-
 			SET_ITERATOR_INIT(&subsumees_iterator_2, &(composition->description.object_property_chain.role2->subsumees));
 			subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			while (subsumee_2) {
-
-				printf("\nsubsumee_2:");
-				print_role((ObjectPropertyExpression*) subsumee_2);
-
 				ObjectPropertyExpression* new_composition = get_create_role_composition_binary(
 						(ObjectPropertyExpression*) subsumee_1,
 						(ObjectPropertyExpression*) subsumee_2,
@@ -148,8 +133,6 @@ void saturate_roles(TBox* tbox) {
 				// actually we do not need to index the composition if it already existed
 				index_role(new_composition);
 
-				printf("\nnew composition:");
-				print_role(new_composition);
 /*
 				// SetIterator subsumers_iterator;
 				SET_ITERATOR_INIT(&told_subsumers_iterator, &(composition->told_subsumers));
@@ -210,10 +193,6 @@ void saturate_roles(TBox* tbox) {
 				if (subsumer_1 != subsumer_2 && subsumer_1 != object_property_expression && subsumer_2 != object_property_expression && IS_SUBSUMED_BY(subsumer_1, subsumer_2)) {
 					SET_REMOVE(subsumer_2, &(object_property_expression->subsumers));
 					list_remove(subsumer_2, &(object_property_expression->subsumer_list));
-					printf("remove ");
-					print_role((ObjectPropertyExpression*) subsumer_2);
-					printf(" from ");
-					print_role((ObjectPropertyExpression*) object_property_expression);
 				}
 				subsumer_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_2);
 			}
