@@ -160,7 +160,11 @@ void saturate_roles(TBox* tbox) {
 		composition = SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
 	}
 
-	// TODO: optimization via removing the redundant subsumers
+	// FIXME: commented out due to a bug.
+	// removes some of the required subsumers in addition to the redundant ones!
+
+	/*
+	// optimization via removing the redundant subsumers
 	// now remove the redundant subsumers
 
 	// push the object properties and chains to the stack
@@ -200,7 +204,7 @@ void saturate_roles(TBox* tbox) {
 		}
 		object_property_expression = (ObjectPropertyExpression*) pop(&scheduled_object_property_expressions);
 	}
-
+	*/
 
 }
 
