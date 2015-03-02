@@ -23,6 +23,7 @@
 #include "datatypes.h"
 #include "model.h"
 #include "limits.h"
+#include "utils.h"
 #include "../hashing/hash_table.h"
 #include "../hashing/hash_map.h"
 
@@ -70,6 +71,19 @@ void print_role(ObjectPropertyExpression* r) {
 }
 	
 void print_atomic_concept(Class* ac) {
+	// Check if the IRI is a prefixed name by splitting it at the ":"
+	/*
+	char* prefix_name = strtok(ac->IRI, ":");
+	char* prefix;
+	if (prefix_name != NULL) {
+		if ((prefix = GET_PREFIX(prefix_name, kb)) != NULL)
+			printf("%s%s ", prefix, ac->IRI);
+		else
+		printf("%s ", ac->IRI);
+	}
+	else
+		printf("%s ", ac->IRI);
+	 */
 	printf("%s ", ac->IRI);
 }
 
@@ -167,8 +181,8 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 
 	// the prefixes
 	int i;
-	for (i = 0; i < kb->prefix_count; ++i)
-		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", kb->prefix_names_list[i], kb->prefix_list[i]);
+	for (i = 0; i < kb->prefix_names.size; ++i)
+		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", (char*) kb->prefix_names.elements[i], (char*) GET_PREFIX((char*) kb->prefix_names.elements[i], kb));
 
 	// the ontology tag
 	fprintf(taxonomy_fp, "\nOntology(\n");
@@ -227,8 +241,8 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 
 	// the prefixes
 	int i;
-	for (i = 0; i < kb->prefix_count; ++i)
-		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", kb->prefix_names_list[i], kb->prefix_list[i]);
+	for (i = 0; i < kb->prefix_names.size; ++i)
+		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", (char*) kb->prefix_names.elements[i], (char*) GET_PREFIX((char*) kb->prefix_names.elements[i], kb));
 
 	// the ontology tag
 	fprintf(taxonomy_fp, "\nOntology(\n");

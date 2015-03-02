@@ -375,13 +375,15 @@ enum reasoning_task {
 struct knowledge_base {
 	TBox* tbox;
 	ABox* abox;
+
 	// flag for inconsistency
 	char inconsistent;
-	// KeyValueHashTable* prefixes;
-	int prefix_count;
-	char** prefix_names_list;
-	char** prefix_list;
 
+	// List for the prefix names
+	List prefix_names;
+	// Map for prefixes.
+	// Key: prefix name, Value: prefix
+	Map prefixes;
 
 	// The list of subclass axioms that result from converting syntactic
 	// shortcuts (disjointness axioms, etc.) to subclass axioms. They are generated in preprocessing.

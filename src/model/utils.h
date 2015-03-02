@@ -27,6 +27,12 @@
 #include "../utils/map.h"
 #include "datatypes.h"
 
+// returns the prefix with the given prefix name
+#define GET_PREFIX(prefix_name, kb)				MAP_GET(hash_string(prefix_name), &(kb->prefixes))
+
+// inserts the prefix with the given prefix name into the prefixes hash
+#define PUT_PREFIX(prefix_name, prefix, kb)		MAP_PUT(hash_string(prefix_name), prefix, &(kb->prefixes))
+
 // returns the atomic concept with the given name if it exists
 // NULL if it does not exist
 #define GET_ATOMIC_CONCEPT(IRI, tbox)		MAP_GET(hash_string(IRI), &(tbox->classes))

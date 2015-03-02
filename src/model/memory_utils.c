@@ -330,23 +330,10 @@ int free_kb(KB* kb) {
 	total_freed_bytes += free_key_value_hash_table(kb->prefixes);
 	*/
 
-	// iterate through the prefixes and prefix names list,
-	// free each of them
+	// free the prefixes hash
+	MAP_RESET(&(kb->prefixes));
+
 	int i;
-	for (i = 0; i < kb->prefix_count; ++i) {
-		total_freed_bytes += strlen(kb->prefix_names_list[i]);
-		free(kb->prefix_names_list[i]);
-		total_freed_bytes += strlen(kb->prefix_list[i]);
-		free(kb->prefix_list[i]);
-	}
-	// free the list of prefix names
-	free(kb->prefix_names_list);
-	total_freed_bytes += kb->prefix_count * sizeof(char*);
-
-	// free the list of prefixes
-	free(kb->prefix_list);
-	total_freed_bytes += kb->prefix_count * sizeof(char*);
-
 	// free the generated subclass axioms
 	for (i = 0; i < kb->generated_subclass_axiom_count; ++i)
 		free(kb->generated_subclass_axioms[i]);

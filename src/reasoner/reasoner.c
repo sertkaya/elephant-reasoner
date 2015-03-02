@@ -110,10 +110,8 @@ KB* init_kb() {
 
 	kb->inconsistent = 0;
 
-	// kb->prefixes = create_key_value_hash_table(DEFAULT_PREFIXES_HASH_SIZE);
-	kb->prefix_count = 0;
-	kb->prefix_names_list = NULL;
-	kb->prefix_list = NULL;
+	LIST_INIT(&(kb->prefix_names));
+	MAP_INIT(&(kb->prefixes), DEFAULT_PREFIXES_HASH_SIZE);
 
 	// init the generated axioms, nominals and exists restrictions
 	kb->generated_exists_restriction_count = 0;

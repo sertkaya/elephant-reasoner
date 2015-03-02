@@ -29,28 +29,12 @@
 #include "limits.h"
 
 // create ontology prefix if it does not already exist
-/*
 void create_prefix(char* prefix_name, char* prefix, KB* kb) {
 	if (GET_PREFIX((unsigned char*) prefix_name, kb) != NULL)
 		return;
 
+	list_add(prefix_name, &(kb->prefix_names));
 	PUT_PREFIX((unsigned char*) prefix_name, prefix, kb);
-}
-*/
-void create_prefix(char* prefix_name, char* prefix, KB* kb) {
-	char **tmp;
-
-	++kb->prefix_count;
-
-	tmp = realloc(kb->prefix_names_list, kb->prefix_count * sizeof(char*));
-	assert(tmp != NULL);
-	kb->prefix_names_list = tmp;
-	kb->prefix_names_list[kb->prefix_count - 1] = prefix_name;
-
-	tmp = realloc(kb->prefix_list, kb->prefix_count * sizeof(char*));
-	assert(tmp != NULL);
-	kb->prefix_list = tmp;
-	kb->prefix_list[kb->prefix_count - 1] = prefix;
 }
 
 /******************************************************************************
