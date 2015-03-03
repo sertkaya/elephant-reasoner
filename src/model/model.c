@@ -30,11 +30,11 @@
 
 // create ontology prefix if it does not already exist
 void create_prefix(char* prefix_name, char* prefix, KB* kb) {
-	if (GET_PREFIX((unsigned char*) prefix_name, kb) != NULL)
+	if (GET_ONTOLOGY_PREFIX(prefix_name, kb) != NULL)
 		return;
 
 	list_add(prefix_name, &(kb->prefix_names));
-	PUT_PREFIX((unsigned char*) prefix_name, prefix, kb);
+	PUT_ONTOLOGY_PREFIX(prefix_name, prefix, kb);
 }
 
 /******************************************************************************

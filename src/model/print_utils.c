@@ -72,7 +72,7 @@ char* class_to_string(KB* kb, Class* class) {
 	char* prefix_name = strtok(class->IRI, ":");
 	char* prefix;
 	if (prefix_name != NULL)
-		if ((prefix = GET_PREFIX(prefix_name, kb)) != NULL) {
+		if ((prefix = GET_ONTOLOGY_PREFIX(prefix_name, kb)) != NULL) {
 			int size = strlen(prefix) + strlen(class->IRI);
 			str = calloc(1, size);
 			assert(str != NULL);
@@ -124,7 +124,7 @@ char* object_one_of_to_string(KB* kb, ObjectOneOf* nominal) {
 	char* prefix_name = strtok(nominal->individual->IRI, ":");
 	char* prefix;
 	if (prefix_name != NULL)
-		if ((prefix = GET_PREFIX(prefix_name, kb)) != NULL) {
+		if ((prefix = GET_ONTOLOGY_PREFIX(prefix_name, kb)) != NULL) {
 			int size = strlen(prefix) + strlen(nominal->individual->IRI) + 2 /* for the curly braces */;
 			str = calloc(1, size);
 			assert(str != NULL);
@@ -146,7 +146,7 @@ char* object_property_to_string(KB* kb, ObjectProperty* object_property) {
 	char* prefix_name = strtok(object_property->IRI, ":");
 	char* prefix;
 	if (prefix_name != NULL)
-		if ((prefix = GET_PREFIX(prefix_name, kb)) != NULL) {
+		if ((prefix = GET_ONTOLOGY_PREFIX(prefix_name, kb)) != NULL) {
 			int size = strlen(prefix) + strlen(object_property->IRI);
 			str = calloc(1, size);
 			assert(str != NULL);
@@ -240,7 +240,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	// the prefixes
 	int i;
 	for (i = 0; i < kb->prefix_names.size; ++i)
-		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", (char*) kb->prefix_names.elements[i], (char*) GET_PREFIX((char*) kb->prefix_names.elements[i], kb));
+		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", (char*) kb->prefix_names.elements[i], (char*) GET_ONTOLOGY_PREFIX((char*) kb->prefix_names.elements[i], kb));
 
 	// the ontology tag
 	fprintf(taxonomy_fp, "\nOntology(\n");
@@ -319,7 +319,7 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 	// the prefixes
 	int i;
 	for (i = 0; i < kb->prefix_names.size; ++i)
-		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", (char*) kb->prefix_names.elements[i], (char*) GET_PREFIX((char*) kb->prefix_names.elements[i], kb));
+		fprintf(taxonomy_fp, "Prefix(%s=%s)\n", (char*) kb->prefix_names.elements[i], (char*) GET_ONTOLOGY_PREFIX((char*) kb->prefix_names.elements[i], kb));
 
 	// the ontology tag
 	fprintf(taxonomy_fp, "\nOntology(\n");

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <stdint.h>
+
 #ifndef HASHING_UTILS_H_
 #define HASHING_UTILS_H_
 
