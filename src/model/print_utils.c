@@ -19,6 +19,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 
 #include "datatypes.h"
 #include "model.h"
@@ -28,152 +30,208 @@
 #include "../hashing/hash_map.h"
 
 
-void print_atomic_concept(Class* ac);
-void print_exists(ObjectSomeValuesFrom* exists);
-void print_conjunction(ObjectIntersectionOf* conjunction);
-void print_nominal(ObjectOneOf* n);
+char* class_to_string(KB* kb, Class* class);
+char* object_some_values_from_to_string(KB* kb, ObjectSomeValuesFrom* obj_some_values);
+char* object_intersection_of_to_string(KB* kb, ObjectIntersectionOf* obj_intersection_of);
+char* object_one_of_to_string(KB* kb, ObjectOneOf* nominal);
 
-void print_atomic_role(ObjectProperty* ar);
-void print_role_composition(ObjectPropertyChain* rc);
+char* object_property_to_string(KB* kb, ObjectProperty* object_property);
+char* object_property_chain_to_string(KB* kb, ObjectPropertyChain* rc);
 
-void print_concept(ClassExpression* c) {
+char* class_expression_to_string(KB* kb, ClassExpression* c) {
 	switch (c->type) {
 		case CLASS_TYPE:
-			print_atomic_concept(&(c->description.atomic));
-			break;
+			return class_to_string(kb, &(c->description.atomic));
 		case OBJECT_SOME_VALUES_FROM_TYPE:
-			print_exists(&(c->description.exists));
-			break;
+			return object_some_values_from_to_string(kb, &(c->description.exists));
 		case OBJECT_INTERSECTION_OF_TYPE:
-			print_conjunction(&(c->description.conj));
-			break;
+			return object_intersection_of_to_string(kb, &(c->description.conj));
 		case OBJECT_ONE_OF_TYPE:
-			print_nominal(&(c->description.nominal));
-			break;
+			return object_one_of_to_string(kb, &(c->description.nominal));
 		default:
-			fprintf(stderr,"unknown concept type, aborting\n");
+			fprintf(stderr,"unknown class expression type, aborting\n");
 			exit(-1);
 	}
 }
 
-void print_role(ObjectPropertyExpression* r) {
+char* object_property_expression_to_string(KB* kb, ObjectPropertyExpression* r) {
 	switch (r->type) {
 		case OBJECT_PROPERTY_TYPE:
-			print_atomic_role(&(r->description.atomic));
-			break;
+			return object_property_to_string(kb, &(r->description.atomic));
 		case OBJECT_PROPERTY_CHAIN_TYPE:
-			print_role_composition(&(r->description.object_property_chain));
-			break;
+			return object_property_chain_to_string(kb, &(r->description.object_property_chain));
 		default:
-			fprintf(stderr,"unknown role type, aborting\n");
+			fprintf(stderr,"unknown object property expression type, aborting\n");
 			exit(-1);
 	}
 }
 	
-void print_atomic_concept(Class* ac) {
-	// Check if the IRI is a prefixed name by splitting it at the ":"
-	/*
-	char* prefix_name = strtok(ac->IRI, ":");
+char* class_to_string(KB* kb, Class* class) {
+	char* str;
+	// Check if the IRI is a prefixed name (split it at the ":")
+	char* prefix_name = strtok(class->IRI, ":");
 	char* prefix;
-	if (prefix_name != NULL) {
-		if ((prefix = GET_PREFIX(prefix_name, kb)) != NULL)
-			printf("%s%s ", prefix, ac->IRI);
-		else
-		printf("%s ", ac->IRI);
-	}
-	else
-		printf("%s ", ac->IRI);
-	 */
-	printf("%s ", ac->IRI);
+	if (prefix_name != NULL)
+		if ((prefix = GET_PREFIX(prefix_name, kb)) != NULL) {
+			int size = strlen(prefix) + strlen(class->IRI);
+			str = calloc(1, size);
+			assert(str != NULL);
+			snprintf(str, size, "%s%s", prefix, class->IRI);
+
+			return str;
+		}
+	// it is not a prefixed name
+	str = calloc(1, strlen(class->IRI));
+	assert(str != NULL);
+	snprintf(str, strlen(class->IRI), "%s", class->IRI);
+
+	return str;
 }
 
-void print_exists(ObjectSomeValuesFrom* ex) {
-	printf("(Some ");
-	print_role(ex->role);
-	print_concept(ex->filler);
-	printf(")");
+char* object_some_values_from_to_string(KB* kb, ObjectSomeValuesFrom* ex) {
+	char* str;
+
+	char* object_property_str = object_property_expression_to_string(kb, ex->role);
+	char* class_expression_str = class_expression_to_string(kb, ex->filler);
+	int size = strlen("(ObjectSomeValuesFrom ") + strlen(object_property_str) + 1 /* for the space */ + strlen(class_expression_str) + 1 /* for the parenthesis*/;
+	str = calloc(1, size);
+	assert(str != NULL);
+	snprintf(str, size, "(ObjectSomeValuesFrom %s %s)", object_property_str, class_expression_str);
+	free(object_property_str);
+	free(class_expression_str);
+
+	return str;
 }
 
-void print_conjunction(ObjectIntersectionOf* conj) {
-	printf("(And  ");
-	print_concept(conj->conjunct1);
-	printf("  ");
-	print_concept(conj->conjunct2);
-	printf(")\n");
+char* object_intersection_of_to_string(KB* kb, ObjectIntersectionOf* obj_int) {
+	char* str;
+
+	char* conjunct_1_str = class_expression_to_string(kb, obj_int->conjunct1);
+	char* conjunct_2_str = class_expression_to_string(kb, obj_int->conjunct2);
+	int size = strlen("(ObjectIntersectionOf ") + strlen(conjunct_1_str) + 1 /* for the space */ + strlen(conjunct_2_str) + 1 /* for the parenthesis*/;
+	str = calloc(1, size);
+	assert(str != NULL);
+	snprintf(str, size, "(ObjectIntersectionOf %s %s)", conjunct_1_str, conjunct_2_str);
+	free(conjunct_1_str);
+	free(conjunct_2_str);
+
+	return str;
 }
 
-void print_nominal(ObjectOneOf* n) {
-	printf("{%s} ", n->individual->IRI);
+char* object_one_of_to_string(KB* kb, ObjectOneOf* nominal) {
+	char* str;
+	// Check if the IRI is a prefixed name (split it at the ":")
+	char* prefix_name = strtok(nominal->individual->IRI, ":");
+	char* prefix;
+	if (prefix_name != NULL)
+		if ((prefix = GET_PREFIX(prefix_name, kb)) != NULL) {
+			int size = strlen(prefix) + strlen(nominal->individual->IRI) + 2 /* for the curly braces */;
+			str = calloc(1, size);
+			assert(str != NULL);
+			snprintf(str, size, "{%s%s}", prefix, nominal->individual->IRI);
+
+			return str;
+		}
+	// it is not a prefixed name
+	str = calloc(1, strlen(nominal->individual->IRI)) + 2 /* for the curly braces */;
+	assert(str != NULL);
+	snprintf(str, strlen(nominal->individual->IRI), "{%s}", nominal->individual->IRI);
+
+	return str;
 }
 
-void print_conjunctions(TBox* tbox) {
+char* object_property_to_string(KB* kb, ObjectProperty* object_property) {
+	char* str;
+	// Check if the IRI is a prefixed name (split it at the ":")
+	char* prefix_name = strtok(object_property->IRI, ":");
+	char* prefix;
+	if (prefix_name != NULL)
+		if ((prefix = GET_PREFIX(prefix_name, kb)) != NULL) {
+			int size = strlen(prefix) + strlen(object_property->IRI);
+			str = calloc(1, size);
+			assert(str != NULL);
+			snprintf(str, size, "%s%s", prefix, object_property->IRI);
 
-	MapIterator map_it;
-	MAP_ITERATOR_INIT(&map_it, &(tbox->object_intersection_of_exps));
-	void* map_element = MAP_ITERATOR_NEXT(&map_it);
-	while (map_element) {
-		print_conjunction(&(((ClassExpression*) map_element)->description.conj));
-		map_element = MAP_ITERATOR_NEXT(&map_it);
-	}
+			return str;
+		}
+	// it is not a prefixed name
+	str = calloc(1, strlen(object_property->IRI));
+	assert(str != NULL);
+	snprintf(str, strlen(object_property->IRI), "%s", object_property->IRI);
+
+	return str;
 }
 
-void print_atomic_role(ObjectProperty* ar) {
-	printf("%s ", ar->IRI);
+char* object_property_chain_to_string(KB* kb, ObjectPropertyChain* rc) {
+	char* str;
+
+	char* obj_prop_expr_1_str = object_property_expression_to_string(kb, rc->role1);
+	char* obj_prop_expr_2_str = object_property_expression_to_string(kb, rc->role2);
+	int size = strlen("(ObjectPropertyChain ") + strlen(obj_prop_expr_1_str) + 1 /* for the space */ + strlen(obj_prop_expr_2_str) + 1 /* for the parenthesis*/;
+	str = calloc(1, size);
+	assert(str != NULL);
+	snprintf(str, size, "(ObjectPropertyChain %s %s)", obj_prop_expr_1_str, obj_prop_expr_2_str);
+	free(obj_prop_expr_1_str);
+	free(obj_prop_expr_2_str);
+
+	return str;
 }
 
-void print_role_composition(ObjectPropertyChain* rc) {
-	printf("ObjectPropertyChain( ");
-	print_role(rc->role1);
-	printf(" ");
-	print_role(rc->role2);
-	printf(")\n");
+char* subclass_of_axiom_to_string(KB* kb, SubClassOfAxiom* sc_ax) {
+	char* str;
+
+	char* class_exp_1_str = class_expression_to_string(kb, sc_ax->lhs);
+	char* class_exp_2_str = class_expression_to_string(kb, sc_ax->rhs);
+	int size = strlen("(SubClassOf ") + strlen(class_exp_1_str) + 1 /* for the space */ + strlen(class_exp_2_str) + 1 /* for the parenthesis*/;
+	str = calloc(1, size);
+	assert(str != NULL);
+	snprintf(str, size, "(SubClassOf %s %s)", class_exp_1_str, class_exp_2_str);
+	free(class_exp_1_str);
+	free(class_exp_2_str);
+
+	return str;
 }
 
-void print_subclass_axiom(SubClassOfAxiom* sc_ax) {
-	printf("(SubClassOf ");
-	print_concept(sc_ax->lhs);
-	printf(" ");
-	print_concept(sc_ax->rhs);
-	printf(")\n");
+char* equivalent_classes_axiom_to_string(KB* kb, EquivalentClassesAxiom* ec_ax) {
+	char* str;
+
+	char* class_exp_1_str = class_expression_to_string(kb, ec_ax->lhs);
+	char* class_exp_2_str = class_expression_to_string(kb, ec_ax->rhs);
+	int size = strlen("(EquivalentClasses ") + strlen(class_exp_1_str) + 1 /* for the space */ + strlen(class_exp_2_str) + 1 /* for the parenthesis*/;
+	str = calloc(1, size);
+	assert(str != NULL);
+	snprintf(str, size, "(EquivalentClasses %s %s)", class_exp_1_str, class_exp_2_str);
+	free(class_exp_1_str);
+	free(class_exp_2_str);
+
+	return str;
 }
 
-void print_eqclass_axiom(EquivalentClassesAxiom* ec_ax) {
-	printf("(EquivalentClasses ");
-	print_concept(ec_ax->lhs);
-	printf(" ");
-	print_concept(ec_ax->rhs);
-	printf(")\n");
+char* sub_object_property_axiom_to_string(KB* kb, SubObjectPropertyOfAxiom* sub_obj_prop_ax) {
+	char* str;
+
+	char* obj_prop_exp_1_str = object_property_expression_to_string(kb, sub_obj_prop_ax->lhs);
+	char* obj_prop_exp_2_str = object_property_expression_to_string(kb, sub_obj_prop_ax->rhs);
+	int size = strlen("(SubObjectPropertyOf ") + strlen(obj_prop_exp_1_str) + 1 /* for the space */ + strlen(obj_prop_exp_2_str) + 1 /* for the parenthesis*/;
+	str = calloc(1, size);
+	assert(str != NULL);
+	snprintf(str, size, "(SubObjectPropertyOf %s %s)", obj_prop_exp_1_str, obj_prop_exp_2_str);
+	free(obj_prop_exp_1_str);
+	free(obj_prop_exp_2_str);
+
+	return str;
 }
 
-// TODO
-void print_subrole_axiom(SubObjectPropertyOfAxiom* subrole_ax) {
-	printf("(SubObjectPropertyOf ");
-	// print_role(subrole_ax->lhs);
-	printf(", ");
-	// print_role(subrole_ax->rhs);
-	// printf("%d",subrole_ax->rhs);
-	printf(")\n");
-}
-
-void print_tbox(TBox* tbox) {
+void print_tbox(KB* kb) {
 	SetIterator it;
-	SET_ITERATOR_INIT(&it, &(tbox->subclass_of_axioms));
-	void* ax = SET_ITERATOR_NEXT(&it);
+	SET_ITERATOR_INIT(&it, &(kb->tbox->subclass_of_axioms));
+	SubClassOfAxiom* ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&it);
+	char* ax_str;
 	while (ax) {
-		print_subclass_axiom((SubClassOfAxiom*) ax);
+		ax_str = subclass_of_axiom_to_string(kb, ax);
+		printf("%s\n", ax_str);
+		free(ax_str);
 		ax = SET_ITERATOR_NEXT(&it);
-	}
-}
-
-void print_direct_subsumers(TBox* tbox, ClassExpression* c, FILE* taxonomy_fp) {
-	SetIterator direct_subsumers_iterator;
-	SET_ITERATOR_INIT(&direct_subsumers_iterator, &(c->description.atomic.direct_subsumers));
-	void* direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
-
-	while (direct_subsumer != NULL) {
-		fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", c->description.atomic.IRI,
-				((ClassExpression*) direct_subsumer)->description.atomic.IRI);
-		direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 	}
 }
 
@@ -189,43 +247,62 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 
 
 	if (kb->inconsistent) {
-		fprintf(taxonomy_fp, "EquivalentClasses(owl:Thing owl:Nothing)\n");
+		char* thing_str = class_expression_to_string(kb, kb->tbox->top_concept);
+		char* nothing_str = class_expression_to_string(kb, kb->tbox->bottom_concept);
+		fprintf(taxonomy_fp, "EquivalentClasses(%s %s)\n", thing_str, nothing_str);
+		free(thing_str);
+		free(nothing_str);
 		// the closing parentheses for the ontology tag
 		fprintf(taxonomy_fp, ")\n");
 		return;
 	}
 
 	// for keeping track of already printed equivalence classes
-	Set* printed = SET_CREATE(10);
+	Set* printed = SET_CREATE(16);
 
 	MapIterator map_it;
 	SetIterator equivalent_classes_iterator;
 	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
-	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
+	ClassExpression* atomic_concept = (ClassExpression*) MAP_ITERATOR_NEXT(&map_it);
+	char* atomic_concept_str;
+	SetIterator direct_subsumers_iterator;
 	while (atomic_concept) {
-		// print_equivalent_concepts((Concept*) *pvalue, taxonomy_fp);
 		// check if the equivalence class is already printed
-		if (!SET_CONTAINS(((ClassExpression*) atomic_concept), printed)) {
+		if (!SET_CONTAINS(atomic_concept, printed)) {
 			// do not print the direct subsumers of bottom
-			if ((ClassExpression*) atomic_concept != kb->tbox->bottom_concept)
-				print_direct_subsumers(kb->tbox, (ClassExpression*) atomic_concept, taxonomy_fp);
+			if (atomic_concept != kb->tbox->bottom_concept) {
+				// iterate over the direct subsumers and print them
+				SET_ITERATOR_INIT(&direct_subsumers_iterator, &(atomic_concept->description.atomic.direct_subsumers));
+				ClassExpression* direct_subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&direct_subsumers_iterator);
+				atomic_concept_str = class_expression_to_string(kb, atomic_concept);
+				char* direct_subsumer_str;
+				while (direct_subsumer != NULL) {
+					direct_subsumer_str = class_expression_to_string(kb, direct_subsumer);
+					fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", atomic_concept_str, direct_subsumer_str);
+					free(direct_subsumer_str);
+					direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
+				}
+			}
 
-			char printing_equivalents = 0;
-			if (((ClassExpression*) atomic_concept)->description.atomic.equivalent_classes.element_count > 0) {
-				fprintf(taxonomy_fp, "EquivalentClasses(%s", ((ClassExpression*) atomic_concept)->description.atomic.IRI);
-				printing_equivalents = 1;
-			}
-			SET_ITERATOR_INIT(&equivalent_classes_iterator, &(((ClassExpression*) atomic_concept)->description.atomic.equivalent_classes));
-			ClassExpression* equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
-			while (equivalent_class != NULL) {
-				// mark the concepts in the equivalent classes as already printed
-				SET_ADD(equivalent_class, printed);
-				// now print it
-				fprintf(taxonomy_fp, " %s", equivalent_class->description.atomic.IRI);
-				equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
-			}
-			if (printing_equivalents)
+			// print the equivalent classes
+			if (atomic_concept->description.atomic.equivalent_classes.element_count > 0) {
+				fprintf(taxonomy_fp, "EquivalentClasses(%s", atomic_concept_str);
+
+				SET_ITERATOR_INIT(&equivalent_classes_iterator, &(atomic_concept->description.atomic.equivalent_classes));
+				ClassExpression* equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
+				char* equivalent_class_str;
+				while (equivalent_class != NULL) {
+					// mark the concepts in the equivalent classes as already printed
+					SET_ADD(equivalent_class, printed);
+					// now print it
+					equivalent_class_str = class_expression_to_string(kb, equivalent_class);
+					fprintf(taxonomy_fp, " %s", equivalent_class_str);
+					free(equivalent_class_str);
+					equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
+				}
 				fprintf(taxonomy_fp, ")\n");
+			}
+			free(atomic_concept_str);
 		}
 		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	}
@@ -248,38 +325,38 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 	fprintf(taxonomy_fp, "\nOntology(\n");
 
 	if (kb->inconsistent) {
-		fprintf(taxonomy_fp, "EquivalentClasses(owl:Thing owl:Nothing)\n");
+		char* thing_str = class_expression_to_string(kb, kb->tbox->top_concept);
+		char* nothing_str = class_expression_to_string(kb, kb->tbox->bottom_concept);
+		fprintf(taxonomy_fp, "EquivalentClasses(%s %s)\n", thing_str, nothing_str);
+		free(thing_str);
+		free(nothing_str);
 		// the closing parentheses for the ontology tag
 		fprintf(taxonomy_fp, ")\n");
 		return;
 	}
 
+
 	// Traverse the hash of nominals that are generated during preprocessing.
-	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);
-	ClassExpression* nominal = NULL;
+	MapIterator iterator;
+	MAP_ITERATOR_INIT(&iterator, &(kb->generated_nominals));
+	ClassExpression* nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 	SetIterator subsumers_iterator;
-	while (node) {
-		nominal = (ClassExpression*) node->value;
-
-
+	char* nominal_str;
+	while (nominal) {
 		SET_ITERATOR_INIT(&subsumers_iterator, &(nominal->subsumers));
 		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+		char* subsumer_str;
+		nominal_str = class_expression_to_string(kb, nominal);
 		while (subsumer != NULL) {
-			if (subsumer->type == CLASS_TYPE)
-				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n",
-						subsumer->description.atomic.IRI,
-						nominal->description.nominal.individual->IRI);
+			if (subsumer->type == CLASS_TYPE) {
+				subsumer_str = class_expression_to_string(kb, subsumer);
+				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n", subsumer_str, nominal_str);
+				free(subsumer_str);
+			}
 			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 		}
-
-		/*
-		for (i = 0; i < nominal->subsumer_count; ++i)
-			if (nominal->subsumer_list[i]->type == ATOMIC_CONCEPT)
-				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n",
-						nominal->subsumer_list[i]->description.atomic->name,
-						nominal->description.nominal->individual->name);
-		*/
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+		free(nominal_str);
+		nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 	}
 
 	// the closing parentheses for the ontology tag

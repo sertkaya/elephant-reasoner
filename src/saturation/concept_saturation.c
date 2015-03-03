@@ -95,15 +95,14 @@ char saturate_concepts(KB* kb) {
 		class = MAP_ITERATOR_NEXT(&iterator);
 	}
 
-	// Traverse the hash of nominals that are generated during preprocessing.
-	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);
-	ClassExpression* nominal = NULL;
+	// Traverse the map of nominals that are generated during preprocessing.
+	MAP_ITERATOR_INIT(&iterator, &(kb->generated_nominals));
+	ClassExpression* nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 	// The input axioms generated from concept and role assertions
-	while (node) {
-		nominal = (ClassExpression*) node->value;
+	while (nominal) {
 		for (j = 0; j < nominal->told_subsumers.size; ++j)
 			push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal->told_subsumers.elements[j], NULL, SUBSUMPTION_INITIALIZATION));
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+		nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 	}
 
 	ax = pop(&scheduled_axioms);

@@ -116,7 +116,7 @@ KB* init_kb() {
 	// init the generated axioms, nominals and exists restrictions
 	kb->generated_exists_restriction_count = 0;
 	kb->generated_exists_restrictions = hash_map_create(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
-	kb->generated_nominals = hash_map_create(DEFAULT_NOMINALS_HASH_SIZE);
+	MAP_INIT(&(kb->generated_nominals), DEFAULT_NOMINALS_HASH_SIZE);
 	kb->generated_subclass_axiom_count = 0;
 	kb->generated_subclass_axioms = NULL;
 	kb->generated_subrole_axiom_count = 0;

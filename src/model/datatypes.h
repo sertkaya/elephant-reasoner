@@ -395,7 +395,7 @@ struct knowledge_base {
 	int generated_subrole_axiom_count;
 
 	// The hash of nominals that are generated during preprocessing.
-	HashMap* generated_nominals;
+	Map generated_nominals;
 
 	// The hash of existential restrictions that are generated during preprocessing.
 	// They are generated from preprocessing role assertions.

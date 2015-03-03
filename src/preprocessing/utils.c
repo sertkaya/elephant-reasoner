@@ -24,7 +24,6 @@
 
 #include "../model/datatypes.h"
 #include "../model/limits.h"
-#include "../hashing/hash_map.h"
 #include "../hashing/utils.h"
 
 /*
@@ -76,7 +75,7 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 	ClassExpression* c;
 
 	// check if the nominal with this individual already exists
-	if ((c = hash_map_get(kb->generated_nominals, ind->id)) != NULL)
+	if ((c = MAP_GET(ind->id, &(kb->generated_nominals))) != NULL)
 		return c;
 
 	// if a nominal with the individual does not already exist, create it
@@ -108,7 +107,7 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 	LIST_INIT(&(c->second_conjunct_of_list));
 	c->second_conjunct_of = NULL;
 
-	hash_map_put(kb->generated_nominals, ind->id, c);
+	MAP_PUT(ind->id, c, &(kb->generated_nominals));
 
 	return c;
 }

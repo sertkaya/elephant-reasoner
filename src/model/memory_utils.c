@@ -25,7 +25,6 @@
 #include "limits.h"
 #include "../utils/set.h"
 #include "../utils/map.h"
-#include "../hashing/hash_map.h"
 
 
 
@@ -318,22 +317,29 @@ int free_kb(KB* kb) {
 	total_freed_bytes += free_tbox(kb->tbox);
 	total_freed_bytes += free_abox(kb->abox);
 
-	/*
-	// iterate over the prefixes hash, free the prefixes
-	Node* node = last_node(kb->prefixes);
-	while (node) {
-		total_freed_bytes += strlen((char*) node->value);
-		free((char*) node->value);
-		node = previous_node(node);
-	}
-	// free the prefixes hash
-	total_freed_bytes += free_key_value_hash_table(kb->prefixes);
-	*/
-
-	// free the prefixes hash
-	MAP_RESET(&(kb->prefixes));
-
+	// free the prefix names
 	int i;
+	for (i = 0; i < kb->prefix_names.size; ++i) {
+		total_freed_bytes += sizeof(char) * strlen(kb->prefix_names.elements[i]);
+		free(kb->prefix_names.elements[i]);
+	}
+	total_freed_bytes += list_reset(&kb->prefix_names);
+
+	// free the prefixes
+	MapIterator map_iterator;
+	void* map_element;
+
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->prefixes));
+	map_element = MAP_ITERATOR_NEXT(&map_iterator);
+	while (map_element) {
+		// the value is prefix (char*), free it
+		total_freed_bytes += sizeof(char) * strlen((char*) map_element);
+		free(map_element);
+		map_element = MAP_ITERATOR_NEXT(&map_iterator);
+	}
+	// free the prefixes map
+	total_freed_bytes += MAP_RESET(&(kb->prefixes));
+
 	// free the generated subclass axioms
 	for (i = 0; i < kb->generated_subclass_axiom_count; ++i)
 		free(kb->generated_subclass_axioms[i]);
@@ -349,16 +355,17 @@ int free_kb(KB* kb) {
 	total_freed_bytes += sizeof(SubObjectPropertyOfAxiom*) * kb->generated_subrole_axiom_count;
 
 	// iterate over the generated nominals hash, free the nominals
-	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_nominals);
-	while (node) {
-		total_freed_bytes += free_concept((ClassExpression*) node->value, kb->tbox);
-		node = HASH_MAP_PREVIOUS_ELEMENT(node);
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->generated_nominals));
+	map_element = MAP_ITERATOR_NEXT(&map_iterator);
+	while (map_element) {
+		total_freed_bytes += free_concept((ClassExpression*) map_element, kb->tbox);
+		map_element = MAP_ITERATOR_NEXT(&map_iterator);
 	}
-	// free the generated nominals hash
-	total_freed_bytes += hash_map_free(kb->generated_nominals);
+	// free the generated nominals map
+	total_freed_bytes += MAP_RESET(&(kb->generated_nominals));
 
 	// iterate over the generated existential restrictions hash, free them
-	node = HASH_MAP_LAST_ELEMENT(kb->generated_exists_restrictions);
+	HashMapElement* node = HASH_MAP_LAST_ELEMENT(kb->generated_exists_restrictions);
 	while (node) {
 		total_freed_bytes += free_concept((ClassExpression*) node->value, kb->tbox);
 		node = HASH_MAP_PREVIOUS_ELEMENT(node);

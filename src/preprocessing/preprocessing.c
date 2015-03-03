@@ -28,10 +28,6 @@
 void preprocess_tbox(KB* kb) {
 	TBox* tbox = kb->tbox;
 
-	// Initialize the hash of generated nominals
-	// TODO: think about the size. maybe take the number of individuals?
-	kb->generated_nominals = hash_map_create(DEFAULT_NOMINALS_HASH_SIZE);
-
 	// Initialize the hash of existential restrictions that are generated as a result of
 	// translating role assertions.
 	// TODO: think about the size. maybe take the number of target individuals?
