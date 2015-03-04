@@ -68,20 +68,47 @@ char* object_property_expression_to_string(KB* kb, ObjectPropertyExpression* r) 
 	
 char* class_to_string(KB* kb, Class* class) {
 	char* str;
-	// Check if the IRI is a prefixed name (split it at the ":")
-	char* prefix_name = strtok(class->IRI, ":");
-	char* prefix;
-	if (prefix_name != NULL)
-		if ((prefix = GET_ONTOLOGY_PREFIX(prefix_name, kb)) != NULL) {
-			int size = strlen(prefix) + strlen(class->IRI);
-			str = calloc(1, size);
-			assert(str != NULL);
-			snprintf(str, size, "%s%s", prefix, class->IRI);
 
-			return str;
+	// Check if the IRI is a prefixed name (search for a ":")
+	int index = 0;
+	for (index = 0; class->IRI[index] != ':' && class->IRI[index] != '\0'; ++index);
+
+	if (class->IRI[index] == '\0') {
+		// The IRI does not have a prefix, just return it
+		str = calloc(1, sizeof(char) * (index + 1 + 1/* for the '\0' character */));
+		assert(str != NULL);
+		snprintf(str, index + 1, "%s", class->IRI);
+
+		return str;
+	}
+
+	// The IRI has a prefix
+	char* prefix = NULL;
+	char* prefix_name = calloc(1, sizeof(char) * (index + 1 /* for the ':' */ + 1 /* for the '\0' character */));
+	assert(prefix_name != NULL);
+	strncpy(prefix_name, class->IRI, index + 1);
+
+	if ((prefix = GET_ONTOLOGY_PREFIX(prefix_name, kb)) != NULL) {
+		int prefix_length = strlen(prefix);
+		str = calloc(1, sizeof(char) * (prefix_length + strlen(class->IRI) - index /* IRI without the prefix name + 1 for the '\0' */));
+		assert(str != NULL);
+		// copy the prefix
+		strncpy(str, prefix, prefix_length - 1 /* leave out the trailing > sign */);
+		// now copy the IRI without the prefix name (part after the ':')
+		int i;
+		for (i = 0; class->IRI[index + 1 + i] != '\0'; ++i) {
+			str[prefix_length - 1 + i] = class->IRI[index + 1 + i];
 		}
-	// it is not a prefixed name
-	str = calloc(1, strlen(class->IRI));
+		// append the '>'
+		str[prefix_length - 1 + i] = '>';
+		// append the '\0'
+		++i;
+		str[prefix_length - 1 + i] = '\0';
+
+		return str;
+	}
+	// it is a prefixed IRI but the prefix name is not found in the prefix names map, just return the IRI
+	str = calloc(1, sizeof (char) * (strlen(class->IRI) + 1));
 	assert(str != NULL);
 	snprintf(str, strlen(class->IRI), "%s", class->IRI);
 
