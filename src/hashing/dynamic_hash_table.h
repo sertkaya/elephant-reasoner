@@ -30,6 +30,7 @@ typedef struct dynamic_hash_table DynamicHashTable;
 typedef struct dynamic_hash_table_iterator DynamicHashTableIterator;
 
 #define HASH_TABLE_EMPTY_KEY		NULL
+#define HASH_TABLE_DELETED_KEY		((void*) -1)
 
 /**
  * Hash table.

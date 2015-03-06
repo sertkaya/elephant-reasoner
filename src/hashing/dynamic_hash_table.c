@@ -26,8 +26,8 @@
 #include "utils.h"
 
 /**
- * An dynamic hash table implementation for storing keys only, no associated values.
- * The allocate space is doubled once the load factor reaches 0.75.
+ * A dynamic hash table implementation for storing keys only, no associated values.
+ * The allocated space is doubled once the load factor reaches 0.75.
  * Uses open addressing with linear probing.
  * Keys cannot be NULL.
  * Allocated space is not shrunk after a removal.
@@ -81,7 +81,7 @@ inline char dynamic_hash_table_insert(void* key, DynamicHashTable* hash_table) {
 	int i, j, new_size;
 	size_t start_index;
 
-	assert(key != HASH_TABLE_EMPTY_KEY);
+	assert(key != HASH_TABLE_EMPTY_KEY && key != HASH_TABLE_DELETED_KEY);
 
 	start_index = HASH_POINTER(key) & (hash_table->size - 1);
 	for (i = start_index; ; i = (i + 1) & (hash_table->size - 1)) {
@@ -197,9 +197,7 @@ inline char dynamic_hash_table_remove(void* key, DynamicHashTable* hash_table) {
 	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key) {
 			// key found, mark it as empty
-			hash_table->elements[i] = HASH_TABLE_EMPTY_KEY;
-			// decrement the element count
-			--hash_table->element_count;
+			hash_table->elements[i] = HASH_TABLE_DELETED_KEY;
 			return 1;
 		}
 	}
@@ -228,7 +226,7 @@ inline void* dynamic_hash_table_iterator_next(DynamicHashTableIterator* iterator
 
 	int i;
 	for (i = iterator->current_index; i < iterator->hash_table->size; ++i)
-		if (iterator->hash_table->elements[i] != HASH_TABLE_EMPTY_KEY) {
+		if (iterator->hash_table->elements[i] != HASH_TABLE_EMPTY_KEY && iterator->hash_table->elements[i] != HASH_TABLE_DELETED_KEY) {
 			iterator->current_index = i + 1;
 			return iterator->hash_table->elements[i];
 		}
