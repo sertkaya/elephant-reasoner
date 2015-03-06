@@ -69,6 +69,17 @@ char* object_property_expression_to_string(KB* kb, ObjectPropertyExpression* r) 
 char* class_to_string(KB* kb, Class* class) {
 	char* str;
 
+	// Check of the IRI is a full IRI
+	if (class->IRI[0] == '<') {
+		// it is a full IRI, just return it
+		int iri_length = strlen(class->IRI);
+		str = calloc(1, sizeof(char) * (iri_length + 1/* for the '\0' character */));
+		assert(str != NULL);
+		snprintf(str, iri_length + 1, "%s", class->IRI);
+
+		return str;
+
+	}
 	// Check if the IRI is a prefixed name (search for a ":")
 	int index = 0;
 	for (index = 0; class->IRI[index] != ':' && class->IRI[index] != '\0'; ++index);
