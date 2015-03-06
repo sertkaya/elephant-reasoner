@@ -35,8 +35,18 @@ void compute_concept_hierarchy(TBox* tbox) {
 	MapIterator map_it;
 	SetIterator direct_subsumers_iterator;
 	SetIterator subsumers_iterator;
+
+	// Add the top class to the subsumers of every atomic concept.
+	// Whether top is a direct subsumer or not will be computed below
 	MAP_ITERATOR_INIT(&map_it, &(tbox->classes));
 	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
+	while (atomic_concept) {
+		SET_ADD(tbox->top_concept, &(((ClassExpression*) atomic_concept)->subsumers));
+		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
+	}
+
+	MAP_ITERATOR_INIT(&map_it, &(tbox->classes));
+	atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	while (atomic_concept) {
 		SET_ITERATOR_INIT(&subsumers_iterator, &(((ClassExpression*) atomic_concept)->subsumers));
 		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
