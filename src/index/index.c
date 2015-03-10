@@ -109,12 +109,15 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 
 		// no need to add told subsumers of bottom
 		// no need to index the bottom concept
-		if (subclass_ax->lhs == tbox->bottom_concept)
+		if (subclass_ax->lhs == tbox->bottom_concept) {
+			subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 			continue;
+		}
 		// no need to add top as a told subsumer
 		if (subclass_ax->rhs == tbox->top_concept) {
-			// still index the lhs, but do not add top to the lhs of rhs
+			// still index the lhs, but do not add top to the subsumers of lhs
 			index_concept(subclass_ax->lhs, tbox);
+			subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 			continue;
 		}
 		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(subclass_ax->rhs, subclass_ax->lhs);
