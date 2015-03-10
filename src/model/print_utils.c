@@ -307,12 +307,12 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	while (atomic_concept) {
 		// check if the equivalence class is already printed
 		if (!SET_CONTAINS(atomic_concept, printed)) {
+			atomic_concept_str = class_expression_to_string(kb, atomic_concept);
 			// do not print the direct subsumers of bottom
 			if (atomic_concept != kb->tbox->bottom_concept) {
 				// iterate over the direct subsumers and print them
 				SET_ITERATOR_INIT(&direct_subsumers_iterator, &(atomic_concept->description.atomic.direct_subsumers));
 				ClassExpression* direct_subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&direct_subsumers_iterator);
-				atomic_concept_str = class_expression_to_string(kb, atomic_concept);
 				char* direct_subsumer_str;
 				while (direct_subsumer != NULL) {
 					direct_subsumer_str = class_expression_to_string(kb, direct_subsumer);
