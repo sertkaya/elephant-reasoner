@@ -90,8 +90,9 @@ char saturate_concepts(KB* kb) {
 	MAP_ITERATOR_INIT(&iterator, &(tbox->classes));
 	void* class = MAP_ITERATOR_NEXT(&iterator);
 	while (class) {
-		for (i = 0; i < ((ClassExpression*) class)->told_subsumers.size; ++i)
-			push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, ((ClassExpression*) class)->told_subsumers.elements[i], NULL, SUBSUMPTION_INITIALIZATION));
+		// for (i = 0; i < ((ClassExpression*) class)->told_subsumers.size; ++i)
+		// 	push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, ((ClassExpression*) class)->told_subsumers.elements[i], NULL, SUBSUMPTION_INITIALIZATION));
+		push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, ((ClassExpression*) class), NULL, SUBSUMPTION_INITIALIZATION));
 		class = MAP_ITERATOR_NEXT(&iterator);
 	}
 
