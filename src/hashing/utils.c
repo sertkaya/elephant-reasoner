@@ -37,15 +37,30 @@ inline uint32_t roundup_pow2(uint32_t value) {
   return value;
 }
 
-inline uint64_t hash_string(unsigned char* key) {
-	uint64_t hash_value = 5381;
-	int c;
+// inline uint64_t hash_string(unsigned char* key) {
+// 	uint64_t hash_value = 5381;
+// 	int c;
+//
+// 	while ((c = *key++))
+// 		hash_value = ((hash_value << 5) + hash_value) + c; /* hash * 33 + c */
+// 		// hash_value = ((hash_value << 5) - hash_value) + c; /* hash * 31 + c */
+//
+// 	return hash_value;
+// }
 
-	while ((c = *key++))
-		// hash_value = ((hash_value << 5) + hash_value) + c; /* hash * 33 + c */
-		hash_value = ((hash_value << 5) - hash_value) + c; /* hash * 31 + c */
+uint64_t hash_string(unsigned char *key) {
+    uint64_t hash_value = 0;
+    int c;
+	while ((c = *key++)) {
+        hash_value += c;
+        hash_value += (hash_value << 10);
+        hash_value ^= (hash_value >> 6);
+    }
+    hash_value += (hash_value << 3);
+    hash_value ^= (hash_value >> 11);
+    hash_value += (hash_value << 15);
 
-	return hash_value;
+    return hash_value;
 }
 
 // murmur3
