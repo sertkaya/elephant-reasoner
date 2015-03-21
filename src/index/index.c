@@ -25,21 +25,16 @@
 #include "../model/utils.h"
 #include "utils.h"
 
-/*
-// The list of subclass axioms that are generated during  preprocessing
-extern SubClassAxiom** generated_subclass_axioms;
-extern int generated_subclass_axiom_count;
-
-// The list of subrole axioms that are generated during  preprocessing
-extern SubRoleAxiom** generated_subrole_axioms;
-extern int generated_subrole_axiom_count;
-*/
-
 
 void index_concept(ClassExpression* c, TBox* tbox) {
 
 	switch (c->type) {
 	case CLASS_TYPE:
+		// check if the top concept occurs on the lhs of an axiom
+		if (c == tbox->top_concept) {
+			tbox->top_occurs_on_lhs = 1;
+		}
+		break;
 	case OBJECT_ONE_OF_TYPE:
 		break;
 	case OBJECT_INTERSECTION_OF_TYPE:

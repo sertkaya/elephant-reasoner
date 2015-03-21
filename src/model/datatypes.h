@@ -327,6 +327,9 @@ struct tbox {
 	// members are of type DisjointClassesAxiom*.
 	Set disjoint_classes_axioms;
 
+	// occurrence of owl:Thing on the lhs of an axiom
+	char top_occurs_on_lhs;
+
 };
 
 /******************************************************************************/

@@ -93,6 +93,9 @@ char saturate_concepts(KB* kb) {
 		// for (i = 0; i < ((ClassExpression*) class)->told_subsumers.size; ++i)
 		// 	push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, ((ClassExpression*) class)->told_subsumers.elements[i], NULL, SUBSUMPTION_INITIALIZATION));
 		push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, ((ClassExpression*) class), NULL, SUBSUMPTION_INITIALIZATION));
+		if (tbox->top_occurs_on_lhs) {
+			push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+		}
 		class = MAP_ITERATOR_NEXT(&iterator);
 	}
 
@@ -101,8 +104,12 @@ char saturate_concepts(KB* kb) {
 	ClassExpression* nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 	// The input axioms generated from concept and role assertions
 	while (nominal) {
-		for (j = 0; j < nominal->told_subsumers.size; ++j)
-			push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal->told_subsumers.elements[j], NULL, SUBSUMPTION_INITIALIZATION));
+		// for (j = 0; j < nominal->told_subsumers.size; ++j)
+		// 	push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal->told_subsumers.elements[j], NULL, SUBSUMPTION_INITIALIZATION));
+		push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) nominal, ((ClassExpression*) nominal), NULL, SUBSUMPTION_INITIALIZATION));
+		if (tbox->top_occurs_on_lhs) {
+			push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) nominal, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+		}
 		nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 	}
 
@@ -329,6 +336,9 @@ char saturate_concepts(KB* kb) {
 
 				// init
 				push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
+				if (tbox->top_occurs_on_lhs) {
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+				}
 
 			}
 			break;

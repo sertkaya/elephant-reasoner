@@ -75,6 +75,8 @@ TBox* init_tbox() {
 	SET_INIT(&(tbox->transitive_objectproperty_axioms), DEFAULT_TRANSITIVE_OBJECTPROPERTY_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->disjoint_classes_axioms), DEFAULT_DISJOINT_CLASSES_AXIOMS_SET_SIZE);
 
+	tbox->top_occurs_on_lhs = 0;
+
 	// add the top and bottom concepts
 	tbox->top_concept = get_create_atomic_concept(OWL_THING, tbox);
 	tbox->bottom_concept = get_create_atomic_concept(OWL_NOTHING, tbox);

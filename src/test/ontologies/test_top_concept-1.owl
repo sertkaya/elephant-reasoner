@@ -1,0 +1,8 @@
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+
+Ontology(<http://www.ihtsdo.org/>
+
+SubClassOf(ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> owl:Thing) <http://www.ihtsdo.org#B>)
+SubClassOf(<http://www.ihtsdo.org#A> ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#C>))
+
+)
