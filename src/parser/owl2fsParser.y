@@ -350,9 +350,12 @@ dataPropertyExpressions:
 		unsupported_feature("dataPropertyExpressions");
 	};
 
+	// TODO:
 DataHasValue:
 	DATA_HAS_VALUE '(' DataPropertyExpression Literal ')' {
 		unsupported_feature("DataHasValue");
+		// for now just return the top concept
+		$$.concept = kb->tbox->top_concept;
 	};
 
 Axiom:
