@@ -26,6 +26,7 @@
 #include "../model/model.h"
 #include "../model/utils.h"
 #include "../model/limits.h"
+#include "../model/print_utils.h"
 #include "../utils/stack.h"
 #include "../index/utils.h"
 #include "../hashing/hash_table.h"
@@ -39,22 +40,20 @@ int saturation_unique_link_count = 0, saturation_total_link_count = 0;
 // marks the axiom with the premise lhs and conclusion rhs as processed
 #define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		SET_ADD(ax->rhs, &(ax->lhs->subsumers))
 
-static inline void print_saturation_axiom(ConceptSaturationAxiom* ax) {
-	printf("\n");
+static inline void print_saturation_axiom(KB* kb, ConceptSaturationAxiom* ax) {
+	printf("%d: ", ax->type);
+	char* lhs_str = class_expression_to_string(kb, ax->lhs);
+	char* rhs_str = class_expression_to_string(kb, ax->rhs);
 	if (ax->type == LINK) {
-		print_concept(ax->lhs);
-		printf(" -> ");
-		print_role(ax->role);
-		printf(" -> ");
-		print_concept(ax->rhs);
-		printf("\n");
+		char* role_str = object_property_expression_to_string(kb, ax->role);
+		printf("%s -> %s -> %s\n", lhs_str, rhs_str, role_str);
+		free(role_str);
 	}
 	else {
-		print_concept(ax->lhs);
-		printf(" <= ");
-		print_concept(ax->rhs);
-		printf("\n");
+		printf("%s <= %s\n", lhs_str, rhs_str);
 	}
+	free(lhs_str);
+	free(rhs_str);
 }
 
 static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpression* lhs, ClassExpression* rhs, ObjectPropertyExpression* role, enum saturation_axiom_type type) {
@@ -124,7 +123,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				// print_saturation_axiom(ax);
+				// print_saturation_axiom(kb, ax);
 
 				// conjunction introduction
 				// the first conjunct
@@ -166,7 +165,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				// print_saturation_axiom(ax);
+				// print_saturation_axiom(kb, ax);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -236,7 +235,7 @@ char saturate_concepts(KB* kb) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
 				++saturation_unique_link_count;
 
-				// print_saturation_axiom(ax);
+				// print_saturation_axiom(kb, ax);
 
 				int i, j, k;
 

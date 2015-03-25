@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([ELepHant Reasoner], [0.5.0], [sertkaya.baris@gmail.com])
-AM_INIT_AUTOMAKE(ELepHant-reasoner, 0.5.0)
+AC_INIT([ELepHant Reasoner], [0.5.1], [sertkaya.baris@gmail.com])
+AM_INIT_AUTOMAKE(ELepHant-reasoner, 0.5.1)
 AC_CONFIG_SRCDIR([src/elephant-reasoner.c])
 AC_CONFIG_HEADERS([config.h])
 AC_PROG_LEX

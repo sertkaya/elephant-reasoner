@@ -24,6 +24,9 @@
 
 #include "datatypes.h"
 
+char* class_expression_to_string(KB* kb, ClassExpression* c);
+char* object_property_expression_to_string(KB* kb, ObjectPropertyExpression* r);
+
 // utility functions for printing concepts, axioms and statistics
 void print_exists(ObjectSomeValuesFrom* ex);
 void print_concept(ClassExpression* c);
