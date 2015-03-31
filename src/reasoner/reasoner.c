@@ -150,10 +150,7 @@ void read_kb(FILE* input_kb, KB* kb) {
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 }
 
-// Returns
-//	0: if the kb is consistent
-//	1: it it is inconsistent
-char classify(KB* kb) {
+void classify(KB* kb) {
 	struct timeval start_time, stop_time;
 
 	// total runtime
@@ -174,11 +171,12 @@ char classify(KB* kb) {
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	total_time += TIME_DIFF(start_time, stop_time);
-	// Return inconsistent if indexing returned inconsistent
+
+	// return if we during indexing already find out that the ontology is inconsistent
 	if (indexing_result == -1) {
 		kb->inconsistent = 1;
 		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
-		return 1;
+		return;
 	}
 
 	printf("Saturating.........................: ");
@@ -188,13 +186,15 @@ char classify(KB* kb) {
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	total_time += TIME_DIFF(start_time, stop_time);
-	// return inconsistent if saturation returned inconsistent
+
+	// return if we during saturation find out that the ontology is inconsistent
 	if (saturation_result == -1){
 		kb->inconsistent = 1;
 		printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
-		return 1;
+		return;
 	}
 
+	// compute the class hierarchy if the ontology is consistent
 	printf("Computing concept hierarchy........: ");
 	fflush(stdout);
 	START_TIMER(start_time);
@@ -205,7 +205,6 @@ char classify(KB* kb) {
 
 	printf("Total time.........................: %.3f milisecs\n", total_time / 1000);
 
-	return 0;
 }
 
 // Returns

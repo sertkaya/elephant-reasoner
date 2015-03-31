@@ -1,0 +1,11 @@
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+
+Ontology(<http://www.ihtsdo.org/>
+
+SubClassOf(<http://www.ihtsdo.org#A> 
+	ObjectIntersectionOf(owl:Nothing <http://www.ihtsdo.org#B>))
+
+ClassAssertion(<http://www.ihtsdo.org#A> <http://www.ihtsdo.org#i1>)
+
+)
+

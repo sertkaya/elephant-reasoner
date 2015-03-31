@@ -34,11 +34,11 @@ void usage(char* program) {
 }
 
 int main(int argc, char *argv[]) {
-	FILE* input_kb;
+	FILE* input_ontology;
 	FILE* output;
 
 	int c, reasoning_task_flag = 0, input_flag = 0, output_flag = 0, wrong_argument_flag = 0, verbose_flag = 0;
-	char *reasoning_task = "", *ontology_file = "", *output_file = "";
+	char *reasoning_task = "", *ontology_file_name = "", *output_file = "";
 	static char usage[] = "Usage: %s -i ontology -o output -r[classification|realisation|consistency]\n";
 	while ((c = getopt(argc, argv, "r:i:o:v")) != -1)
 		switch (c) {
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'i':
 			input_flag = 1;
-			ontology_file = optarg;
+			ontology_file_name = optarg;
 			break;
 		case 'o':
 			output_flag = 1;
@@ -85,25 +85,25 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, usage, argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	// the input kb file
-	input_kb = fopen(ontology_file, "r");
-	assert(input_kb != NULL);
+	// open the ontology file
+	input_ontology = fopen(ontology_file_name, "r");
+	assert(input_ontology != NULL);
 
-	// the output taxonomy file
+	// initialize global variables, allocate space for the ontology
+	KB* kb = init_kb();
+
+	// read and parse the ontology
+	read_kb(input_ontology, kb);
+	fclose(input_ontology);
+
+	// open the output file
 	output = fopen(output_file, "w");
 	assert(output != NULL);
 
-	// initialize global variables, allocate space
-	KB* kb = init_kb();
-
-	// read and parse the kb
-	read_kb(input_kb, kb);
-	fclose(input_kb);
-
 	if (!strcmp(reasoning_task, "classification")) {
-		// classify the kb
+		// classify the ontology
 		classify(kb);
-		// print the concept hierarchy
+		// print the class hierarchy to the output file
 		print_concept_hierarchy(kb, output);
 	}
 	else if (!strcmp(reasoning_task, "consistency")) {
@@ -115,10 +115,11 @@ int main(int argc, char *argv[]) {
 	else if (!strcmp(reasoning_task, "realisation")) {
 		// realize the kb
 		realize_kb(kb);
-		// print the individual types
+		// print the individual types to the output file
 		print_individual_types(kb, output);
 	}
 
+	// close the output file
 	fclose(output);
 
 	// display kb information

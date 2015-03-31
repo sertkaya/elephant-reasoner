@@ -283,7 +283,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	// the ontology tag
 	fprintf(taxonomy_fp, "\nOntology(\n");
 
-
+	// just print EquivalentClasses(owl:Thing, owl:Nothing) if the ontology is inconsistent
 	if (kb->inconsistent) {
 		char* thing_str = class_expression_to_string(kb, kb->tbox->top_concept);
 		char* nothing_str = class_expression_to_string(kb, kb->tbox->bottom_concept);
