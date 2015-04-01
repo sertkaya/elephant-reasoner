@@ -55,6 +55,41 @@ void index_class_expression(ClassExpression* c, TBox* tbox) {
 	}
 }
 
+/*
+ * Recursively checks if bottom is a given class expression contains bottom as a subexpression.
+ * Returns 1 if this is the case, 0 otherwise
+ */
+char class_expression_contains_bottom(ClassExpression* c, TBox* tbox)  {
+	switch (c->type) {
+	case CLASS_TYPE:
+		if (c == tbox->bottom_concept) {
+			return 1;
+		}
+		break;
+	case OBJECT_ONE_OF_TYPE:
+		break;
+	case OBJECT_INTERSECTION_OF_TYPE:
+		if (class_expression_contains_bottom(c->description.conj.conjunct1, tbox)) {
+			return 1;
+		}
+		if (class_expression_contains_bottom(c->description.conj.conjunct2, tbox)) {
+			return 1;
+		}
+		break;
+	case OBJECT_SOME_VALUES_FROM_TYPE:
+		if (class_expression_contains_bottom(c->description.exists.filler, tbox)) {
+			return 1;
+		}
+		break;
+	default:
+		fprintf(stderr, "unknown concept type, aborting\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return 0;
+}
+
+
 void index_role(ObjectPropertyExpression* r) {
 	switch (r->type) {
 	case OBJECT_PROPERTY_TYPE:
@@ -79,7 +114,7 @@ void index_role(ObjectPropertyExpression* r) {
  * Returns:
  * 	-1: if the reasoning task is consistency check, and an atomic concept or the top concept is
  * 	subsumed by bottom. In this case it immediately returns, i.e., the rest of the KB is not indexed!
- * 	1: if the reasoning task is consistency check and bottom does not appear on the rhs of any axiom.
+ * 	1: if the reasoning task is consistency check, and bottom does not appear on the rhs of any axiom.
  * 	The KB cannot be inconsistent in this case.
  * 	0: if none of the above holds. (In this case, we need to saturate the ontology for checking consistency)
  */
@@ -93,10 +128,8 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 	SET_ITERATOR_INIT(&iterator, &(kb->tbox->subclass_of_axioms));
 	SubClassOfAxiom* subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 	while (subclass_ax) {
-		// Check if bottom appears on the rhs. Needed for consistency.
+		// Check if bottom appears on the rhs. Needed for determining inconsistency already during indexing.
 		if (subclass_ax->rhs == tbox->bottom_concept) {
-			if (subclass_ax->lhs != tbox->bottom_concept)
-				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the ontology is inconsistent
 			if (subclass_ax->lhs->type == OBJECT_ONE_OF_TYPE || subclass_ax->lhs == tbox->top_concept)
 				// return inconsistent immediately
@@ -118,6 +151,8 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 		}
 		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(subclass_ax->rhs, subclass_ax->lhs);
 		index_class_expression(subclass_ax->lhs, tbox);
+		if (class_expression_contains_bottom(subclass_ax->rhs, tbox) && subclass_ax->lhs != tbox->bottom_concept)
+			bottom_appears_on_rhs = 1;
 		subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&iterator);
 	}
 
@@ -126,8 +161,6 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 
 		// Check if bottom appears on the rhs. Needed for consistency
 		if (kb->generated_subclass_axioms[i]->rhs == tbox->bottom_concept)  {
-			if (kb->generated_subclass_axioms[i]->lhs != tbox->bottom_concept)
-				bottom_appears_on_rhs = 1;
 			// if the top concept or a nominal is subsumed by bottom, the kb is inconsistent
 			if (kb->generated_subclass_axioms[i]->lhs->type == OBJECT_ONE_OF_TYPE || kb->generated_subclass_axioms[i]->lhs == tbox->top_concept)
 				// return inconsistent immediately
@@ -146,6 +179,8 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 		}
 		ADD_TOLD_SUBSUMER_CLASS_EXPRESSION(kb->generated_subclass_axioms[i]->rhs, kb->generated_subclass_axioms[i]->lhs);
 		index_class_expression(kb->generated_subclass_axioms[i]->lhs, tbox);
+		if (class_expression_contains_bottom(kb->generated_subclass_axioms[i]->rhs, tbox) && kb->generated_subclass_axioms[i]->lhs != tbox->bottom_concept)
+			bottom_appears_on_rhs = 1;
 	}
 
 	// If bottom does not appear on the rhs, the KB cannot be inconcsistent, i.e., it is consistent

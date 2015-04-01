@@ -42,7 +42,7 @@ KB* init_kb();
 
 void read_kb(FILE* input_kb, KB* kb);
 
-char classify(KB* kb);
+void classify(KB* kb);
 
 char check_consistency(KB* kb);
 
