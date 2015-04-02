@@ -89,7 +89,7 @@ void add_to_second_conjunct_of_list(ClassExpression* concept, ClassExpression* c
 }
 
 // add ex to the filler_of_negative_exists hash of the filler of ex.
-void add_to_negative_exists(ClassExpression* ex, TBox* tbox) {
+void add_to_negative_exists(ClassExpression* ex) {
 	// create the set if we are adding it for the first time
 	if (ex->description.exists.filler->filler_of_negative_exists == NULL)
 		ex->description.exists.filler->filler_of_negative_exists = MAP_CREATE(DEFAULT_NEGATIVE_FILLER_OF_SET_SIZE);

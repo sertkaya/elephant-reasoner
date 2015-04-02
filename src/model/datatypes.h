@@ -327,9 +327,6 @@ struct tbox {
 	// members are of type DisjointClassesAxiom*.
 	Set disjoint_classes_axioms;
 
-	// occurrence of owl:Thing on the lhs of an axiom
-	char top_occurs_on_lhs;
-
 };
 
 /******************************************************************************/
@@ -404,6 +401,12 @@ struct knowledge_base {
 	// They are generated from preprocessing role assertions.
 	HashMap* generated_exists_restrictions;
 	int generated_exists_restriction_count;
+
+	// occurrence of owl:Thing on the lhs of an axiom
+	char top_occurs_on_lhs;
+	// occurrence of owl:Nothing on the rhs of an axiom
+	char bottom_occurs_on_rhs;
+
 };
 
 #endif

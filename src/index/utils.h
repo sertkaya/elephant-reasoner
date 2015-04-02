@@ -66,7 +66,7 @@ void add_to_second_conjunct_of_list(ClassExpression* concept, ClassExpression* c
 
 // add ex to the filler_of_negative_exists hash of the filler of ex.
 // key of the hash is ex->description.exists->role, the value is ex.
-void add_to_negative_exists(ClassExpression* ex, TBox* tbox);
+void add_to_negative_exists(ClassExpression* ex);
 // #define ADD_TO_NEGATIVE_EXISTS(ex)		insert_key_value(ex->description.exists->filler->filler_of_negative_exists, ex->description.exists->role->id, ex)
 
 // return the negative existential restriction whose role is r and filler is c
