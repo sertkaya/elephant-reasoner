@@ -158,6 +158,8 @@ void saturate_roles(KB* kb) {
 		object_property_chain = SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
 	}
 
+	// TODO: free/reset tmp_object_property_chanins ?
+
 	// FIXME: commented out due to a bug.
 	// removes some of the required subsumers in addition to the redundant ones!
 
