@@ -23,6 +23,6 @@
 
 #include "../model/datatypes.h"
 
-void saturate_roles(TBox* tbox);
+void saturate_roles(KB* kb);
 
 #endif

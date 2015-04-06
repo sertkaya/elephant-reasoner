@@ -37,8 +37,6 @@
 // of subsumers. the reason for keeping the subsumers twice
 // is performance in saturation
 int add_to_role_subsumer_list(ObjectPropertyExpression* r, ObjectPropertyExpression* s) {
-	ObjectPropertyExpression** tmp;
-
 	if (SET_ADD(s, &(r->subsumers))) {
 		list_add(s, &(r->subsumer_list));
 
@@ -49,8 +47,6 @@ int add_to_role_subsumer_list(ObjectPropertyExpression* r, ObjectPropertyExpress
 }
 
 int add_to_role_subsumee_list(ObjectPropertyExpression*r, ObjectPropertyExpression* s) {
-	ObjectPropertyExpression** tmp;
-
 	if (SET_ADD(s, &(r->subsumees)))
 		return 1;
 

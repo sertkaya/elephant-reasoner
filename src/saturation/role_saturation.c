@@ -24,6 +24,7 @@
 #include "../model/datatypes.h"
 #include "../model/model.h"
 #include "../model/limits.h"
+#include "../model/print_utils.h"
 #include "../index/index.h"
 #include "../index/utils.h"
 #include "../hashing/hash_map.h"
@@ -60,7 +61,7 @@ static inline void print_saturation_axiom(RoleSaturationAxiom* ax) {
 }
 
 
-void saturate_roles(TBox* tbox) {
+void saturate_roles(KB* kb) {
 	RoleSaturationAxiom* ax;
 	Stack scheduled_axioms;
 
@@ -71,15 +72,15 @@ void saturate_roles(TBox* tbox) {
 	MapIterator map_iterator;
 
 	// the role compositions
-	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_property_chains));
-	ObjectPropertyExpression* composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
-	while (composition) {
-		push(&scheduled_axioms, create_role_saturation_axiom(composition, composition));
-		composition = MAP_ITERATOR_NEXT(&map_iterator);
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
+	ObjectPropertyExpression* object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	while (object_property_chain) {
+		push(&scheduled_axioms, create_role_saturation_axiom(object_property_chain, object_property_chain));
+		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
     // the atomic roles
-	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_properties));
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_properties));
 	ObjectPropertyExpression* object_property = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property) {
 		push(&scheduled_axioms, create_role_saturation_axiom((ObjectPropertyExpression*) object_property, (ObjectPropertyExpression*) object_property));
@@ -107,57 +108,54 @@ void saturate_roles(TBox* tbox) {
 	// modify it at the same time.
 	Set tmp_object_property_chains;
 	SET_INIT(&tmp_object_property_chains, 32);
-	MAP_ITERATOR_INIT(&map_iterator, &(tbox->object_property_chains));
-	composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
-	while (composition) {
-		SET_ADD(composition, &tmp_object_property_chains);
-		composition = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
+	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	while (object_property_chain) {
+		SET_ADD(object_property_chain, &tmp_object_property_chains);
+		object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
 	SetIterator subsumees_iterator_1, subsumees_iterator_2, tmp_object_property_chains_iterator;
 	ObjectPropertyExpression* subsumee_1;
 	ObjectPropertyExpression* subsumee_2;
 	SET_ITERATOR_INIT(&tmp_object_property_chains_iterator, &tmp_object_property_chains);
-	composition = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
-	while (composition) {
-		SET_ITERATOR_INIT(&subsumees_iterator_1, &(composition->description.object_property_chain.role1->subsumees));
+	object_property_chain = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
+	while (object_property_chain) {
+		SET_ITERATOR_INIT(&subsumees_iterator_1, &(object_property_chain->description.object_property_chain.role1->subsumees));
 		subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		while (subsumee_1) {
-			SET_ITERATOR_INIT(&subsumees_iterator_2, &(composition->description.object_property_chain.role2->subsumees));
+			SET_ITERATOR_INIT(&subsumees_iterator_2, &(object_property_chain->description.object_property_chain.role2->subsumees));
 			subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			while (subsumee_2) {
 				ObjectPropertyExpression* new_composition = get_create_role_composition_binary(
 						(ObjectPropertyExpression*) subsumee_1,
 						(ObjectPropertyExpression*) subsumee_2,
-						tbox);
+						kb->tbox);
 				// actually we do not need to index the composition if it already existed
 				index_role(new_composition);
 
-/*
+				/*
 				// SetIterator subsumers_iterator;
-				SET_ITERATOR_INIT(&told_subsumers_iterator, &(composition->told_subsumers));
+				SET_ITERATOR_INIT(&told_subsumers_iterator, &(object_property_chain->told_subsumers));
 				ObjectPropertyExpression* told_subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
-				// subsumer of composition is a subsumer of the new_composition
+				// subsumer of object_property_chain is a subsumer of the new_composition
 				while (told_subsumer) {
-
-					// printf("\n");
-					// print_role(new_composition);
-					// printf(" <= ");
-					// print_role(subsumer);
-					// printf("\n");
-
-					add_to_role_subsumer_list(new_composition, told_subsumer);
 					// CAUTION!: from this point on, subsumees and subsumers are not synchronized.
-					// add_to_role_subsumee_list(subsumer, new_composition);
+					printf("%s <= %s\n", object_property_expression_to_string(kb, new_composition), object_property_expression_to_string(kb, told_subsumer));
+					add_to_role_subsumer_list(new_composition, told_subsumer);
 					told_subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
 				}
-*/
-				add_to_role_subsumer_list(new_composition, composition);
+				*/
+
+				// CAUTION!: from this point on, subsumees and subsumers are not synchronized. Subsumees set
+				// is incomplete, but it is not used in concept saturation. There the subsumers_list is used.
+				add_to_role_subsumer_list(new_composition, object_property_chain);
+
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}
 			subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		}
-		composition = SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
+		object_property_chain = SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
 	}
 
 	// FIXME: commented out due to a bug.

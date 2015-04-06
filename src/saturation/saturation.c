@@ -33,7 +33,7 @@
 char saturate_tbox(KB* kb) {
 	char saturation_result = 0;
 
-	saturate_roles(kb->tbox);
+	saturate_roles(kb);
 	saturation_result = saturate_concepts(kb);
 
 	return saturation_result;
