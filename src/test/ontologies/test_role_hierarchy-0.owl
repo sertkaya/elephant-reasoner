@@ -1,0 +1,16 @@
+Ontology(<http://www.ihtsdo.org/>
+ 
+SubClassOf(
+	<http://www.ihtsdo.org#C>
+	ObjectSomeValuesFrom(
+		<http://www.ihtsdo.org#r> 
+		<http://www.ihtsdo.org#D>))
+
+SubClassOf(
+	ObjectSomeValuesFrom(
+		<http://www.ihtsdo.org#r> 
+		<http://www.ihtsdo.org#D>)
+	<http://www.ihtsdo.org#E>)
+
+
+)

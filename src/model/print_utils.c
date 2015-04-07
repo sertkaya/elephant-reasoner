@@ -30,18 +30,17 @@
 #include "../hashing/hash_map.h"
 
 
-char* class_to_string(KB* kb, Class* class);
+char* iri_to_string(KB* kb, char* iri);
 char* object_some_values_from_to_string(KB* kb, ObjectSomeValuesFrom* obj_some_values);
 char* object_intersection_of_to_string(KB* kb, ObjectIntersectionOf* obj_intersection_of);
 char* object_one_of_to_string(KB* kb, ObjectOneOf* nominal);
 
-char* object_property_to_string(KB* kb, ObjectProperty* object_property);
 char* object_property_chain_to_string(KB* kb, ObjectPropertyChain* rc);
 
 char* class_expression_to_string(KB* kb, ClassExpression* c) {
 	switch (c->type) {
 		case CLASS_TYPE:
-			return class_to_string(kb, &(c->description.atomic));
+			return iri_to_string(kb, c->description.atomic.IRI);
 		case OBJECT_SOME_VALUES_FROM_TYPE:
 			return object_some_values_from_to_string(kb, &(c->description.exists));
 		case OBJECT_INTERSECTION_OF_TYPE:
@@ -57,7 +56,7 @@ char* class_expression_to_string(KB* kb, ClassExpression* c) {
 char* object_property_expression_to_string(KB* kb, ObjectPropertyExpression* r) {
 	switch (r->type) {
 		case OBJECT_PROPERTY_TYPE:
-			return object_property_to_string(kb, &(r->description.atomic));
+			return iri_to_string(kb, r->description.atomic.IRI);
 		case OBJECT_PROPERTY_CHAIN_TYPE:
 			return object_property_chain_to_string(kb, &(r->description.object_property_chain));
 		default:
@@ -66,29 +65,29 @@ char* object_property_expression_to_string(KB* kb, ObjectPropertyExpression* r) 
 	}
 }
 	
-char* class_to_string(KB* kb, Class* class) {
+char* iri_to_string(KB* kb, char* iri) {
 	char* str;
 
 	// Check of the IRI is a full IRI
-	if (class->IRI[0] == '<') {
+	if (iri[0] == '<') {
 		// it is a full IRI, just return it
-		int iri_length = strlen(class->IRI);
+		int iri_length = strlen(iri);
 		str = calloc(1, sizeof(char) * (iri_length + 1/* for the '\0' character */));
 		assert(str != NULL);
-		snprintf(str, iri_length + 1, "%s", class->IRI);
+		snprintf(str, iri_length + 1, "%s", iri);
 
 		return str;
 
 	}
 	// Check if the IRI is a prefixed name (search for a ":")
 	int index = 0;
-	for (index = 0; class->IRI[index] != ':' && class->IRI[index] != '\0'; ++index);
+	for (index = 0; iri[index] != ':' && iri[index] != '\0'; ++index);
 
-	if (class->IRI[index] == '\0') {
+	if (iri[index] == '\0') {
 		// The IRI does not have a prefix, just return it
 		str = calloc(1, sizeof(char) * (index + 1 + 1/* for the '\0' character */));
 		assert(str != NULL);
-		snprintf(str, index + 1, "%s", class->IRI);
+		snprintf(str, index + 1, "%s", iri);
 
 		return str;
 	}
@@ -97,18 +96,18 @@ char* class_to_string(KB* kb, Class* class) {
 	char* prefix = NULL;
 	char* prefix_name = calloc(1, sizeof(char) * (index + 1 /* for the ':' */ + 1 /* for the '\0' character */));
 	assert(prefix_name != NULL);
-	strncpy(prefix_name, class->IRI, index + 1);
+	strncpy(prefix_name, iri, index + 1);
 
 	if ((prefix = GET_ONTOLOGY_PREFIX(prefix_name, kb)) != NULL) {
 		int prefix_length = strlen(prefix);
-		str = calloc(1, sizeof(char) * (prefix_length + strlen(class->IRI) - index /* IRI without the prefix name + 1 for the '\0' */));
+		str = calloc(1, sizeof(char) * (prefix_length + strlen(iri) - index /* IRI without the prefix name + 1 for the '\0' */));
 		assert(str != NULL);
 		// copy the prefix
 		strncpy(str, prefix, prefix_length - 1 /* leave out the trailing > sign */);
 		// now copy the IRI without the prefix name (part after the ':')
 		int i;
-		for (i = 0; class->IRI[index + 1 + i] != '\0'; ++i) {
-			str[prefix_length - 1 + i] = class->IRI[index + 1 + i];
+		for (i = 0; iri[index + 1 + i] != '\0'; ++i) {
+			str[prefix_length - 1 + i] = iri[index + 1 + i];
 		}
 		// append the '>'
 		str[prefix_length - 1 + i] = '>';
@@ -119,9 +118,9 @@ char* class_to_string(KB* kb, Class* class) {
 		return str;
 	}
 	// it is a prefixed IRI but the prefix name is not found in the prefix names map, just return the IRI
-	str = calloc(1, sizeof (char) * (strlen(class->IRI) + 1));
+	str = calloc(1, sizeof (char) * (strlen(iri) + 1));
 	assert(str != NULL);
-	snprintf(str, strlen(class->IRI), "%s", class->IRI);
+	snprintf(str, strlen(iri), "%s", iri);
 
 	return str;
 }
@@ -174,28 +173,6 @@ char* object_one_of_to_string(KB* kb, ObjectOneOf* nominal) {
 	str = calloc(1, strlen(nominal->individual->IRI)) + 2 /* for the curly braces */;
 	assert(str != NULL);
 	snprintf(str, strlen(nominal->individual->IRI), "{%s}", nominal->individual->IRI);
-
-	return str;
-}
-
-char* object_property_to_string(KB* kb, ObjectProperty* object_property) {
-	char* str;
-	// Check if the IRI is a prefixed name (split it at the ":")
-	char* prefix_name = strtok(object_property->IRI, ":");
-	char* prefix;
-	if (prefix_name != NULL)
-		if ((prefix = GET_ONTOLOGY_PREFIX(prefix_name, kb)) != NULL) {
-			int size = strlen(prefix) + strlen(object_property->IRI);
-			str = calloc(1, size);
-			assert(str != NULL);
-			snprintf(str, size, "%s%s", prefix, object_property->IRI);
-
-			return str;
-		}
-	// it is not a prefixed name
-	str = calloc(1, strlen(object_property->IRI));
-	assert(str != NULL);
-	snprintf(str, strlen(object_property->IRI), "%s", object_property->IRI);
 
 	return str;
 }

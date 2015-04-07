@@ -113,7 +113,7 @@ char saturate_concepts(KB* kb) {
 
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
-
+		print_saturation_axiom(kb, ax);
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
@@ -122,7 +122,8 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				// print_saturation_axiom(kb, ax);
+				printf("NEW: ");
+				print_saturation_axiom(kb, ax);
 
 				// conjunction introduction
 				// the first conjunct
@@ -164,6 +165,8 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
+				printf("NEW: ");
+				print_saturation_axiom(kb, ax);
 				// print_saturation_axiom(kb, ax);
 
 				// bottom rule
@@ -234,6 +237,8 @@ char saturate_concepts(KB* kb) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
 				++saturation_unique_link_count;
 
+				printf("NEW: ");
+				print_saturation_axiom(kb, ax);
 				// print_saturation_axiom(kb, ax);
 
 				int i, j, k;
