@@ -134,7 +134,7 @@ void saturate_roles(KB* kb) {
 				// actually we do not need to index the composition if it already existed
 				index_role(new_composition);
 
-				/*
+
 				// SetIterator subsumers_iterator;
 				SET_ITERATOR_INIT(&told_subsumers_iterator, &(object_property_chain->told_subsumers));
 				ObjectPropertyExpression* told_subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
@@ -145,11 +145,12 @@ void saturate_roles(KB* kb) {
 					add_to_role_subsumer_list(new_composition, told_subsumer);
 					told_subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
 				}
-				*/
 
+				/*
 				// CAUTION!: from this point on, subsumees and subsumers are not synchronized. Subsumees set
 				// is incomplete, but it is not used in concept saturation. There the subsumers_list is used.
 				add_to_role_subsumer_list(new_composition, object_property_chain);
+				*/
 
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}

@@ -275,15 +275,16 @@ char saturate_concepts(KB* kb) {
 					for (j = 0; j < ax->lhs->predecessor_r_count; ++j)
 						if (ax->lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
 							for (k = 0; k < ax->lhs->predecessors[j].filler_count; ++k) {
-								int l;
-								for (l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
+								// int l;
+								// for (l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
 									push(&scheduled_axioms,
 											create_concept_saturation_axiom(
 													ax->lhs->predecessors[j].fillers[k],
 													ax->rhs,
-													(ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
+													ax->role->second_component_of_list[i], LINK));
+													// (ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
 
-								}
+								// }
 								/*
 								SET_ITERATOR_INIT(&subsumers_iterator, &(ax->role->second_component_of_list[i]->subsumers));
 								subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
@@ -312,14 +313,15 @@ char saturate_concepts(KB* kb) {
 					for (j = 0; j < ax->rhs->successor_r_count; ++j)
 						if (ax->rhs->successors[j].role == ax->role->first_component_of_list[i]->description.object_property_chain.role2) {
 							for (k = 0; k < ax->rhs->successors[j].filler_count; ++k) {
-								int l;
-								for (l = 0; l < ax->role->first_component_of_list[i]->subsumer_list.size; ++l) {
+								// int l;
+								// for (l = 0; l < ax->role->first_component_of_list[i]->subsumer_list.size; ++l) {
 									push(&scheduled_axioms,
 											create_concept_saturation_axiom(
 													ax->lhs,
 													ax->rhs->successors[j].fillers[k],
-													(ObjectPropertyExpression*) ax->role->first_component_of_list[i]->subsumer_list.elements[l], LINK));
-								}
+													ax->role->first_component_of_list[i], LINK));
+													// (ObjectPropertyExpression*) ax->role->first_component_of_list[i]->subsumer_list.elements[l], LINK));
+								// }
 								/*
 								SET_ITERATOR_INIT(&subsumers_iterator, &(ax->role->first_component_of_list[i]->subsumers));
 								subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
