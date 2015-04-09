@@ -52,12 +52,12 @@ int mark_role_saturation_axiom_processed(RoleSaturationAxiom* ax) {
 	return added_to_subsumer_list;
 }
 
-static inline void print_saturation_axiom(RoleSaturationAxiom* ax) {
-	printf("\n");
-	print_role(ax->lhs);
-	printf(" <= ");
-	print_role(ax->rhs);
-	printf("\n");
+static inline void print_role_saturation_axiom(KB* kb, RoleSaturationAxiom* ax) {
+	char* lhs_str = object_property_expression_to_string(kb, ax->lhs);
+	char* rhs_str = object_property_expression_to_string(kb, ax->rhs);
+	printf("%s <= %s\n", lhs_str, rhs_str);
+	free(lhs_str);
+	free(rhs_str);
 }
 
 
