@@ -99,11 +99,36 @@ void saturate_roles(KB* kb) {
 			 	push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, (ObjectPropertyExpression*) told_subsumer));
 			 	told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 			}
+			if (ax->lhs->type == OBJECT_PROPERTY_CHAIN_TYPE) {
+				SetIterator subsumees_iterator_1, subsumees_iterator_2;
+				ObjectPropertyExpression* subsumee_1;
+				ObjectPropertyExpression* subsumee_2;
+
+				SET_ITERATOR_INIT(&subsumees_iterator_1, &(ax->lhs->description.object_property_chain.role1->subsumees));
+				subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
+				while (subsumee_1) {
+					SET_ITERATOR_INIT(&subsumees_iterator_2, &(ax->lhs->description.object_property_chain.role2->subsumees));
+					subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
+					while (subsumee_2) {
+						ObjectPropertyExpression* new_composition = get_create_role_composition_binary(
+								(ObjectPropertyExpression*) subsumee_1,
+								(ObjectPropertyExpression*) subsumee_2,
+								kb->tbox);
+						// actually we do not need to index the composition if it already existed
+						index_role(new_composition);
+						push(&scheduled_axioms, create_role_saturation_axiom(new_composition, ax->rhs));
+						subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
+					}
+					subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
+				}
+
+			}
 		}
 		free(ax);
 		ax = pop(&scheduled_axioms);
 	}
 
+	/*
 	// Make a copy of the object property chains since we are going to traverse and
 	// modify it at the same time.
 	Set tmp_object_property_chains;
@@ -146,11 +171,11 @@ void saturate_roles(KB* kb) {
 					told_subsumer = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&told_subsumers_iterator);
 				}
 
-				/*
+
 				// CAUTION!: from this point on, subsumees and subsumers are not synchronized. Subsumees set
 				// is incomplete, but it is not used in concept saturation. There the subsumers_list is used.
-				add_to_role_subsumer_list(new_composition, object_property_chain);
-				*/
+				// add_to_role_subsumer_list(new_composition, object_property_chain);
+
 
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}
@@ -158,6 +183,7 @@ void saturate_roles(KB* kb) {
 		}
 		object_property_chain = SET_ITERATOR_NEXT(&tmp_object_property_chains_iterator);
 	}
+	*/
 
 	// TODO: free/reset tmp_object_property_chanins ?
 
