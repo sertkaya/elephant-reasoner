@@ -96,6 +96,11 @@ int main(int argc, char *argv[]) {
 	read_kb(input_ontology, kb);
 	fclose(input_ontology);
 
+	// display kb information
+	if (verbose_flag) {
+		print_short_stats(kb);
+	}
+
 	// open the output file
 	output = fopen(output_file, "w");
 	assert(output != NULL);
@@ -122,9 +127,8 @@ int main(int argc, char *argv[]) {
 	// close the output file
 	fclose(output);
 
-	// display kb information
+	// display saturation information
 	if (verbose_flag) {
-		print_short_stats(kb);
 		printf("\n------ Saturation statistics ------\n");
 		printf( "Total subsumptions.................: %d\n"
 				"Unique subsumptions................: %d\n",
