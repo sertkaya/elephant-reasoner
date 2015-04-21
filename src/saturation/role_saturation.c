@@ -127,7 +127,9 @@ void saturate_roles(KB* kb) {
 				SET_ITERATOR_INIT(&subsumees_iterator_2, &(ax->lhs->description.object_property_chain.role2->subsumees));
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 				while (subsumee_2) {
-					if (!SET_CONTAINS(ax->lhs, &(subsumee_1->subsumees)) && !SET_CONTAINS(ax->lhs, &(subsumee_2->subsumees))) {
+					if (!is_subformula_of(ax->lhs->description.object_property_chain.role1, subsumee_1) || !is_subformula_of(ax->lhs->description.object_property_chain.role2, subsumee_2)) {
+					// if (!SET_CONTAINS(ax->lhs->description.object_property_chain.role1, &(subsumee_1->subsumees)) ||
+					// 		!SET_CONTAINS(ax->lhs->description.object_property_chain.role2, &(subsumee_2->subsumees))) {
 						ObjectPropertyExpression* new_composition = get_create_role_composition_binary(
 								(ObjectPropertyExpression*) subsumee_1,
 								(ObjectPropertyExpression*) subsumee_2,
