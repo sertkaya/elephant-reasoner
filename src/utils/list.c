@@ -87,7 +87,7 @@ inline char list_remove(void* e, List* l) {
 	}
 	// shrink the allocated space
 	void** tmp = realloc(l->elements, (l->size - 1) * sizeof(void*));
-	assert(tmp != NULL);
+	assert(l->size == 1 || tmp != NULL);
 	l->elements = tmp;
 	// decrement the element count
 	--l->size;
