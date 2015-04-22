@@ -208,7 +208,7 @@ void saturate_roles(KB* kb) {
 	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property_chain) {
 		printf("%s:%d\n", object_property_expression_to_string(kb, object_property_chain), object_property_chain->subsumers.element_count);
-		SET_RESET(&subsumers_to_remove);
+		SET_INIT(&subsumers_to_remove, 16);
 		SetIterator subsumers_iterator_1;
 		SET_ITERATOR_INIT(&subsumers_iterator_1, &(object_property_chain->subsumers));
 		ObjectPropertyExpression* subsumer_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_1);
@@ -236,6 +236,7 @@ void saturate_roles(KB* kb) {
 			list_remove(subsumer_to_remove, &(object_property_chain->subsumer_list));
 			subsumer_to_remove = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&remove_iterator);
 		}
+		SET_RESET(&subsumers_to_remove);
 
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
