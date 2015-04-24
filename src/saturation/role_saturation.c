@@ -78,16 +78,14 @@ void saturate_roles(KB* kb) {
 
 	// push the input axioms to the stack
 	MapIterator map_iterator;
-
-	SetIterator told_subsumers_iterator;
-    // the atomic roles
+    // the object properties
 	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_properties));
 	ObjectPropertyExpression* object_property = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property) {
 		push(&scheduled_axioms, create_role_saturation_axiom(object_property, object_property));
 		object_property = MAP_ITERATOR_NEXT(&map_iterator);
 	}
-
+	// now the object property chains
 	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
 	ObjectPropertyExpression* object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property_chain) {
@@ -95,6 +93,8 @@ void saturate_roles(KB* kb) {
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
+	// reflexive transitive closure
+	SetIterator told_subsumers_iterator;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax)) {
@@ -110,7 +110,10 @@ void saturate_roles(KB* kb) {
 		ax = pop(&scheduled_axioms);
 	}
 
-	// make a copy of the role compositions
+
+	// object property chain hierarchy computation.
+	// first make a copy of the object property chains since we are going to iterate over them
+	// and modify the map at the same time
 	Map tmp;
 	MAP_INIT(&tmp, 16);
 	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
@@ -119,9 +122,8 @@ void saturate_roles(KB* kb) {
 		MAP_PUT(object_property_chain->id, object_property_chain, &tmp);
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
-
-	ObjectPropertyExpression* subsumee_1;
-	ObjectPropertyExpression* subsumee_2;
+	// iterate over the map tmp, compute the object property chain hierarchy
+	ObjectPropertyExpression *subsumee_1, *subsumee_2;
 	SetIterator subsumees_iterator_1, subsumees_iterator_2, component_of_iterator;
 	MAP_ITERATOR_INIT(&map_iterator, &(tmp));
 	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
@@ -136,16 +138,81 @@ void saturate_roles(KB* kb) {
 						(ObjectPropertyExpression*) subsumee_1,
 						(ObjectPropertyExpression*) subsumee_2,
 						kb->tbox);
-				// actually we do not need to index the composition if it already existed
+				// actually we do not need to index the composition if it already existed but we do not differentiate here between
+				// the newly created property chains and the already existing ones
 				index_role(new_composition);
-				// CAUTION: subsumers and subsumees not synchronized!
+
+				SET_ITERATOR_INIT(&told_subsumers_iterator, &(object_property_chain->told_subsumers));
+				ObjectPropertyExpression* told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 				add_to_role_subsumer_list(new_composition, object_property_chain);
+				while (told_subsumer) {
+					add_to_role_subsumer_list(new_composition, told_subsumer);
+					// add_to_role_subsumee_list(told_subsumer, new_composition);
+					told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
+				}
+				// add_to_role_subsumer_list(new_composition, object_property_chain);
+				// add_to_role_subsumee_list(object_property_chain, new_composition);
 
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}
 			subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		}
 		object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	}
+
+
+	// remove the redundant subsumers of object property chains
+	Set subsumers_to_remove;
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
+	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	while (object_property_chain) {
+		// printf("%s:%d\n", object_property_expression_to_string(kb, object_property_chain), object_property_chain->subsumers.element_count);
+		SET_INIT(&subsumers_to_remove, 16);
+		SetIterator subsumers_iterator_1;
+		SET_ITERATOR_INIT(&subsumers_iterator_1, &(object_property_chain->subsumers));
+		ObjectPropertyExpression* subsumer_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_1);
+		while (subsumer_1 && subsumer_1 != object_property_chain) {
+			if (subsumer_1 == object_property_chain) {
+				subsumer_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_1);
+				continue;
+			}
+			// printf("%s:remove:", object_property_expression_to_string(kb, subsumer_1));
+			SetIterator subsumers_iterator_2;
+			SET_ITERATOR_INIT(&subsumers_iterator_2, &(object_property_chain->subsumers));
+			ObjectPropertyExpression* subsumer_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_2);
+			while (subsumer_2) {
+				if (subsumer_2 == object_property_chain || subsumer_1 == subsumer_2) {
+					subsumer_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_2);
+					continue;
+				}
+				if (SET_CONTAINS(subsumer_2, &(subsumer_1->subsumers))) {
+					// printf("%s:", object_property_expression_to_string(kb, subsumer_2));
+					SET_ADD(subsumer_2, &subsumers_to_remove);
+				}
+				subsumer_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_2);
+			}
+			// printf("\n");
+			subsumer_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_1);
+		}
+
+		// now remove the elements of the set 'remove' from the subsumers of object_property_chain
+		SetIterator remove_iterator;
+		SET_ITERATOR_INIT(&remove_iterator, &subsumers_to_remove);
+		ObjectPropertyExpression* subsumer_to_remove = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&remove_iterator);
+		while (subsumer_to_remove) {
+			list_remove(subsumer_to_remove, &(object_property_chain->subsumer_list));
+			printf("removed %s from the subsumers of %s\n", object_property_expression_to_string(kb, subsumer_to_remove), object_property_expression_to_string(kb, object_property_chain));
+			subsumer_to_remove = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&remove_iterator);
+		}
+		SET_RESET(&subsumers_to_remove);
+
+		printf("subsumers list of %s:", object_property_expression_to_string(kb, object_property_chain));
+		int i;
+		for (i = 0; i < object_property_chain->subsumer_list.size; ++i)
+			printf("%s: ", object_property_expression_to_string(kb, (ObjectPropertyExpression*) object_property_chain->subsumer_list.elements[i]));
+		printf("\n");
+
+		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
 
@@ -201,45 +268,5 @@ void saturate_roles(KB* kb) {
 		ax = pop(&scheduled_axioms);
 	}
 	*/
-
-	// the set of subsumers to remove
-	Set subsumers_to_remove;
-	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
-	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
-	while (object_property_chain) {
-		printf("%s:%d\n", object_property_expression_to_string(kb, object_property_chain), object_property_chain->subsumers.element_count);
-		SET_INIT(&subsumers_to_remove, 16);
-		SetIterator subsumers_iterator_1;
-		SET_ITERATOR_INIT(&subsumers_iterator_1, &(object_property_chain->subsumers));
-		ObjectPropertyExpression* subsumer_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_1);
-		while (subsumer_1) {
-			printf("%s:remove:", object_property_expression_to_string(kb, subsumer_1));
-			SetIterator subsumers_iterator_2;
-			SET_ITERATOR_INIT(&subsumers_iterator_2, &(object_property_chain->subsumers));
-			ObjectPropertyExpression* subsumer_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_2);
-			while (subsumer_2) {
-				if (subsumer_1 != subsumer_2 && SET_CONTAINS(subsumer_2, &(subsumer_1->subsumers))) {
-					printf("%s:", object_property_expression_to_string(kb, subsumer_2));
-					SET_ADD(subsumer_2, &subsumers_to_remove);
-				}
-				subsumer_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_2);
-			}
-			printf("\n");
-			subsumer_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumers_iterator_1);
-		}
-
-		// now remove the elements of the set 'remove' from the subsumers of object_property_chain
-		SetIterator remove_iterator;
-		SET_ITERATOR_INIT(&remove_iterator, &subsumers_to_remove);
-		ObjectPropertyExpression* subsumer_to_remove = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&remove_iterator);
-		while (subsumer_to_remove) {
-			list_remove(subsumer_to_remove, &(object_property_chain->subsumer_list));
-			subsumer_to_remove = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&remove_iterator);
-		}
-		SET_RESET(&subsumers_to_remove);
-
-		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
-	}
-
 
 }

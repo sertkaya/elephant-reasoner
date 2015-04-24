@@ -207,6 +207,7 @@ char saturate_concepts(KB* kb) {
 				case OBJECT_SOME_VALUES_FROM_TYPE:
 					// existential decomposition
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ax->rhs->description.exists.filler, ax->rhs->description.exists.role, LINK));
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->description.exists.filler, ax->rhs->description.exists.filler, NULL, SUBSUMPTION_INITIALIZATION));
 					break;
 				}
 
@@ -235,6 +236,9 @@ char saturate_concepts(KB* kb) {
 
 				// print_saturation_axiom(kb, ax);
 
+				// init
+				// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
+
 				int i, j, k;
 
 				// bottom rule
@@ -248,7 +252,9 @@ char saturate_concepts(KB* kb) {
 				void* subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 				// TODO: change the order of the loops for better performance
 				while (subsumer != NULL) {
+					// printf("!!! subsumer %s of %s\n", class_expression_to_string(kb, subsumer), class_expression_to_string(kb, ax->rhs));
 					for (j = 0; j < ax->role->subsumer_list.size; ++j) {
+						// printf("### role subsumer:%s\n", object_property_expression_to_string(kb, (ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
 						ClassExpression* ex = GET_NEGATIVE_EXISTS(((ClassExpression*) subsumer), ((ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
 						if (ex != NULL)
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
@@ -271,12 +277,14 @@ char saturate_concepts(KB* kb) {
 							for (k = 0; k < ax->lhs->predecessors[j].filler_count; ++k) {
 								int l;
 								for (l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
+									// printf("**%s %s\n", object_property_expression_to_string(kb, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]), object_property_expression_to_string(kb, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l]));
 									push(&scheduled_axioms,
 											create_concept_saturation_axiom(
 													ax->lhs->predecessors[j].fillers[k],
 													ax->rhs,
 													// ax->role->second_component_of_list[i], LINK));
 													(ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
+									push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 
 								}
 								/*
@@ -315,6 +323,7 @@ char saturate_concepts(KB* kb) {
 													ax->rhs->successors[j].fillers[k],
 													// ax->role->first_component_of_list[i], LINK));
 													(ObjectPropertyExpression*) ax->role->first_component_of_list[i]->subsumer_list.elements[l], LINK));
+									push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->successors[j].fillers[k], ax->rhs->successors[j].fillers[k], NULL, SUBSUMPTION_INITIALIZATION));
 								}
 								/*
 								SET_ITERATOR_INIT(&subsumers_iterator, &(ax->role->first_component_of_list[i]->subsumers));
@@ -333,8 +342,6 @@ char saturate_concepts(KB* kb) {
 				}
 
 
-				// init
-				push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 				if (kb->top_occurs_on_lhs) {
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
 				}
