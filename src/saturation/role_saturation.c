@@ -114,14 +114,14 @@ void saturate_roles(KB* kb) {
 		ax = pop(&scheduled_axioms);
 	}
 
-/*
+
 	// object property chain hierarchy computation.
 	// first make a copy of the object property chains since we are going to iterate over them
 	// and modify the map at the same time
 	Map tmp;
 	MAP_INIT(&tmp, 16);
 	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
-	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
+	ObjectPropertyExpression* object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property_chain) {
 		MAP_PUT(object_property_chain->id, object_property_chain, &tmp);
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
@@ -163,11 +163,10 @@ void saturate_roles(KB* kb) {
 		}
 		object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	}
-	*/
 
 
+/*
 	// the role compositions
-	// MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
 	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
 	ObjectPropertyExpression* object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property_chain) {
@@ -196,6 +195,9 @@ void saturate_roles(KB* kb) {
 					// actually we do not need to index the composition if it already existed
 					index_role(new_composition);
 					// push(&scheduled_axioms, create_role_saturation_axiom(new_composition, ax->lhs));
+
+					// add_to_role_subsumee_list(ax->lhs, new_composition);
+					// add_to_role_subsumer_list(new_composition, ax->lhs);
 
 					SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->lhs->told_subsumers));
 					ObjectPropertyExpression* told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
@@ -241,7 +243,7 @@ void saturate_roles(KB* kb) {
 		free(ax);
 		ax = pop(&scheduled_axioms);
 	}
-
+*/
 
 	// remove the redundant subsumers of object property chains
 	Set subsumers_to_remove;
