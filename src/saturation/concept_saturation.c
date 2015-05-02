@@ -121,7 +121,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				print_saturation_axiom(kb, ax);
+				// print_saturation_axiom(kb, ax);
 
 				// conjunction introduction
 				// the first conjunct
@@ -163,7 +163,7 @@ char saturate_concepts(KB* kb) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
 
-				print_saturation_axiom(kb, ax);
+				// print_saturation_axiom(kb, ax);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -234,7 +234,7 @@ char saturate_concepts(KB* kb) {
 				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
 				++saturation_unique_link_count;
 
-				print_saturation_axiom(kb, ax);
+				// print_saturation_axiom(kb, ax);
 
 				// init
 				// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
@@ -252,12 +252,12 @@ char saturate_concepts(KB* kb) {
 				void* subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 				// TODO: change the order of the loops for better performance
 				while (subsumer != NULL) {
-					printf("!!! subsumer %s of %s\n", class_expression_to_string(kb, subsumer), class_expression_to_string(kb, ax->rhs));
+					// printf("!!! subsumer %s of %s\n", class_expression_to_string(kb, subsumer), class_expression_to_string(kb, ax->rhs));
 					for (j = 0; j < ax->role->subsumer_list.size; ++j) {
-						printf("### role subsumer:%s\n", object_property_expression_to_string(kb, (ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
+						// printf("### role subsumer:%s\n", object_property_expression_to_string(kb, (ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
 						ClassExpression* ex = GET_NEGATIVE_EXISTS(((ClassExpression*) subsumer), ((ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
 						if (ex != NULL) {
-							printf("$$$ ex:%s\n", class_expression_to_string(kb, ex));
+							// printf("$$$ ex:%s\n", class_expression_to_string(kb, ex));
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 						}
 					}

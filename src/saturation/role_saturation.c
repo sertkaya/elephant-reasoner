@@ -114,7 +114,7 @@ void saturate_roles(KB* kb) {
 		ax = pop(&scheduled_axioms);
 	}
 
-
+/*
 	// object property chain hierarchy computation.
 	// first make a copy of the object property chains since we are going to iterate over them
 	// and modify the map at the same time
@@ -164,12 +164,15 @@ void saturate_roles(KB* kb) {
 		object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
+*/
 
-/*
 	// the role compositions
 	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
 	ObjectPropertyExpression* object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property_chain) {
+		if (object_property_chain->first_component_of.element_count > 0 || object_property_chain->second_component_of.element_count > 0) {
+			ADD_TOLD_SUBSUMER_OBJECT_PROPERTY_EXPRESSION(object_property_chain, object_property_chain);
+		}
 		push(&scheduled_axioms, create_role_saturation_axiom(object_property_chain, object_property_chain));
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
@@ -191,7 +194,7 @@ void saturate_roles(KB* kb) {
 							(ObjectPropertyExpression*) subsumee_1,
 							(ObjectPropertyExpression*) subsumee_2,
 							kb->tbox);
-					printf("new composition:%s\n", object_property_expression_to_string(kb, new_composition));
+					// printf("new composition:%s\n", object_property_expression_to_string(kb, new_composition));
 					// actually we do not need to index the composition if it already existed
 					index_role(new_composition);
 					// push(&scheduled_axioms, create_role_saturation_axiom(new_composition, ax->lhs));
@@ -206,12 +209,13 @@ void saturate_roles(KB* kb) {
 						told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 					}
 
+
 					subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 				}
 				subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 			}
 
-
+/*
 			SetIterator component_of_iterator;
 			SET_ITERATOR_INIT(&component_of_iterator, &ax->lhs->first_component_of);
 			ObjectPropertyExpression* component_of = SET_ITERATOR_NEXT(&component_of_iterator);
@@ -228,7 +232,7 @@ void saturate_roles(KB* kb) {
 				push(&scheduled_axioms, create_role_saturation_axiom(component_of, component_of));
 				component_of = SET_ITERATOR_NEXT(&component_of_iterator);
 			}
-
+*/
 
 
 			SET_ITERATOR_INIT(&told_subsumers_iterator, &(ax->rhs->told_subsumers));
@@ -243,7 +247,7 @@ void saturate_roles(KB* kb) {
 		free(ax);
 		ax = pop(&scheduled_axioms);
 	}
-*/
+
 
 	// remove the redundant subsumers of object property chains
 	Set subsumers_to_remove;
@@ -284,17 +288,18 @@ void saturate_roles(KB* kb) {
 		SET_ITERATOR_INIT(&remove_iterator, &subsumers_to_remove);
 		ObjectPropertyExpression* subsumer_to_remove = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&remove_iterator);
 		while (subsumer_to_remove) {
-			// list_remove(subsumer_to_remove, &(object_property_chain->subsumer_list));
+			list_remove(subsumer_to_remove, &(object_property_chain->subsumer_list));
 			printf("removed %s from the subsumers of %s\n", object_property_expression_to_string(kb, subsumer_to_remove), object_property_expression_to_string(kb, object_property_chain));
 			subsumer_to_remove = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&remove_iterator);
 		}
 		SET_RESET(&subsumers_to_remove);
-
+/*
 		printf("subsumers list of %s:", object_property_expression_to_string(kb, object_property_chain));
 		int i;
 		for (i = 0; i < object_property_chain->subsumer_list.size; ++i)
 			printf("%s: ", object_property_expression_to_string(kb, (ObjectPropertyExpression*) object_property_chain->subsumer_list.elements[i]));
 		printf("\n");
+		*/
 
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
