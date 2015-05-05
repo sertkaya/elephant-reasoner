@@ -82,9 +82,7 @@ char saturate_concepts(KB* kb) {
 	// initialize the stack
 	init_stack(&scheduled_axioms);
 
-	// push the input axioms to the stack
-	int i, j, k;
-
+	// initialization axioms from classes
 	MapIterator iterator;
 	MAP_ITERATOR_INIT(&iterator, &(tbox->classes));
 	void* class = MAP_ITERATOR_NEXT(&iterator);
@@ -96,7 +94,7 @@ char saturate_concepts(KB* kb) {
 		class = MAP_ITERATOR_NEXT(&iterator);
 	}
 
-	if (kb->bottom_occurs_on_rhs) {
+	// if (kb->bottom_occurs_on_rhs) {
 		// the ontology might be inconsistent. treat the class and object property assertions as well.
 		// Traverse the map of nominals that are generated during preprocessing.
 		MAP_ITERATOR_INIT(&iterator, &(kb->generated_nominals));
@@ -109,8 +107,9 @@ char saturate_concepts(KB* kb) {
 			}
 			nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 		}
-	}
+	// }
 
+	int i, j, k;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		switch (ax->type) {

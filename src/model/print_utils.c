@@ -156,23 +156,12 @@ char* object_intersection_of_to_string(KB* kb, ObjectIntersectionOf* obj_int) {
 }
 
 char* object_one_of_to_string(KB* kb, ObjectOneOf* nominal) {
-	char* str;
-	// Check if the IRI is a prefixed name (split it at the ":")
-	char* prefix_name = strtok(nominal->individual->IRI, ":");
-	char* prefix;
-	if (prefix_name != NULL)
-		if ((prefix = GET_ONTOLOGY_PREFIX(prefix_name, kb)) != NULL) {
-			int size = strlen(prefix) + strlen(nominal->individual->IRI) + 2 /* for the curly braces */;
-			str = calloc(1, size);
-			assert(str != NULL);
-			snprintf(str, size, "{%s%s}", prefix, nominal->individual->IRI);
-
-			return str;
-		}
-	// it is not a prefixed name
-	str = calloc(1, strlen(nominal->individual->IRI)) + 2 /* for the curly braces */;
+	char* individual_str = iri_to_string(kb, nominal->individual->IRI);
+	int size = strlen(individual_str) + 3 /* 2 for the curly braces, 1 for the \0 */;
+	char* str = calloc(1, size);
 	assert(str != NULL);
-	snprintf(str, strlen(nominal->individual->IRI), "{%s}", nominal->individual->IRI);
+	snprintf(str, size, "{%s}", individual_str);
+	free(individual_str);
 
 	return str;
 }
@@ -358,10 +347,10 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 	SetIterator subsumers_iterator;
 	char* nominal_str;
 	while (nominal) {
+		char* subsumer_str;
+		nominal_str = iri_to_string(kb, nominal->description.nominal.individual->IRI);
 		SET_ITERATOR_INIT(&subsumers_iterator, &(nominal->subsumers));
 		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
-		char* subsumer_str;
-		nominal_str = class_expression_to_string(kb, nominal);
 		while (subsumer != NULL) {
 			if (subsumer->type == CLASS_TYPE) {
 				subsumer_str = class_expression_to_string(kb, subsumer);
