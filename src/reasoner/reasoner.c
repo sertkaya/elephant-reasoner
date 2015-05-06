@@ -199,7 +199,7 @@ void classify(KB* kb) {
 	printf("Computing concept hierarchy........: ");
 	fflush(stdout);
 	START_TIMER(start_time);
-	compute_concept_hierarchy(kb->tbox);
+	compute_concept_hierarchy(kb);
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	total_time += TIME_DIFF(start_time, stop_time);

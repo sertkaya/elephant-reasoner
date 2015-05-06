@@ -22,7 +22,7 @@
 
 #include "../model/datatypes.h"
 
-void compute_concept_hierarchy(TBox* tbox);
+void compute_concept_hierarchy(KB* kb);
 
 
 #endif /* HIERARCHY_H_ */
