@@ -36,19 +36,13 @@ void compute_concept_hierarchy(KB* kb) {
 	SetIterator direct_subsumers_iterator;
 	SetIterator subsumers_iterator;
 
-	// Add the top class to the subsumers of every atomic concept and to the subsumers of every generated nominal (they are generated from ABox individuals)
+	// Add the top class to the subsumers of every atomic concept.
 	// Whether top is a direct subsumer or not will be computed below
 	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
 	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	while (atomic_concept) {
 		SET_ADD(kb->tbox->top_concept, &(((ClassExpression*) atomic_concept)->subsumers));
 		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
-	}
-	MAP_ITERATOR_INIT(&map_it, &(kb->generated_nominals));
-	ClassExpression* nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&map_it);
-	while (nominal) {
-		SET_ADD(kb->tbox->top_concept, &(((ClassExpression*) nominal)->subsumers));
-		nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&map_it);
 	}
 
 	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
