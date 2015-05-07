@@ -31,6 +31,6 @@
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_concepts(KB* kb);
+char saturate_concepts(KB* kb, ReasoningTask reasoning_task);
 
 #endif

@@ -183,7 +183,7 @@ void classify(KB* kb) {
 	printf("Saturating.........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
-	char saturation_result = saturate_tbox(kb);
+	char saturation_result = saturate_tbox(kb, CLASSIFICATION);
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	total_time += TIME_DIFF(start_time, stop_time);
@@ -249,7 +249,7 @@ char check_consistency(KB* kb) {
 	printf("Saturating.........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
-	char saturation_result = saturate_tbox(kb);
+	char saturation_result = saturate_tbox(kb, CONSISTENCY);
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	total_time += TIME_DIFF(start_time, stop_time);
@@ -296,7 +296,7 @@ char realize_kb(KB* kb) {
 	printf("Saturating.........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);
-	char saturation_result = saturate_tbox(kb);
+	char saturation_result = saturate_tbox(kb, REALISATION);
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 	total_time += TIME_DIFF(start_time, stop_time);

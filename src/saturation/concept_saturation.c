@@ -73,7 +73,7 @@ static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpre
  * 	is cancelled.
  * 	0: Otherwise
  */
-char saturate_concepts(KB* kb) {
+char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	TBox* tbox = kb->tbox;
 
 	ConceptSaturationAxiom* ax;
@@ -94,8 +94,11 @@ char saturate_concepts(KB* kb) {
 		class = MAP_ITERATOR_NEXT(&iterator);
 	}
 
-	// if (kb->bottom_occurs_on_rhs) {
-		// the ontology might be inconsistent. treat the class and object property assertions as well.
+	// Nominals (created from ABox individuals) take place in the saturation only if either:
+	// - the reasoning task is realisation, or
+	// - the reasoning task is classification and owl:Nothing occurs on the rhs of an axiom
+	// (in the second case, there is the possibility that the ontology is inconsistent since an indivial has the type owl:Nothing)
+	if (reasoning_task == REALISATION || (reasoning_task == CLASSIFICATION && kb->bottom_occurs_on_rhs)) {
 		// Traverse the map of nominals that are generated during preprocessing.
 		MAP_ITERATOR_INIT(&iterator, &(kb->generated_nominals));
 		ClassExpression* nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
@@ -107,7 +110,7 @@ char saturate_concepts(KB* kb) {
 			}
 			nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 		}
-	// }
+	}
 
 	int i, j, k;
 	ax = pop(&scheduled_axioms);
