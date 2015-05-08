@@ -349,10 +349,6 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 	while (nominal) {
 		char* subsumer_str;
 		nominal_str = iri_to_string(kb, nominal->description.nominal.individual->IRI);
-		subsumer_str = class_expression_to_string(kb, kb->tbox->top_concept);
-		// TODO: It is not neat to manually write owl:Thing as type, improve.
-		fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n", subsumer_str, nominal_str);
-		free(subsumer_str);
 		SET_ITERATOR_INIT(&subsumers_iterator, &(nominal->subsumers));
 		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
 		while (subsumer != NULL) {

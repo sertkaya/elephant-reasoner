@@ -105,6 +105,9 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 		ClassExpression* nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 		// The input axioms generated from concept and role assertions
 		while (nominal) {
+			// add owl:Thing manually to the subsumers of the generated nominals
+			SET_ADD(kb->tbox->top_concept, &(nominal->subsumers));
+
 			push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) nominal, ((ClassExpression*) nominal), NULL, SUBSUMPTION_INITIALIZATION));
 			if (kb->top_occurs_on_lhs) {
 				push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) nominal, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
