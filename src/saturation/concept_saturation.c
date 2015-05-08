@@ -97,8 +97,9 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	// Nominals (created from ABox individuals) take place in the saturation only if either:
 	// - the reasoning task is realisation, or
 	// - the reasoning task is classification and owl:Nothing occurs on the rhs of an axiom
-	// (in the second case, there is the possibility that the ontology is inconsistent since an indivial has the type owl:Nothing)
-	if (reasoning_task == REALISATION || (reasoning_task == CLASSIFICATION && kb->bottom_occurs_on_rhs)) {
+	// - the reasoning task is consistency and owl:Nothing occurs on the rhs of an axiom
+	// (in the second and third cases, there is the possibility that the ontology is inconsistent since an indivial has the type owl:Nothing)
+	if (reasoning_task == REALISATION || (reasoning_task == CLASSIFICATION && kb->bottom_occurs_on_rhs) || (reasoning_task == CONSISTENCY && kb->bottom_occurs_on_rhs)) {
 		// Traverse the map of nominals that are generated during preprocessing.
 		MAP_ITERATOR_INIT(&iterator, &(kb->generated_nominals));
 		ClassExpression* nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
