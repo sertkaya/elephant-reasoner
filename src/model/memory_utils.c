@@ -199,6 +199,16 @@ int free_tbox(TBox* tbox) {
 	}
 	total_freed_bytes += SET_RESET(&(tbox->transitive_objectproperty_axioms));
 
+	// free the objectproperty domain axioms
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->objectproperty_domain_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
+	while (ax) {
+		free(ax);
+		total_freed_bytes += sizeof(ObjectPropertyDomainAxiom);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
+	}
+	total_freed_bytes += SET_RESET(&(tbox->objectproperty_domain_axioms));
+
 	// iterate over the existentials hash, free the existentials
 	MapIterator iterator;
 	MAP_ITERATOR_INIT(&iterator, &(tbox->object_some_values_from_exps));
@@ -241,24 +251,24 @@ int free_tbox(TBox* tbox) {
 	total_freed_bytes += MAP_RESET(&(tbox->classes));
 
 	// iterate over the role_compositions hash, free the role compositions
-	MAP_ITERATOR_INIT(&iterator, &(tbox->object_property_chains));
+	MAP_ITERATOR_INIT(&iterator, &(tbox->objectproperty_chains));
 	map_element = MAP_ITERATOR_NEXT(&iterator);
 	while (map_element) {
 		total_freed_bytes += free_role((ObjectPropertyExpression*) map_element);
 		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the role compositions hash
-	total_freed_bytes += MAP_RESET(&(tbox->object_property_chains));
+	total_freed_bytes += MAP_RESET(&(tbox->objectproperty_chains));
 
 	// iterate over atomic roles, free them
-	MAP_ITERATOR_INIT(&iterator, &(tbox->object_properties));
+	MAP_ITERATOR_INIT(&iterator, &(tbox->objectproperties));
 	map_element = MAP_ITERATOR_NEXT(&iterator);
 	while (map_element) {
 		total_freed_bytes += free_role((ObjectPropertyExpression*) map_element);
 		map_element = MAP_ITERATOR_NEXT(&iterator);
 	}
 	// free the atomic roles hash
-	total_freed_bytes += MAP_RESET(&(tbox->object_properties));
+	total_freed_bytes += MAP_RESET(&(tbox->objectproperties));
 
 	// finally free the tbox itself
 	free(tbox);

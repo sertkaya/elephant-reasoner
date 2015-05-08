@@ -84,6 +84,15 @@ void preprocess_tbox(KB* kb) {
 			}
 		ax = SET_ITERATOR_NEXT(&iterator);
 	}
+
+	// Process the ObjectProperyDomain axioms
+	SET_ITERATOR_INIT(&iterator, &(tbox->objectproperty_domain_axioms));
+	ax = SET_ITERATOR_NEXT(&iterator);
+	while (ax) {
+		ClassExpression* lhs = get_create_exists_restriction(((ObjectPropertyDomainAxiom*) ax)->object_property_expression, tbox->top_concept, tbox);
+		add_generated_subclass_axiom(kb, create_subclass_axiom(lhs, ((ObjectPropertyDomainAxiom*) ax)->class_expression));
+		ax = SET_ITERATOR_NEXT(&iterator);
+	}
 }
 
 // Preprocess assertions and translate them to subclass axioms for saturation. ABox individuals are translated to

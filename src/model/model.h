@@ -83,6 +83,8 @@ TransitiveObjectPropertyAxiom* create_transitive_role_axiom(ObjectPropertyExpres
 // create the eqrole axiom with the given role descriptions
 EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs);
 
+// create an objectproperty domain axiom with the given objectproperty and class expressions
+ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpression* ope, ClassExpression* ce);
 /******************************************************************************
  * add functions for axioms
 *****************************************************************************/
@@ -102,7 +104,10 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
 #define ADD_TRANSITIVE_OBJECTPROPERTY_AXIOM(ax, tbox)		SET_ADD(ax, &(tbox->transitive_objectproperty_axioms))
 
 // add a given equivalent object properties axiom to a given ontology
-#define ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(ax, tbox)	SET_ADD(ax, &(tbox->equivalent_objectproperties_axioms))
+#define ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(ax, tbox)		SET_ADD(ax, &(tbox->equivalent_objectproperties_axioms))
+
+// add a given object property domain axiom to a given ontology
+#define ADD_OBJECTPROPERTY_DOMAIN_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->objectproperty_domain_axioms))
 /******************************************************************************
  * Get/create functions for ABox
  *****************************************************************************/

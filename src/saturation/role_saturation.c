@@ -73,7 +73,7 @@ void saturate_roles(KB* kb) {
 	MapIterator map_iterator;
 
 	// the object property chains
-	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->objectproperty_chains));
 	ObjectPropertyExpression* object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property_chain) {
 		push(&scheduled_axioms, create_role_saturation_axiom(object_property_chain, object_property_chain));
@@ -81,7 +81,7 @@ void saturate_roles(KB* kb) {
 	}
 
    // the object properties
-	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_properties));
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->objectproperties));
 	ObjectPropertyExpression* object_property = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property) {
 		push(&scheduled_axioms, create_role_saturation_axiom(object_property, object_property));
@@ -113,7 +113,7 @@ void saturate_roles(KB* kb) {
 	init_queue(&scheduled_object_property_chains);
 
 	// push the object property chains to the scheduled stack
-	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->objectproperty_chains));
 	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property_chain) {
 		// push(&scheduled_object_property_chains, object_property_chain);
@@ -169,7 +169,7 @@ void saturate_roles(KB* kb) {
 
 	// remove the redundant subsumers of object property chains
 	Set subsumers_to_remove;
-	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->object_property_chains));
+	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->objectproperty_chains));
 	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
 	while (object_property_chain) {
 		// printf("%s:%d\n", object_property_expression_to_string(kb, object_property_chain), object_property_chain->subsumers.element_count);

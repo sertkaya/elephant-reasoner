@@ -376,29 +376,30 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 // void print_short_stats(TBox* tbox, ABox* abox) {
 void print_short_stats(KB* kb) {
 	printf("\n---------- KB statistics ----------\n");
-	printf( "Atomic concepts....................: %d\n"
-			"Atomic roles.......................: %d\n"
-			"Existential restrictions...........: %d\n"
-			"Unique existential restrictions....: %d\n"
-			"Conjunction........................: %d\n"
+	printf( "Class..............................: %d\n"
+			"ObjectProperty.....................: %d\n"
+			"ObjectSomeValuesFrom...............: %d\n"
+			"ObjectSomeValuesFrom (unique)......: %d\n"
+			"ObjectIntersectionOf...............: %d\n"
 			// "unique conjunctions: %d\n"
-			"Binary conjunctions................: %d\n"
-			"Unique binary conjunctions.........: %d\n"
-			"Role compositions..................: %d\n"
-			"Binary role compositions...........: %d\n"
-			"Unique binary role compositions....: %d\n"
-			"SubClass axioms....................: %d\n"
-			"EquivalentClass axioms.............: %d\n"
-			"Disjointness axioms................: %d\n"
-			"SubObjectProperty axioms...........: %d\n"
-			"EquivalentObjectProperty axioms....: %d\n"
+			"ObjectIntersectionOf (binary)......: %d\n"
+			"ObjectIntersectionOf (bin., unique): %d\n"
+			"ObjectPropertyChain................: %d\n"
+			"ObjectPropertyChain (binary).......: %d\n"
+			"ObjectPropertyChain (bin., unique).: %d\n"
+			"SubClassOf axioms..................: %d\n"
+			"EquivalentClasses axioms...........: %d\n"
+			"DisjointClasses axioms.............: %d\n"
+			"SubObjectPropertyOf axioms.........: %d\n"
+			"EquivalentObjectProperties axioms..: %d\n"
 			"TransitiveObjectProperty axioms....: %d\n"
-			"Individuals........................: %d\n"
-			"Concept assertions.................: %d\n"
-			"Role assertions....................: %d\n"
+			"ObjectPropertyDomain axioms........: %d\n"
+			"Individual.........................: %d\n"
+			"ClassAssertion axioms..............: %d\n"
+			"ObjectPropertyAssertion axioms.....: %d\n"
 			"-----------------------------------\n\n",
 			kb->tbox->classes.element_count,
-			kb->tbox->object_properties.element_count,
+			kb->tbox->objectproperties.element_count,
 			kb->tbox->object_some_values_from_exps_count,
 			kb->tbox->object_some_values_from_exps.element_count,
 			kb->tbox->object_intersection_of_exps_count,
@@ -406,13 +407,14 @@ void print_short_stats(KB* kb) {
 			kb->tbox->object_intersection_of_exps.element_count,
 			kb->tbox->role_composition_count,
 			kb->tbox->binary_role_composition_count,
-			kb->tbox->object_property_chains.element_count,
+			kb->tbox->objectproperty_chains.element_count,
 			kb->tbox->subclass_of_axioms.element_count,
 			kb->tbox->equivalent_classes_axioms.element_count,
 			kb->tbox->disjoint_classes_axioms.element_count,
 			kb->tbox->subobjectproperty_of_axioms.element_count,
 			kb->tbox->equivalent_objectproperties_axioms.element_count,
 			kb->tbox->transitive_objectproperty_axioms.element_count,
+			kb->tbox->objectproperty_domain_axioms.element_count,
 			kb->abox->individual_count,
 			kb->abox->concept_assertion_count,
 			kb->abox->role_assertion_count);

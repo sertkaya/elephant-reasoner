@@ -52,7 +52,7 @@ TBox* init_tbox() {
 
 	MAP_INIT(&(tbox->classes), DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
-	MAP_INIT(&(tbox->object_properties), DEFAULT_ATOMIC_ROLES_HASH_SIZE);
+	MAP_INIT(&(tbox->objectproperties), DEFAULT_ATOMIC_ROLES_HASH_SIZE);
 
 	tbox->object_some_values_from_exps_count = 0;
 	MAP_INIT(&(tbox->object_some_values_from_exps), DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
@@ -66,14 +66,15 @@ TBox* init_tbox() {
 
 	tbox->role_composition_count = 0;
 	tbox->binary_role_composition_count = 0;
-	MAP_INIT(&(tbox->object_property_chains), DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
+	MAP_INIT(&(tbox->objectproperty_chains), DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
 
 	SET_INIT(&(tbox->subclass_of_axioms), DEFAULT_SUBCLASS_OF_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->equivalent_classes_axioms), DEFAULT_EQUIVALENT_CLASSES_AXIOMS_SET_SIZE);
+	SET_INIT(&(tbox->disjoint_classes_axioms), DEFAULT_DISJOINT_CLASSES_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->subobjectproperty_of_axioms), DEFAULT_SUBOBJECTPROPERTY_OF_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->equivalent_objectproperties_axioms), DEFAULT_EQUIVALENT_OBJECTPROPERTIES_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->transitive_objectproperty_axioms), DEFAULT_TRANSITIVE_OBJECTPROPERTY_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->disjoint_classes_axioms), DEFAULT_DISJOINT_CLASSES_AXIOMS_SET_SIZE);
+	SET_INIT(&(tbox->objectproperty_domain_axioms), DEFAULT_OBJECTPROPERTY_DOMAIN_AXIOMS_SET_SIZE);
 
 	// add the top and bottom concepts
 	tbox->top_concept = get_create_atomic_concept(OWL_THING, tbox);

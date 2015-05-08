@@ -465,7 +465,7 @@ equivalentObjectPropertyExpressions:
 
 ObjectPropertyDomain:
 	OBJECT_PROPERTY_DOMAIN '(' axiomAnnotations ObjectPropertyExpression ClassExpression ')' {
-		unsupported_feature("ObjectPropertyDomain");
+		ADD_OBJECTPROPERTY_DOMAIN_AXIOM(create_objectproperty_domain_axiom($4.role, $5.concept), kb->tbox);
 	};
 
 ObjectPropertyRange:

@@ -404,6 +404,15 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
 	return ax;
 }
 
+// create an objectproperty domain axiom with the given objectproperty and class expressions
+ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpression* ope, ClassExpression* ce) {
+	ObjectPropertyDomainAxiom* ax = (ObjectPropertyDomainAxiom*) malloc(sizeof(ObjectPropertyDomainAxiom));
+	assert(ax != NULL);
+	ax->object_property_expression = ope;
+	ax->class_expression = ce;
+	return ax;
+}
+
 /******************************************************************************
  * get/create functions for ABox
  *****************************************************************************/

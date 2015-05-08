@@ -50,6 +50,7 @@ typedef struct disjoint_classes_axiom DisjointClassesAxiom;
 typedef struct subobject_property_of_axiom SubObjectPropertyOfAxiom;
 typedef struct equivalent_object_properties_axiom EquivalentObjectPropertiesAxiom;
 typedef struct transitive_object_property_axiom TransitiveObjectPropertyAxiom;
+typedef struct objectproperty_domain_axiom ObjectPropertyDomainAxiom;
 
 // TBox
 typedef struct tbox TBox;
@@ -253,6 +254,11 @@ struct equivalent_object_properties_axiom {
 	ObjectPropertyExpression* rhs;
 };
 
+struct objectproperty_domain_axiom {
+	ObjectPropertyExpression* object_property_expression;
+	ClassExpression* class_expression;
+};
+
 // TBox
 struct tbox {
 	// Class expressions and object property expressions
@@ -294,12 +300,12 @@ struct tbox {
 	// ObjectProperties
 	// Key: IRI (char*)
 	// Value: ObjectPropertyExpression*
-	Map object_properties;
+	Map objectproperties;
 
 	// Binary ObjectPropertyChains
 	// Key: 64-bit hash value obtained from the 32-bit ids of the two components
 	// Value: ObjectPropertyExpression*
-	Map object_property_chains;
+	Map objectproperty_chains;
 	int role_composition_count;
 	int binary_role_composition_count;
 
@@ -327,6 +333,9 @@ struct tbox {
 	// members are of type DisjointClassesAxiom*.
 	Set disjoint_classes_axioms;
 
+	// The set of ObjectPropertyDomain axioms.
+	// The members are of type ObjectPropertyDomainAxiom*.
+	Set objectproperty_domain_axioms;
 };
 
 /******************************************************************************/

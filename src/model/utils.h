@@ -61,17 +61,17 @@
 
 // return the atomic role with the given name if it exists
 // NULL if it does not exist
-#define GET_ATOMIC_ROLE(IRI, tbox)			MAP_GET(hash_string(IRI), &(tbox->object_properties))
+#define GET_ATOMIC_ROLE(IRI, tbox)			MAP_GET(hash_string(IRI), &(tbox->objectproperties))
 
 // insert the atomic role with the given name to the hash
-#define PUT_ATOMIC_ROLE(IRI, r, tbox)		MAP_PUT(hash_string(IRI), r, &(tbox->object_properties))
+#define PUT_ATOMIC_ROLE(IRI, r, tbox)		MAP_PUT(hash_string(IRI), r, &(tbox->objectproperties))
 
 
 // get the role compoisiton with the given roles
-#define GET_ROLE_COMPOSITION(r1, r2, tbox)	MAP_GET(HASH_INTEGERS(r1->id, r2->id), &(tbox->object_property_chains))
+#define GET_ROLE_COMPOSITION(r1, r2, tbox)	MAP_GET(HASH_INTEGERS(r1->id, r2->id), &(tbox->objectproperty_chains))
 
 // put the role composition with the given roles into the role compositions hash
-#define PUT_ROLE_COMPOSITION(r, tbox)		MAP_PUT(HASH_INTEGERS(r->description.object_property_chain.role1->id, r->description.object_property_chain.role2->id), r, &(tbox->object_property_chains))
+#define PUT_ROLE_COMPOSITION(r, tbox)		MAP_PUT(HASH_INTEGERS(r->description.object_property_chain.role1->id, r->description.object_property_chain.role2->id), r, &(tbox->objectproperty_chains))
 
 /******************************************************************************/
 // Returns the individual with the given name if it exists
