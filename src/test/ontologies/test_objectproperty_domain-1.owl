@@ -1,0 +1,10 @@
+Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
+
+Ontology(<http://www.ihtsdo.org/>
+
+ObjectPropertyDomain(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#A>)
+
+ObjectPropertyAssertion(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#i1> <http://www.ihtsdo.org#i2>)
+
+)
+
