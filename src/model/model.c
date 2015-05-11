@@ -413,11 +413,21 @@ ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpr
 	return ax;
 }
 
+// create a SameIndividual axiom with the given list of individuals
+SameIndividualAxiom* create_same_individual_axiom(int individual_count, Individual** individuals) {
+	SameIndividualAxiom* ax = (SameIndividualAxiom*) calloc(1, sizeof(SameIndividualAxiom));
+	assert(ax != NULL);
+	LIST_INIT(&(ax->individuals));
+	int i;
+	for (i = 0; i < individual_count; ++i)
+		list_add(individuals[i], &(ax->individuals));
+
+	return ax;
+}
 /******************************************************************************
  * get/create functions for ABox
  *****************************************************************************/
 
-// TODO: stub implementation!
 Individual* get_create_individual(char* name, ABox* abox) {
 	Individual* i;
 

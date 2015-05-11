@@ -23,18 +23,14 @@
 // configuration parameters
 
 // Maximum lengths/sizes for the parser
-// Max number of conjuncts that can occur in an ObjectIntersectionOf expression
-#define MAX_CONJUNCT_COUNT				1024
-// Max number of class expressions that can occur in an EquivalentClasses axiom
-#define MAX_EQ_CLASS_EXP_COUNT			1024
-// Max number of role expressions that can occur in an EquivalentObjectProperties axiom
-#define MAX_EQ_ROLE_EXP_COUNT			1024
-// Max size of a role composition
-#define MAX_ROLE_COMPOSITION_SIZE		1024
-#define MAX_CONCEPT_NAME_LENGTH			1024
-#define MAX_ROLE_NAME_LENGTH			1024
-// Max number of disjoint classes in a DisjointClasses axiom
-#define MAX_DISJ_CLASS_EXP_COUNT		1024
+#define MAX_CONJUNCT_COUNT				1024 /* max number of conjuncts in an ObjectIntersectionOf expression */
+#define MAX_EQ_CLASS_EXP_COUNT			1024 /* max number of class expressions in an EquivalentClasses axiom */
+#define MAX_EQ_ROLE_EXP_COUNT			1024 /* max number of object property expressions in an EquivalentObjectProperties axiom */
+#define MAX_ROLE_COMPOSITION_SIZE		1024 /* max size of an ObjectPropertyChain expression */
+// #define MAX_CLASS_NAME_LENGTH			1024 /* max size for class names */
+// #define MAX_OBJECT_PROPERTY_NAME_LENGTH	1024 /* max size for object property names */
+#define MAX_DISJ_CLASS_EXP_COUNT		1024 /* max number of disjoint classes in a DisjointClasses axiom */
+#define MAX_SAME_INDIVIDUAL_COUNT		1024 /* max number of individuals in a SameIndividual axiom */
 
 // Default set/map sizes (per ontology)
 #define DEFAULT_PREFIXES_HASH_SIZE					32
@@ -54,6 +50,7 @@
 #define DEFAULT_TRANSITIVE_OBJECTPROPERTY_AXIOMS_SET_SIZE		128
 #define DEFAULT_EQUIVALENT_OBJECTPROPERTIES_AXIOMS_SET_SIZE		128
 #define DEFAULT_OBJECTPROPERTY_DOMAIN_AXIOMS_SET_SIZE			128
+#define DEFAULT_SAME_INDIVIDUAL_AXIOMS_SET_SIZE					128
 
 // Default set/map sizes (per class expression)
 #define DEFAULT_NEGATIVE_FILLER_OF_SET_SIZE			8

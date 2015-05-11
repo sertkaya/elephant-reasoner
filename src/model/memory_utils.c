@@ -209,6 +209,20 @@ int free_tbox(TBox* tbox) {
 	}
 	total_freed_bytes += SET_RESET(&(tbox->objectproperty_domain_axioms));
 
+	// free the same individual axioms
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->same_individual_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
+	while (ax) {
+		total_freed_bytes += list_reset(&(((SameIndividualAxiom*) ax)->individuals));
+		free(ax);
+		total_freed_bytes += sizeof(SameIndividualAxiom);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
+	}
+	total_freed_bytes += SET_RESET(&(tbox->same_individual_axioms));
+
+
+	/************************************************************/
+
 	// iterate over the existentials hash, free the existentials
 	MapIterator iterator;
 	MAP_ITERATOR_INIT(&iterator, &(tbox->object_some_values_from_exps));

@@ -383,6 +383,7 @@ void print_short_stats(KB* kb) {
 			"ObjectPropertyChain................: %d\n"
 			"ObjectPropertyChain (binary).......: %d\n"
 			"ObjectPropertyChain (bin., unique).: %d\n"
+			"-----------------------------------\n"
 			"SubClassOf axioms..................: %d\n"
 			"EquivalentClasses axioms...........: %d\n"
 			"DisjointClasses axioms.............: %d\n"
@@ -393,6 +394,7 @@ void print_short_stats(KB* kb) {
 			"Individual.........................: %d\n"
 			"ClassAssertion axioms..............: %d\n"
 			"ObjectPropertyAssertion axioms.....: %d\n"
+			"SameIndvidual axioms...............: %d\n"
 			"-----------------------------------\n\n",
 			kb->tbox->classes.element_count,
 			kb->tbox->objectproperties.element_count,
@@ -413,5 +415,6 @@ void print_short_stats(KB* kb) {
 			kb->tbox->objectproperty_domain_axioms.element_count,
 			kb->abox->individual_count,
 			kb->abox->concept_assertion_count,
-			kb->abox->role_assertion_count);
+			kb->abox->role_assertion_count,
+			kb->tbox->same_individual_axioms.element_count);
 }

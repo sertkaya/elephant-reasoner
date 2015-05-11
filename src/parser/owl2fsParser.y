@@ -27,7 +27,6 @@
 	#include "../model/limits.h"
 	
 	#define YYSTYPE Expression
-	// #define YYPARSE_PARAM tbox 
 
 	char* yytext;
 	int yylex(void);
@@ -39,33 +38,49 @@
 	extern KB* kb;
 
 	// for parsing conjunction
-	int cls_exp_count;      								/* number of conjuncts */
-	ClassExpression* cls_exps[MAX_CONJUNCT_COUNT];			/* conjuncts */
+	// number of conjuncts in an ObjectIntersectionOf expression
+	int conjunct_count;
+	// the conjuncts in an ObjectIntersectionOf expression
+	ClassExpression* conjuncts[MAX_CONJUNCT_COUNT];
 
-	// for parsing equivalent classes axioms containing more than 2 class expressions
-	int eq_cls_exp_count;									/* number of class exps */
-	ClassExpression* eq_cls_exps[MAX_EQ_CLASS_EXP_COUNT];	/* class exps */
+	// for parsing EquivalentClasses axioms containing more than 2 class expressions
+	// number of class expressions in an EquivalentClasses axiom 
+	int equivalent_classes_count;
+	// the number of class expressions in an EquivalentClasses axiom
+	ClassExpression* equivalent_classes[MAX_EQ_CLASS_EXP_COUNT];
 	
-	// for parsing equivalent roles axioms containing more than 2 role expressions 
-	int equivalent_objectproperties_expressions_count;												/* number of roles */
-	ObjectPropertyExpression* equivalent_objectproperties_expressions[MAX_EQ_ROLE_EXP_COUNT];		/* roles in the composition */
+	// for parsing EquivalentObjectProperties axioms containing more than 2 object properties
+	// the number of object property expressions in an EquivalentObjectProperties axiom
+	int equivalent_objectproperties_count;
+	// the object property expressions in an EquivalentObjectProperties axiom
+	ObjectPropertyExpression* equivalent_objectproperties[MAX_EQ_ROLE_EXP_COUNT];
 	
-	// for parsing role composition
-	int comp_role_exp_count;													/* number of roles in the role composition */
-	ObjectPropertyExpression* comp_role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles in the composition */
+	// for parsing ObjectPropertyChain expressions
+	// the number of object property expressions in an object property chain expression
+	int objectproperty_chain_components_count;
+	// the object property expressions in an object property chain expression
+	ObjectPropertyExpression* objectproperty_chain_components[MAX_ROLE_COMPOSITION_SIZE];
 	
-	// for parsing role exps in HasKey
-	int hasKey_role_exp_count;									/* number of roles */
-	ObjectPropertyExpression* hasKey_role_exps[MAX_ROLE_COMPOSITION_SIZE];		/* roles */
+	// for parsing HasKey expressions
+	// the number of object properties in an HasKey expression
+	int haskey_objectproperty_expression_count;
+	// the object properties in an HasKey expression
+	ObjectPropertyExpression* haskey_objectproperties[MAX_ROLE_COMPOSITION_SIZE];
 	
-	int disj_cls_exp_count;										/* number of classes in a disjointclasses axiom */
-	ClassExpression* disj_cls_exps[MAX_DISJ_CLASS_EXP_COUNT];	/* the class exps in a disjointclasses axiom */
+	// for parsing DisjointClasses axioms
+	// number of classes in a DisjointClasses axiom 
+	int disjoint_classes_count;
+	// the class expressions in a DisjointClasses axiom
+	ClassExpression* disjoint_classes[MAX_DISJ_CLASS_EXP_COUNT];
 
+	// for parsing SameIndividual axioms
+	int same_individuals_count;
+	// the individuals in a SameIndividual axiom
+	Individual* same_individuals[MAX_SAME_INDIVIDUAL_COUNT];
+	
 	void unsupported_feature(char* feature);
 %}
 
-	// %parse-param {TBox* tbox} 
-	// %parse-param {ABox* abox}
 %parse-param {KB* kb} 
 
 %start ontologyDocument
@@ -299,23 +314,23 @@ ClassExpression:
 	| DataSomeValuesFrom
 	| DataHasValue; 
 
-classExpressions:
-	| ClassExpression classExpressions {
+conjuncts:
+	| ClassExpression conjuncts {
 		if ($1.concept != NULL)
-			cls_exps[cls_exp_count++] = $1.concept;
+			conjuncts[conjunct_count++] = $1.concept;
 	};
 
 
 ObjectIntersectionOf:
-	OBJECT_INTERSECTION_OF '(' ClassExpression ClassExpression classExpressions ')' {
-		cls_exps[cls_exp_count++] = $3.concept;
-		cls_exps[cls_exp_count++] = $4.concept;
-		$$.concept = get_create_conjunction(cls_exp_count, cls_exps, kb->tbox);
-		cls_exp_count = 0;
+	OBJECT_INTERSECTION_OF '(' ClassExpression ClassExpression conjuncts ')' {
+		conjuncts[conjunct_count++] = $3.concept;
+		conjuncts[conjunct_count++] = $4.concept;
+		$$.concept = get_create_conjunction(conjunct_count, conjuncts, kb->tbox);
+		conjunct_count = 0;
 	};
 
 
-	// TODO:
+// OWL2 EL allows only one individual in an ObjectOneOf description
 ObjectOneOf:
 	OBJECT_ONE_OF '(' Individual ')' {
 		$$.concept = get_create_nominal($3.individual, kb->tbox);
@@ -384,36 +399,37 @@ subClassExpression:
 superClassExpression:
 	ClassExpression;
 
+// TODO: move the creation of binary axioms to preprocessing
 EquivalentClasses:
 	EQUIVALENT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression equivalentClassExpressions ')' {
-		eq_cls_exps[eq_cls_exp_count++] = $4.concept;
-		eq_cls_exps[eq_cls_exp_count++] = $5.concept;
+		equivalent_classes[equivalent_classes_count++] = $4.concept;
+		equivalent_classes[equivalent_classes_count++] = $5.concept;
 		int i;
-		for (i = 0; i < eq_cls_exp_count - 1; ++i)
-			ADD_EQUIVALENT_CLASSES_AXIOM(create_eqclass_axiom(eq_cls_exps[i], eq_cls_exps[i+1]), kb->tbox);
-		eq_cls_exp_count = 0;
+		for (i = 0; i < equivalent_classes_count - 1; ++i)
+			ADD_EQUIVALENT_CLASSES_AXIOM(create_eqclass_axiom(equivalent_classes[i], equivalent_classes[i+1]), kb->tbox);
+		equivalent_classes_count = 0;
 	};
 
 // for parsing EquivalentClasses axioms containing more than 2 class expressions
 equivalentClassExpressions:
 	| ClassExpression equivalentClassExpressions {
 		if ($1.concept != NULL)
-			eq_cls_exps[eq_cls_exp_count++] = $1.concept;
+			equivalent_classes[equivalent_classes_count++] = $1.concept;
 	};
 
 DisjointClasses:
 	DISJOINT_CLASSES '(' axiomAnnotations ClassExpression ClassExpression disjointClassExpressions ')' {
-		disj_cls_exps[disj_cls_exp_count++] = $4.concept;
-		disj_cls_exps[disj_cls_exp_count++] = $5.concept;
-		ADD_DISJOINT_CLASSES_AXIOM(create_disjointclasses_axiom(disj_cls_exp_count, disj_cls_exps), kb->tbox);
-		disj_cls_exp_count = 0;
+		disjoint_classes[disjoint_classes_count++] = $4.concept;
+		disjoint_classes[disjoint_classes_count++] = $5.concept;
+		ADD_DISJOINT_CLASSES_AXIOM(create_disjointclasses_axiom(disjoint_classes_count, disjoint_classes), kb->tbox);
+		disjoint_classes_count = 0;
 	};
 
 
 disjointClassExpressions:
 	| ClassExpression disjointClassExpressions {
 		if ($1.concept != NULL)
-			disj_cls_exps[disj_cls_exp_count++] = $1.concept;
+			disjoint_classes[disjoint_classes_count++] = $1.concept;
 	};
 
 
@@ -437,36 +453,36 @@ subObjectPropertyExpression:
 
 propertyExpressionChain:
 	OBJECT_PROPERTY_CHAIN '(' ObjectPropertyExpression ObjectPropertyExpression chainObjectPropertyExpressions ')' {
-		comp_role_exps[comp_role_exp_count++] = $4.role;
-		comp_role_exps[comp_role_exp_count++] = $3.role;
-		$$.role = get_create_role_composition(comp_role_exp_count, comp_role_exps, kb->tbox);
-		comp_role_exp_count = 0;
+		objectproperty_chain_components[objectproperty_chain_components_count++] = $4.role;
+		objectproperty_chain_components[objectproperty_chain_components_count++] = $3.role;
+		$$.role = get_create_role_composition(objectproperty_chain_components_count, objectproperty_chain_components, kb->tbox);
+		objectproperty_chain_components_count = 0;
 	}
 
 chainObjectPropertyExpressions:
 	| ObjectPropertyExpression chainObjectPropertyExpressions {
 		if ($1.role != NULL)
-			comp_role_exps[comp_role_exp_count++] = $1.role;
+			objectproperty_chain_components[objectproperty_chain_components_count++] = $1.role;
 	};
 
 superObjectPropertyExpression:
 	ObjectPropertyExpression;
 
+// TODO: move the creation of binary axioms to preprocessing
 EquivalentObjectProperties:
 	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations ObjectPropertyExpression ObjectPropertyExpression equivalentObjectPropertyExpressions ')' {
-		// ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(create_eqrole_axiom($4.role, $5.role), kb->tbox);
-		equivalent_objectproperties_expressions[equivalent_objectproperties_expressions_count++] = $4.role;
-		equivalent_objectproperties_expressions[equivalent_objectproperties_expressions_count++] = $5.role;
+		equivalent_objectproperties[equivalent_objectproperties_count++] = $4.role;
+		equivalent_objectproperties[equivalent_objectproperties_count++] = $5.role;
 		int i;
-		for (i = 0; i < equivalent_objectproperties_expressions_count - 1; ++i)
-			ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(create_eqrole_axiom(equivalent_objectproperties_expressions[i], equivalent_objectproperties_expressions[i+1]), kb->tbox);
-		equivalent_objectproperties_expressions_count = 0;
+		for (i = 0; i < equivalent_objectproperties_count - 1; ++i)
+			ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(create_eqrole_axiom(equivalent_objectproperties[i], equivalent_objectproperties[i+1]), kb->tbox);
+		equivalent_objectproperties_count = 0;
 	};
 	
 equivalentObjectPropertyExpressions:
 	| ObjectPropertyExpression equivalentObjectPropertyExpressions {
 		if ($1.role != NULL)
-			equivalent_objectproperties_expressions[equivalent_objectproperties_expressions_count++] = $1.role;
+			equivalent_objectproperties[equivalent_objectproperties_count++] = $1.role;
 	};
 
 ObjectPropertyDomain:
@@ -540,7 +556,7 @@ HasKey:
 hasKeyObjectPropertyExpressions:
 	| ObjectPropertyExpression hasKeyObjectPropertyExpressions {
 		if ($1.role != NULL)
-			hasKey_role_exps[hasKey_role_exp_count++] = $1.role;
+			haskey_objectproperties[haskey_objectproperty_expression_count++] = $1.role;
 	};
 
 Assertion:
@@ -563,12 +579,16 @@ targetValue:
 	
 SameIndividual:
 	SAME_INDIVIDUAL '(' axiomAnnotations Individual Individual sameIndividuals ')' {
-		unsupported_feature("SameIndividual");
+		same_individuals[same_individuals_count++] = $4.individual;
+		same_individuals[same_individuals_count++] = $5.individual;
+		ADD_SAME_INDIVIDUAL_AXIOM(create_same_individual_axiom(same_individuals_count, same_individuals), kb->tbox);
+		same_individuals_count = 0;
 	};
 	
-	// TODO:
 sameIndividuals:
 	| Individual sameIndividuals {
+		if ($1.individual != NULL)
+			same_individuals[same_individuals_count++] = $1.individual;
 	};
 
 DifferentIndividuals:
@@ -608,7 +628,6 @@ NegativeDataPropertyAssertion:
 
 %%
 
-// void yyerror(TBox* tbox, ABox* abox, char* msg) {
 void yyerror(KB* kb, char* msg) {
 	fprintf(stderr, "\nline %d: %s\n", yylineno, msg);
 }

@@ -75,6 +75,7 @@ TBox* init_tbox() {
 	SET_INIT(&(tbox->equivalent_objectproperties_axioms), DEFAULT_EQUIVALENT_OBJECTPROPERTIES_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->transitive_objectproperty_axioms), DEFAULT_TRANSITIVE_OBJECTPROPERTY_AXIOMS_SET_SIZE);
 	SET_INIT(&(tbox->objectproperty_domain_axioms), DEFAULT_OBJECTPROPERTY_DOMAIN_AXIOMS_SET_SIZE);
+	SET_INIT(&(tbox->same_individual_axioms), DEFAULT_SAME_INDIVIDUAL_AXIOMS_SET_SIZE);
 
 	// add the top and bottom concepts
 	tbox->top_concept = get_create_atomic_concept(OWL_THING, tbox);

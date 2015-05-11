@@ -34,32 +34,32 @@ void preprocess_tbox(KB* kb) {
 	kb->generated_exists_restrictions = hash_map_create(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
 
 	// Convert equivalent classes axioms to subclass axioms
-	SetIterator iterator;
-	SET_ITERATOR_INIT(&iterator, &(tbox->equivalent_classes_axioms));
-	void* ax = SET_ITERATOR_NEXT(&iterator);
+	SetIterator set_iterator;
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->equivalent_classes_axioms));
+	void* ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		add_generated_subclass_axiom(kb, create_subclass_axiom(((EquivalentClassesAxiom*) ax)->lhs, ((EquivalentClassesAxiom*) ax)->rhs));
 		add_generated_subclass_axiom(kb, create_subclass_axiom(((EquivalentClassesAxiom*) ax)->rhs, ((EquivalentClassesAxiom*) ax)->lhs));
-		ax = SET_ITERATOR_NEXT(&iterator);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
 
 	// Convert equivalent roles axioms to subrole axioms
-	SET_ITERATOR_INIT(&iterator, &(tbox->equivalent_objectproperties_axioms));
-	ax = SET_ITERATOR_NEXT(&iterator);
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->equivalent_objectproperties_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		add_generated_subrole_axiom(kb, create_subrole_axiom(((EquivalentObjectPropertiesAxiom*) ax)->lhs, ((EquivalentObjectPropertiesAxiom*) ax)->rhs));
 		add_generated_subrole_axiom(kb, create_subrole_axiom(((EquivalentObjectPropertiesAxiom*) ax)->rhs, ((EquivalentObjectPropertiesAxiom*) ax)->lhs));
-		ax = SET_ITERATOR_NEXT(&iterator);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
 
 	// Process the transitive role axioms
 	ObjectPropertyExpression* composition;
-	SET_ITERATOR_INIT(&iterator, &(tbox->transitive_objectproperty_axioms));
-	ax = SET_ITERATOR_NEXT(&iterator);
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->transitive_objectproperty_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		composition = get_create_role_composition_binary(((TransitiveObjectPropertyAxiom*) ax)->r, ((TransitiveObjectPropertyAxiom*) ax)->r, tbox);
 		add_generated_subrole_axiom(kb, create_subrole_axiom(composition, ((TransitiveObjectPropertyAxiom*) ax)->r));
-		ax = SET_ITERATOR_NEXT(&iterator);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
 
 	// Process the disjointclasses axioms.
@@ -68,8 +68,8 @@ void preprocess_tbox(KB* kb) {
 	// TODO: optimize!
 	int i, j;
 	ClassExpression* conjunction;
-	SET_ITERATOR_INIT(&iterator, &(tbox->disjoint_classes_axioms));
-	ax = SET_ITERATOR_NEXT(&iterator);
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->disjoint_classes_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		for (i = 0; i < ((DisjointClassesAxiom*) ax)->classes.size - 1; ++i)
 			for (j = i + 1; j < ((DisjointClassesAxiom*) ax)->classes.size ; ++j) {
@@ -82,16 +82,32 @@ void preprocess_tbox(KB* kb) {
 						(ClassExpression*) ((DisjointClassesAxiom*) ax)->classes.elements[j], tbox);
 				add_generated_subclass_axiom(kb, create_subclass_axiom(conjunction, tbox->bottom_concept));
 			}
-		ax = SET_ITERATOR_NEXT(&iterator);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
 
 	// Process the ObjectProperyDomain axioms
-	SET_ITERATOR_INIT(&iterator, &(tbox->objectproperty_domain_axioms));
-	ax = SET_ITERATOR_NEXT(&iterator);
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->objectproperty_domain_axioms));
+	ax = SET_ITERATOR_NEXT(&set_iterator);
 	while (ax) {
 		ClassExpression* lhs = get_create_exists_restriction(((ObjectPropertyDomainAxiom*) ax)->object_property_expression, tbox->top_concept, tbox);
 		add_generated_subclass_axiom(kb, create_subclass_axiom(lhs, ((ObjectPropertyDomainAxiom*) ax)->class_expression));
-		ax = SET_ITERATOR_NEXT(&iterator);
+		ax = SET_ITERATOR_NEXT(&set_iterator);
+	}
+
+	// Process the SameIndividual axioms
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->same_individual_axioms));
+	SameIndividualAxiom* same_individual_ax = SET_ITERATOR_NEXT(&set_iterator);
+	while (same_individual_ax) {
+		int i;
+		for (i = 0; i < same_individual_ax->individuals.size - 1; ++i) {
+			add_generated_subclass_axiom(kb, create_subclass_axiom(
+					get_create_generated_nominal(kb, same_individual_ax->individuals.elements[i]),
+					get_create_generated_nominal(kb, same_individual_ax->individuals.elements[i+1])));
+			add_generated_subclass_axiom(kb, create_subclass_axiom(
+					get_create_generated_nominal(kb, same_individual_ax->individuals.elements[i+1]),
+					get_create_generated_nominal(kb, same_individual_ax->individuals.elements[i])));
+		}
+		same_individual_ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
 }
 

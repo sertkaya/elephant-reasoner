@@ -85,6 +85,9 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
 
 // create an objectproperty domain axiom with the given objectproperty and class expressions
 ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpression* ope, ClassExpression* ce);
+
+// create a SameIndividual axiom with the given list of individuals
+SameIndividualAxiom* create_same_individual_axiom(int individual_count, Individual** individuals);
 /******************************************************************************
  * add functions for axioms
 *****************************************************************************/
@@ -108,6 +111,9 @@ ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpr
 
 // add a given object property domain axiom to a given ontology
 #define ADD_OBJECTPROPERTY_DOMAIN_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->objectproperty_domain_axioms))
+
+// add a given same individual axiom to a given ontology
+#define ADD_SAME_INDIVIDUAL_AXIOM(ax, tbox)					SET_ADD(ax, &(tbox->same_individual_axioms))
 /******************************************************************************
  * Get/create functions for ABox
  *****************************************************************************/
