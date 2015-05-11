@@ -2,11 +2,10 @@ Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
 
 Ontology(<http://www.ihtsdo.org/>
 
+SubClassOf(ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#A>) <http://www.ihtsdo.org#B>)
+ClassAssertion(<http://www.ihtsdo.org#A> <http://www.ihtsdo.org#i2>)
+ObjectPropertyAssertion(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#i1> <http://www.ihtsdo.org#i2>)
 
-ClassAssertion(<http://www.ihtsdo.org#A> <http://www.ihtsdo.org#i1>)
-
-SameIndividual(<http://www.ihtsdo.org#i1> <http://www.ihtsdo.org#i2> <http://www.ihtsdo.org#i3>)
-SameIndividual(<http://www.ihtsdo.org#i3> <http://www.ihtsdo.org#i4>)
-
+SameIndividual(<http://www.ihtsdo.org#i1> <http://www.ihtsdo.org#i3> <http://www.ihtsdo.org#i4>)
 )
 
