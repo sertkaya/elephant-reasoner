@@ -1,0 +1,8 @@
+Ontology(<http://www.ihtsdo.org/>
+
+EquivalentObjectProperties(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#s> <http://www.ihtsdo.org#t> <http://www.ihtsdo.org#u>) 
+
+SubClassOf(<http://www.ihtsdo.org#A> ObjectSomeValuesFrom(<http://www.ihtsdo.org#r> <http://www.ihtsdo.org#C>))
+
+SubClassOf(ObjectSomeValuesFrom(<http://www.ihtsdo.org#t> <http://www.ihtsdo.org#C>) <http://www.ihtsdo.org#B>) 
+)

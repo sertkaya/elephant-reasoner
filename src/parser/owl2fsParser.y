@@ -47,8 +47,8 @@
 	ClassExpression* eq_cls_exps[MAX_EQ_CLASS_EXP_COUNT];	/* class exps */
 	
 	// for parsing equivalent roles axioms containing more than 2 role expressions 
-	int eq_role_exp_count;														/* number of roles */
-	ObjectPropertyExpression* eq_role_exps[MAX_EQ_ROLE_EXP_COUNT];				/* roles in the composition */
+	int equivalent_objectproperties_expressions_count;												/* number of roles */
+	ObjectPropertyExpression* equivalent_objectproperties_expressions[MAX_EQ_ROLE_EXP_COUNT];		/* roles in the composition */
 	
 	// for parsing role composition
 	int comp_role_exp_count;													/* number of roles in the role composition */
@@ -454,13 +454,19 @@ superObjectPropertyExpression:
 
 EquivalentObjectProperties:
 	EQUIVALENT_OBJECT_PROPERTIES '(' axiomAnnotations ObjectPropertyExpression ObjectPropertyExpression equivalentObjectPropertyExpressions ')' {
-		ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(create_eqrole_axiom($4.role, $5.role), kb->tbox);
+		// ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(create_eqrole_axiom($4.role, $5.role), kb->tbox);
+		equivalent_objectproperties_expressions[equivalent_objectproperties_expressions_count++] = $4.role;
+		equivalent_objectproperties_expressions[equivalent_objectproperties_expressions_count++] = $5.role;
+		int i;
+		for (i = 0; i < equivalent_objectproperties_expressions_count - 1; ++i)
+			ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(create_eqrole_axiom(equivalent_objectproperties_expressions[i], equivalent_objectproperties_expressions[i+1]), kb->tbox);
+		equivalent_objectproperties_expressions_count = 0;
 	};
 	
 equivalentObjectPropertyExpressions:
 	| ObjectPropertyExpression equivalentObjectPropertyExpressions {
 		if ($1.role != NULL)
-			eq_role_exps[eq_role_exp_count++] = $1.role;
+			equivalent_objectproperties_expressions[equivalent_objectproperties_expressions_count++] = $1.role;
 	};
 
 ObjectPropertyDomain:
