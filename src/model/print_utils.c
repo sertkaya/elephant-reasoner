@@ -394,7 +394,8 @@ void print_short_stats(KB* kb) {
 			"Individual.........................: %d\n"
 			"ClassAssertion axioms..............: %d\n"
 			"ObjectPropertyAssertion axioms.....: %d\n"
-			"SameIndvidual axioms...............: %d\n"
+			"SameIndividual axioms..............: %d\n"
+			"DifferentIndividuals axioms........: %d\n"
 			"-----------------------------------\n\n",
 			kb->tbox->classes.element_count,
 			kb->tbox->objectproperties.element_count,
@@ -416,5 +417,6 @@ void print_short_stats(KB* kb) {
 			kb->abox->individual_count,
 			kb->abox->concept_assertion_count,
 			kb->abox->role_assertion_count,
-			kb->tbox->same_individual_axioms.element_count);
+			kb->tbox->same_individual_axioms.element_count,
+			kb->tbox->different_individuals_axioms.element_count);
 }

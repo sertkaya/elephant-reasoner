@@ -77,7 +77,12 @@
 	int same_individuals_count;
 	// the individuals in a SameIndividual axiom
 	Individual* same_individuals[MAX_SAME_INDIVIDUAL_COUNT];
-	
+
+	// for parsing DifferentIndividuals axioms
+	int different_individuals_count;
+	// the individuals in a DifferentIndividuals axiom
+	Individual* different_individuals[MAX_DIFFERENT_INDIVIDUALS_COUNT];
+
 	void unsupported_feature(char* feature);
 %}
 
@@ -593,12 +598,16 @@ sameIndividuals:
 
 DifferentIndividuals:
 	DIFFERENT_INDIVIDUALS '(' axiomAnnotations Individual Individual differentIndividuals  ')' {
-		unsupported_feature("DifferentIndividuals");
+		different_individuals[different_individuals_count++] = $4.individual;
+		different_individuals[different_individuals_count++] = $5.individual;
+		ADD_DIFFERENT_INDIVIDUALS_AXIOM(create_different_individuals_axiom(different_individuals_count, different_individuals), kb->tbox);
+		different_individuals_count = 0;
 	};
 
-	// TODO:
 differentIndividuals:
 	| Individual differentIndividuals {
+		if ($1.individual != NULL)
+			different_individuals[different_individuals_count++] = $1.individual;
 	};
 
 ClassAssertion:

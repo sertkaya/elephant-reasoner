@@ -424,6 +424,18 @@ SameIndividualAxiom* create_same_individual_axiom(int individual_count, Individu
 
 	return ax;
 }
+
+// create a DifferentIndividuals axiom with the given list of individuals
+DifferentIndividualsAxiom* create_different_individuals_axiom(int individual_count, Individual** individuals) {
+	DifferentIndividualsAxiom* ax = (DifferentIndividualsAxiom*) calloc(1, sizeof(DifferentIndividualsAxiom));
+	assert(ax != NULL);
+	LIST_INIT(&(ax->individuals));
+	int i;
+	for (i = 0; i < individual_count; ++i)
+		list_add(individuals[i], &(ax->individuals));
+
+	return ax;
+}
 /******************************************************************************
  * get/create functions for ABox
  *****************************************************************************/

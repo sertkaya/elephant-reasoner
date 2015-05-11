@@ -88,6 +88,9 @@ ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpr
 
 // create a SameIndividual axiom with the given list of individuals
 SameIndividualAxiom* create_same_individual_axiom(int individual_count, Individual** individuals);
+
+// create a DifferentIndividuals axiom with the given list of individuals
+DifferentIndividualsAxiom* create_different_individuals_axiom(int individual_count, Individual** individuals);
 /******************************************************************************
  * add functions for axioms
 *****************************************************************************/
@@ -114,6 +117,9 @@ SameIndividualAxiom* create_same_individual_axiom(int individual_count, Individu
 
 // add a given same individual axiom to a given ontology
 #define ADD_SAME_INDIVIDUAL_AXIOM(ax, tbox)					SET_ADD(ax, &(tbox->same_individual_axioms))
+
+// add a given different individuals axiom to a given ontology
+#define ADD_DIFFERENT_INDIVIDUALS_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->different_individuals_axioms))
 /******************************************************************************
  * Get/create functions for ABox
  *****************************************************************************/

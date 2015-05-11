@@ -52,6 +52,7 @@ typedef struct equivalent_object_properties_axiom EquivalentObjectPropertiesAxio
 typedef struct transitive_object_property_axiom TransitiveObjectPropertyAxiom;
 typedef struct objectproperty_domain_axiom ObjectPropertyDomainAxiom;
 typedef struct same_individual_axiom SameIndividualAxiom;
+typedef struct different_individuals_axiom DifferentIndividualsAxiom;
 
 // TBox
 typedef struct tbox TBox;
@@ -266,6 +267,12 @@ struct same_individual_axiom {
 	List individuals;
 };
 
+struct different_individuals_axiom {
+	// List of individuals in this axiom
+	// Elements are of type Individual*
+	List individuals;
+};
+
 // TBox
 struct tbox {
 	// Class expressions and object property expressions
@@ -347,6 +354,11 @@ struct tbox {
 	// The set of SameIndividual axioms
 	// The members are of type SameIndividualAxiom*
 	Set same_individual_axioms;
+
+	// The set of DifferentIndividuals axioms
+	// The members are of type DifferentIndividualsAxiom*
+	Set different_individuals_axioms;
+
 };
 
 /******************************************************************************/

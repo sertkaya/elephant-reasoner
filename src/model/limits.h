@@ -31,6 +31,7 @@
 // #define MAX_OBJECT_PROPERTY_NAME_LENGTH	1024 /* max size for object property names */
 #define MAX_DISJ_CLASS_EXP_COUNT		1024 /* max number of disjoint classes in a DisjointClasses axiom */
 #define MAX_SAME_INDIVIDUAL_COUNT		1024 /* max number of individuals in a SameIndividual axiom */
+#define MAX_DIFFERENT_INDIVIDUALS_COUNT	1024 /* max number of individuals in a DifferentIndividuals axiom */
 
 // Default set/map sizes (per ontology)
 #define DEFAULT_PREFIXES_HASH_SIZE					32
@@ -51,6 +52,7 @@
 #define DEFAULT_EQUIVALENT_OBJECTPROPERTIES_AXIOMS_SET_SIZE		128
 #define DEFAULT_OBJECTPROPERTY_DOMAIN_AXIOMS_SET_SIZE			128
 #define DEFAULT_SAME_INDIVIDUAL_AXIOMS_SET_SIZE					128
+#define DEFAULT_DIFFERENT_INDIVIDUALS_AXIOMS_SET_SIZE			128
 
 // Default set/map sizes (per class expression)
 #define DEFAULT_NEGATIVE_FILLER_OF_SET_SIZE			8
