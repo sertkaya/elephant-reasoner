@@ -109,6 +109,24 @@ void preprocess_tbox(KB* kb) {
 		}
 		same_individual_ax = SET_ITERATOR_NEXT(&set_iterator);
 	}
+
+	// Process the DifferentIndividuals axioms
+	// TODO: Improvement in performance. Like in processing of DisjointClasses axioms, it
+	// generates n^2 new subclass axioms for a DifferentIndividuals axiom containing n individuals
+	SET_ITERATOR_INIT(&set_iterator, &(tbox->different_individuals_axioms));
+	DifferentIndividualsAxiom* different_individuals_ax = SET_ITERATOR_NEXT(&set_iterator);
+	while (different_individuals_ax) {
+		for (i = 0; i < different_individuals_ax->individuals.size - 1; ++i)
+			for (j = i + 1; j < different_individuals_ax->individuals.size; ++j) {
+				conjunction = get_create_conjunction_binary(
+						get_create_generated_nominal(kb, different_individuals_ax->individuals.elements[i]),
+						get_create_generated_nominal(kb, different_individuals_ax->individuals.elements[j]), tbox);
+				add_generated_subclass_axiom(kb, create_subclass_axiom(conjunction, tbox->bottom_concept));
+				printf("%s\n", class_expression_to_string(kb, conjunction));
+			}
+		printf("--------------------\n");
+		different_individuals_ax = SET_ITERATOR_NEXT(&set_iterator);
+	}
 }
 
 // Preprocess assertions and translate them to subclass axioms for saturation. ABox individuals are translated to
