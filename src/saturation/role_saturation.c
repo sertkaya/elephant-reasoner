@@ -136,75 +136,21 @@ void saturate_roles(KB* kb) {
 			SET_ITERATOR_INIT(&subsumees_iterator_2, &(object_property_chain->description.object_property_chain.role2->subsumees));
 			subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			while (subsumee_2) {
-				// if (!GET_ROLE_COMPOSITION(subsumee_1, subsumee_2, kb->tbox)) {
-				// if (subsumee_1 != object_property_chain->description.object_property_chain.role1 && subsumee_2 != object_property_chain->description.object_property_chain.role2) {
 					// new object property chain
 					ObjectPropertyExpression* new_composition = get_create_role_composition_binary(
 							(ObjectPropertyExpression*) subsumee_1,
 							(ObjectPropertyExpression*) subsumee_2,
 							kb->tbox);
 
-					// add_to_role_subsumer_list(new_composition, new_composition);
-					// add_to_role_subsumee_list(new_composition, new_composition);
-
 					add_to_role_subsumer_list(new_composition, object_property_chain);
-					// add_to_role_subsumee_list(object_property_chain, new_composition);
-					// push(&scheduled_object_property_chains, object_property_chain);
-					// enqueue(&scheduled_object_property_chains, object_property_chain);
-
-					// printf("new composition:%s\n", object_property_expression_to_string(kb, new_composition));
 					index_role(new_composition);
-					// push(&scheduled_object_property_chains, new_composition);
-					// enqueue(&scheduled_object_property_chains, new_composition);
-
-					/*
-					SET_ITERATOR_INIT(&told_subsumers_iterator, &(object_property_chain->told_subsumers));
-					ObjectPropertyExpression* told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
-					while (told_subsumer) {
-						add_to_role_subsumer_list(new_composition, told_subsumer);
-						// add_to_role_subsumee_list(told_subsumer, new_composition);
-						// enqueue(&scheduled_object_property_chains, new_composition);
-						told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
-					}
-					*/
-
-					/*
-					SetIterator component_of_iterator;
-					SET_ITERATOR_INIT(&component_of_iterator, &new_composition->first_component_of);
-					ObjectPropertyExpression* component_of = SET_ITERATOR_NEXT(&component_of_iterator);
-					while (component_of) {
-						printf("first component of:%s\n", object_property_expression_to_string(kb, component_of));
-						enqueue(&scheduled_object_property_chains, component_of);
-						component_of = SET_ITERATOR_NEXT(&component_of_iterator);
-					}
-
-					SET_ITERATOR_INIT(&component_of_iterator, &new_composition->second_component_of);
-					component_of = SET_ITERATOR_NEXT(&component_of_iterator);
-					while (component_of) {
-						printf("second component of:%s\n", object_property_expression_to_string(kb, component_of));
-						enqueue(&scheduled_object_property_chains, component_of);
-						component_of = SET_ITERATOR_NEXT(&component_of_iterator);
-					}
-					*/
-				// }
 				subsumee_2 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}
 			subsumee_1 = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		}
-
-
 		// object_property_chain = pop(&scheduled_object_property_chains);
 		object_property_chain = dequeue(&scheduled_object_property_chains);
 	}
-/*
-	// print the object property chains
-	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->objectproperty_chains));
-	object_property_chain = (ObjectPropertyExpression*) MAP_ITERATOR_NEXT(&map_iterator);
-	while (object_property_chain) {
-		printf("%s:%d\n", object_property_expression_to_string(kb, object_property_chain), object_property_chain->subsumers.element_count);
-		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
-	}
-	*/
 
 	// remove the redundant subsumers of object property chains
 	Set subsumers_to_remove;
@@ -250,11 +196,6 @@ void saturate_roles(KB* kb) {
 			subsumer_to_remove = (ObjectPropertyExpression*) SET_ITERATOR_NEXT(&remove_iterator);
 		}
 		SET_RESET(&subsumers_to_remove);
-
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
-
-
-
-
 }
