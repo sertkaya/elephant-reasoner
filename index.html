@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>elephant-reasoner by sertkaya</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>elephant-reasoner</h1>
+        <p>ELepHant: An OWL 2 EL Reasoner</p>
+
+        <p class="view"><a href="https://github.com/sertkaya/elephant-reasoner">View the Project on GitHub <small>sertkaya/elephant-reasoner</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/sertkaya/elephant-reasoner/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/sertkaya/elephant-reasoner/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/sertkaya/elephant-reasoner">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <pre><code>                                THE
+                              ELEPHANT
+                       rea   sonerisaco   nse
+                      quence basedreaso nerfor
+                     theEL+fr agmentof descript
+                      ionlog ics.Itaims scalab
+                        lea     ndfas     tre
+                              /(ason)\
+                             (( ingsu))
+                                pport
+                                forOW
+                                L2ELp
+                                 rof
+                                 il
+                                 e
+                                .
+</code></pre>
+
+<p>ELepHant is a consequence-based reasoner for the EL+ fragment of Description
+Logics. </p>
+
+<p>Currently it supports input ontologies from command line in the 
+OWL Functional Style Syntax. Support for OWL API is planned.</p>
+
+<p>The supported reasoning tasks are the following:</p>
+
+<ul>
+<li>classification,</li>
+<li>consistency, and</li>
+<li>realization.</li>
+</ul>
+
+<p>ELepHant supports a subset of the OWL2 EL ontology language, which contains
+the following features:</p>
+
+<p>Axiom types:</p>
+
+<ul>
+<li>SubClassOf</li>
+<li>EquivalentClasses</li>
+<li>DisjointClasses</li>
+<li>SubObjectPropertyOf</li>
+<li>EquivalentObjectProperties</li>
+<li>TransitiveObjectProperty</li>
+<li>ObjectPropertyDomain</li>
+<li>ClassAssertion</li>
+<li>ObjectPropertyAssertion </li>
+<li>SameIndividual</li>
+<li>DifferentIndividuals</li>
+</ul>
+
+<p>Class expressions:</p>
+
+<ul>
+<li>owl:Thing</li>
+<li>owl:Nothing</li>
+<li>ObjectIntersectionOf</li>
+<li>ObjectSomeValuesFrom</li>
+<li>ObjectOneOf</li>
+</ul>
+
+<p>Object property expressions:</p>
+
+<ul>
+<li>ObjectPropertyChain </li>
+</ul>
+
+<hr>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>The ELepHant Reasoner is available both as precompiled binaries and source.
+Currently the binary distribution is available for the 64-bit Linux x86 
+platform. The binary is statically compiled, i.e., you do not need to install
+any external libraries. Binaries for other platforms are on the way.</p>
+
+<p>You can also install ELepHant from the sources. It does not depend on any external
+libraries. You can get the source either as a tarball or clone the git repository.</p>
+
+<h2>
+<a id="compiling" class="anchor" href="#compiling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compiling:</h2>
+
+<p>Untar the tarball: 
+$ tar zxvf ELepHant-reasoner-0.3.0.tar.gz</p>
+
+<p>Change to the source directory
+$ cd ELepHant-reasoner-0.3.0</p>
+
+<p>Run the configure script with
+$ ./configure</p>
+
+<p>Then run make:
+$ make</p>
+
+<p>If everything goes right, the executable elephant-reasoner will be created in the
+src directory. You can install it with:
+$ make install</p>
+
+<p>The executable elephant-reasoner will be installed in /usr/local/bin</p>
+
+<hr>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>$ elephant-reasoner -i input_ontology -o output_taxonomy -r reasoning_task</p>
+
+<p>where reasoning task is one of classification, consistency or realisation.</p>
+
+<p>If run with the verbose option "-v", ELepHant prints detailed information about 
+the input ontology (like the number of axioms, classes etc.) and statistical information 
+about reasoning (like runtimes, number of inferred axioms, etc.)</p>
+
+<h2>
+<a id="known-bugs" class="anchor" href="#known-bugs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known bugs:</h2>
+
+<ul>
+<li>So far no known bugs for the supported features (20.05.2015)</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/sertkaya">sertkaya</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
