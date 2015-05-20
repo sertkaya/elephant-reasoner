@@ -1,8 +1,27 @@
 
+                                       
+                                    THE
+                                  ELEPHANT
+                           rea   sonerisaco   nse
+                          quence basedreaso nerfor
+                         theEL+fr agmentof descript
+                          ionlog ics.Itaims scalab
+                            lea     ndfas     tre
+                                  /(ason)\
+                                 (( ingsu))
+                                    pport
+                                    forOW
+                                    L2ELp
+                                     rof
+                                     il
+                                     e
+                                    .
+
+
 ELepHant is a consequence-based reasoner for the EL+ fragment of Description
 Logics. 
 
-Currently it only supports input ontologies from command line in the 
+Currently it supports input ontologies from command line in the 
 OWL Functional Style Syntax. Support for OWL API is planned.
 
 The supported reasoning tasks are the following:
@@ -10,28 +29,32 @@ The supported reasoning tasks are the following:
 	- consistency, and
 	- realization.
 
-ELepHant does not yet support full OWL2 EL. The supported features are the following:
-Supported axiom types:
+ELepHant supports a subset of the OWL2 EL ontology language, which contains
+the following features:
+
+Axiom types:
 	- SubClassOf
 	- EquivalentClasses
 	- DisjointClasses
 	- SubObjectPropertyOf
 	- EquivalentObjectProperties
 	- TransitiveObjectProperty
+	- ObjectPropertyDomain
 	- ClassAssertion
 	- ObjectPropertyAssertion 
-
-Supported class expressions:
+	- SameIndividual
+	- DifferentIndividuals
+	
+Class expressions:
 	- owl:Thing
 	- owl:Nothing
 	- ObjectIntersectionOf
 	- ObjectSomeValuesFrom
+	- ObjectOneOf
 
-Supported property expressions:
+Object property expressions:
 	- ObjectPropertyChain 
 
-Supported Individual expressions:
-	- NamedIndividual 
 
 --------------------------------------------------------------------------------
 Installation
@@ -42,7 +65,7 @@ platform. The binary is statically compiled, i.e., you do not need to install
 any external libraries. Binaries for other platforms are on the way.
 
 You can also install ELepHant from the sources. It does not depend on any external
-library. You can get the source either as a tarball or check it out from the SVN. 
+libraries. You can get the source either as a tarball or clone the git repository.
 
 Compiling:
 ----------
@@ -82,4 +105,4 @@ about reasoning (like runtimes, number of inferred axioms, etc.)
 Known bugs:
 --------------------------------------------------------------------------------
 
-- So far no known bugs for the supported features (22.05.2014)
+- So far no known bugs for the supported features (20.05.2015)
