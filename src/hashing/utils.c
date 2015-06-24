@@ -19,35 +19,34 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
+#include <string.h>
 
 #include "hash_table.h"
 #include "hash_map.h"
+#include "murmur3.h"
 
-/* Round up to the next highest power of 2 */
-/* from http://www-graphics.stanford.edu/~seander/bithacks.html */
+/*
+ * Round up to the next highest power of 2.
+ * From http://www-graphics.stanford.edu/~seander/bithacks.html
+ */
 inline uint32_t roundup_pow2(uint32_t value) {
-  --value;
-  value |= value >> 1;
-  value |= value >> 2;
-  value |= value >> 4;
-  value |= value >> 8;
-  value |= value >> 16;
-  ++value;
+	--value;
+	value |= value >> 1;
+	value |= value >> 2;
+	value |= value >> 4;
+	value |= value >> 8;
+	value |= value >> 16;
+	++value;
 
-  return value;
+	return value;
 }
 
-// inline uint64_t hash_string(unsigned char* key) {
-// 	uint64_t hash_value = 5381;
-// 	int c;
-//
-// 	while ((c = *key++))
-// 		hash_value = ((hash_value << 5) + hash_value) + c; /* hash * 33 + c */
-// 		// hash_value = ((hash_value << 5) - hash_value) + c; /* hash * 31 + c */
-//
-// 	return hash_value;
-// }
-
+/*
+ * The Jenkins hash algorithm. Originally 32-bit, modified here to 64-bit.
+ * Switched to the Murmur3 algorithm due to collisions in class names in large
+ * ontologies, for instance the ore_ont_13355.owl ontology in the ORE 2015 dataset.
+ */
+/*
 uint64_t hash_string(unsigned char *key) {
     uint64_t hash_value = 0;
     int c;
@@ -62,15 +61,4 @@ uint64_t hash_string(unsigned char *key) {
 
     return hash_value;
 }
-
-// murmur3
-inline uint32_t hash_pointer(uint32_t key) {
-	uint32_t hash_value;
-	hash_value ^= key >> 16;
-	hash_value *= 0x85ebca6b;
-	hash_value ^= hash_value >> 13;
-	hash_value *= 0xc2b2ae35;
-	hash_value ^= hash_value >> 16;
-
-	return hash_value;
-}
+*/

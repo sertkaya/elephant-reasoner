@@ -21,6 +21,7 @@
 #define MODEL_UTILS_H_
 
 #include <stdint.h>
+#include <string.h>
 
 #include "../hashing/utils.h"
 #include "../hashing/hash_map.h"
@@ -28,17 +29,17 @@
 #include "datatypes.h"
 
 // returns the prefix with the given prefix name
-#define GET_ONTOLOGY_PREFIX(prefix_name, kb)	MAP_GET(hash_string(prefix_name), &(kb->prefixes))
+#define GET_ONTOLOGY_PREFIX(prefix_name, kb)			MAP_GET(HASH_STRING(prefix_name), &(kb->prefixes))
 
 // inserts the prefix with the given prefix name into the prefixes hash
-#define PUT_ONTOLOGY_PREFIX(prefix_name, prefix, kb)		MAP_PUT(hash_string(prefix_name), prefix, &(kb->prefixes))
+#define PUT_ONTOLOGY_PREFIX(prefix_name, prefix, kb)	MAP_PUT(HASH_STRING(prefix_name), prefix, &(kb->prefixes))
 
 // returns the atomic concept with the given name if it exists
 // NULL if it does not exist
-#define GET_ATOMIC_CONCEPT(IRI, tbox)		MAP_GET(hash_string(IRI), &(tbox->classes))
+#define GET_ATOMIC_CONCEPT(IRI, tbox)					MAP_GET(HASH_STRING(IRI), &(tbox->classes))
 
 // inserts the atomic concept with the given name to the hash
-#define PUT_ATOMIC_CONCEPT(IRI, c, tbox)	MAP_PUT(hash_string(IRI), c, &(tbox->classes))
+#define PUT_ATOMIC_CONCEPT(IRI, c, tbox)				MAP_PUT(HASH_STRING(IRI), c, &(tbox->classes))
 
 // get the existential restriction with role r and filler f from hash
 #define GET_EXISTS_RESTRICTION(role_id, filler_id, tbox)		MAP_GET(HASH_INTEGERS(role_id, filler_id), &(tbox->object_some_values_from_exps))
@@ -61,10 +62,10 @@
 
 // return the atomic role with the given name if it exists
 // NULL if it does not exist
-#define GET_ATOMIC_ROLE(IRI, tbox)			MAP_GET(hash_string(IRI), &(tbox->objectproperties))
+#define GET_ATOMIC_ROLE(IRI, tbox)			MAP_GET(HASH_STRING(IRI), &(tbox->objectproperties))
 
 // insert the atomic role with the given name to the hash
-#define PUT_ATOMIC_ROLE(IRI, r, tbox)		MAP_PUT(hash_string(IRI), r, &(tbox->objectproperties))
+#define PUT_ATOMIC_ROLE(IRI, r, tbox)		MAP_PUT(HASH_STRING(IRI), r, &(tbox->objectproperties))
 
 
 // get the role compoisiton with the given roles
@@ -76,10 +77,10 @@
 /******************************************************************************/
 // Returns the individual with the given name if it exists
 // NULL if it does not exist
-#define GET_INDIVIDUAL(IRI, abox)			hash_map_get(abox->individuals, hash_string(IRI))
+#define GET_INDIVIDUAL(IRI, abox)			hash_map_get(abox->individuals, HASH_STRING(IRI))
 
 // Inserts the given individual into the hash of individuals.
 // Individual name is the key.
-#define PUT_INDIVIDUAL(IRI, i, abox)		hash_map_put(abox->individuals, hash_string(IRI), i)
+#define PUT_INDIVIDUAL(IRI, i, abox)		hash_map_put(abox->individuals, HASH_STRING(IRI), i)
 
 #endif

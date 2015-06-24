@@ -18,23 +18,19 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
-#include "../hashing/utils.h"
 #include "../utils/map.h"
+#include "../hashing/utils.h"
 
 int main(int argc, char *argv[]) {
 	Map map;
 	MAP_INIT(&map, 16);
+	MAP_PUT(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), "D054872", &map);
 
-	char* prefix_name = "";
-	char* prefix = "<http://www.w3.org/2002/07/owl#>";
-	MAP_PUT(HASH_STRING(prefix_name), prefix, &map);
-
-	char str[32] = ":Thing";
-	char delim[2] = ":";
-	char* token = strtok(str, delim);
-	printf("token: %s\n", token);
-	printf("token value: %s\n", (char*) MAP_GET(HASH_STRING(token), &map));
+	printf("%s\n", MAP_GET(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), &map));
+	printf("%s\n", MAP_GET(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"), &map));
+	printf("%" PRIu32 "\n%" PRIu32 "\n", HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"));
 
 	return 0;
 }

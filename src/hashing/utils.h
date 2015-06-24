@@ -18,29 +18,26 @@
 
 #include <stdint.h>
 
+#include "murmur3.h"
+
 #ifndef HASHING_UTILS_H_
 #define HASHING_UTILS_H_
 
 /**
  * Hash function for hashing a pointer.
- * TODO: temporary implementation!
+ * TODO: improve and check 32-bit/64-bit differences
  */
-// #define HASH_POINTER(key)									(((size_t) key << 5) - (size_t) key)
-#define HASH_POINTER(key)									((size_t) key) >> 3	// for 64 bit
-// #define HASH_POINTER(key)									((unsigned int) key) >> 3	// for 64 bit
-// #define HASH_POINTER(key)									((unsigned int) key) 	// for 64 bit
-// #define HASH_POINTER(key)									(size_t)((13 * (size_t) key) ^ ((size_t) key >> 15))
+#define HASH_POINTER(key)			((size_t) key) >> 3	// for 64 bit
 
 /**
  * Simple hash function for hashing an unsigned integer.
  */
-// #define HASH_UNSIGNED(hash_table_bucket_count,key)			(((key << 5) - key) & (hash_table_bucket_count - 1))
-#define HASH_UNSIGNED(key)									((key << 3) - key)
+#define HASH_UNSIGNED(key)			((key << 3) - key)
 
 /**
  * Hash two 32-bit unsigned integers into a 64-bit unsigned integer.
  */
-#define HASH_INTEGERS(int1,int2)							((uint64_t)int1 << 32 | int2)
+#define HASH_INTEGERS(int1,int2)	((uint64_t)int1 << 32 | int2)
 
 /**
  * Round up to the next higher power of 2. Used for hash sizes.
@@ -48,8 +45,9 @@
 inline uint32_t roundup_pow2(uint32_t value);
 
 /**
- * Hash a string into a 64-bit int.
+ * Hash a string into a 64-bit unsigned int using the Murmur3 algorithm.
+ * 42 is the seed.
  */
-inline uint64_t hash_string(unsigned char* key);
+#define HASH_STRING(key)			MurmurHash3_x64_128(key, strlen(key), 42)
 
 #endif
