@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	int test_size = atoi(argv[1]);
 	int hash_table_size = atoi(argv[2]);
 
-	int* tmp = malloc(test_size * sizeof(int));
+	void** tmp = malloc(test_size * sizeof(void*));
 	assert(tmp != NULL);
 
 	HashTable* hash_table = hash_table_create(hash_table_size);
@@ -39,7 +39,8 @@ int main(int argc, char *argv[]) {
 	fflush(stdout);
 	START_TIMER(start_time);
 	for (i = 0; i < test_size; ++i) {
-		tmp[i] = i+1;
+		tmp[i] = malloc(sizeof(void));
+		assert(tmp[i] != NULL);
 		hash_table_insert(hash_table, (void*) tmp[i]);
 	}
 	STOP_TIMER(stop_time);

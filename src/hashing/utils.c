@@ -29,17 +29,7 @@
  * Round up to the next highest power of 2.
  * From http://www-graphics.stanford.edu/~seander/bithacks.html
  */
-inline uint32_t roundup_pow2(uint32_t value) {
-	--value;
-	value |= value >> 1;
-	value |= value >> 2;
-	value |= value >> 4;
-	value |= value >> 8;
-	value |= value >> 16;
-	++value;
-
-	return value;
-}
+extern inline uint32_t roundup_pow2(uint32_t value);
 
 /*
  * The Jenkins hash algorithm. Originally 32-bit, modified here to 64-bit.

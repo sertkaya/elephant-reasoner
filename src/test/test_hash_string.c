@@ -28,9 +28,10 @@ int main(int argc, char *argv[]) {
 	MAP_INIT(&map, 16);
 	MAP_PUT(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), "D054872", &map);
 
-	printf("%s\n", MAP_GET(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), &map));
-	printf("%s\n", MAP_GET(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"), &map));
-	printf("%" PRIu32 "\n%" PRIu32 "\n", HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"));
+	printf("%s\n", (char*) MAP_GET(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), &map));
+	printf("%s\n", (char*) MAP_GET(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"), &map));
+	printf("%" PRIu64 "\n%" PRIu64 "\n", HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"),
+			HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"));
 
 	return 0;
 }

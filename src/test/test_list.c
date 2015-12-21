@@ -32,17 +32,14 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < 100; ++i) {
 		tmp[i] = malloc(sizeof(void));
 		assert(tmp[i] != NULL);
-		// list_add(tmp[i], &list);
-		list_add(i, &list);
+		list_add(tmp[i], &list);
 	}
 
-	// list_remove(tmp[10], &list);
-	list_remove(10, &list);
-	// list_remove(tmp[99], &list);
-	list_remove(99, &list);
+	list_remove(tmp[10], &list);
+	list_remove(tmp[99], &list);
 
 	for (i = 0; i < list.size; ++i) {
-		printf("%d ", list.elements[i]);
+		printf("%d ", ((int*) list.elements)[i]);
 	}
 	return 1;
 }

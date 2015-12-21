@@ -21,7 +21,7 @@
 
 #include "list.h"
 
-inline List* list_create() {
+List* list_create() {
 	List* l = (List*) malloc(sizeof(List));
 	assert(l != NULL);
  	l->size = 0;
@@ -37,7 +37,7 @@ inline void list_init(List* l) {
 }
 */
 
-inline int list_free(List* l) {
+int list_free(List* l) {
 	free(l->elements);
 	int freed_bytes = l->size * sizeof(void*);
 	free(l);
@@ -46,7 +46,7 @@ inline int list_free(List* l) {
 	return freed_bytes;
 }
 
-inline int list_reset(List* l) {
+int list_reset(List* l) {
 	free(l->elements);
 	int freed_bytes = l->size * sizeof(void*);
 	l->size = 0;
@@ -55,46 +55,12 @@ inline int list_reset(List* l) {
 	return freed_bytes;
 }
 
-inline char list_add(void* e, List* l) {
-	void** tmp = realloc(l->elements, (l->size + 1) * sizeof(void*));
-	assert(tmp != NULL);
-	l->elements = tmp;
-	l->elements[l->size] = e;
-	++l->size;
+extern inline char list_add(void* e, List* l);
 
-	return 1;
-}
 
-/**
- * TODO
- */
-inline char list_remove(void* e, List* l) {
-	int i;
+extern inline char list_remove(void* e, List* l);
 
-	for (i = 0; i < l->size; ++i) {
-		if (e == l->elements[i])
-			// the element is at index i
-			break;
-	}
-	// if we reached the last element and it is not e,
-	// then e does not exist in l.
-	if ((i == l->size - 1) && (l->elements[i] != e))
-		return 1;
-	// now shift the elements, overwrite index i
-	int j;
-	for (j = i; j < l->size - 1; ++j) {
-		l->elements[j] = l->elements[j + 1];
-	}
-	// shrink the allocated space
-	void** tmp = realloc(l->elements, (l->size - 1) * sizeof(void*));
-	assert(l->size == 1 || tmp != NULL);
-	l->elements = tmp;
-	// decrement the element count
-	--l->size;
-	return 0;
-}
-
-inline ListIterator* list_iterator_create(List* l) {
+ListIterator* list_iterator_create(List* l) {
 	ListIterator* it = (ListIterator*) malloc(sizeof(ListIterator));
 	assert(it != NULL);
 	it->list = l;
@@ -103,14 +69,10 @@ inline ListIterator* list_iterator_create(List* l) {
 	return it;
 }
 
-inline void* list_iterator_next(ListIterator* it) {
-	void* next = (it->current_index == it->list->size) ? NULL : it->list->elements[it->current_index];
-	++it->current_index;
 
-	return next;
-}
+extern inline void* list_iterator_next(ListIterator* it);
 
-inline int list_iterator_free(ListIterator* it) {
+int list_iterator_free(ListIterator* it) {
 	free(it);
 
 	return sizeof(ListIterator);

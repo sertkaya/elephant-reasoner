@@ -52,7 +52,7 @@ inline HashMap* hash_map_create(unsigned int size) {
 	return hash_map;
 }
 
-inline void hash_map_init(HashMap* hash_map, unsigned int size) {
+void hash_map_init(HashMap* hash_map, unsigned int size) {
 
 	if (size < 16)
 		size = 16;
@@ -135,51 +135,9 @@ int hash_map_reset(HashMap* hash_map) {
 	return freed_bytes;
 }
 
-inline int hash_map_put(HashMap* hash_map, uint64_t key, void* value) {
+extern inline int hash_map_put(HashMap* hash_map, uint64_t key, void* value);
 
-	int hash_value = key & (hash_map->bucket_count - 1);
-	// int hash_value = HASH_UNSIGNED(key) & (hash_map->bucket_count - 1);
-	HashMapElement** bucket = hash_map->buckets[hash_value];
-	int chain_size = hash_map->chain_sizes[hash_value];
-
-	int i;
-	for (i = 0; i < chain_size; i++)
-		if (bucket[i]->key == key) {
-			bucket[i]->value = value;
-			return 0;
-		}
-
-	HashMapElement** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement*));
-	assert(tmp != NULL);
-	bucket = hash_map->buckets[hash_value] = tmp;
-
-	bucket[chain_size] = malloc(sizeof(HashMapElement));
-	assert(bucket[chain_size] != NULL);
-	bucket[chain_size]->key = key;
-	bucket[chain_size]->value = value;
-	bucket[chain_size]->previous = hash_map->tail;
-
-	hash_map->tail = bucket[chain_size];
-
-	++hash_map->chain_sizes[hash_value];
-
-	++hash_map->element_count;
-
-	return 1;
-}
-
-inline void* hash_map_get(HashMap* hash_map, uint64_t key) {
-	int bucket_index = key & (hash_map->bucket_count - 1);
-	HashMapElement** bucket = hash_map->buckets[bucket_index];
-	int chain_size = hash_map->chain_sizes[bucket_index];
-
-	int i;
-	for (i = 0; i < chain_size; i++)
-		if (key == bucket[i]->key)
-			return bucket[i]->value;
-
-	return NULL;
-}
+extern inline void* hash_map_get(HashMap* hash_map, uint64_t key);
 
 void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map) {
 	iterator->hash_map = map;
@@ -189,14 +147,7 @@ void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map) {
 	iterator->current_element = tmp;
 }
 
-
-inline void* hash_map_iterator_next(HashMapIterator* iterator) {
-	void* next = iterator->current_element->previous;
-	iterator->current_element = iterator->current_element->previous;
-	if (!next) return NULL;
-	return ((HashMapElement*) next)->value;
-}
-
+extern inline void* hash_map_iterator_next(HashMapIterator* iterator);
 
 /*
 inline HashMapElement* hash_map_last_element(HashMap* hash_map) {

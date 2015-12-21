@@ -20,6 +20,7 @@
 #include "../model/datatypes.h"
 #include "../model/model.h"
 #include "../model/limits.h"
+#include "../model/print_utils.h"
 #include "../hashing/hash_map.h"
 #include "utils.h"
 

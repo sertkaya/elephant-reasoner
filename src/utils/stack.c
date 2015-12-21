@@ -21,31 +21,11 @@
 
 #include "stack.h"
 
+extern inline void push(Stack*s, void* e);
+extern inline void* pop(Stack* s);
+
 void init_stack(Stack* s) {
 	s->size = 0;
 	s->elements = NULL;
 }
 
-inline void push(Stack* s, void* e) {
-	void** tmp = realloc(s->elements, (s->size + 1) * sizeof(void*));
-	assert(tmp != NULL);
-	s->elements = tmp;
-	s->elements[s->size] = e;
-	++s->size;
-}
-
-inline void* pop(Stack* s) {
-	void* e;
-	void** tmp;
-
-	if (s->size == 0)
-		return NULL;
-
-	--s->size;
-	e = s->elements[s->size];
-	tmp = realloc(s->elements, (s->size) * sizeof(void*));
-	assert(tmp != NULL || s->size == 0);
-	s->elements = tmp;
-
-	return e;
-}

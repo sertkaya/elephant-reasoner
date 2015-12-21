@@ -42,7 +42,17 @@
 /**
  * Round up to the next higher power of 2. Used for hash sizes.
  */
-inline uint32_t roundup_pow2(uint32_t value);
+inline uint32_t roundup_pow2(uint32_t value) {
+	--value;
+	value |= value >> 1;
+	value |= value >> 2;
+	value |= value >> 4;
+	value |= value >> 8;
+	value |= value >> 16;
+	++value;
+
+	return value;
+}
 
 /**
  * Hash a string into a 64-bit unsigned int using the Murmur3 algorithm.

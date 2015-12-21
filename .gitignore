@@ -4,6 +4,7 @@
 /Makefile.in
 /aclocal.m4
 /autoscan-2.68.log
+/autoscan.log
 /config.h.in
 /configure
 /configure.scan

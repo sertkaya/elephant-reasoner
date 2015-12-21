@@ -20,6 +20,8 @@
 #define HASH_MAP_H
 
 #include <stdint.h>
+#include <assert.h>
+#include <stdlib.h>
 
 typedef struct hash_map HashMap;
 typedef struct hash_map_element HashMapElement;
@@ -74,13 +76,55 @@ int hash_map_reset(HashMap* hash_map);
  * value is not inserted, i.e., the existing value is not overwritten.
  * Returns 1 if the key value pair is inserted, 0 otherwise.
  */
-inline int hash_map_put(HashMap* hash_map, uint64_t key, void* value);
+inline int hash_map_put(HashMap* hash_map, uint64_t key, void* value) {
+
+	int hash_value = key & (hash_map->bucket_count - 1);
+	// int hash_value = HASH_UNSIGNED(key) & (hash_map->bucket_count - 1);
+	HashMapElement** bucket = hash_map->buckets[hash_value];
+	int chain_size = hash_map->chain_sizes[hash_value];
+
+	int i;
+	for (i = 0; i < chain_size; i++)
+		if (bucket[i]->key == key) {
+			bucket[i]->value = value;
+			return 0;
+		}
+
+	HashMapElement** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement*));
+	assert(tmp != NULL);
+	bucket = hash_map->buckets[hash_value] = tmp;
+
+	bucket[chain_size] = malloc(sizeof(HashMapElement));
+	assert(bucket[chain_size] != NULL);
+	bucket[chain_size]->key = key;
+	bucket[chain_size]->value = value;
+	bucket[chain_size]->previous = hash_map->tail;
+
+	hash_map->tail = bucket[chain_size];
+
+	++hash_map->chain_sizes[hash_value];
+
+	++hash_map->element_count;
+
+	return 1;
+}
+
 
 /**
  * Returns the value for the given key, it it exists, NULL if it does not exist.
  */
-inline void* hash_map_get(HashMap* hash_map, uint64_t key);
+inline void* hash_map_get(HashMap* hash_map, uint64_t key) {
+	int bucket_index = key & (hash_map->bucket_count - 1);
+	HashMapElement** bucket = hash_map->buckets[bucket_index];
+	int chain_size = hash_map->chain_sizes[bucket_index];
 
+	int i;
+	for (i = 0; i < chain_size; i++)
+		if (key == bucket[i]->key)
+			return bucket[i]->value;
+
+	return NULL;
+}
 /**
  * Reset a given hash map iterator.
  */
@@ -90,7 +134,13 @@ void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map);
  * Get the next element.
  * Returns NULL if there is no next element.
  */
-inline void* hash_map_iterator_next(HashMapIterator* iterator);
+inline void* hash_map_iterator_next(HashMapIterator* iterator) {
+	void* next = iterator->current_element->previous;
+	iterator->current_element = iterator->current_element->previous;
+	if (!next) return NULL;
+	return ((HashMapElement*) next)->value;
+}
+
 
 /**
  * Returns the last node in the hash table or NULL if it is empty.
