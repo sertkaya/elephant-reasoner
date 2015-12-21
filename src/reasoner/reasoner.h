@@ -20,18 +20,7 @@
 #ifndef REASONER_H_
 #define REASONER_H_
 
-// #include <sys/time.h>
-
 #include "../model/datatypes.h"
-
-/*
-struct timeval tStart, tEnd;
-#define START_TIMER	gettimeofday(&tStart, NULL)
-#define STOP_TIMER	gettimeofday(&tEnd, NULL)
-#define TIME_DIFF	(((double)tEnd.tv_sec * 1000000.0 + \
-		(double)tEnd.tv_usec) - \
-		((double)tStart.tv_sec * 1000000.0 + (double)tStart.tv_usec) )
-		*/
 
 // for saturation statistics
 extern int saturation_unique_subsumption_count, saturation_total_subsumption_count;

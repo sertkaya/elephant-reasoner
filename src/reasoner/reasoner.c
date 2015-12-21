@@ -36,7 +36,6 @@
 #include "reasoner.h"
 
 // the parser
-// extern int yyparse(TBox* tbox, ABox* abox);
 extern int yyparse(KB* kb);
 // file pointer for the parser
 extern FILE* yyin;

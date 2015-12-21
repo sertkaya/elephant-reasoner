@@ -98,10 +98,4 @@ typedef HashMapIterator MapIterator;
  */
 #define MAP_ITERATOR_FREE(map_it)		hash_map_iterator_free(map_it)
 
-/*
-#define MAP_FIRST_ELEMENT(map)			HASH_MAP_FIRST_ELEMENT(map)
-
-#define MAP_NEXT_ELEMENT(current_element)		HASH_MAP_NEXT_ELEMENT(current_element)
-*/
-
 #endif

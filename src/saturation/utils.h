@@ -29,16 +29,9 @@
 // for class and object property expressions.
 #define IS_SUBSUMED_BY(c1,c2)						SET_CONTAINS(c2, &(c1->subsumers))
 
-// unsigned long hash_it(int x, int y);
-// long long hash_it(int x, int y);
-
-// int is_subsumed_by(Concept* c1, Concept* c2);
-
-// int add_predecessor(Concept* c, Concept* ex);
 // add r-predecessor p to c
 int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* p, TBox* tbox);
 
-// int add_successor(Concept* c, Concept* ex);
 // add r-successor s to c
 int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* s, TBox* tbox);
 

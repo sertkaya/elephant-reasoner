@@ -155,7 +155,6 @@ inline void* hash_map_iterator_next(HashMapIterator* iterator) {
  * Returns the node that comes before the current node, or NULL if
  * there is none.
  */
-// inline HashMapElement* hash_map_previous_element(HashMapElement* current_node);
 #define HASH_MAP_PREVIOUS_ELEMENT(current_element)	current_element->previous
 
 #endif

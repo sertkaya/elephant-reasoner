@@ -148,13 +148,3 @@ void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map) {
 }
 
 extern inline void* hash_map_iterator_next(HashMapIterator* iterator);
-
-/*
-inline HashMapElement* hash_map_last_element(HashMap* hash_map) {
-	return hash_map->tail;
-}
-
-inline HashMapElement* hash_map_previous_element(HashMapElement* current_node) {
-	return current_node->previous;
-}
-*/
