@@ -49,7 +49,7 @@ struct queue {
 	void** elements;
 };
 */
-void init_queue(Queue* q);
+void init_queue(Queue* q);
 void enqueue(Queue* queue, void* data);
 void* dequeue(Queue* queue);
 
