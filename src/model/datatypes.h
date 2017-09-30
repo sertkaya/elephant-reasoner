@@ -161,8 +161,9 @@ struct class_expression {
 // For keeping successors and predecessors of a  concept
 struct link {
 	ObjectPropertyExpression* role;
-	ClassExpression** fillers;
-	int filler_count;
+	// ClassExpression** fillers;
+	// int filler_count;
+	Set fillers;
 };
 
 /*****************************************************************************/

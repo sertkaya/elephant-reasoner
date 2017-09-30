@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "../model/datatypes.h"
+#include "../model/limits.h"
 #include "utils.h"
 
 // add p to the predecessors hash of c
@@ -34,6 +35,7 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 	for (i = 0; i < c->predecessor_r_count; ++i)
 		if (c->predecessors[i].role == r) {
 			// yes, we have a link for role r, now check if we already have p in its fillers list
+			/*
 			for (j = 0; j < c->predecessors[i].filler_count; ++j)
 				if (c->predecessors[i].fillers[j] == p)
 					return 0;
@@ -44,6 +46,8 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 			c->predecessors[i].fillers[c->predecessors[i].filler_count] = p;
 			++c->predecessors[i].filler_count;
 			return 1;
+			 */
+			return SET_ADD(p, &(c->predecessors[i].fillers));
 		}
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
@@ -52,10 +56,14 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 	c->predecessors = (Link*) tmp;
 	// 2) fill the fields of the new link
 	c->predecessors[c->predecessor_r_count].role = r;
+	/*
 	c->predecessors[c->predecessor_r_count].fillers = calloc(1, sizeof(ClassExpression*));
 	assert(c->predecessors[c->predecessor_r_count].fillers != NULL);
 	c->predecessors[c->predecessor_r_count].fillers[0] = p;
 	c->predecessors[c->predecessor_r_count].filler_count = 1;
+	*/
+	SET_INIT(&(c->predecessors[c->predecessor_r_count].fillers), DEFAULT_PREDECESSORS_SET__SIZE);
+	SET_ADD(p, &(c->predecessors[c->predecessor_r_count].fillers));
 
 	// finally increment the r_count
 	++c->predecessor_r_count;
@@ -72,6 +80,7 @@ int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpressi
 	for (i = 0; i < c->successor_r_count; ++i)
 		if (c->successors[i].role == r) {
 			// yes, we have a link for role r, now check if we already have p in its fillers list
+			/*
 			for (j = 0; j < c->successors[i].filler_count; ++j)
 				if (c->successors[i].fillers[j] == p)
 					return 0;
@@ -82,6 +91,8 @@ int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpressi
 			c->successors[i].fillers[c->successors[i].filler_count] = p;
 			++c->successors[i].filler_count;
 			return 1;
+			*/
+			return SET_ADD(p, &(c->successors[i].fillers));
 		}
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
@@ -90,10 +101,14 @@ int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpressi
 	c->successors = (Link*) tmp;
 	// 2) fill the fields of the new link
 	c->successors[c->successor_r_count].role = r;
+	/*
 	c->successors[c->successor_r_count].fillers = calloc(1, sizeof(ClassExpression*));
 	assert(c->successors[c->successor_r_count].fillers != NULL);
 	c->successors[c->successor_r_count].fillers[0] = p;
 	c->successors[c->successor_r_count].filler_count = 1;
+	*/
+	SET_INIT(&(c->successors[c->successor_r_count].fillers), DEFAULT_SUCCESSORS_SET__SIZE);
+	SET_ADD(p, &(c->successors[c->successor_r_count].fillers));
 
 	// finally increment the r_count
 	++c->successor_r_count;

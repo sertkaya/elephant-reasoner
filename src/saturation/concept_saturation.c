@@ -149,9 +149,19 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
 					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_list.size; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) ax->lhs->predecessors[i].role->subsumer_list.elements[j]));
-						if (ex != NULL)
+						if (ex != NULL) {
+							/*
 							for (k = 0; k < ax->lhs->predecessors[i].filler_count; ++k)
 								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+							 */
+							SetIterator predecessors_iterator;
+							SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[i].fillers));
+							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+							while (predecessor != NULL) {
+								push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+								predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+							}
+						}
 					}
 
 
@@ -180,9 +190,19 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 					// We push the saturation axiom bottom <= ax->lhs, if we already know ax->lhs <= bottom. This way ax->lhs = bottom
 					// gets computed. The information bottom <= c is not taken into account for any other concept c.
 					push(&scheduled_axioms, create_concept_saturation_axiom(tbox->bottom_concept, ax->lhs, NULL, SUBSUMPTION_BOTTOM));
-					for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
+					for (i = 0; i < ax->lhs->predecessor_r_count; ++i) {
+						/*
 						for (j = 0; j < ax->lhs->predecessors[i].filler_count; ++j)
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[j], tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+						 */
+						SetIterator predecessors_iterator;
+						SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[i].fillers));
+						ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+						while (predecessor != NULL) {
+							push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+							predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+						}
+					}
 				}
 
 
@@ -223,9 +243,19 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				for (i = 0; i < ax->lhs->predecessor_r_count; ++i)
 					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_list.size; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) ax->lhs->predecessors[i].role->subsumer_list.elements[j]));
-						if (ex != NULL)
+						if (ex != NULL) {
+							/*
 							for (k = 0; k < ax->lhs->predecessors[i].filler_count; ++k)
 								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+							 */
+							SetIterator predecessors_iterator;
+							SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[i].fillers));
+							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+							while (predecessor != NULL) {
+								push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+								predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+							}
+						}
 					}
 
 
@@ -282,6 +312,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 
 					for (j = 0; j < ax->lhs->predecessor_r_count; ++j)
 						if (ax->lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
+							/*
 							for (k = 0; k < ax->lhs->predecessors[j].filler_count; ++k) {
 								int l;
 								for (l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
@@ -295,19 +326,23 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 									push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 
 								}
-								/*
-								SET_ITERATOR_INIT(&subsumers_iterator, &(ax->role->second_component_of_list[i]->subsumers));
-								subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-								while (subsumer) {
-									push(&scheduled_axioms,
-											create_concept_saturation_axiom(
-													ax->lhs->predecessors[j].fillers[k],
-													ax->rhs,
-													(ObjectPropertyExpression*) subsumer, LINK));
-									subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-								}
-								*/
 							}
+							*/
+
+							SetIterator predecessors_iterator;
+							SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[i].fillers));
+							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+							while (predecessor != NULL) {
+								int l;
+								for (l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
+									push(&scheduled_axioms,
+											create_concept_saturation_axiom(predecessor, ax->rhs, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
+									push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
+								}
+								predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+							}
+
+
 						}
 				}
 
@@ -322,6 +357,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 
 					for (j = 0; j < ax->rhs->successor_r_count; ++j)
 						if (ax->rhs->successors[j].role == ax->role->first_component_of_list[i]->description.object_property_chain.role2) {
+							/*
 							for (k = 0; k < ax->rhs->successors[j].filler_count; ++k) {
 								int l;
 								for (l = 0; l < ax->role->first_component_of_list[i]->subsumer_list.size; ++l) {
@@ -333,19 +369,22 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 													(ObjectPropertyExpression*) ax->role->first_component_of_list[i]->subsumer_list.elements[l], LINK));
 									push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->successors[j].fillers[k], ax->rhs->successors[j].fillers[k], NULL, SUBSUMPTION_INITIALIZATION));
 								}
-								/*
-								SET_ITERATOR_INIT(&subsumers_iterator, &(ax->role->first_component_of_list[i]->subsumers));
-								subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-								while (subsumer) {
-									push(&scheduled_axioms,
-											create_concept_saturation_axiom(
-													ax->lhs,
-													ax->rhs->successors[j].fillers[k],
-													(ObjectPropertyExpression*) subsumer, LINK));
-									subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-								}
-								*/
 							}
+							*/
+
+							SetIterator successors_iterator;
+							SET_ITERATOR_INIT(&successors_iterator, &(ax->lhs->successors[i].fillers));
+							ClassExpression* successor= (ClassExpression*) SET_ITERATOR_NEXT(&successors_iterator);
+							while (successor!= NULL) {
+								int l;
+								for (l = 0; l < ax->role->first_component_of_list[i]->subsumer_list.size; ++l) {
+									push(&scheduled_axioms,
+											create_concept_saturation_axiom( ax->lhs, successor, (ObjectPropertyExpression*) ax->role->first_component_of_list[i]->subsumer_list.elements[l], LINK));
+									push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, NULL, SUBSUMPTION_INITIALIZATION));
+								}
+								successor= (ClassExpression*) SET_ITERATOR_NEXT(&successors_iterator);
+							}
+
 						}
 				}
 
