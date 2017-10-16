@@ -330,7 +330,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 							*/
 
 							SetIterator predecessors_iterator;
-							SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[i].fillers));
+							SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[j].fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								int l;
@@ -373,7 +373,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 							*/
 
 							SetIterator successors_iterator;
-							SET_ITERATOR_INIT(&successors_iterator, &(ax->lhs->successors[i].fillers));
+							SET_ITERATOR_INIT(&successors_iterator, &(ax->rhs->successors[j].fillers));
 							ClassExpression* successor= (ClassExpression*) SET_ITERATOR_NEXT(&successors_iterator);
 							while (successor!= NULL) {
 								int l;
