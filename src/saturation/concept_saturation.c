@@ -150,10 +150,6 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_list.size; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) ax->lhs->predecessors[i].role->subsumer_list.elements[j]));
 						if (ex != NULL) {
-							/*
-							for (k = 0; k < ax->lhs->predecessors[i].filler_count; ++k)
-								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
-							 */
 							SetIterator predecessors_iterator;
 							SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[i].fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
@@ -244,10 +240,6 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 					for (j = 0; j < ax->lhs->predecessors[i].role->subsumer_list.size; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) ax->lhs->predecessors[i].role->subsumer_list.elements[j]));
 						if (ex != NULL) {
-							/*
-							for (k = 0; k < ax->lhs->predecessors[i].filler_count; ++k)
-								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[k], ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
-							 */
 							SetIterator predecessors_iterator;
 							SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[i].fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
@@ -288,12 +280,9 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				void* subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 				// TODO: change the order of the loops for better performance
 				while (subsumer != NULL) {
-					// printf("!!! subsumer %s of %s\n", class_expression_to_string(kb, subsumer), class_expression_to_string(kb, ax->rhs));
 					for (j = 0; j < ax->role->subsumer_list.size; ++j) {
-						// printf("### role subsumer:%s\n", object_property_expression_to_string(kb, (ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
 						ClassExpression* ex = GET_NEGATIVE_EXISTS(((ClassExpression*) subsumer), ((ObjectPropertyExpression*) ax->role->subsumer_list.elements[j]));
 						if (ex != NULL) {
-							// printf("$$$ ex:%s\n", class_expression_to_string(kb, ex));
 							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 						}
 					}
@@ -303,32 +292,8 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				// the role chain rule
 				// the role composition where this role appears as the second component
 				for (i = 0; i < ax->role->second_component_of_count; ++i) {
-
-					/*
-					 printf("role composition where this role appears as the second component: ");
-					 print_role(ax->role->subsumer_list[i]->second_component_of_list[j]);
-					 printf("\n");
-					 */
-
 					for (j = 0; j < ax->lhs->predecessor_r_count; ++j)
 						if (ax->lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
-							/*
-							for (k = 0; k < ax->lhs->predecessors[j].filler_count; ++k) {
-								int l;
-								for (l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
-									// printf("**%s %s\n", object_property_expression_to_string(kb, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]), object_property_expression_to_string(kb, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l]));
-									push(&scheduled_axioms,
-											create_concept_saturation_axiom(
-													ax->lhs->predecessors[j].fillers[k],
-													ax->rhs,
-													// ax->role->second_component_of_list[i], LINK));
-													(ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
-									push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
-
-								}
-							}
-							*/
-
 							SetIterator predecessors_iterator;
 							SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[j].fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
@@ -350,28 +315,8 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				// now the same for the successors of the filler of the existential on the rhs
 				// the role composition where this role appears as the first component
 				for (i = 0; i < ax->role->first_component_of_count; ++i) {
-
-					// printf("role composition where this role appears as the first component: ");
-					// print_role(ax->rhs->description.exists->role->subsumer_list[i]->first_component_of_list[j]);
-					// printf("\n");
-
 					for (j = 0; j < ax->rhs->successor_r_count; ++j)
 						if (ax->rhs->successors[j].role == ax->role->first_component_of_list[i]->description.object_property_chain.role2) {
-							/*
-							for (k = 0; k < ax->rhs->successors[j].filler_count; ++k) {
-								int l;
-								for (l = 0; l < ax->role->first_component_of_list[i]->subsumer_list.size; ++l) {
-									push(&scheduled_axioms,
-											create_concept_saturation_axiom(
-													ax->lhs,
-													ax->rhs->successors[j].fillers[k],
-													// ax->role->first_component_of_list[i], LINK));
-													(ObjectPropertyExpression*) ax->role->first_component_of_list[i]->subsumer_list.elements[l], LINK));
-									push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs->successors[j].fillers[k], ax->rhs->successors[j].fillers[k], NULL, SUBSUMPTION_INITIALIZATION));
-								}
-							}
-							*/
-
 							SetIterator successors_iterator;
 							SET_ITERATOR_INIT(&successors_iterator, &(ax->rhs->successors[j].fillers));
 							ClassExpression* successor= (ClassExpression*) SET_ITERATOR_NEXT(&successors_iterator);
