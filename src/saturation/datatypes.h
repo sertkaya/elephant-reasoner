@@ -21,9 +21,11 @@
 #define SATURATION_DATATYPES_H_
 
 #include "../model/datatypes.h"
+#include "../utils/lstack.h"
 
 typedef struct concept_saturation_axiom ConceptSaturationAxiom;
 typedef struct role_saturation_axiom RoleSaturationAxiom;
+typedef struct saturation_job SaturationJob;
 
 enum saturation_axiom_type {
 	SUBSUMPTION_CONJUNCTION_INTRODUCTION, SUBSUMPTION_EXISTENTIAL_INTRODUCTION, SUBSUMPTION_INITIALIZATION, SUBSUMPTION_TOLD_SUBSUMER, SUBSUMPTION_CONJUNCTION_DECOMPOSITION,
@@ -31,7 +33,7 @@ enum saturation_axiom_type {
 };
 
 struct concept_saturation_axiom {
-	ClassExpression* lhs;
+	// ClassExpression* lhs;
 	ClassExpression* rhs;
 	ObjectPropertyExpression* role;
 	enum saturation_axiom_type type;
@@ -40,6 +42,12 @@ struct concept_saturation_axiom {
 struct role_saturation_axiom {
 	ObjectPropertyExpression* lhs;
 	ObjectPropertyExpression* rhs;
+};
+
+struct saturation_job {
+	lstack_t *lhs_stack;
+	KB *kb;
+	int thread_id;
 };
 
 #endif /* SATURATION_DATATYPES_H_ */

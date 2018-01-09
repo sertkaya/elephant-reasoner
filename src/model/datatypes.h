@@ -20,9 +20,13 @@
 #ifndef DATATYPES_H_
 #define DATATYPES_H_
 
+#include <stdatomic.h>
+
 #include "../utils/set.h"
 #include "../utils/map.h"
 #include "../utils/list.h"
+#include "../utils/stack.h"
+#include "../utils/ts_stack.h"
 #include "../hashing/hash_table.h"
 #include "../hashing/hash_map.h"
 
@@ -134,6 +138,7 @@ struct class_expression {
 
 	// 2-dimensional dynamic array for storing predecessors.
 	Link* predecessors;
+	pthread_mutex_t predecessors_mutex;
 	// Number of roles, for which this concept has a predecessor (the size of predecessors array)
 	int predecessor_r_count;
 
@@ -156,6 +161,9 @@ struct class_expression {
 	Set* first_conjunct_of;
 	Set* second_conjunct_of;
 
+	Stack own_axioms;
+	ThreadSafeStack foreign_axioms;
+	volatile atomic_flag is_active;
 };
 
 // For keeping successors and predecessors of a  concept

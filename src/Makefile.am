@@ -1,4 +1,4 @@
-elephant_reasoner_CFLAGS	= -O2 -Wall
+elephant_reasoner_CFLAGS	= -O2 -Wall -pthread -mcx16
 
 bin_PROGRAMS     			= elephant-reasoner
 

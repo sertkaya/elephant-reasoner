@@ -32,6 +32,8 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 	// first check if we already have a link for role r
 	int i, j;
 	void* tmp;
+
+	pthread_mutex_lock(&c->predecessors_mutex);
 	for (i = 0; i < c->predecessor_r_count; ++i)
 		if (c->predecessors[i].role == r) {
 			// yes, we have a link for role r, now check if we already have p in its fillers list
@@ -47,7 +49,9 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 			++c->predecessors[i].filler_count;
 			return 1;
 			 */
-			return SET_ADD(p, &(c->predecessors[i].fillers));
+			int added = SET_ADD(p, &(c->predecessors[i].fillers));
+			pthread_mutex_unlock(&c->predecessors_mutex);
+			return(added);
 		}
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
@@ -68,6 +72,7 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 	// finally increment the r_count
 	++c->predecessor_r_count;
 
+	pthread_mutex_unlock(&c->predecessors_mutex);
 	return 1;
 }
 

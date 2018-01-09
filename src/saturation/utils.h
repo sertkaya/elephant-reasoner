@@ -35,4 +35,13 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 // add r-successor s to c
 int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* s, TBox* tbox);
 
+static inline ConceptSaturationAxiom* create_concept_saturation_axiom( ClassExpression* rhs, ObjectPropertyExpression* role, enum saturation_axiom_type type) {
+	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
+	assert(ax != NULL);
+	ax->rhs = rhs;
+	ax->role = role;
+	ax->type = type;
+	return ax;
+}
+
 #endif /* SATURATION_UTILS_H_ */

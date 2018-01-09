@@ -32,14 +32,16 @@
 #include "../hashing/hash_table.h"
 #include "../hashing/hash_map.h"
 #include "utils.h"
+#include "saturation_worker.h"
 
 // for statistics
-int saturation_unique_subsumption_count = 0, saturation_total_subsumption_count = 0;
-int saturation_unique_link_count = 0, saturation_total_link_count = 0;
+// int saturation_unique_subsumption_count = 0, saturation_total_subsumption_count = 0;
+// int saturation_unique_link_count = 0, saturation_total_link_count = 0;
 
 // marks the axiom with the premise lhs and conclusion rhs as processed
-#define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		SET_ADD(ax->rhs, &(ax->lhs->subsumers))
+// #define MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)		SET_ADD(ax->rhs, &(ax->lhs->subsumers))
 
+/*
 static inline void print_saturation_axiom(KB* kb, ConceptSaturationAxiom* ax) {
 	printf("%d: ", ax->type);
 	char* lhs_str = class_expression_to_string(kb, ax->lhs);
@@ -55,7 +57,9 @@ static inline void print_saturation_axiom(KB* kb, ConceptSaturationAxiom* ax) {
 	free(lhs_str);
 	free(rhs_str);
 }
+*/
 
+/*
 static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpression* lhs, ClassExpression* rhs, ObjectPropertyExpression* role, enum saturation_axiom_type type) {
 	ConceptSaturationAxiom* ax = (ConceptSaturationAxiom*) malloc(sizeof(ConceptSaturationAxiom));
 	assert(ax != NULL);
@@ -65,6 +69,9 @@ static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpre
 	ax->type = type;
 	return ax;
 }
+*/
+
+void *saturation_worker(void *job);
 
 /*
  * Saturates the concepts of a given TBox.
@@ -76,21 +83,30 @@ static inline ConceptSaturationAxiom* create_concept_saturation_axiom(ClassExpre
 char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	TBox* tbox = kb->tbox;
 
+	lstack_t scheduled_lhs;
+	lstack_init(&scheduled_lhs, 40000000);
+
+	/*
 	ConceptSaturationAxiom* ax;
 	Stack scheduled_axioms;
 
 	// initialize the stack
 	init_stack(&scheduled_axioms);
+	*/
 
 	// initialization axioms from classes
 	MapIterator iterator;
 	MAP_ITERATOR_INIT(&iterator, &(tbox->classes));
 	void* class = MAP_ITERATOR_NEXT(&iterator);
 	while (class) {
-		push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, ((ClassExpression*) class), NULL, SUBSUMPTION_INITIALIZATION));
+		// push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, ((ClassExpression*) class), NULL, SUBSUMPTION_INITIALIZATION));
+		push(&(((ClassExpression*) class)->own_axioms), create_concept_saturation_axiom((ClassExpression*) class, NULL, SUBSUMPTION_INITIALIZATION));
 		if (kb->top_occurs_on_lhs) {
-			push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+			// push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) class, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+			push(&(((ClassExpression*) class)->own_axioms), create_concept_saturation_axiom(tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
 		}
+		lstack_push(&scheduled_lhs, class);
+		atomic_flag_test_and_set(&(((ClassExpression*) class)->is_active));
 		class = MAP_ITERATOR_NEXT(&iterator);
 	}
 
@@ -108,14 +124,34 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 			// add owl:Thing manually to the subsumers of the generated nominals
 			SET_ADD(kb->tbox->top_concept, &(nominal->subsumers));
 
-			push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) nominal, ((ClassExpression*) nominal), NULL, SUBSUMPTION_INITIALIZATION));
+			// push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) nominal, ((ClassExpression*) nominal), NULL, SUBSUMPTION_INITIALIZATION));
+			push(&(((ClassExpression*) nominal)->own_axioms), create_concept_saturation_axiom((ClassExpression*) nominal, NULL, SUBSUMPTION_INITIALIZATION));
 			if (kb->top_occurs_on_lhs) {
-				push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) nominal, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+				// push(&scheduled_axioms, create_concept_saturation_axiom((ClassExpression*) nominal, tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+				push(&(((ClassExpression*) nominal)->own_axioms), create_concept_saturation_axiom(tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
 			}
+			lstack_push(&scheduled_lhs, nominal);
+			atomic_flag_test_and_set(&(((ClassExpression*) nominal)->is_active));
 			nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
 		}
 	}
 
+	int thread_count = 4;
+	SaturationJob saturation_job = {&scheduled_lhs, kb};
+	pthread_t *threads = (pthread_t*) malloc(sizeof(pthread_t) * thread_count);
+	assert(threads != NULL);
+
+	for (int i = 0; i < thread_count; ++i) {
+		saturation_job.thread_id = i;
+		pthread_create(threads + i, NULL, saturation_worker, &saturation_job);
+	}
+
+	for (int i = 0; i < thread_count; ++i) {
+		pthread_join(threads[i], NULL);
+	}
+
+
+/*
 	int i, j, k;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
@@ -187,10 +223,10 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 					// gets computed. The information bottom <= c is not taken into account for any other concept c.
 					push(&scheduled_axioms, create_concept_saturation_axiom(tbox->bottom_concept, ax->lhs, NULL, SUBSUMPTION_BOTTOM));
 					for (i = 0; i < ax->lhs->predecessor_r_count; ++i) {
-						/*
-						for (j = 0; j < ax->lhs->predecessors[i].filler_count; ++j)
-							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[j], tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
-						 */
+
+						// for (j = 0; j < ax->lhs->predecessors[i].filler_count; ++j)
+						// 	push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs->predecessors[i].fillers[j], tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+
 						SetIterator predecessors_iterator;
 						SET_ITERATOR_INIT(&predecessors_iterator, &(ax->lhs->predecessors[i].fillers));
 						ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
@@ -349,6 +385,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	}
 	// printf("Total subsumptions:%d\nUnique subsumptions:%d\n", saturation_total_subsumption_count, saturation_unique_subsumption_count);
 	// printf("Total links:%d\nUnique links:%d\n", saturation_total_link_count, saturation_unique_link_count);
+*/
 
 	return 0;
 }

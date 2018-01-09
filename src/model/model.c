@@ -74,6 +74,7 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
+	pthread_mutex_init(&c->predecessors_mutex, NULL);
 	c->predecessor_r_count = 0;
 
 	c->successors = NULL;
@@ -84,6 +85,10 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 
 	LIST_INIT(&(c->second_conjunct_of_list));
 	c->second_conjunct_of = NULL;
+
+	init_stack(&c->own_axioms);
+	init_ts_stack(&c->foreign_axioms);
+	atomic_flag_clear(&c->is_active);
 
 	PUT_ATOMIC_CONCEPT(c->description.atomic.IRI, c, tbox);
 
@@ -119,6 +124,7 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
+	pthread_mutex_init(&c->predecessors_mutex, NULL);
 	c->predecessor_r_count = 0;
 
 	c->successors = NULL;
@@ -129,6 +135,10 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 
 	LIST_INIT(&(c->second_conjunct_of_list));
 	c->second_conjunct_of = NULL;
+
+	init_stack(&c->own_axioms);
+	init_ts_stack(&c->foreign_axioms);
+	atomic_flag_clear(&c->is_active);
 
 	PUT_EXISTS_RESTRICTION(r->id, f->id, c, tbox);
 
@@ -166,6 +176,7 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
+	pthread_mutex_init(&c->predecessors_mutex, NULL);
 	c->predecessor_r_count = 0;
 
 	c->successors = NULL;
@@ -176,6 +187,10 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 
 	LIST_INIT(&(c->second_conjunct_of_list));
 	c->second_conjunct_of = NULL;
+
+	init_stack(&c->own_axioms);
+	init_ts_stack(&c->foreign_axioms);
+	atomic_flag_clear(&c->is_active);
 
 	PUT_CONJUNCTION(c, tbox);
 
@@ -231,6 +246,7 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
+	pthread_mutex_init(&c->predecessors_mutex, NULL);
 	c->predecessor_r_count = 0;
 
 	c->successors = NULL;
@@ -241,6 +257,10 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 
 	LIST_INIT(&(c->second_conjunct_of_list));
 	c->second_conjunct_of = NULL;
+
+	init_stack(&c->own_axioms);
+	init_ts_stack(&c->foreign_axioms);
+	atomic_flag_clear(&c->is_active);
 
 	PUT_NOMINAL(c, tbox);
 
