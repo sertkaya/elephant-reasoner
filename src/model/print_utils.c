@@ -130,7 +130,7 @@ char* object_some_values_from_to_string(KB* kb, ObjectSomeValuesFrom* ex) {
 
 	char* object_property_str = object_property_expression_to_string(kb, ex->role);
 	char* class_expression_str = class_expression_to_string(kb, ex->filler);
-	int size = strlen("(ObjectSomeValuesFrom ") + strlen(object_property_str) + 1 /* for the space */ + strlen(class_expression_str) + 1 /* for the parenthesis*/;
+	int size = strlen("(ObjectSomeValuesFrom ") + strlen(object_property_str) + 1 /* for the space */ + strlen(class_expression_str) + 2 /* for the parenthesis*/;
 	str = calloc(1, size);
 	assert(str != NULL);
 	snprintf(str, size, "(ObjectSomeValuesFrom %s %s)", object_property_str, class_expression_str);
@@ -145,7 +145,7 @@ char* object_intersection_of_to_string(KB* kb, ObjectIntersectionOf* obj_int) {
 
 	char* conjunct_1_str = class_expression_to_string(kb, obj_int->conjunct1);
 	char* conjunct_2_str = class_expression_to_string(kb, obj_int->conjunct2);
-	int size = strlen("(ObjectIntersectionOf ") + strlen(conjunct_1_str) + 1 /* for the space */ + strlen(conjunct_2_str) + 1 /* for the parenthesis*/;
+	int size = strlen("(ObjectIntersectionOf ") + strlen(conjunct_1_str) + 1 /* for the space */ + strlen(conjunct_2_str) + 2 /* for the parenthesis*/;
 	str = calloc(1, size);
 	assert(str != NULL);
 	snprintf(str, size, "(ObjectIntersectionOf %s %s)", conjunct_1_str, conjunct_2_str);
