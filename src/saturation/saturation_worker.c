@@ -82,7 +82,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								pthread_mutex_lock(&(predecessor->foreign_axioms.mutex));
-								// ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+								ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 								pthread_mutex_unlock(&(predecessor->foreign_axioms.mutex));
 								if (!atomic_flag_test_and_set(&(predecessor->is_active)))
 									lstack_push(lhs_stack, predecessor);
@@ -117,7 +117,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 					// We push the saturation axiom bottom <= ax->lhs, if we already know ax->lhs <= bottom. This way ax->lhs = bottom
 					// gets computed. The information bottom <= c is not taken into account for any other concept c.
 					pthread_mutex_lock(&(tbox->bottom_concept->foreign_axioms.mutex));
-					// ts_push(&(tbox->bottom_concept->foreign_axioms), create_concept_saturation_axiom(lhs, NULL, SUBSUMPTION_BOTTOM));
+					ts_push(&(tbox->bottom_concept->foreign_axioms), create_concept_saturation_axiom(lhs, NULL, SUBSUMPTION_BOTTOM));
 					pthread_mutex_unlock(&(tbox->bottom_concept->foreign_axioms.mutex));
 					if (!atomic_flag_test_and_set(&(tbox->bottom_concept->is_active)))
 						lstack_push(lhs_stack, tbox->bottom_concept);
@@ -127,7 +127,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 						ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 						while (predecessor != NULL) {
 							pthread_mutex_lock(&(predecessor->foreign_axioms.mutex));
-							// ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+							ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
 							pthread_mutex_unlock(&(predecessor->foreign_axioms.mutex));
 							if (!atomic_flag_test_and_set(&(predecessor->is_active)))
 								lstack_push(lhs_stack, predecessor);
@@ -165,7 +165,6 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 					// existential decomposition
 					push(&(lhs->own_axioms), create_concept_saturation_axiom(ax->rhs->description.exists.filler, ax->rhs->description.exists.role, LINK));
 					pthread_mutex_lock(&ax->rhs->description.exists.filler->foreign_axioms.mutex);
-					// HERE?
 					ts_push(&(ax->rhs->description.exists.filler->foreign_axioms), create_concept_saturation_axiom( ax->rhs->description.exists.filler, NULL, SUBSUMPTION_INITIALIZATION));
 					pthread_mutex_unlock(&ax->rhs->description.exists.filler->foreign_axioms.mutex);
 					if (!atomic_flag_test_and_set(&(ax->rhs->description.exists.filler->is_active)))
@@ -176,6 +175,10 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 				// existential introduction
 				int j,k;
 				ClassExpression* ex;
+				// TODO: Experimental ! Predecessors should be locked !
+				// Busy-wait if already locked
+				while (atomic_flag_test_and_set(&lhs->is_predecessors_locked));
+
 				for (int i = 0; i < lhs->predecessor_r_count; ++i)
 					for (int j = 0; j < lhs->predecessors[i].role->subsumer_list.size; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) lhs->predecessors[i].role->subsumer_list.elements[j]));
@@ -185,7 +188,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								pthread_mutex_lock(&(predecessor->foreign_axioms.mutex));
-								// ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+								ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 								pthread_mutex_unlock(&(predecessor->foreign_axioms.mutex));
 								if (!atomic_flag_test_and_set(&(predecessor->is_active)))
 									lstack_push(lhs_stack, predecessor);
@@ -193,6 +196,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 							}
 						}
 					}
+				atomic_flag_clear(&lhs->is_predecessors_locked);
 
 
 				// told subsumers
@@ -239,7 +243,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 							while (predecessor != NULL) {
 								pthread_mutex_lock(&(predecessor->foreign_axioms.mutex));
 								for (int l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
-									// ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ax->rhs, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
+									ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ax->rhs, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
 									// TODO: move the following out of the loop! (done)
 									// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 								}
@@ -252,7 +256,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 							// for loops. What about the "if" in this case? Code-restructure?
 							// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 							pthread_mutex_lock(&(ax->rhs->foreign_axioms.mutex));
-							// ts_push(&(ax->rhs->foreign_axioms), create_concept_saturation_axiom(ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
+							ts_push(&(ax->rhs->foreign_axioms), create_concept_saturation_axiom(ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 							pthread_mutex_unlock(&(ax->rhs->foreign_axioms.mutex));
 							if (!atomic_flag_test_and_set(&(ax->rhs->is_active)))
 								lstack_push(lhs_stack, ax->rhs);
@@ -277,7 +281,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 									// push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, NULL, SUBSUMPTION_INITIALIZATION));
 								}
 								pthread_mutex_lock(&(successor->foreign_axioms.mutex));
-								// ts_push(&(successor->foreign_axioms), create_concept_saturation_axiom(successor, NULL, SUBSUMPTION_INITIALIZATION));
+								ts_push(&(successor->foreign_axioms), create_concept_saturation_axiom(successor, NULL, SUBSUMPTION_INITIALIZATION));
 								pthread_mutex_unlock(&(successor->foreign_axioms.mutex));
 								if (!atomic_flag_test_and_set(&(successor->is_active)))
 									lstack_push(lhs_stack, successor);
@@ -288,7 +292,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 
 				if (kb->top_occurs_on_lhs) {
 					pthread_mutex_lock(&(ax->rhs->foreign_axioms.mutex));
-					// ts_push(&(ax->rhs->foreign_axioms), create_concept_saturation_axiom(tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+					ts_push(&(ax->rhs->foreign_axioms), create_concept_saturation_axiom(tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
 					pthread_mutex_unlock(&(ax->rhs->foreign_axioms.mutex));
 					if (!atomic_flag_test_and_set(&(ax->rhs->is_active)))
 						lstack_push(lhs_stack, ax->rhs);
@@ -313,6 +317,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 	ax = ts_pop(&(lhs->foreign_axioms));
 	pthread_mutex_unlock(&(lhs->foreign_axioms.mutex));
 	while (ax != NULL) {
+		// printf("pop:%s\n", class_expression_to_string(kb,ax->rhs));
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
@@ -347,7 +352,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								pthread_mutex_lock(&(predecessor->foreign_axioms.mutex));
-								// ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+								ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 								pthread_mutex_unlock(&(predecessor->foreign_axioms.mutex));
 								if (!atomic_flag_test_and_set(&(predecessor->is_active)))
 									lstack_push(lhs_stack, predecessor);
@@ -382,7 +387,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 					// We push the saturation axiom bottom <= ax->lhs, if we already know ax->lhs <= bottom. This way ax->lhs = bottom
 					// gets computed. The information bottom <= c is not taken into account for any other concept c.
 					pthread_mutex_lock(&(tbox->bottom_concept->foreign_axioms.mutex));
-					// ts_push(&(tbox->bottom_concept->foreign_axioms), create_concept_saturation_axiom(lhs, NULL, SUBSUMPTION_BOTTOM));
+					ts_push(&(tbox->bottom_concept->foreign_axioms), create_concept_saturation_axiom(lhs, NULL, SUBSUMPTION_BOTTOM));
 					pthread_mutex_unlock(&(tbox->bottom_concept->foreign_axioms.mutex));
 					if (!atomic_flag_test_and_set(&(tbox->bottom_concept->is_active)))
 						lstack_push(lhs_stack, tbox->bottom_concept);
@@ -392,7 +397,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 						ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 						while (predecessor != NULL) {
 							pthread_mutex_lock(&(predecessor->foreign_axioms.mutex));
-							// ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
+							ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(tbox->bottom_concept, NULL, SUBSUMPTION_BOTTOM));
 							pthread_mutex_unlock(&(predecessor->foreign_axioms.mutex));
 							if (!atomic_flag_test_and_set(&(predecessor->is_active)))
 								lstack_push(lhs_stack, predecessor);
@@ -430,7 +435,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 					// existential decomposition
 					push(&(lhs->own_axioms), create_concept_saturation_axiom(ax->rhs->description.exists.filler, ax->rhs->description.exists.role, LINK));
 					pthread_mutex_lock(&ax->rhs->description.exists.filler->foreign_axioms.mutex);
-					// ts_push(&(ax->rhs->description.exists.filler->foreign_axioms), create_concept_saturation_axiom( ax->rhs->description.exists.filler, NULL, SUBSUMPTION_INITIALIZATION));
+					ts_push(&(ax->rhs->description.exists.filler->foreign_axioms), create_concept_saturation_axiom( ax->rhs->description.exists.filler, NULL, SUBSUMPTION_INITIALIZATION));
 					pthread_mutex_unlock(&ax->rhs->description.exists.filler->foreign_axioms.mutex);
 					if (!atomic_flag_test_and_set(&(ax->rhs->description.exists.filler->is_active)))
 						lstack_push(lhs_stack, ax->rhs->description.exists.filler);
@@ -449,7 +454,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								pthread_mutex_lock(&(predecessor->foreign_axioms.mutex));
-								// ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+								ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
 								pthread_mutex_unlock(&(predecessor->foreign_axioms.mutex));
 								if (!atomic_flag_test_and_set(&(predecessor->is_active)))
 									lstack_push(lhs_stack, predecessor);
@@ -503,7 +508,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 							while (predecessor != NULL) {
 								pthread_mutex_lock(&(predecessor->foreign_axioms.mutex));
 								for (int l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
-									// ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ax->rhs, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
+									ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ax->rhs, (ObjectPropertyExpression*) ax->role->second_component_of_list[i]->subsumer_list.elements[l], LINK));
 									// TODO: move the following out of the loop! (done)
 									// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 								}
@@ -515,7 +520,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 							// TODO: Check this! Previously it was above, in the loop.
 							// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 							pthread_mutex_lock(&(ax->rhs->foreign_axioms.mutex));
-							// ts_push(&(ax->rhs->foreign_axioms), create_concept_saturation_axiom(ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
+							ts_push(&(ax->rhs->foreign_axioms), create_concept_saturation_axiom(ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 							pthread_mutex_unlock(&(ax->rhs->foreign_axioms.mutex));
 							if (!atomic_flag_test_and_set(&(ax->rhs->is_active)))
 								lstack_push(lhs_stack, ax->rhs);
@@ -540,7 +545,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 									// push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, NULL, SUBSUMPTION_INITIALIZATION));
 								}
 								pthread_mutex_lock(&(successor->foreign_axioms.mutex));
-								// ts_push(&(successor->foreign_axioms), create_concept_saturation_axiom(successor, NULL, SUBSUMPTION_INITIALIZATION));
+								ts_push(&(successor->foreign_axioms), create_concept_saturation_axiom(successor, NULL, SUBSUMPTION_INITIALIZATION));
 								pthread_mutex_unlock(&(successor->foreign_axioms.mutex));
 								if (!atomic_flag_test_and_set(&(successor->is_active)))
 									lstack_push(lhs_stack, successor);
@@ -551,7 +556,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 
 				if (kb->top_occurs_on_lhs) {
 					pthread_mutex_lock(&(ax->rhs->foreign_axioms.mutex));
-					// ts_push(&(ax->rhs->foreign_axioms), create_concept_saturation_axiom(tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
+					ts_push(&(ax->rhs->foreign_axioms), create_concept_saturation_axiom(tbox->top_concept, NULL, SUBSUMPTION_INITIALIZATION));
 					pthread_mutex_unlock(&(ax->rhs->foreign_axioms.mutex));
 					if (!atomic_flag_test_and_set(&(ax->rhs->is_active)))
 						lstack_push(lhs_stack, ax->rhs);

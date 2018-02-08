@@ -138,7 +138,10 @@ struct class_expression {
 
 	// 2-dimensional dynamic array for storing predecessors.
 	Link* predecessors;
-	pthread_mutex_t predecessors_mutex;
+
+	// True if the predecessors are being accessed. False otherwise.
+	volatile atomic_flag is_predecessors_locked;
+
 	// Number of roles, for which this concept has a predecessor (the size of predecessors array)
 	int predecessor_r_count;
 
@@ -161,8 +164,16 @@ struct class_expression {
 	Set* first_conjunct_of;
 	Set* second_conjunct_of;
 
+	// The stack of own axioms. Not synchronized since only the thread processing this
+	// class expression accesses these axioms.
 	Stack own_axioms;
+
+	// The stack of foreign axioms. Synchronized since it can be accessed from several
+	// threads simultaneously.
 	ThreadSafeStack foreign_axioms;
+
+	// True if the own and foreign axioms of this class expression are currently being processed
+	// or are scheduled to be processed. False otherwise.
 	volatile atomic_flag is_active;
 };
 

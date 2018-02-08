@@ -74,7 +74,7 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
-	pthread_mutex_init(&c->predecessors_mutex, NULL);
+	atomic_flag_clear(&c->is_predecessors_locked);
 	c->predecessor_r_count = 0;
 
 	c->successors = NULL;
@@ -124,7 +124,7 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
-	pthread_mutex_init(&c->predecessors_mutex, NULL);
+	atomic_flag_clear(&c->is_predecessors_locked);
 	c->predecessor_r_count = 0;
 
 	c->successors = NULL;
@@ -176,7 +176,7 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
-	pthread_mutex_init(&c->predecessors_mutex, NULL);
+	atomic_flag_clear(&c->is_predecessors_locked);
 	c->predecessor_r_count = 0;
 
 	c->successors = NULL;
@@ -246,7 +246,7 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
-	pthread_mutex_init(&c->predecessors_mutex, NULL);
+	atomic_flag_clear(&c->is_predecessors_locked);
 	c->predecessor_r_count = 0;
 
 	c->successors = NULL;
