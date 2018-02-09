@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <pthread.h>
 
 #include "../model/datatypes.h"
 #include "../model/model.h"

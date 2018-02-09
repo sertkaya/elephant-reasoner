@@ -42,14 +42,9 @@ char is_prime_naive(long x) {
 
 static void* worker(void* wd) {
 	ThreadSafeStack* stack = ((ThreadData*) wd)->stack;
-	pthread_mutex_t* mutex = &(stack->mutex);
-	pthread_mutex_lock(mutex);
 	void* data = ts_pop(stack);
-	pthread_mutex_unlock(mutex);
 	while (data != NULL) {
-		pthread_mutex_lock(mutex);
 		data =ts_pop(stack);
-		pthread_mutex_unlock(mutex);
 		is_prime_naive((long) data);
 	}
 

@@ -28,5 +28,5 @@ extern inline void* ts_pop(ThreadSafeStack* s);
 void init_ts_stack(ThreadSafeStack* s) {
 	s->size = 0;
 	s->elements = NULL;
-	pthread_mutex_init(&s->mutex, NULL);
+	atomic_flag_clear(&s->is_locked);
 }

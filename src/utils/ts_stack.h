@@ -22,32 +22,37 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <pthread.h>
+#include <stdatomic.h>
 
 typedef struct ts_stack ThreadSafeStack;
 
 struct ts_stack {
 	int size;
 	void** elements;
-	pthread_mutex_t mutex;
+	// True if the stack is being accessed, false otherwise
+	volatile atomic_flag is_locked;
 };
 
 // void init_ts_stack(ThreadSafeStack* s, int capacity);
 void init_ts_stack(ThreadSafeStack* s);
 
 inline void ts_push(ThreadSafeStack* s, void* e) {
-	// pthread_mutex_lock(&s->mutex);
+	// Busy-wait if already locked
+	// while (atomic_flag_test_and_set(&s->is_locked));
+
 	void** tmp = realloc(s->elements, (s->size + 1) * sizeof(void*));
 	assert(tmp != NULL);
 	s->elements = tmp;
 
 	s->elements[s->size] = e;
 	++(s->size);
-	// pthread_mutex_unlock(&s->mutex);
+	// atomic_flag_clear(&s->is_locked);
 }
 
 inline void* ts_pop(ThreadSafeStack* s) {
-	// pthread_mutex_lock(&s->mutex);
+	// Busy-wait if already locked
+	// while (atomic_flag_test_and_set(&s->is_locked));
+
 	void* e;
 	void **tmp;
 
@@ -59,7 +64,7 @@ inline void* ts_pop(ThreadSafeStack* s) {
 	tmp = realloc(s->elements, (s->size) * sizeof(void*));
 	assert(tmp != NULL || s->size == 0);
 	s->elements = tmp;
-	// pthread_mutex_unlock(&s->mutex);
+	// atomic_flag_clear(&s->is_locked);
 
 	return e;
 }
