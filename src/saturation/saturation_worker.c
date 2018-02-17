@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdatomic.h>
 #include "utils.h"
 #include "../model/print_utils.h"
 #include "../index/utils.h"
@@ -38,8 +39,8 @@ static inline ConceptSaturationAxiom* create_concept_saturation_axiom( ClassExpr
 */
 
 // for statistics
-int saturation_unique_subsumption_count = 0, saturation_total_subsumption_count = 0;
-int saturation_unique_link_count = 0, saturation_total_link_count = 0;
+volatile atomic_int saturation_unique_subsumption_count = 0, saturation_total_subsumption_count = 0;
+volatile atomic_int saturation_unique_link_count = 0, saturation_total_link_count = 0;
 
 lstack_t *lhs_stack;
 
@@ -50,10 +51,10 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
-			++saturation_total_subsumption_count;
+			atomic_fetch_add(&saturation_total_subsumption_count, 1);
 			// no conjunction decomposition, no existential decomposition and no bottom rule here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(lhs, ax->rhs)) {
-				++saturation_unique_subsumption_count;
+				atomic_fetch_add(&saturation_unique_subsumption_count, 1);
 
 				// conjunction introduction
 				// the first conjunct
@@ -107,10 +108,10 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 		case SUBSUMPTION_CONJUNCTION_DECOMPOSITION:
 		case SUBSUMPTION_TOLD_SUBSUMER:
 		case SUBSUMPTION_BOTTOM:
-			++saturation_total_subsumption_count;
+			atomic_fetch_add(&saturation_total_subsumption_count, 1);
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(lhs, ax->rhs)) {
-				++saturation_unique_subsumption_count;
+				atomic_fetch_add(&saturation_unique_subsumption_count, 1);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -215,10 +216,10 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 			}
 			break;
 		case LINK:
-			++saturation_total_link_count;
+			atomic_fetch_add(&saturation_total_link_count, 1);
 			if (add_successor(lhs, ax->role, ax->rhs, tbox)) {
 				 add_predecessor(ax->rhs, ax->role, lhs, tbox);
-				++saturation_unique_link_count;
+				 atomic_fetch_add(&saturation_unique_link_count, 1);
 
 				// int i, j, k;
 
@@ -336,10 +337,10 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
-			++saturation_total_subsumption_count;
+			atomic_fetch_add(&saturation_total_subsumption_count, 1);
 			// no conjunction decomposition, no existential decomposition and no bottom rule here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(lhs, ax->rhs)) {
-				++saturation_unique_subsumption_count;
+				atomic_fetch_add(&saturation_unique_subsumption_count, 1);
 
 				// conjunction introduction
 				// the first conjunct
@@ -392,10 +393,10 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 		case SUBSUMPTION_CONJUNCTION_DECOMPOSITION:
 		case SUBSUMPTION_TOLD_SUBSUMER:
 		case SUBSUMPTION_BOTTOM:
-			++saturation_total_subsumption_count;
+			atomic_fetch_add(&saturation_total_subsumption_count, 1);
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(lhs, ax->rhs)) {
-				++saturation_unique_subsumption_count;
+				atomic_fetch_add(&saturation_unique_subsumption_count, 1);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -495,10 +496,10 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 			}
 			break;
 		case LINK:
-			++saturation_total_link_count;
+			atomic_fetch_add(&saturation_total_link_count, 1);
 			if (add_successor(lhs, ax->role, ax->rhs, tbox)) {
 				 add_predecessor(ax->rhs, ax->role, lhs, tbox);
-				++saturation_unique_link_count;
+				 atomic_fetch_add(&saturation_unique_link_count, 1);
 
 				// int i, j, k;
 
