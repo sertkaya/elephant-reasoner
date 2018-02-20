@@ -39,8 +39,11 @@ static inline ConceptSaturationAxiom* create_concept_saturation_axiom( ClassExpr
 */
 
 // for statistics
-volatile atomic_int saturation_unique_subsumption_count = 0, saturation_total_subsumption_count = 0;
-volatile atomic_int saturation_unique_link_count = 0, saturation_total_link_count = 0;
+ volatile atomic_int saturation_unique_own_subsumption_count = 0, saturation_total_own_subsumption_count = 0;
+ volatile atomic_int saturation_unique_own_link_count = 0, saturation_total_own_link_count = 0;
+
+ volatile atomic_int saturation_unique_foreign_subsumption_count = 0, saturation_total_foreign_subsumption_count = 0;
+ volatile atomic_int saturation_unique_foreign_link_count = 0, saturation_total_foreign_link_count = 0;
 
 lstack_t *lhs_stack;
 
@@ -51,10 +54,10 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
-			atomic_fetch_add(&saturation_total_subsumption_count, 1);
+			atomic_fetch_add(&saturation_total_own_subsumption_count, 1);
 			// no conjunction decomposition, no existential decomposition and no bottom rule here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(lhs, ax->rhs)) {
-				atomic_fetch_add(&saturation_unique_subsumption_count, 1);
+				atomic_fetch_add(&saturation_unique_own_subsumption_count, 1);
 
 				// conjunction introduction
 				// the first conjunct
@@ -108,10 +111,10 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 		case SUBSUMPTION_CONJUNCTION_DECOMPOSITION:
 		case SUBSUMPTION_TOLD_SUBSUMER:
 		case SUBSUMPTION_BOTTOM:
-			atomic_fetch_add(&saturation_total_subsumption_count, 1);
+			atomic_fetch_add(&saturation_total_own_subsumption_count, 1);
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(lhs, ax->rhs)) {
-				atomic_fetch_add(&saturation_unique_subsumption_count, 1);
+				atomic_fetch_add(&saturation_unique_own_subsumption_count, 1);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -216,10 +219,10 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 			}
 			break;
 		case LINK:
-			atomic_fetch_add(&saturation_total_link_count, 1);
+			atomic_fetch_add(&saturation_total_own_link_count, 1);
 			if (add_successor(lhs, ax->role, ax->rhs, tbox)) {
 				 add_predecessor(ax->rhs, ax->role, lhs, tbox);
-				 atomic_fetch_add(&saturation_unique_link_count, 1);
+				 atomic_fetch_add(&saturation_unique_own_link_count, 1);
 
 				// int i, j, k;
 
@@ -337,10 +340,10 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 		switch (ax->type) {
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION:
-			atomic_fetch_add(&saturation_total_subsumption_count, 1);
+			atomic_fetch_add(&saturation_total_foreign_subsumption_count, 1);
 			// no conjunction decomposition, no existential decomposition and no bottom rule here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(lhs, ax->rhs)) {
-				atomic_fetch_add(&saturation_unique_subsumption_count, 1);
+				atomic_fetch_add(&saturation_unique_foreign_subsumption_count, 1);
 
 				// conjunction introduction
 				// the first conjunct
@@ -393,10 +396,10 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 		case SUBSUMPTION_CONJUNCTION_DECOMPOSITION:
 		case SUBSUMPTION_TOLD_SUBSUMER:
 		case SUBSUMPTION_BOTTOM:
-			atomic_fetch_add(&saturation_total_subsumption_count, 1);
+			atomic_fetch_add(&saturation_total_foreign_subsumption_count, 1);
 			// all here
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(lhs, ax->rhs)) {
-				atomic_fetch_add(&saturation_unique_subsumption_count, 1);
+				atomic_fetch_add(&saturation_unique_foreign_subsumption_count, 1);
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -496,10 +499,10 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 			}
 			break;
 		case LINK:
-			atomic_fetch_add(&saturation_total_link_count, 1);
+			atomic_fetch_add(&saturation_total_foreign_link_count, 1);
 			if (add_successor(lhs, ax->role, ax->rhs, tbox)) {
 				 add_predecessor(ax->rhs, ax->role, lhs, tbox);
-				 atomic_fetch_add(&saturation_unique_link_count, 1);
+				 atomic_fetch_add(&saturation_unique_foreign_link_count, 1);
 
 				// int i, j, k;
 

@@ -18,8 +18,8 @@
 
 #ifndef SRC_SATURATION_SATURATION_WORKER_H_
 #define SRC_SATURATION_SATURATION_WORKER_H_
+#include <stdatomic.h>
 
 void *saturation_worker(void *job);
-
 
 #endif /* SRC_SATURATION_SATURATION_WORKER_H_ */

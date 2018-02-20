@@ -128,16 +128,29 @@ int main(int argc, char *argv[]) {
 	fclose(output);
 
 	// display saturation information
+	extern volatile atomic_int saturation_unique_own_subsumption_count, saturation_total_own_subsumption_count;
+	extern volatile atomic_int saturation_unique_own_link_count, saturation_total_own_link_count;
+
+	extern volatile atomic_int saturation_unique_foreign_subsumption_count, saturation_total_foreign_subsumption_count;
+	extern volatile atomic_int saturation_unique_foreign_link_count, saturation_total_foreign_link_count;
 	if (verbose_flag) {
 		printf("\n------ Saturation statistics ------\n");
-		printf( "Total subsumptions.................: %d\n"
-				"Unique subsumptions................: %d\n",
-				saturation_total_subsumption_count,
-				saturation_unique_subsumption_count);
-		printf( "Total links........................: %d\n"
-				"Unique links.......................: %d\n",
-				saturation_total_link_count,
-				saturation_unique_link_count);
+		printf( "Total own subsumptions.................: %d\n"
+				"Unique own subsumptions................: %d\n",
+				saturation_total_own_subsumption_count,
+				saturation_unique_own_subsumption_count);
+		printf( "Total own links........................: %d\n"
+				"Unique own links.......................: %d\n",
+				saturation_total_own_link_count,
+				saturation_unique_own_link_count);
+		printf( "Total foreign subsumptions.................: %d\n"
+				"Unique foreign subsumptions................: %d\n",
+				saturation_total_foreign_subsumption_count,
+				saturation_unique_foreign_subsumption_count);
+		printf( "Total foreign links........................: %d\n"
+				"Unique foreign links.......................: %d\n",
+				saturation_total_foreign_link_count,
+				saturation_unique_foreign_link_count);
 	}
 
 	// free the kb
