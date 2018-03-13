@@ -30,3 +30,14 @@ void init_ts_stack(ThreadSafeStack* s) {
 	s->elements = NULL;
 	atomic_flag_clear(&s->is_locked);
 }
+
+
+int reset_ts_stack(ThreadSafeStack* s) {
+	free(s->elements);
+	int freed_bytes =s->size * sizeof(void*);
+	s->size = 0;
+	s->elements = NULL;
+	atomic_flag_clear(&s->is_locked);
+
+	return freed_bytes;
+}

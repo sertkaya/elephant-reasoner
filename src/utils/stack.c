@@ -29,3 +29,20 @@ void init_stack(Stack* s) {
 	s->elements = NULL;
 }
 
+int free_stack(Stack* s) {
+	free(s->elements);
+	int freed_bytes = s->size * sizeof(void*);
+	free(s);
+	freed_bytes+= sizeof(Stack);
+
+	return freed_bytes;
+}
+
+int reset_stack(Stack* s) {
+	free(s->elements);
+	int freed_bytes =s->size * sizeof(void*);
+	s->size = 0;
+	s->elements = NULL;
+
+	return freed_bytes;
+}

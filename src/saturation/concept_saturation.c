@@ -85,7 +85,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	TBox* tbox = kb->tbox;
 
 	lstack_t scheduled_lhs;
-	lstack_init(&scheduled_lhs, 40000000);
+	lstack_init(&scheduled_lhs, 400000);
 
 	/*
 	ConceptSaturationAxiom* ax;

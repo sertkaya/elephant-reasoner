@@ -29,6 +29,10 @@ struct stack {
 
 void init_stack(Stack* s);
 
+int free_stack(Stack* s);
+
+int reset_stack(Stack* s);
+
 inline void push(Stack* s, void* e) {
 	void** tmp = realloc(s->elements, (s->size + 1) * sizeof(void*));
 	assert(tmp != NULL);

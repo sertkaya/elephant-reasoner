@@ -36,6 +36,8 @@ struct ts_stack {
 // void init_ts_stack(ThreadSafeStack* s, int capacity);
 void init_ts_stack(ThreadSafeStack* s);
 
+int reset_ts_stack(ThreadSafeStack* s);
+
 inline void ts_push(ThreadSafeStack* s, void* e) {
 	// Busy-wait if already locked
 	// while (atomic_flag_test_and_set(&s->is_locked));

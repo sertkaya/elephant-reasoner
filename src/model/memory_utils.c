@@ -84,6 +84,14 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	if (c->second_conjunct_of != NULL)
 		total_freed_bytes += SET_FREE(c->second_conjunct_of);
 
+	// reset the own axioms stack. normally after saturation it should be
+	// empty anyway.
+	total_freed_bytes += reset_stack(&(c->own_axioms));
+
+	// reset the foreign axioms stack. normally after saturation it should be
+	// empty anyway.
+	total_freed_bytes += reset_ts_stack(&(c->foreign_axioms));
+
 	// finally free this concept
 	total_freed_bytes += sizeof(ClassExpression);
 	free(c);
