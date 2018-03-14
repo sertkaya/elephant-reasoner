@@ -42,9 +42,11 @@ struct linked_list_iterator {
 
 LinkedList *linked_list_create();
 
-LinkedListIterator *linked_list_iterator_create(LinkedList *ll);
+LinkedListIterator *linked_list_iterator_create(LinkedList* ll);
 
-inline Node *linked_list_append(LinkedList *ll, void *p) {
+int linked_list_free(LinkedList* ll);
+
+static inline Node *linked_list_append(LinkedList *ll, void *p) {
 	Node *new_node  = malloc(sizeof(Node));
 	assert(new_node != NULL);
 
@@ -63,8 +65,8 @@ inline Node *linked_list_append(LinkedList *ll, void *p) {
 
 #define LINKED_LIST_ITERATOR_HAS_NEXT(it) !(it->current_node->next == NULL)
 
-inline Node *linked_list_iterator_next(LinkedListIterator *it) {
-	if (it->current_node == NULL)
+static inline Node *linked_list_iterator_next(LinkedListIterator *it) {
+	if (it == NULL || it->current_node == NULL)
 		return(NULL);
 	Node *tmp = it->current_node;
 	it->current_node = it->current_node->next;

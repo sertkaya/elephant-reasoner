@@ -29,6 +29,27 @@ LinkedList *linked_list_create() {
 LinkedListIterator *linked_list_iterator_create(LinkedList *ll) {
 	LinkedListIterator *it = malloc(sizeof(LinkedListIterator));
 	assert(it != NULL);
+	if (ll == NULL)
+		return(NULL);
+
 	it->current_node = ll->head;
 	return(it);
+}
+
+int linked_list_free_nodes(Node *current_node) {
+
+	if (current_node == NULL) {
+		return(0);
+	}
+	int freed_bytes = linked_list_free_nodes(current_node->next) + sizeof(Node);
+	free(current_node);
+	return(freed_bytes);
+}
+
+int linked_list_free(LinkedList *ll) {
+	if (ll == NULL)
+		return(0);
+	int freed_bytes = linked_list_free_nodes(ll->head);
+	free(ll);
+	return(freed_bytes + sizeof(LinkedList));
 }
