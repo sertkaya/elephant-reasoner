@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// free the kb
-	int freed_bytes = free_kb(kb);
+	int freed_bytes; // = free_kb(kb);
 	printf("Freed bytes:%d\n", freed_bytes);
 
 	return 0;

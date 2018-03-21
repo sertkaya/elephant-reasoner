@@ -51,6 +51,7 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 
 	// free the predecessors matrix.
 	int i;
+/*
 	for (i = 0; i < c->predecessor_r_count; ++i) {
 		// free(c->predecessors[i].fillers);
 		// total_freed_bytes += c->predecessors[i].filler_count * sizeof(ClassExpression*);
@@ -58,6 +59,19 @@ int free_concept(ClassExpression* c, TBox* tbox) {
 	}
 	free(c->predecessors);
 	total_freed_bytes += c->predecessor_r_count  * sizeof(Link);
+*/
+	LinkedListIterator* it;
+	linked_list_iterator_create(c->predecessors);
+	Node* node;
+	while ((node = linked_list_iterator_next(it)) != NULL) {
+		total_freed_bytes += SET_RESET(&(((Link*) (node->content))->fillers));
+		// free the Link
+		// free(node->content);
+		total_freed_bytes += sizeof(Link);
+	}
+
+	// now free the predecessors linked list
+	total_freed_bytes += linked_list_free(c->predecessors);
 
 	// similarly free the successors hash.
 	for (i = 0; i < c->successor_r_count; ++i) {

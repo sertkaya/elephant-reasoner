@@ -79,8 +79,32 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 				ClassExpression* ex;
 				// TODO: Experimental ! Predecessors should be locked !
 				// Busy-wait if already locked
-				while (atomic_flag_test_and_set(&lhs->is_predecessors_locked));
+				// while (atomic_flag_test_and_set(&lhs->is_predecessors_locked));
 
+				LinkedListIterator* ll_it = linked_list_iterator_create(lhs->predecessors);
+				Node* node;
+				while ((node = linked_list_iterator_next(ll_it)) != NULL) {
+					Link* link = (Link*) (node->content);
+					for (int j = 0; j < link->role->subsumer_list.size; ++j) {
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) link->role->subsumer_list.elements[j]));
+						if (ex != NULL) {
+							SetIterator predecessors_iterator;
+							SET_ITERATOR_INIT(&predecessors_iterator, &(link->fillers));
+							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+							while (predecessor != NULL) {
+								// Busy-wait if already locked
+								while (atomic_flag_test_and_set(&predecessor->foreign_axioms.is_locked));
+								ts_push(&(predecessor->foreign_axioms), create_concept_saturation_axiom(ex, NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION));
+								atomic_flag_clear(&predecessor->foreign_axioms.is_locked);
+								if (!atomic_flag_test_and_set(&(predecessor->is_active)))
+									lstack_push(lhs_stack, predecessor);
+								predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
+							}
+						}
+					}
+
+				}
+				/*
 				for (int i = 0; i < lhs->predecessor_r_count; ++i)
 					for (int j = 0; j < lhs->predecessors[i].role->subsumer_list.size; ++j) {
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) lhs->predecessors[i].role->subsumer_list.elements[j]));
@@ -99,7 +123,8 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 							}
 						}
 					}
-				atomic_flag_clear(&lhs->is_predecessors_locked);
+				*/
+				// atomic_flag_clear(&lhs->is_predecessors_locked);
 
 
 				// told subsumers
@@ -132,9 +157,16 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 					atomic_flag_clear(&tbox->bottom_concept->foreign_axioms.is_locked);
 					if (!atomic_flag_test_and_set(&(tbox->bottom_concept->is_active)))
 						lstack_push(lhs_stack, tbox->bottom_concept);
-					for (int i = 0; i < lhs->predecessor_r_count; ++i) {
+
+					LinkedListIterator* ll_it = linked_list_iterator_create(lhs->predecessors);
+					Node* node;
+					while ((node = linked_list_iterator_next(ll_it)) != NULL) {
+						Link* link = (Link*) (node->content);
+
+					// for (int i = 0; i < lhs->predecessor_r_count; ++i) {
 						SetIterator predecessors_iterator;
-						SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+						// SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+						SET_ITERATOR_INIT(&predecessors_iterator, &(link->fillers));
 						ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 						while (predecessor != NULL) {
 							// Busy-wait if already locked
@@ -190,14 +222,22 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 				ClassExpression* ex;
 				// TODO: Experimental ! Predecessors should be locked !
 				// Busy-wait if already locked
-				while (atomic_flag_test_and_set(&lhs->is_predecessors_locked));
+				// while (atomic_flag_test_and_set(&lhs->is_predecessors_locked));
 
-				for (int i = 0; i < lhs->predecessor_r_count; ++i)
-					for (int j = 0; j < lhs->predecessors[i].role->subsumer_list.size; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) lhs->predecessors[i].role->subsumer_list.elements[j]));
+				LinkedListIterator* ll_it = linked_list_iterator_create(lhs->predecessors);
+				Node* node;
+				while ((node = linked_list_iterator_next(ll_it)) != NULL) {
+					Link* link = (Link*) (node->content);
+					for (int j = 0; j < link->role->subsumer_list.size; ++j) {
+
+				// for (int i = 0; i < lhs->predecessor_r_count; ++i)
+				// 	for (int j = 0; j < lhs->predecessors[i].role->subsumer_list.size; ++j) {
+				//		ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) lhs->predecessors[i].role->subsumer_list.elements[j]));
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) link->role->subsumer_list.elements[j]));
 						if (ex != NULL) {
 							SetIterator predecessors_iterator;
-							SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+				//			SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+							SET_ITERATOR_INIT(&predecessors_iterator, &(link->fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								// Busy-wait if already locked
@@ -210,7 +250,8 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 							}
 						}
 					}
-				atomic_flag_clear(&lhs->is_predecessors_locked);
+				}
+				// atomic_flag_clear(&lhs->is_predecessors_locked);
 
 
 				// told subsumers
@@ -249,10 +290,18 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 				// the role chain rule
 				// the role composition where this role appears as the second component
 				for (int i = 0; i < ax->role->second_component_of_count; ++i) {
-					for (int j = 0; j < lhs->predecessor_r_count; ++j)
-						if (lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
+
+					LinkedListIterator* ll_it = linked_list_iterator_create(lhs->predecessors);
+					Node* node;
+					while ((node = linked_list_iterator_next(ll_it)) != NULL) {
+						Link* link = (Link*) (node->content);
+
+					// for (int j = 0; j < lhs->predecessor_r_count; ++j)
+					//	if (lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
+						if (link->role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
 							SetIterator predecessors_iterator;
-							SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[j].fillers));
+							// SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[j].fillers));
+							SET_ITERATOR_INIT(&predecessors_iterator, &(link->fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								for (int l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
@@ -277,6 +326,7 @@ void process_own_axioms(ClassExpression *lhs, KB* kb) {
 							if (!atomic_flag_test_and_set(&(ax->rhs->is_active)))
 								lstack_push(lhs_stack, ax->rhs);
 						}
+					}
 				}
 
 
@@ -364,14 +414,22 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 				ClassExpression* ex;
 				// TODO: Experimental ! Predecessors should be locked !
 				// Busy-wait if already locked
-				while (atomic_flag_test_and_set(&lhs->is_predecessors_locked));
+				// while (atomic_flag_test_and_set(&lhs->is_predecessors_locked));
 
-				for (int i = 0; i < lhs->predecessor_r_count; ++i)
-					for (int j = 0; j < lhs->predecessors[i].role->subsumer_list.size; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) lhs->predecessors[i].role->subsumer_list.elements[j]));
+				LinkedListIterator* ll_it = linked_list_iterator_create(lhs->predecessors);
+				Node* node;
+				while ((node = linked_list_iterator_next(ll_it)) != NULL) {
+					Link* link = (Link*) (node->content);
+					for (int j = 0; j < link->role->subsumer_list.size; ++j) {
+
+				// for (int i = 0; i < lhs->predecessor_r_count; ++i)
+				// 	for (int j = 0; j < lhs->predecessors[i].role->subsumer_list.size; ++j) {
+				//		ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) lhs->predecessors[i].role->subsumer_list.elements[j]));
+						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) link->role->subsumer_list.elements[j]));
 						if (ex != NULL) {
 							SetIterator predecessors_iterator;
-							SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+							// SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+							SET_ITERATOR_INIT(&predecessors_iterator, &(link->fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								// Busy-wait if already locked
@@ -384,7 +442,8 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 							}
 						}
 					}
-				atomic_flag_clear(&lhs->is_predecessors_locked);
+				}
+				// atomic_flag_clear(&lhs->is_predecessors_locked);
 
 
 				// told subsumers
@@ -417,9 +476,16 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 					atomic_flag_clear(&tbox->bottom_concept->foreign_axioms.is_locked);
 					if (!atomic_flag_test_and_set(&(tbox->bottom_concept->is_active)))
 						lstack_push(lhs_stack, tbox->bottom_concept);
-					for (int i = 0; i < lhs->predecessor_r_count; ++i) {
+
+					LinkedListIterator* ll_it = linked_list_iterator_create(lhs->predecessors);
+					Node* node;
+					while ((node = linked_list_iterator_next(ll_it)) != NULL) {
+						Link* link = (Link*) (node->content);
+
+					// for (int i = 0; i < lhs->predecessor_r_count; ++i) {
 						SetIterator predecessors_iterator;
-						SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+						// SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+						SET_ITERATOR_INIT(&predecessors_iterator, &(link->fillers));
 						ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 						while (predecessor != NULL) {
 							// Busy-wait if already locked
@@ -473,12 +539,20 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 				// existential introduction
 				int j,k;
 				ClassExpression* ex;
-				for (int i = 0; i < lhs->predecessor_r_count; ++i)
-					for (int j = 0; j < lhs->predecessors[i].role->subsumer_list.size; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) lhs->predecessors[i].role->subsumer_list.elements[j]));
+				LinkedListIterator* ll_it = linked_list_iterator_create(lhs->predecessors);
+				Node* node;
+				while ((node = linked_list_iterator_next(ll_it)) != NULL) {
+					Link* link = (Link*) (node->content);
+					for (int j = 0; j < link->role->subsumer_list.size; ++j) {
+
+				// for (int i = 0; i < lhs->predecessor_r_count; ++i)
+				// 	for (int j = 0; j < lhs->predecessors[i].role->subsumer_list.size; ++j) {
+				// 		ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) lhs->predecessors[i].role->subsumer_list.elements[j]));
+				 		ex = GET_NEGATIVE_EXISTS(ax->rhs, ((ObjectPropertyExpression*) link->role->subsumer_list.elements[j]));
 						if (ex != NULL) {
 							SetIterator predecessors_iterator;
-							SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+				//			SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[i].fillers));
+							SET_ITERATOR_INIT(&predecessors_iterator, &(link->fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								// Busy-wait if already locked
@@ -491,6 +565,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 							}
 						}
 					}
+				}
 
 
 				// told subsumers
@@ -529,10 +604,16 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 				// the role chain rule
 				// the role composition where this role appears as the second component
 				for (int i = 0; i < ax->role->second_component_of_count; ++i) {
-					for (int j = 0; j < lhs->predecessor_r_count; ++j)
-						if (lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
+					LinkedListIterator* ll_it = linked_list_iterator_create(lhs->predecessors);
+					Node* node;
+					while ((node = linked_list_iterator_next(ll_it)) != NULL) {
+						Link* link = (Link*) (node->content);
+					// for (int j = 0; j < lhs->predecessor_r_count; ++j)
+					//	if (lhs->predecessors[j].role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
+						if (link->role == ax->role->second_component_of_list[i]->description.object_property_chain.role1) {
 							SetIterator predecessors_iterator;
-							SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[j].fillers));
+					//		SET_ITERATOR_INIT(&predecessors_iterator, &(lhs->predecessors[j].fillers));
+							SET_ITERATOR_INIT(&predecessors_iterator, &(link->fillers));
 							ClassExpression* predecessor = (ClassExpression*) SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != NULL) {
 								for (int l = 0; l < ax->role->second_component_of_list[i]->subsumer_list.size; ++l) {
@@ -556,6 +637,7 @@ void process_foreign_axioms(ClassExpression *lhs, KB* kb) {
 							if (!atomic_flag_test_and_set(&(ax->rhs->is_active)))
 								lstack_push(lhs_stack, ax->rhs);
 						}
+					}
 				}
 
 

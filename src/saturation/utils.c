@@ -36,46 +36,56 @@ int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpres
 	// Busy-wait if already locked
 	while (atomic_flag_test_and_set(&c->is_predecessors_locked));
 
+	Node* node;
+	LinkedListIterator* it = linked_list_iterator_create(c->predecessors);
+	while ((node = linked_list_iterator_next(it)) != NULL) {
+		if (((Link*) node->content)->role == r) {
+			// yes, we have a link for role r, now check if we already have p in its fillers list
+			int added = SET_ADD(p, &(((Link*) node->content)->fillers));
+			atomic_flag_clear(&c->is_predecessors_locked);
+			return(added);
+		}
+	}
+	/*
 	for (i = 0; i < c->predecessor_r_count; ++i)
 		if (c->predecessors[i].role == r) {
 			// yes, we have a link for role r, now check if we already have p in its fillers list
-			/*
-			for (j = 0; j < c->predecessors[i].filler_count; ++j)
-				if (c->predecessors[i].fillers[j] == p)
-					return 0;
-			// no we do not have p in this list, add it
-			tmp = realloc(c->predecessors[i].fillers, (c->predecessors[i].filler_count + 1) * sizeof(ClassExpression*));
-			assert(tmp != NULL);
-			c->predecessors[i].fillers = (ClassExpression**) tmp;
-			c->predecessors[i].fillers[c->predecessors[i].filler_count] = p;
-			++c->predecessors[i].filler_count;
-			return 1;
-			 */
 			int added = SET_ADD(p, &(c->predecessors[i].fillers));
 			atomic_flag_clear(&c->is_predecessors_locked);
 			return(added);
 		}
+	*/
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
+	/*
 	tmp = realloc(c->predecessors, (c->predecessor_r_count + 1) * sizeof(Link));
 	assert(tmp != NULL);
 	c->predecessors = (Link*) tmp;
 	// 2) fill the fields of the new link
 	c->predecessors[c->predecessor_r_count].role = r;
-	/*
-	c->predecessors[c->predecessor_r_count].fillers = calloc(1, sizeof(ClassExpression*));
-	assert(c->predecessors[c->predecessor_r_count].fillers != NULL);
-	c->predecessors[c->predecessor_r_count].fillers[0] = p;
-	c->predecessors[c->predecessor_r_count].filler_count = 1;
 	*/
+	Link* new_link = malloc(sizeof(Link));
+	assert(new_link != NULL);
+	new_link->role = r;
+	/*
 	SET_INIT(&(c->predecessors[c->predecessor_r_count].fillers), DEFAULT_PREDECESSORS_SET__SIZE);
 	SET_ADD(p, &(c->predecessors[c->predecessor_r_count].fillers));
+	*/
+	SET_INIT(&(new_link->fillers), DEFAULT_PREDECESSORS_SET__SIZE);
+	SET_ADD(p, &(new_link->fillers));
+
+	// TODO: improve this !
+	if (c->predecessors == NULL)
+		c->predecessors = linked_list_create();
+
+	linked_list_append(c->predecessors, new_link);
 
 	// finally increment the r_count
-	++c->predecessor_r_count;
+	// ++c->predecessor_r_count;
 
 	atomic_flag_clear(&c->is_predecessors_locked);
 
+	// TODO: return the result of SET_ADD or perhaps linked_list_append??
 	return(1);
 }
 

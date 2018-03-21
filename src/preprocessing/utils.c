@@ -96,7 +96,7 @@ ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
-	c->predecessor_r_count = 0;
+	// c->predecessor_r_count = 0;
 
 	c->successors = NULL;
 	c->successor_r_count = 0;
@@ -141,7 +141,7 @@ ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyE
 
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
-	c->predecessor_r_count = 0;
+	// c->predecessor_r_count = 0;
 
 	c->successors = NULL;
 	c->successor_r_count = 0;

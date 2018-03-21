@@ -27,6 +27,7 @@
 #include "../utils/list.h"
 #include "../utils/stack.h"
 #include "../utils/ts_stack.h"
+#include "../utils/linked_list.h"
 #include "../hashing/hash_table.h"
 #include "../hashing/hash_map.h"
 
@@ -136,14 +137,16 @@ struct class_expression {
 	// Elements are ClassExpression*
 	Set subsumers;
 
-	// 2-dimensional dynamic array for storing predecessors.
-	Link* predecessors;
+	// Linked list for storing predecessors.
+	// Elements of the list are of type Link*
+	// Link* predecessors;
+	LinkedList* predecessors;
 
 	// True if the predecessors are being accessed. False otherwise.
 	volatile atomic_flag is_predecessors_locked;
 
 	// Number of roles, for which this concept has a predecessor (the size of predecessors array)
-	int predecessor_r_count;
+	// int predecessor_r_count;
 
 	// the same data structure to store the successors.
 	// needed for implementing the role composition rule in saturation

@@ -72,10 +72,10 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 
 	c->filler_of_negative_exists = NULL;
 
-	// initialize the 2-dim dynamic predecessors array
+	// initialize predecessors linked list
 	c->predecessors = NULL;
 	atomic_flag_clear(&c->is_predecessors_locked);
-	c->predecessor_r_count = 0;
+	// c->predecessor_r_count = 0;
 
 	c->successors = NULL;
 	c->successor_r_count = 0;
@@ -125,7 +125,7 @@ ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, Clas
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
 	atomic_flag_clear(&c->is_predecessors_locked);
-	c->predecessor_r_count = 0;
+	// c->predecessor_r_count = 0;
 
 	c->successors = NULL;
 	c->successor_r_count = 0;
@@ -177,7 +177,7 @@ ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpress
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
 	atomic_flag_clear(&c->is_predecessors_locked);
-	c->predecessor_r_count = 0;
+	// c->predecessor_r_count = 0;
 
 	c->successors = NULL;
 	c->successor_r_count = 0;
@@ -247,7 +247,7 @@ ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
 	// initialize the 2-dim dynamic predecessors array
 	c->predecessors = NULL;
 	atomic_flag_clear(&c->is_predecessors_locked);
-	c->predecessor_r_count = 0;
+	// c->predecessor_r_count = 0;
 
 	c->successors = NULL;
 	c->successor_r_count = 0;
