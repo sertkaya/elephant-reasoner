@@ -22,139 +22,52 @@
 #include <assert.h>
 #include <string.h>
 
+#include "utils.h"
+#include "../model/model.h"
 #include "../model/datatypes.h"
 #include "../model/limits.h"
 #include "../hashing/utils.h"
 
-/*
-// The list of subclass axioms that are generated during  preprocessing
-extern SubClassAxiom** generated_subclass_axioms;
-extern int generated_subclass_axiom_count;
-
-// The list of subrole axioms that are generated during  preprocessing
-extern SubRoleAxiom** generated_subrole_axioms;
-extern int generated_subrole_axiom_count;
-
-// The hash of nominals that are generated during preprocessing.
-extern KeyValueHashTable* generated_nominals;
-
-// The hash of existential restrictions that are generated during preprocessing.
-// They are generated from preprocessing role assertions.
-extern KeyValueHashTable* generated_exists_restrictions;
-extern int generated_exists_restriction_count;
-*/
-
-/******************************************************************************
- * Add functions for axioms
- *****************************************************************************/
-
-// Add a given subclass axiom to the list of subclass axioms generated during
-// preprocessing
-void add_generated_subclass_axiom(KB* kb, SubClassOfAxiom* ax) {
-	SubClassOfAxiom** tmp;
-	tmp = realloc(kb->generated_subclass_axioms, (kb->generated_subclass_axiom_count + 1) * sizeof(SubClassOfAxiom*));
-	assert(tmp != NULL);
-	kb->generated_subclass_axioms = tmp;
-	kb->generated_subclass_axioms[kb->generated_subclass_axiom_count] = ax;
-	++(kb->generated_subclass_axiom_count);
-}
-
-// Add a given subrole axiom the list of subclass axioms generated during
-// preprocessing
-void add_generated_subrole_axiom(KB* kb, SubObjectPropertyOfAxiom* ax) {
-	SubObjectPropertyOfAxiom** tmp;
-	tmp = realloc(kb->generated_subrole_axioms, (kb->generated_subrole_axiom_count + 1) * sizeof(SubObjectPropertyOfAxiom*));
-	assert(tmp != NULL);
-	kb->generated_subrole_axioms = tmp;
-	kb->generated_subrole_axioms[kb->generated_subrole_axiom_count] = ax;
-	++(kb->generated_subrole_axiom_count);
-}
-
-
-ClassExpression* get_create_generated_nominal(KB* kb, Individual* ind) {
-	ClassExpression* c;
+ClassExpressionId get_create_generated_nominal(TBox* tbox, IndividualId ind_id) {
+	ClassExpressionId id;
 
 	// check if the nominal with this individual already exists
-	if ((c = MAP_GET(ind->id, &(kb->generated_nominals))) != NULL)
-		return c;
+	if ((id = GET_GENERATED_NOMINAL(ind_id, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
 
-	// if a nominal with the individual does not already exist, create it
-	c = (ClassExpression*) malloc(sizeof(ClassExpression));
-	assert(c != NULL);
+	// a class with the IRI not found, create it
+	// first create a class expression template
+	id  = create_class_expression_template(tbox);
 
-	c->description.nominal.individual = ind;
+	tbox->class_expressions[id].type = OBJECT_ONE_OF_TYPE;
 
-	c->type = OBJECT_ONE_OF_TYPE;
-	// c->id = ind->id;
-	c->id = kb->tbox->next_class_expression_id++;
+	tbox->class_expressions[id].description.nominal.individual = ind_id;
 
-	LIST_INIT(&(c->told_subsumers));
+	PUT_GENERATED_NOMINAL(ind_id, id, tbox);
 
-	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
-
-	c->filler_of_negative_exists = NULL;
-
-	// initialize the 2-dim dynamic predecessors array
-	c->predecessors = NULL;
-	c->predecessor_r_count = 0;
-
-	c->successors = NULL;
-	c->successor_r_count = 0;
-
-	LIST_INIT(&(c->first_conjunct_of_list));
-	c->first_conjunct_of = NULL;
-
-	LIST_INIT(&(c->second_conjunct_of_list));
-	c->second_conjunct_of = NULL;
-
-	MAP_PUT(ind->id, c, &(kb->generated_nominals));
-
-	return c;
+	return(id);
 }
 
 
 // get or create generated the existential restriction with role r and filler f
-ClassExpression* get_create_generated_exists_restriction(KB* kb, ObjectPropertyExpression* r, ClassExpression* f) {
-	ClassExpression* c;
+ClassExpressionId get_create_generated_exists_restriction(TBox* tbox, ObjectPropertyExpressionId r, ClassExpressionId f) {
+	ClassExpressionId id;
 
 	// first check if we already created an existential
 	// restriction with the same role and filler
-	if ((c = hash_map_get(kb->generated_exists_restrictions, HASH_INTEGERS(r->id, f->id))) != NULL)
-		return c;
+	if ((id = GET_GENERATED_EXISTS_RESTRICTION(r, f, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
 
 	// if it does not already exist, create it
-	c = (ClassExpression*) malloc(sizeof(ClassExpression));
-	assert(c != NULL);
+	// first create a class expression template
+	id  = create_class_expression_template(tbox);
 
-	c->type = OBJECT_SOME_VALUES_FROM_TYPE;
+	tbox->class_expressions[id].type = OBJECT_SOME_VALUES_FROM_TYPE;
 
-	c->description.exists.role = r;
-	c->description.exists.filler = f;
-	// c->id = (kb->generated_exists_restriction_count)++;
-	c->id = kb->tbox->next_class_expression_id++;
+	tbox->class_expressions[id].description.exists.role = r;
+	tbox->class_expressions[id].description.exists.filler = f;
 
-	LIST_INIT(&(c->told_subsumers));
+	PUT_GENERATED_EXISTS_RESTRICTION(r, f, id, tbox);
 
-	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
-
-	c->filler_of_negative_exists = NULL;
-
-	// initialize the 2-dim dynamic predecessors array
-	c->predecessors = NULL;
-	c->predecessor_r_count = 0;
-
-	c->successors = NULL;
-	c->successor_r_count = 0;
-
-	LIST_INIT(&(c->first_conjunct_of_list));
-	c->first_conjunct_of = NULL;
-
-	LIST_INIT(&(c->second_conjunct_of_list));
-	c->second_conjunct_of = NULL;
-
-	++kb->generated_exists_restriction_count;
-
-	hash_map_put(kb->generated_exists_restrictions, HASH_INTEGERS(r->id, f->id), c);
-
-	return c;
+	return(id);
 }

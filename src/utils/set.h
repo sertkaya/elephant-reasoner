@@ -25,9 +25,12 @@
 #define SET_H_
 
 #include "../hashing/dynamic_hash_table.h"
+#include "../hashing/dynamic_hash_table_64.h"
 
 typedef DynamicHashTable Set;
+typedef DynamicHashTable_64 Set_64;
 typedef DynamicHashTableIterator SetIterator;
+typedef DynamicHashTableIterator_64 SetIterator_64;
 
 
 /**
@@ -40,12 +43,14 @@ typedef DynamicHashTableIterator SetIterator;
  * Initialize a set with an underlying hash table of the given size.
  */
 #define SET_INIT(set, size)		dynamic_hash_table_init(set, size)
+#define SET_INIT_64(set, size)		dynamic_hash_table_init_64(set, size)
 
 /**
  * Adds element e to the set s. Duplicates are not allowed.
  * Returns 1 if e is successfully added, 0 otherwise.
  */
 #define SET_ADD(e, s)			dynamic_hash_table_insert(e, s)
+#define SET_ADD_64(e, s)			dynamic_hash_table_insert_64(e, s)
 
 /**
  * Removes the element e if it is present. The set stays unchanged
@@ -75,6 +80,7 @@ typedef DynamicHashTableIterator SetIterator;
  * Returns the number of freed bytes.
  */
 #define SET_RESET(s)			dynamic_hash_table_reset(s)
+#define SET_RESET_64(s)			dynamic_hash_table_reset_64(s)
 
 /**
  * Return an array containing the elements of the given set.
@@ -93,13 +99,15 @@ typedef DynamicHashTableIterator SetIterator;
  * It is the iterator of the underlying hash table.
  */
 #define SET_ITERATOR_INIT(it, s)	dynamic_hash_table_iterator_init(it, s)
+#define SET_ITERATOR_INIT_64(it, s)	dynamic_hash_table_iterator_init_64(it, s)
 
 /**
  * Get the next element in the set.
  * Gets the next element in the underlying hash table.
  * Elements are not necessarily returned in the order of addition.
  */
-#define SET_ITERATOR_NEXT(si)		dynamic_hash_table_iterator_next(si)
+#define SET_ITERATOR_NEXT(si)			dynamic_hash_table_iterator_next(si)
+#define SET_ITERATOR_NEXT_64(si)		dynamic_hash_table_iterator_next_64(si)
 
 /**
  * Free the space for the given set iterator.

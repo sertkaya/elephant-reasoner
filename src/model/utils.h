@@ -24,18 +24,19 @@
 #include <string.h>
 
 #include "../hashing/utils.h"
+#include "../hashing/hash_map_64.h"
 #include "../hashing/hash_map.h"
 #include "../utils/map.h"
 #include "datatypes.h"
 
 // returns the prefix with the given prefix name
-#define GET_ONTOLOGY_PREFIX(prefix_name, kb)			MAP_GET(HASH_STRING(prefix_name), &(kb->prefixes))
+#define GET_ONTOLOGY_PREFIX(prefix_name, kb)			MAP_GET_64(HASH_STRING(prefix_name), &(kb->prefixes))
 
 // inserts the prefix with the given prefix name into the prefixes hash
-#define PUT_ONTOLOGY_PREFIX(prefix_name, prefix, kb)	MAP_PUT(HASH_STRING(prefix_name), prefix, &(kb->prefixes))
+#define PUT_ONTOLOGY_PREFIX(prefix_name, prefix, kb)	MAP_PUT_64(HASH_STRING(prefix_name), prefix, &(kb->prefixes))
 
 // returns the atomic concept with the given name if it exists
-// NULL if it does not exist
+// KEY_NOT_FOUND if it does not exist
 #define GET_ATOMIC_CONCEPT(IRI, tbox)					MAP_GET(HASH_STRING(IRI), &(tbox->classes))
 
 // inserts the atomic concept with the given name to the hash
@@ -48,17 +49,17 @@
 #define PUT_EXISTS_RESTRICTION(role_id, filler_id, c, tbox)		MAP_PUT(HASH_INTEGERS(role_id, filler_id), c, &(tbox->object_some_values_from_exps))
 
 // get the (binary) conjunction with the first conjunct c1 and second conjunct c2
-#define GET_CONJUNCTION(c1, c2, tbox)		(c1->id <= c2->id) ? MAP_GET(HASH_INTEGERS(c1->id, c2->id), &(tbox->object_intersection_of_exps)) : MAP_GET(HASH_INTEGERS(c2->id, c1->id), &(tbox->object_intersection_of_exps))
+#define GET_CONJUNCTION(c1, c2, tbox)		(c1 <= c2) ? MAP_GET(HASH_INTEGERS(c1, c2), &(tbox->object_intersection_of_exps)) : MAP_GET(HASH_INTEGERS(c2, c1), &(tbox->object_intersection_of_exps))
 
 // put the (binary) conjunction
-#define PUT_CONJUNCTION(c, tbox)			(c->description.conj.conjunct1->id <= c->description.conj.conjunct2->id) ? MAP_PUT(HASH_INTEGERS(c->description.conj.conjunct1->id, c->description.conj.conjunct2->id), c, &(tbox->object_intersection_of_exps)) : MAP_PUT(HASH_INTEGERS(c->description.conj.conjunct2->id, c->description.conj.conjunct1->id), c, &(tbox->object_intersection_of_exps))
+#define PUT_CONJUNCTION(c1, c2, c, tbox)			(c1 <= c2) ? MAP_PUT(HASH_INTEGERS(c1, c2), c, &(tbox->object_intersection_of_exps)) : MAP_PUT(HASH_INTEGERS(c2, c1), c, &(tbox->object_intersection_of_exps))
 
 // return the nominal with the given individual if it exists
 // NULL if it does not exist
-#define GET_NOMINAL(individual, tbox)		MAP_GET(individual->id, &(tbox->object_one_of_exps))
+#define GET_NOMINAL(ind_id, tbox)		MAP_GET(ind_id, &(tbox->object_one_of_exps))
 
 // insert the nominal with the given individual
-#define PUT_NOMINAL(n, tbox)				MAP_PUT(n->description.nominal.individual->id, n, &(tbox->object_one_of_exps))
+#define PUT_NOMINAL(ind_id, n_id, tbox)		MAP_PUT(ind_id, n_id, &(tbox->object_one_of_exps))
 
 // return the atomic role with the given name if it exists
 // NULL if it does not exist
@@ -69,18 +70,18 @@
 
 
 // get the role compoisiton with the given roles
-#define GET_ROLE_COMPOSITION(r1, r2, tbox)	MAP_GET(HASH_INTEGERS(r1->id, r2->id), &(tbox->objectproperty_chains))
+#define GET_ROLE_COMPOSITION(r1, r2, tbox)	MAP_GET(HASH_INTEGERS(r1, r2), &(tbox->objectproperty_chains))
 
 // put the role composition with the given roles into the role compositions hash
-#define PUT_ROLE_COMPOSITION(r, tbox)		MAP_PUT(HASH_INTEGERS(r->description.object_property_chain.role1->id, r->description.object_property_chain.role2->id), r, &(tbox->objectproperty_chains))
+#define PUT_ROLE_COMPOSITION(r1,r2, r, tbox)		MAP_PUT(HASH_INTEGERS(r1, r2), r, &(tbox->objectproperty_chains))
 
 /******************************************************************************/
-// Returns the individual with the given name if it exists
-// NULL if it does not exist
-#define GET_INDIVIDUAL(IRI, abox)			hash_map_get(abox->individuals, HASH_STRING(IRI))
+// Returns the id of the individual with the given name if it exists
+// KEY_NOT_FOUND if it does not exist
+#define GET_INDIVIDUAL(IRI, abox)			hash_map_get(abox->individuals_map, HASH_STRING(IRI))
 
-// Inserts the given individual into the hash of individuals.
+// Inserts the given individual id into the hash of individuals.
 // Individual name is the key.
-#define PUT_INDIVIDUAL(IRI, i, abox)		hash_map_put(abox->individuals, HASH_STRING(IRI), i)
+#define PUT_INDIVIDUAL(IRI, i, abox)		hash_map_put(abox->individuals_map, HASH_STRING(IRI), i)
 
 #endif

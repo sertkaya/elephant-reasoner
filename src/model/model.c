@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "../utils/set.h"
+#include "../utils/list_64.h"
 #include "datatypes.h"
 #include "model.h"
 #include "utils.h"
@@ -33,172 +34,151 @@ void create_prefix(char* prefix_name, char* prefix, KB* kb) {
 	if (GET_ONTOLOGY_PREFIX(prefix_name, kb) != NULL)
 		return;
 
-	list_add(prefix_name, &(kb->prefix_names));
+	list_add_64(prefix_name, &(kb->prefix_names));
 	PUT_ONTOLOGY_PREFIX(prefix_name, prefix, kb);
 }
 
+ClassExpressionId create_class_expression_template(TBox* tbox) {
+	// first increment the last id
+	++tbox->last_class_expression_id;
+
+	if (tbox->last_class_expression_id == (tbox->class_expressions_size -1)) {
+		ClassExpression* tmp = realloc(tbox->class_expressions, tbox->class_expressions_size + DEFAULT_CLASS_EXPRESSION_COUNT_INCREMENT);
+		assert (tmp != NULL);
+		tbox->class_expressions = tmp;
+		tbox->class_expressions_size += DEFAULT_CLASS_EXPRESSION_COUNT_INCREMENT;
+	}
+
+	// now fill this class expression
+	ClassExpression* c = &(tbox->class_expressions[tbox->last_class_expression_id]);
+
+	LIST_INIT(&(c->told_subsumers));
+
+	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
+
+	c->filler_of_negative_exists = NULL;
+
+	// initialize the 2-dim dynamic predecessors array
+	c->predecessors = NULL;
+	c->predecessor_r_count = 0;
+
+	c->successors = NULL;
+	c->successor_r_count = 0;
+
+	LIST_INIT(&(c->first_conjunct_of_list));
+	c->first_conjunct_of = NULL;
+
+	LIST_INIT(&(c->second_conjunct_of_list));
+	c->second_conjunct_of = NULL;
+
+	// return the id of this class expression
+	return(tbox->last_class_expression_id);
+
+}
 /******************************************************************************
  * get/create functions for concepts
  *****************************************************************************/
 
-ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
-	ClassExpression* c;
-	ClassExpression** tmp;
+ClassExpressionId get_create_atomic_concept(char* IRI, TBox* tbox) {
+	ClassExpressionId id;
 
 	// check if the atomic concept with this name already exists
-	// if ((c = get_atomic_concept((unsigned char*) name, tbox)) != NULL)
-	if ((c = GET_ATOMIC_CONCEPT(IRI, tbox)) != NULL)
-		return c;
+	if ((id = GET_ATOMIC_CONCEPT(IRI, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
 
-	// if an atomic concept with the name does not already exist, create it
-	c = (ClassExpression*) malloc(sizeof(ClassExpression));
-	assert(c != NULL);
+	// a class with the IRI not found, create it
+	// first create a class expression template
+	id  = create_class_expression_template(tbox);
 
-	c->description.atomic.IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
-	assert(c->description.atomic.IRI != NULL);
+	// fill the class expression
+	tbox->class_expressions[id].type = CLASS_TYPE;
 
-	strcpy(c->description.atomic.IRI, IRI);
+	tbox->class_expressions[id].description.atomic.IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
+	assert(tbox->class_expressions[id].description.atomic.IRI != NULL);
+	strcpy(tbox->class_expressions[id].description.atomic.IRI, IRI);
 
-	SET_INIT(&(c->description.atomic.direct_subsumers), DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
+	SET_INIT(&(tbox->class_expressions[id].description.atomic.direct_subsumers), DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
 
-	SET_INIT(&(c->description.atomic.equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
+	SET_INIT(&(tbox->class_expressions[id].description.atomic.equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
 
-	c->type = CLASS_TYPE;
-	c->id = tbox->next_class_expression_id++;
+	PUT_ATOMIC_CONCEPT(tbox->class_expressions[id].description.atomic.IRI, id, tbox);
 
-	LIST_INIT(&(c->told_subsumers));
-
-	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
-
-	c->filler_of_negative_exists = NULL;
-
-	// initialize the 2-dim dynamic predecessors array
-	c->predecessors = NULL;
-	c->predecessor_r_count = 0;
-
-	c->successors = NULL;
-	c->successor_r_count = 0;
-
-	LIST_INIT(&(c->first_conjunct_of_list));
-	c->first_conjunct_of = NULL;
-
-	LIST_INIT(&(c->second_conjunct_of_list));
-	c->second_conjunct_of = NULL;
-
-	PUT_ATOMIC_CONCEPT(c->description.atomic.IRI, c, tbox);
-
-	return c;
+	return(id);
 }
 
 // get or create the existential restriction with role r and filler f
-ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, ClassExpression* f, TBox* tbox) {
-	ClassExpression* c;
+ClassExpressionId get_create_exists_restriction(ObjectPropertyExpressionId r, ClassExpressionId f, TBox* tbox) {
+	ClassExpressionId id;
 
 	++tbox->object_some_values_from_exps_count;
+
 	// first check if we already created an existential
 	// restriction with the same role and filler
-	// if ((c = get_exists_restriction(r->id, f->id, tbox)) != NULL)
-	if ((c = GET_EXISTS_RESTRICTION(r->id, f->id, tbox)) != NULL)
-		return c;
+	if ((id = GET_EXISTS_RESTRICTION(r, f, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
 
 	// if it does not already exist, create it
-	c = (ClassExpression*) malloc(sizeof(ClassExpression));
-	assert(c != NULL);
+	// first create a class expression template
+	id  = create_class_expression_template(tbox);
 
-	c->type = OBJECT_SOME_VALUES_FROM_TYPE;
+	// fill the class expression
+	tbox->class_expressions[id].type = OBJECT_SOME_VALUES_FROM_TYPE;
 
-	c->description.exists.role = r;
-	c->description.exists.filler = f;
-	c->id = tbox->next_class_expression_id++;
+	tbox->class_expressions[id].description.exists.role = r;
+	tbox->class_expressions[id].description.exists.filler = f;
 
-	LIST_INIT(&(c->told_subsumers));
+	PUT_EXISTS_RESTRICTION(r, f, id, tbox);
 
-	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
-
-	c->filler_of_negative_exists = NULL;
-
-	// initialize the 2-dim dynamic predecessors array
-	c->predecessors = NULL;
-	c->predecessor_r_count = 0;
-
-	c->successors = NULL;
-	c->successor_r_count = 0;
-
-	LIST_INIT(&(c->first_conjunct_of_list));
-	c->first_conjunct_of = NULL;
-
-	LIST_INIT(&(c->second_conjunct_of_list));
-	c->second_conjunct_of = NULL;
-
-	PUT_EXISTS_RESTRICTION(r->id, f->id, c, tbox);
-
-	return c;
+	return(id);
 }
 
-ClassExpression* get_create_conjunction_binary(ClassExpression* c1, ClassExpression* c2, TBox* tbox) {
-	ClassExpression* c;
+ClassExpressionId get_create_conjunction_binary(ClassExpressionId c1, ClassExpressionId c2, TBox* tbox) {
+	ClassExpressionId id;
 
 	++tbox->binary_object_intersection_of_exps_count;
-	if ((c = GET_CONJUNCTION(c1, c2, tbox)) != NULL)
-		return c;
+	if ((id = GET_CONJUNCTION(c1, c2, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
 
-	c = (ClassExpression*) malloc(sizeof(ClassExpression));
-	assert(c != NULL);
+	// if it does not already exist, create it
+	// first create a class expression template
+	id  = create_class_expression_template(tbox);
 
-	c->type = OBJECT_INTERSECTION_OF_TYPE;
+	// fill the class expression
+	tbox->class_expressions[id].type = OBJECT_INTERSECTION_OF_TYPE;
 
 	// we order the conjuncts!
-	if (c1->id < c2->id) {
-		c->description.conj.conjunct1 = c1;
-		c->description.conj.conjunct2 = c2;
+	if (c1 < c2) {
+		tbox->class_expressions[id].description.conj.conjunct1 = c1;
+		tbox->class_expressions[id].description.conj.conjunct2 = c2;
 	}
 	else {
-		c->description.conj.conjunct1 = c2;
-		c->description.conj.conjunct2 = c1;
+		tbox->class_expressions[id].description.conj.conjunct1 = c2;
+		tbox->class_expressions[id].description.conj.conjunct2 = c1;
 	}
-	c->id = tbox->next_class_expression_id++;
 
-	LIST_INIT(&(c->told_subsumers));
+	PUT_CONJUNCTION(c1, c2, id, tbox);
 
-	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
-
-	c->filler_of_negative_exists = NULL;
-
-	// initialize the 2-dim dynamic predecessors array
-	c->predecessors = NULL;
-	c->predecessor_r_count = 0;
-
-	c->successors = NULL;
-	c->successor_r_count = 0;
-
-	LIST_INIT(&(c->first_conjunct_of_list));
-	c->first_conjunct_of = NULL;
-
-	LIST_INIT(&(c->second_conjunct_of_list));
-	c->second_conjunct_of = NULL;
-
-	PUT_CONJUNCTION(c, tbox);
-
-	return c;
+	return(id);
 }
 
 // comparison function for qsorting conjucts based on ids
-static int compare_conjunct(const void* c1, const void* c2) {
-	if (((ClassExpression*) c1)->id < ((ClassExpression*) c2)->id)
+ static int compare_conjunct(const void* c1, const void* c2) {
+	if (c1 <  c2)
 		return -1;
-	if (((ClassExpression*) c1)->id == ((ClassExpression*) c2)->id)
+	if ( c1 == c2)
 		return 0;
 	return 1;
 }
 
 // returns a binary conjunction from a given list of conjuncts.
 // called by the parser.
-ClassExpression* get_create_conjunction(int size, ClassExpression** conjuncts, TBox* tbox) {
+ClassExpressionId get_create_conjunction(int size, ClassExpressionId* conjuncts, TBox* tbox) {
 	int i;
-	ClassExpression* conjunction = NULL;
+	// TODO: Does this 0 have a special meaning/reason?
+	ClassExpressionId conjunction = 0;
 
 	++tbox->object_intersection_of_exps_count;
-	qsort(conjuncts, size, sizeof(ClassExpression*), compare_conjunct);
+	qsort(conjuncts, size, sizeof(ClassExpressionId), compare_conjunct);
 	conjunction = get_create_conjunction_binary(conjuncts[0], conjuncts[1], tbox);
 	for (i = 2; i < size; i++)
 		conjunction = get_create_conjunction_binary(conjunction, conjuncts[i], tbox);
@@ -207,65 +187,41 @@ ClassExpression* get_create_conjunction(int size, ClassExpression** conjuncts, T
 }
 
 // get or create the nominal for a given individual
-ClassExpression* get_create_nominal(Individual* ind, TBox* tbox) {
-	ClassExpression* c;
+ClassExpressionId get_create_nominal(IndividualId ind, TBox* tbox) {
+	ClassExpressionId id;
 
 	// check if the nominal with this individual already exists
-	if ((c = GET_NOMINAL(ind, tbox)) != NULL)
-		return c;
+	if ((id = GET_NOMINAL(ind, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
 
 	// if a nominal with the individual does not already exist, create it
-	c = (ClassExpression*) malloc(sizeof(ClassExpression));
-	assert(c != NULL);
+	id  = create_class_expression_template(tbox);
 
-	c->description.nominal.individual = ind;
+	tbox->class_expressions[id].type = OBJECT_ONE_OF_TYPE;
+	tbox->class_expressions[id].description.nominal.individual = ind;
 
-	c->type = OBJECT_ONE_OF_TYPE;
-	c->id = tbox->next_class_expression_id++;
+	PUT_NOMINAL(ind, id, tbox);
 
-	LIST_INIT(&(c->told_subsumers));
-
-	SET_INIT(&(c->subsumers), DEFAULT_SUBSUMERS_HASH_SIZE);
-
-	c->filler_of_negative_exists = NULL;
-
-	// initialize the 2-dim dynamic predecessors array
-	c->predecessors = NULL;
-	c->predecessor_r_count = 0;
-
-	c->successors = NULL;
-	c->successor_r_count = 0;
-
-	LIST_INIT(&(c->first_conjunct_of_list));
-	c->first_conjunct_of = NULL;
-
-	LIST_INIT(&(c->second_conjunct_of_list));
-	c->second_conjunct_of = NULL;
-
-	PUT_NOMINAL(c, tbox);
-
-	return c;
+	return(id);
 }
+
+
 /******************************************************************************
  * get/create functions for roles
  *****************************************************************************/
 
-ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
-	ObjectPropertyExpression* r;
+ObjectPropertyExpressionId create_object_property_expression_template(TBox* tbox) {
+	// first increment the last id
+	++tbox->last_object_property_expression_id;
 
-	// check if the atomic role already exists
-	if ((r = GET_ATOMIC_ROLE(IRI, tbox)) != NULL)
-		return r;
+	if (tbox->last_object_property_expression_id >= tbox->object_property_expressions_size - 1) {
+		ObjectPropertyExpression* tmp = realloc(tbox->object_property_expressions, tbox->object_property_expressions_size + DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT_INCREMENT);
+		assert (tmp != NULL);
+		tbox->object_property_expressions = tmp;
+	}
 
-	// if it does not already exist, create it
-	r = (ObjectPropertyExpression*) malloc(sizeof(ObjectPropertyExpression));
-	assert(r != NULL);
-
-	r->type = OBJECT_PROPERTY_TYPE;
-	r->description.atomic.IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
-	assert(r->description.atomic.IRI != NULL);
-	strcpy(r->description.atomic.IRI, IRI);
-	r->id = tbox->next_objectproperty_expression_id++;
+	// now fill this object property expression
+	ObjectPropertyExpression* r = &(tbox->object_property_expressions[tbox->last_object_property_expression_id]);
 
 	SET_INIT(&(r->told_subsumers), DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
 
@@ -282,54 +238,59 @@ ObjectPropertyExpression* get_create_atomic_role(char* IRI, TBox* tbox) {
 	r->second_component_of_list = NULL;
 	SET_INIT(&(r->second_component_of), DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
 
-	PUT_ATOMIC_ROLE(r->description.atomic.IRI, r, tbox);
+	// return the id of this object property expression
+	return(tbox->last_object_property_expression_id);
 
-	return r;
+}
+ObjectPropertyExpressionId get_create_atomic_role(char* IRI, TBox* tbox) {
+	ObjectPropertyExpressionId id;
+
+	// check if the atomic role already exists
+	if ((id = GET_ATOMIC_ROLE(IRI, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
+
+	// if it does not already exist, create it
+	id = create_object_property_expression_template(tbox);
+
+	tbox->object_property_expressions[id].type = OBJECT_PROPERTY_TYPE;
+
+	tbox->object_property_expressions[id].description.atomic.IRI = (char*) malloc((strlen(IRI) + 1) * sizeof(char));
+	assert(tbox->object_property_expressions[id].description.atomic.IRI != NULL);
+	strcpy(tbox->object_property_expressions[id].description.atomic.IRI, IRI);
+
+	PUT_ATOMIC_ROLE(tbox->object_property_expressions[id].description.atomic.IRI, id, tbox);
+
+	return(id);
 }
 
 
-
-ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpression *r1, ObjectPropertyExpression* r2, TBox* tbox) {
-	ObjectPropertyExpression* r;
+ObjectPropertyExpressionId get_create_role_composition_binary(ObjectPropertyExpressionId r1, ObjectPropertyExpressionId r2, TBox* tbox) {
+	ObjectPropertyExpressionId id;
 
 	tbox->binary_role_composition_count++;
-	if ((r = GET_ROLE_COMPOSITION(r1, r2, tbox)) != NULL)
-		return r;
+	if ((id = GET_ROLE_COMPOSITION(r1, r2, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
 
-	r = (ObjectPropertyExpression*) malloc(sizeof(ObjectPropertyExpression));
-	assert(r != NULL);
+	// if it does not already exist, create it
+	id = create_object_property_expression_template(tbox);
 
-	r->type = OBJECT_PROPERTY_CHAIN_TYPE;
+	tbox->object_property_expressions[id].type = OBJECT_PROPERTY_CHAIN_TYPE;
+
 	// we DO assume role1 and role2 to be ordered!
-	r->description.object_property_chain.role1 = r1;
-	r->description.object_property_chain.role2 = r2;
-	r->id = tbox->next_objectproperty_expression_id++;
+	// TODO: is it required that they are ordered? As it is, there is no sorting!
+	tbox->object_property_expressions[id].description.object_property_chain.role1 = r1;
+	tbox->object_property_expressions[id].description.object_property_chain.role2 = r2;
 
-	SET_INIT(&(r->told_subsumers), DEFAULT_ROLE_TOLD_SUBSUMERS_HASH_SIZE);
+	PUT_ROLE_COMPOSITION(r1, r2, id, tbox);
 
-	LIST_INIT(&(r->subsumer_list));
-	SET_INIT(&(r->subsumers), DEFAULT_ROLE_SUBSUMERS_HASH_SIZE);
-
-	SET_INIT(&(r->subsumees), DEFAULT_ROLE_SUBSUMEES_HASH_SIZE);
-
-	r->first_component_of_count = 0;
-	r->first_component_of_list = NULL;
-	SET_INIT(&(r->first_component_of), DEFAULT_ROLE_FIRST_COMPONENT_OF_HASH_SIZE);
-
-	r->second_component_of_count = 0;
-	r->second_component_of_list = NULL;
-	SET_INIT(&(r->second_component_of), DEFAULT_ROLE_SECOND_COMPONENT_OF_HASH_SIZE);
-
-	PUT_ROLE_COMPOSITION(r, tbox);
-
-	return r;
+	return(id);
 }
 
 // get or create the role composition consisting of the given roles.
 // called by the parser.
-ObjectPropertyExpression* get_create_role_composition(int size, ObjectPropertyExpression** roles, TBox* tbox) {
+ObjectPropertyExpressionId get_create_role_composition(int size, ObjectPropertyExpressionId* roles, TBox* tbox) {
 	int i;
-	ObjectPropertyExpression* composition = NULL;
+	ObjectPropertyExpressionId composition = -1;
 
 	tbox->role_composition_count++;
 	composition = get_create_role_composition_binary(roles[size-1], roles[size-2], tbox);
@@ -344,7 +305,7 @@ ObjectPropertyExpression* get_create_role_composition(int size, ObjectPropertyEx
  * create functions for axioms
  *****************************************************************************/
 // create the subclass axiom with the given concept descriptions
-SubClassOfAxiom* create_subclass_axiom(ClassExpression* lhs, ClassExpression* rhs) {
+SubClassOfAxiom* create_subclass_axiom(ClassExpressionId lhs, ClassExpressionId rhs) {
 	SubClassOfAxiom* ax = (SubClassOfAxiom*) malloc(sizeof(SubClassOfAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
@@ -353,7 +314,7 @@ SubClassOfAxiom* create_subclass_axiom(ClassExpression* lhs, ClassExpression* rh
 }
 
 // create the equivalent classes axiom with the given concept descriptions
-EquivalentClassesAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpression* rhs) {
+EquivalentClassesAxiom* create_eqclass_axiom(ClassExpressionId lhs, ClassExpressionId rhs) {
 	/*
 	if (lhs->type != ATOMIC_CONCEPT) {
 		fprintf(stderr,"the lhs of an equivalent classes axiom must be an atomic concept, aborting\n");
@@ -368,7 +329,7 @@ EquivalentClassesAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpressi
 }
 
 // create the disjointclasses axiom with the given concept descriptions
-DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpression** classes) {
+DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpressionId* classes) {
 	DisjointClassesAxiom* ax = (DisjointClassesAxiom*) calloc(1, sizeof(DisjointClassesAxiom));
 	assert(ax != NULL);
 	LIST_INIT(&(ax->classes));
@@ -380,7 +341,7 @@ DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpress
 }
 
 // create the subrole axiom with the given role descriptions
-SubObjectPropertyOfAxiom* create_subrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs) {
+SubObjectPropertyOfAxiom* create_subrole_axiom(ObjectPropertyExpressionId lhs, ObjectPropertyExpressionId rhs) {
 	SubObjectPropertyOfAxiom* ax = (SubObjectPropertyOfAxiom*) malloc(sizeof(SubObjectPropertyOfAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
@@ -388,7 +349,7 @@ SubObjectPropertyOfAxiom* create_subrole_axiom(ObjectPropertyExpression* lhs, Ob
 	return ax;
 }
 
-TransitiveObjectPropertyAxiom* create_transitive_role_axiom(ObjectPropertyExpression* r) {
+TransitiveObjectPropertyAxiom* create_transitive_role_axiom(ObjectPropertyExpressionId r) {
 	TransitiveObjectPropertyAxiom* ax = (TransitiveObjectPropertyAxiom*) malloc(sizeof(TransitiveObjectPropertyAxiom));
 	assert(ax != NULL);
 	ax->r = r;
@@ -396,7 +357,7 @@ TransitiveObjectPropertyAxiom* create_transitive_role_axiom(ObjectPropertyExpres
 }
 
 // create the eqrole axiom with the given role descriptions
-EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs) {
+EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpressionId lhs, ObjectPropertyExpressionId rhs) {
 	EquivalentObjectPropertiesAxiom* ax = (EquivalentObjectPropertiesAxiom*) malloc(sizeof(EquivalentObjectPropertiesAxiom));
 	assert(ax != NULL);
 	ax->lhs = lhs;
@@ -405,7 +366,7 @@ EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* l
 }
 
 // create an objectproperty domain axiom with the given objectproperty and class expressions
-ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpression* ope, ClassExpression* ce) {
+ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpressionId ope, ClassExpressionId ce) {
 	ObjectPropertyDomainAxiom* ax = (ObjectPropertyDomainAxiom*) malloc(sizeof(ObjectPropertyDomainAxiom));
 	assert(ax != NULL);
 	ax->object_property_expression = ope;
@@ -414,7 +375,7 @@ ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpr
 }
 
 // create a SameIndividual axiom with the given list of individuals
-SameIndividualAxiom* create_same_individual_axiom(int individual_count, Individual** individuals) {
+SameIndividualAxiom* create_same_individual_axiom(int individual_count, IndividualId* individuals) {
 	SameIndividualAxiom* ax = (SameIndividualAxiom*) calloc(1, sizeof(SameIndividualAxiom));
 	assert(ax != NULL);
 	LIST_INIT(&(ax->individuals));
@@ -426,7 +387,7 @@ SameIndividualAxiom* create_same_individual_axiom(int individual_count, Individu
 }
 
 // create a DifferentIndividuals axiom with the given list of individuals
-DifferentIndividualsAxiom* create_different_individuals_axiom(int individual_count, Individual** individuals) {
+DifferentIndividualsAxiom* create_different_individuals_axiom(int individual_count, IndividualId* individuals) {
 	DifferentIndividualsAxiom* ax = (DifferentIndividualsAxiom*) calloc(1, sizeof(DifferentIndividualsAxiom));
 	assert(ax != NULL);
 	LIST_INIT(&(ax->individuals));
@@ -440,35 +401,39 @@ DifferentIndividualsAxiom* create_different_individuals_axiom(int individual_cou
  * get/create functions for ABox
  *****************************************************************************/
 
-Individual* get_create_individual(char* name, ABox* abox) {
-	Individual* i;
+IndividualId get_create_individual(char* name, ABox* abox) {
+	IndividualId id;
 
 	// check if an individual with this name already exists in the ABox
-	if ((i = (Individual*) GET_INDIVIDUAL(name, abox)) != NULL)
-		return i;
+	if ((id = GET_INDIVIDUAL(name, abox)) != KEY_NOT_FOUND_IN_HASH_MAP)
+		return(id);
 
-	// if an individual with the name does not already exist, create it
-	i = (Individual*) malloc(sizeof(Individual));
-	assert(i != NULL);
+	// first increment the last id
+	id = ++abox->last_individual_id;
 
-	i->id = abox->last_individual_id++;
+	if (abox->last_individual_id >= abox->individual_count) {
+		Individual* tmp = realloc(abox->individuals, abox->individual_count + DEFAULT_INDIVIDUAL_COUNT_INCREMENT);
+		assert (tmp != NULL);
+		abox->individuals = tmp;
+		abox->individual_count += DEFAULT_INDIVIDUAL_COUNT_INCREMENT;
+	}
 
-	i->IRI = (char*) malloc((strlen(name) + 1) * sizeof(char));
-	assert(i->IRI != NULL);
-	strcpy(i->IRI, name);
+	abox->individuals[id].IRI = (char*) malloc((strlen(name) + 1) * sizeof(char));
+	assert(abox->individuals[id].IRI != NULL);
+	strcpy(abox->individuals[id].IRI, name);
 
-	PUT_INDIVIDUAL(i->IRI, i, abox);
+	PUT_INDIVIDUAL(abox->individuals[id].IRI, id, abox);
 
 	++abox->individual_count;
 
-	return i;
+	return(id);
 }
 
 /******************************************************************************
  * create functions for assertions
  *****************************************************************************/
 // create the concept assertion with the given individual and concept
-ClassAssertion* create_concept_assertion(Individual* ind, ClassExpression* c) {
+ClassAssertion* create_concept_assertion(IndividualId ind, ClassExpressionId c) {
 	ClassAssertion* as = (ClassAssertion*) malloc(sizeof(ClassAssertion));
 	assert(as != NULL);
 	as->individual = ind;
@@ -477,8 +442,8 @@ ClassAssertion* create_concept_assertion(Individual* ind, ClassExpression* c) {
 	return as;
 }
 
-// create the role assertion with the given role and individuals
-ObjectPropertyAssertion* create_role_assertion(ObjectPropertyExpression* role, Individual* source_ind, Individual* target_ind) {
+// create the role assertion with the given role and individuals_map
+ObjectPropertyAssertion* create_role_assertion(ObjectPropertyExpressionId role, IndividualId source_ind, IndividualId target_ind) {
 	ObjectPropertyAssertion* as = (ObjectPropertyAssertion*) malloc(sizeof(ObjectPropertyAssertion));
 	assert(as != NULL);
 	as->role = role;

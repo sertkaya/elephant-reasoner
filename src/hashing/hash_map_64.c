@@ -21,13 +21,13 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
-#include "hash_map.h"
+#include "hash_map_64.h"
 #include "utils.h"
 
 
-inline HashMap* hash_map_create(unsigned int size) {
+inline HashMap_64* hash_map_create_64(unsigned int size) {
 
-	HashMap* hash_map = (HashMap*) malloc(sizeof(HashMap));
+	HashMap_64* hash_map = (HashMap_64*) malloc(sizeof(HashMap_64));
 	assert(hash_map != NULL);
 
 	if (size < 16)
@@ -36,7 +36,7 @@ inline HashMap* hash_map_create(unsigned int size) {
 		size = roundup_pow2(size);
 
 	// allocate space for the buckets
-	hash_map->buckets = (HashMapElement***) calloc(size, sizeof(HashMapElement**));
+	hash_map->buckets = (HashMapElement_64***) calloc(size, sizeof(HashMapElement_64**));
 	assert(hash_map->buckets != NULL);
 
 	// allocate space for the chain sizes
@@ -52,7 +52,7 @@ inline HashMap* hash_map_create(unsigned int size) {
 	return hash_map;
 }
 
-void hash_map_init(HashMap* hash_map, unsigned int size) {
+void hash_map_init_64(HashMap_64* hash_map, unsigned int size) {
 
 	if (size < 16)
 		size = 16;
@@ -60,7 +60,7 @@ void hash_map_init(HashMap* hash_map, unsigned int size) {
 		size = roundup_pow2(size);
 
 	// allocate space for the buckets
-	hash_map->buckets = (HashMapElement***) calloc(size, sizeof(HashMapElement**));
+	hash_map->buckets = (HashMapElement_64***) calloc(size, sizeof(HashMapElement_64**));
 	assert(hash_map->buckets != NULL);
 
 	// allocate space for the chain sizes
@@ -75,7 +75,7 @@ void hash_map_init(HashMap* hash_map, unsigned int size) {
 }
 
 
-int hash_map_free(HashMap* hash_map) {
+int hash_map_free_64(HashMap_64* hash_map) {
 	int freed_bytes = 0;
 
 	int i;
@@ -86,26 +86,26 @@ int hash_map_free(HashMap* hash_map) {
 				// note that we only free the node.
 				// the space allocated for  node->value is not freed!
 				free(hash_map->buckets[i][j]);
-				freed_bytes += sizeof(HashMapElement);
+				freed_bytes += sizeof(HashMapElement_64);
 			}
 
 			free(hash_map->buckets[i]);
-			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement*);
+			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement_64*);
 		}
 	}
 	free(hash_map->buckets);
-	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement***);
+	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement_64***);
 
 	free(hash_map->chain_sizes);
 	freed_bytes += hash_map->bucket_count * sizeof(unsigned int);
 
 	free(hash_map);
-	freed_bytes += sizeof(HashMap);
+	freed_bytes += sizeof(HashMap_64);
 
 	return freed_bytes;
 }
 
-int hash_map_reset(HashMap* hash_map) {
+int hash_map_reset_64(HashMap_64* hash_map) {
 	int freed_bytes = 0;
 
 	int i;
@@ -116,15 +116,15 @@ int hash_map_reset(HashMap* hash_map) {
 				// note that we only free the node.
 				// the space allocated for  node->value is not freed!
 				free(hash_map->buckets[i][j]);
-				freed_bytes += sizeof(HashMapElement);
+				freed_bytes += sizeof(HashMapElement_64);
 			}
 
 			free(hash_map->buckets[i]);
-			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement*);
+			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement_64*);
 		}
 	}
 	free(hash_map->buckets);
-	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement***);
+	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement_64***);
 
 	free(hash_map->chain_sizes);
 	freed_bytes += hash_map->bucket_count * sizeof(unsigned int);
@@ -135,16 +135,16 @@ int hash_map_reset(HashMap* hash_map) {
 	return freed_bytes;
 }
 
-extern inline int hash_map_put(HashMap* hash_map, uint64_t key, uint32_t value);
+extern inline int hash_map_put_64(HashMap_64* hash_map, uint64_t key, void* value);
 
-extern inline uint32_t hash_map_get(HashMap* hash_map, uint64_t key);
+extern inline void* hash_map_get_64(HashMap_64* hash_map, uint64_t key);
 
-void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map) {
+void hash_map_iterator_init_64(HashMapIterator_64* iterator, HashMap_64* map) {
 	iterator->hash_map = map;
-	HashMapElement* tmp = (HashMapElement*) calloc(1, sizeof(HashMapElement));
+	HashMapElement_64* tmp = (HashMapElement_64*) calloc(1, sizeof(HashMapElement_64));
 	assert(tmp != NULL);
 	tmp->previous = map->tail;
 	iterator->current_element = tmp;
 }
 
-extern inline uint32_t hash_map_iterator_next(HashMapIterator* iterator);
+extern inline void* hash_map_iterator_next_64(HashMapIterator_64* iterator);

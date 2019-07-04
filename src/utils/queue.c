@@ -35,7 +35,7 @@ void init_queue(Queue* q) {
 	q->rear = NULL;
 }
 
-void enqueue(Queue* queue, void* data) {
+void enqueue(Queue* queue, uint32_t data) {
 	QueueElement* new_qe;
 
 	new_qe = (QueueElement*) malloc(sizeof(QueueElement));
@@ -54,13 +54,13 @@ void enqueue(Queue* queue, void* data) {
 	}
 }
 
-void* dequeue(Queue* queue) {
-	void* data;
+uint32_t dequeue(Queue* queue) {
+	uint32_t data;
 	QueueElement* tmp;
 
 	if (queue->front == NULL && queue->rear == NULL)
 		// the queue is empty
-		return NULL;
+		return -1;
 
 	data = queue->front->data;
 	if (queue->rear == queue->front)

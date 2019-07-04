@@ -19,47 +19,46 @@
 
 /**
  * A simple list implementation that supports adding and removing elements.
- * Elements are 32 bit ids (32 bit unsigned int)
+ * Elements are 64 bit pointers
  */
 
-#ifndef LIST_H_
-#define LIST_H_
+#ifndef LIST_64_H_
+#define LIST_64_H_
 
-#include <stdint.h>
+#include <assert.h>
+#include <stdlib.h>
 
-#define KEY_NOT_FOUND_IN_LIST UINT32_MAX
+typedef struct list_64 List_64;
+typedef struct list_iterator_64 ListIterator_64;
 
-typedef struct list List;
-typedef struct list_iterator ListIterator;
-
-struct list {
+struct list_64 {
 	int size;
-	uint32_t* elements;
+	void** elements;
 };
 
-struct list_iterator {
-	List* list;
+struct list_iterator_64 {
+	List_64* list;
 	int current_index;
 };
 
 /**
  * Create list.
- * Returns a pointer to the created list.
+ * Returns a pointer to the created list_64.
  */
-List* list_create();
+List_64* list_create_64();
 
 /**
  * Initialize a given list. Intended for not dynamically created
  * lists.
  */
 // inline void list_init(List* l);
-#define LIST_INIT(l)		do {((List*) l)->size=0; ((List*) l)->elements=NULL;} while(0)
+#define LIST_INIT_64(l)		do {((List_64*) l)->size=0; ((List*) l)->elements=NULL;} while(0)
 /**
  * Appends element e to list l. Does not check for duplicates.
  * Returns 1.
  */
-inline char list_add(uint32_t e, List* l) {
-	uint32_t* tmp = realloc(l->elements, (l->size + 1) * sizeof(uint32_t));
+inline char list_add_64(void* e, List_64* l) {
+	void** tmp = realloc(l->elements, (l->size + 1) * sizeof(void*));
 	assert(tmp != NULL);
 	l->elements = tmp;
 	l->elements[l->size] = e;
@@ -76,7 +75,7 @@ inline char list_add(uint32_t e, List* l) {
 /**
  * TODO
  */
-inline char list_remove(uint32_t e, List* l) {
+inline char list_remove_64(void* e, List_64* l) {
 	int i;
 
 	for (i = 0; i < l->size; ++i) {
@@ -94,7 +93,7 @@ inline char list_remove(uint32_t e, List* l) {
 		l->elements[j] = l->elements[j + 1];
 	}
 	// shrink the allocated space
-	uint32_t* tmp = realloc(l->elements, (l->size - 1) * sizeof(uint32_t));
+	void** tmp = realloc(l->elements, (l->size - 1) * sizeof(void*));
 	assert(l->size == 1 || tmp != NULL);
 	l->elements = tmp;
 	// decrement the element count
@@ -102,30 +101,33 @@ inline char list_remove(uint32_t e, List* l) {
 	return 0;
 }
 /**
- * Free the space allocated for this list.
+ * Free the space allocated for this list_64.
  */
-int list_free(List* l);
+int list_free_64(List_64* l);
 
 /**
- * Free the space allocated for the elements of the given list.
+ * Free the space allocated for the elements of the given list_64.
  */
-int list_reset(List* l);
+int list_reset_64(List_64* l);
 
 /**
  * Creates an iterator for the given list.
  * Returns the created iterator.
  */
-ListIterator* list_iterator_create(List* l);
+ListIterator_64* list_iterator_create_64(List_64* l);
 
 
 /**
  * Returns the next element of the given iterator.
  * NULL if there is no next element.
  */
-inline uint32_t list_iterator_next(ListIterator* it) {
-	uint32_t next = (it->current_index == it->list->size) ? KEY_NOT_FOUND_IN_LIST : it->list->elements[it->current_index];
+inline void* list_iterator_next_64(ListIterator_64* it) {
+	void* next = (it->current_index == it->list->size) ? NULL : it->list->elements[it->current_index];
 	++it->current_index;
 
 	return next;
 }
+
+int list_iterator_free_64(ListIterator_64* it);
+
 #endif

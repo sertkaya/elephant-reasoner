@@ -28,10 +28,9 @@ int main(int argc, char *argv[]) {
 	LIST_INIT(&list);
 
 	int i;
-	void* tmp[100];
-	for (i = 0; i < 100; ++i) {
-		tmp[i] = malloc(sizeof(void));
-		assert(tmp[i] != NULL);
+	uint32_t tmp[100];
+	for (i = 1; i <= 100; ++i) {
+		tmp[i] = i;
 		list_add(tmp[i], &list);
 	}
 

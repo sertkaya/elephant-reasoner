@@ -16,79 +16,76 @@
  * limitations under the License.
  */
 
-#ifndef HASH_MAP_H
-#define HASH_MAP_H
+#ifndef HASH_MAP_64_H
+#define HASH_MAP_64_H
 
 #include <stdint.h>
 #include <assert.h>
 #include <stdlib.h>
 
 /*
- * A hash map implementation for storing 32 bit ids as values.
+ * A hash map implementation for storing 64 bit expression ids as values.
  * Keys are of type uint64_t
- * Values are of type uint32_t
+ * Values are of type void*
  */
+typedef struct hash_map_64 HashMap_64;
+typedef struct hash_map_element_64 HashMapElement_64;
+typedef struct hash_map_iterator_64 HashMapIterator_64;
 
-#define KEY_NOT_FOUND_IN_HASH_MAP UINT32_MAX
-
-typedef struct hash_map HashMap;
-typedef struct hash_map_element HashMapElement;
-typedef struct hash_map_iterator HashMapIterator;
-
-struct hash_map_element {
+struct hash_map_element_64 {
 	uint64_t key;
-	uint32_t value;
-	HashMapElement* previous;
+	void* value;
+	HashMapElement_64* previous;
 };
 
-struct hash_map {
-	HashMapElement*** buckets;		// the buckets
+struct hash_map_64 {
+	HashMapElement_64*** buckets;		// the buckets
 	unsigned int bucket_count;		// the number of buckets
 	unsigned int* chain_sizes;		// sizes of the chains
 	unsigned int element_count;	// the number of elements
-	HashMapElement* tail;			// the last node of the hash.
+	HashMapElement_64* tail;			// the last node of the hash.
 									// we maintain a backward linked list.
 };
 
 /**
  * Iterator for hash map.
  */
-struct hash_map_iterator {
-	HashMap* hash_map;
-	HashMapElement* current_element;// of the current element
+struct hash_map_iterator_64 {
+	HashMap_64* hash_map;
+	HashMapElement_64* current_element;// of the current element
 };
 
 /**
  * Create a hash map with the given number of buckets.
  */
-HashMap* hash_map_create(unsigned int size);
+HashMap_64* hash_map_create_64(unsigned int size);
 
 /**
  * Initialize a hash map with the given number of buckets.
  */
-void hash_map_init(HashMap*hash_map, unsigned int size);
+void hash_map_init_64(HashMap_64*hash_map, unsigned int size);
 
 /**
  * Free the space allocated for the given hash map.
  */
-int hash_map_free(HashMap* hash_map);
+int hash_map_free_64(HashMap_64* hash_map);
 
 /**
  * Free the space allocated for the elements of a given hash map.
  * Does not free the space allocated for the hash map itself.
  */
-int hash_map_reset(HashMap* hash_map);
+int hash_map_reset_64(HashMap_64* hash_map);
 
 /**
  * Insert a key value pair to the hash map. If the key already exists, the given
  * value is not inserted, i.e., the existing value is not overwritten.
  * Returns 1 if the key value pair is inserted, 0 otherwise.
  */
-inline int hash_map_put(HashMap* hash_map, uint64_t key, uint32_t value) {
+inline int hash_map_put_64(HashMap_64* hash_map, uint64_t key, void* value) {
 
 	int hash_value = key & (hash_map->bucket_count - 1);
 	// int hash_value = HASH_UNSIGNED(key) & (hash_map->bucket_count - 1);
-	HashMapElement** bucket = hash_map->buckets[hash_value];
+	HashMapElement_64** bucket = hash_map->buckets[hash_value];
 	int chain_size = hash_map->chain_sizes[hash_value];
 
 	int i;
@@ -98,11 +95,11 @@ inline int hash_map_put(HashMap* hash_map, uint64_t key, uint32_t value) {
 			return 0;
 		}
 
-	HashMapElement** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement*));
+	HashMapElement_64** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement_64*));
 	assert(tmp != NULL);
 	bucket = hash_map->buckets[hash_value] = tmp;
 
-	bucket[chain_size] = malloc(sizeof(HashMapElement));
+	bucket[chain_size] = malloc(sizeof(HashMapElement_64));
 	assert(bucket[chain_size] != NULL);
 	bucket[chain_size]->key = key;
 	bucket[chain_size]->value = value;
@@ -119,11 +116,11 @@ inline int hash_map_put(HashMap* hash_map, uint64_t key, uint32_t value) {
 
 
 /**
- * Returns the value for the given key, it it exists, KEY_NOT_FOUND if it does not exist.
+ * Returns the value for the given key, it it exists, NULL if it does not exist.
  */
-inline uint32_t hash_map_get(HashMap* hash_map, uint64_t key) {
+inline void* hash_map_get_64(HashMap_64* hash_map, uint64_t key) {
 	int bucket_index = key & (hash_map->bucket_count - 1);
-	HashMapElement** bucket = hash_map->buckets[bucket_index];
+	HashMapElement_64** bucket = hash_map->buckets[bucket_index];
 	int chain_size = hash_map->chain_sizes[bucket_index];
 
 	int i;
@@ -131,22 +128,22 @@ inline uint32_t hash_map_get(HashMap* hash_map, uint64_t key) {
 		if (key == bucket[i]->key)
 			return bucket[i]->value;
 
-	return KEY_NOT_FOUND_IN_HASH_MAP;
+	return NULL;
 }
 /**
  * Reset a given hash map iterator.
  */
-void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map);
+void hash_map_iterator_init_64(HashMapIterator_64* iterator, HashMap_64* map);
 
 /**
  * Get the next element.
  * Returns NULL if there is no next element.
  */
-inline uint32_t  hash_map_iterator_next(HashMapIterator* iterator) {
+inline void* hash_map_iterator_next_64(HashMapIterator_64* iterator) {
 	void* next = iterator->current_element->previous;
 	iterator->current_element = iterator->current_element->previous;
-	if (!next) return KEY_NOT_FOUND_IN_HASH_MAP;
-	return ((HashMapElement*) next)->value;
+	if (!next) return NULL;
+	return ((HashMapElement_64*) next)->value;
 }
 
 
@@ -156,13 +153,13 @@ inline uint32_t  hash_map_iterator_next(HashMapIterator* iterator) {
  * of insertion, since the implementation is easier and the order of
  * iteration is not relevant for our purposes.
  */
-// inline HashMapElement* hash_map_last_element(HashMap* hash_map);
-#define HASH_MAP_LAST_ELEMENT(hash_map)			hash_map->tail
+// inline HashMapElement_64* hash_map_last_element(HashMap_64* hash_map);
+#define HASH_MAP_LAST_ELEMENT_64(hash_map)			hash_map->tail
 
 /**
  * Returns the node that comes before the current node, or NULL if
  * there is none.
  */
-#define HASH_MAP_PREVIOUS_ELEMENT(current_element)	current_element->previous
+#define HASH_MAP_PREVIOUS_ELEMENT_64(current_element)	current_element->previous
 
 #endif

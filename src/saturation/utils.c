@@ -27,91 +27,91 @@
 
 // add p to the predecessors hash of c
 // the key of the predecessors hash is r
-int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* p, TBox* tbox) {
+int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpressionId p, TBox* tbox) {
 
 	// first check if we already have a link for role r
 	int i, j;
 	void* tmp;
-	for (i = 0; i < c->predecessor_r_count; ++i)
-		if (c->predecessors[i].role == r) {
+	for (i = 0; i < CEXP(c).predecessor_r_count; ++i)
+		if (CEXP(c).predecessors[i].role == r) {
 			// yes, we have a link for role r, now check if we already have p in its fillers list
 			/*
-			for (j = 0; j < c->predecessors[i].filler_count; ++j)
-				if (c->predecessors[i].fillers[j] == p)
+			for (j = 0; j < CEXP(c).predecessors[i].filler_count; ++j)
+				if (CEXP(c).predecessors[i].fillers[j] == p)
 					return 0;
 			// no we do not have p in this list, add it
-			tmp = realloc(c->predecessors[i].fillers, (c->predecessors[i].filler_count + 1) * sizeof(ClassExpression*));
+			tmp = realloc(CEXP(c).predecessors[i].fillers, (CEXP(c).predecessors[i].filler_count + 1) * sizeof(ClassExpressionId));
 			assert(tmp != NULL);
-			c->predecessors[i].fillers = (ClassExpression**) tmp;
-			c->predecessors[i].fillers[c->predecessors[i].filler_count] = p;
-			++c->predecessors[i].filler_count;
+			CEXP(c).predecessors[i].fillers = (ClassExpressionId*) tmp;
+			CEXP(c).predecessors[i].fillers[CEXP(c).predecessors[i].filler_count] = p;
+			++CEXP(c).predecessors[i].filler_count;
 			return 1;
 			 */
-			return SET_ADD(p, &(c->predecessors[i].fillers));
+			return SET_ADD(p, &(CEXP(c).predecessors[i].fillers));
 		}
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
-	tmp = realloc(c->predecessors, (c->predecessor_r_count + 1) * sizeof(Link));
+	tmp = realloc(CEXP(c).predecessors, (CEXP(c).predecessor_r_count + 1) * sizeof(Link));
 	assert(tmp != NULL);
-	c->predecessors = (Link*) tmp;
+	CEXP(c).predecessors = (Link*) tmp;
 	// 2) fill the fields of the new link
-	c->predecessors[c->predecessor_r_count].role = r;
+	CEXP(c).predecessors[CEXP(c).predecessor_r_count].role = r;
 	/*
-	c->predecessors[c->predecessor_r_count].fillers = calloc(1, sizeof(ClassExpression*));
-	assert(c->predecessors[c->predecessor_r_count].fillers != NULL);
-	c->predecessors[c->predecessor_r_count].fillers[0] = p;
-	c->predecessors[c->predecessor_r_count].filler_count = 1;
+	CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers = calloc(1, sizeof(ClassExpressionId));
+	assert(CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers != NULL);
+	CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers[0] = p;
+	CEXP(c).predecessors[CEXP(c).predecessor_r_count].filler_count = 1;
 	*/
-	SET_INIT(&(c->predecessors[c->predecessor_r_count].fillers), DEFAULT_PREDECESSORS_SET__SIZE);
-	SET_ADD(p, &(c->predecessors[c->predecessor_r_count].fillers));
+	SET_INIT(&(CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers), DEFAULT_PREDECESSORS_SET__SIZE);
+	SET_ADD(p, &(CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers));
 
 	// finally increment the r_count
-	++c->predecessor_r_count;
+	++(CEXP(c).predecessor_r_count);
 
 	return 1;
 }
 
 
-int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* p, TBox* tbox) {
+int add_successor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpressionId p, TBox* tbox) {
 
 	// first check if we already have a link for role r
 	int i, j;
 	void* tmp;
-	for (i = 0; i < c->successor_r_count; ++i)
-		if (c->successors[i].role == r) {
+	for (i = 0; i < CEXP(c).successor_r_count; ++i)
+		if (CEXP(c).successors[i].role == r) {
 			// yes, we have a link for role r, now check if we already have p in its fillers list
 			/*
-			for (j = 0; j < c->successors[i].filler_count; ++j)
-				if (c->successors[i].fillers[j] == p)
+			for (j = 0; j < CEXP(c).successors[i].filler_count; ++j)
+				if (CEXP(c).successors[i].fillers[j] == p)
 					return 0;
 			// no we do not have p in this list, add it
-			tmp = realloc(c->successors[i].fillers, (c->successors[i].filler_count + 1) * sizeof(ClassExpression*));
+			tmp = realloc(CEXP(c).successors[i].fillers, (CEXP(c).successors[i].filler_count + 1) * sizeof(ClassExpressionId));
 			assert(tmp != NULL);
-			c->successors[i].fillers = (ClassExpression**) tmp;
-			c->successors[i].fillers[c->successors[i].filler_count] = p;
-			++c->successors[i].filler_count;
+			CEXP(c).successors[i].fillers = (ClassExpressionId*) tmp;
+			CEXP(c).successors[i].fillers[CEXP(c).successors[i].filler_count] = p;
+			++CEXP(c).successors[i].filler_count;
 			return 1;
 			*/
-			return SET_ADD(p, &(c->successors[i].fillers));
+			return SET_ADD(p, &(CEXP(c).successors[i].fillers));
 		}
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
-	tmp = realloc(c->successors, (c->successor_r_count + 1) * sizeof(Link));
+	tmp = realloc(CEXP(c).successors, (CEXP(c).successor_r_count + 1) * sizeof(Link));
 	assert(tmp != NULL);
-	c->successors = (Link*) tmp;
+	CEXP(c).successors = (Link*) tmp;
 	// 2) fill the fields of the new link
-	c->successors[c->successor_r_count].role = r;
+	CEXP(c).successors[CEXP(c).successor_r_count].role = r;
 	/*
-	c->successors[c->successor_r_count].fillers = calloc(1, sizeof(ClassExpression*));
-	assert(c->successors[c->successor_r_count].fillers != NULL);
-	c->successors[c->successor_r_count].fillers[0] = p;
-	c->successors[c->successor_r_count].filler_count = 1;
+	CEXP(c).successors[CEXP(c).successor_r_count].fillers = calloc(1, sizeof(ClassExpressionId));
+	assert(CEXP(c).successors[CEXP(c).successor_r_count].fillers != NULL);
+	CEXP(c).successors[CEXP(c).successor_r_count].fillers[0] = p;
+	CEXP(c).successors[CEXP(c).successor_r_count].filler_count = 1;
 	*/
-	SET_INIT(&(c->successors[c->successor_r_count].fillers), DEFAULT_SUCCESSORS_SET__SIZE);
-	SET_ADD(p, &(c->successors[c->successor_r_count].fillers));
+	SET_INIT(&(CEXP(c).successors[CEXP(c).successor_r_count].fillers), DEFAULT_SUCCESSORS_SET__SIZE);
+	SET_ADD(p, &(CEXP(c).successors[CEXP(c).successor_r_count].fillers));
 
 	// finally increment the r_count
-	++c->successor_r_count;
+	++(CEXP(c).successor_r_count);
 
 	return 1;
 }

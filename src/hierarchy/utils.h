@@ -21,22 +21,22 @@
 #define _HIERARCHY_UTILS_H_
 
 // Add concept c1 to the list of equivalent concepts of c2
-int add_equivalent_concept(ClassExpression* c1, ClassExpression* c2);
+int add_equivalent_concept(ClassExpressionId c1, ClassExpressionId c2);
 
 /**
  * Add class expression c1 to the equivalent classes of class expression c2.
  */
-#define ADD_EQUIVALENT_CLASS(c1, c2)	SET_ADD(c1, &(c2->description.atomic.equivalent_classes))
+#define ADD_EQUIVALENT_CLASS(c1, c2, tbox)		SET_ADD(c1, &(tbox->class_expressions[c2].description.atomic.equivalent_classes))
 
 /**
  * Add class expression c1 to the direct subsumers of c2
  */
-#define ADD_DIRECT_SUBSUMER(c1, c2)		SET_ADD(c1, &(c2->description.atomic.direct_subsumers))
+#define ADD_DIRECT_SUBSUMER(c1, c2, tbox)		SET_ADD(c1, &(tbox->class_expressions[c2].description.atomic.direct_subsumers))
 
 /**
  * Remove class expression c1 from the direct subsumers of class expression c2
  */
-#define REMOVE_DIRECT_SUBSUMER(c1, c2)	SET_REMOVE(c1, &(c2->description.atomic.direct_subsumers))
+#define REMOVE_DIRECT_SUBSUMER(c1, c2,tbox)	SET_REMOVE(c1, &(tbox->class_expressions[c2].description.atomic.direct_subsumers))
 
 
 #endif /* _HIERARCHY_UTILS_H_ */

@@ -26,9 +26,9 @@
 // for lexer and parser
 typedef union expression Expression;
 union expression {
-	ClassExpression* concept;
-	ObjectPropertyExpression* role;
-	Individual* individual;
+	ClassExpressionId concept;
+	ObjectPropertyExpressionId role;
+	IndividualId individual;
 	char* text;
 };
 

@@ -34,108 +34,110 @@ void create_prefix(char* prefix_name, char* prefix, KB* kb);
  * get/create functions for concepts
  *****************************************************************************/
 
+ClassExpressionId create_class_expression_template(TBox* tbox);
+
 // returns the atomic concept with given name or creates if it does not
 // already exist
-ClassExpression* get_create_atomic_concept(char* name, TBox* tbox);
+ClassExpressionId get_create_atomic_concept(char* name, TBox* tbox);
 
 // get or create the existential restriction with role r and filler f
-ClassExpression* get_create_exists_restriction(ObjectPropertyExpression* r, ClassExpression* f, TBox* tbox);
+ClassExpressionId get_create_exists_restriction(ObjectPropertyExpressionId r, ClassExpressionId f, TBox* tbox);
 
 // get or create the existential restriction with the given conjuncts
-ClassExpression* get_create_conjunction(int conjunct_count, ClassExpression** conjuncts, TBox* tbox);
+ClassExpressionId get_create_conjunction(int conjunct_count, ClassExpressionId* conjuncts, TBox* tbox);
 
 // get or create the binary existential restriction with the given conjuncts
-ClassExpression* get_create_conjunction_binary(ClassExpression* conjunct1, ClassExpression* conjunct2, TBox* tbox);
+ClassExpressionId get_create_conjunction_binary(ClassExpressionId conjunct1, ClassExpressionId conjunct2, TBox* tbox);
 
 // get or create the nominal for a given individual
-ClassExpression* get_create_nominal(Individual* ind, TBox* tbox);
+ClassExpressionId get_create_nominal(IndividualId ind, TBox* tbox);
 
 /******************************************************************************
  * get/create functions for roles
  *****************************************************************************/
 // returns the atomic role with given name or creates if it does not
 // already exist
-ObjectPropertyExpression* get_create_atomic_role(char* name, TBox* tbox);
+ObjectPropertyExpressionId get_create_atomic_role(char* name, TBox* tbox);
 
 // get or create the role composition consisting of the given roles.
 // called by the parser.
-ObjectPropertyExpression* get_create_role_composition(int size, ObjectPropertyExpression** roles, TBox* tbox);
+ObjectPropertyExpressionId get_create_role_composition(int size, ObjectPropertyExpressionId* roles, TBox* tbox);
 
-ObjectPropertyExpression* get_create_role_composition_binary(ObjectPropertyExpression *r1, ObjectPropertyExpression* r2, TBox* tbox);
+ObjectPropertyExpressionId get_create_role_composition_binary(ObjectPropertyExpressionId r1, ObjectPropertyExpressionId r2, TBox* tbox);
 /******************************************************************************
  * create functions for axioms
  *****************************************************************************/
 // create the subclass axiom with the given concept descriptions
-SubClassOfAxiom* create_subclass_axiom(ClassExpression* lhs, ClassExpression* rhs);
+SubClassOfAxiom* create_subclass_axiom(ClassExpressionId lhs, ClassExpressionId rhs);
 
 // create the equivalent class axiom with the given concept descriptions
-EquivalentClassesAxiom* create_eqclass_axiom(ClassExpression* lhs, ClassExpression* rhs);
+EquivalentClassesAxiom* create_eqclass_axiom(ClassExpressionId lhs, ClassExpressionId rhs);
 
 // create disjoint classes axiom
-DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpression** classes);
+DisjointClassesAxiom* create_disjointclasses_axiom(int class_count, ClassExpressionId* classes);
 
 // create the subrole axiom with the given role descriptions
-SubObjectPropertyOfAxiom* create_subrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs);
+SubObjectPropertyOfAxiom* create_subrole_axiom(ObjectPropertyExpressionId lhs, ObjectPropertyExpressionId rhs);
 
 // create transitive role axiom
-TransitiveObjectPropertyAxiom* create_transitive_role_axiom(ObjectPropertyExpression* r);
+TransitiveObjectPropertyAxiom* create_transitive_role_axiom(ObjectPropertyExpressionId r);
 
 // create the eqrole axiom with the given role descriptions
-EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpression* lhs, ObjectPropertyExpression* rhs);
+EquivalentObjectPropertiesAxiom* create_eqrole_axiom(ObjectPropertyExpressionId lhs, ObjectPropertyExpressionId rhs);
 
 // create an objectproperty domain axiom with the given objectproperty and class expressions
-ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpression* ope, ClassExpression* ce);
+ObjectPropertyDomainAxiom* create_objectproperty_domain_axiom(ObjectPropertyExpressionId ope, ClassExpressionId ce);
 
 // create a SameIndividual axiom with the given list of individuals
-SameIndividualAxiom* create_same_individual_axiom(int individual_count, Individual** individuals);
+SameIndividualAxiom* create_same_individual_axiom(int individual_count, IndividualId* individuals);
 
 // create a DifferentIndividuals axiom with the given list of individuals
-DifferentIndividualsAxiom* create_different_individuals_axiom(int individual_count, Individual** individuals);
+DifferentIndividualsAxiom* create_different_individuals_axiom(int individual_count, IndividualId* individuals);
 /******************************************************************************
  * add functions for axioms
 *****************************************************************************/
 // add a given subclass axiom to a given ontology
-#define ADD_SUBCLASS_OF_AXIOM(ax, tbox)						SET_ADD(ax, &(tbox->subclass_of_axioms))
+#define ADD_SUBCLASS_OF_AXIOM(ax, tbox)						SET_ADD_64(ax, &(tbox->subclass_of_axioms))
 
 // add a given equivalent classes axiom to a given ontology
-#define ADD_EQUIVALENT_CLASSES_AXIOM(ax, tbox)				SET_ADD(ax, &(tbox->equivalent_classes_axioms))
+#define ADD_EQUIVALENT_CLASSES_AXIOM(ax, tbox)				SET_ADD_64(ax, &(tbox->equivalent_classes_axioms))
 
 // add a given disjoint classes axiom to the TBox
-#define ADD_DISJOINT_CLASSES_AXIOM(ax, tbox)				SET_ADD(ax, &(tbox->disjoint_classes_axioms))
+#define ADD_DISJOINT_CLASSES_AXIOM(ax, tbox)				SET_ADD_64(ax, &(tbox->disjoint_classes_axioms))
 
 // add a given subobjectpropertyof axiom to a given ontology
-#define ADD_SUBOBJECTPROPERTY_OF_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->subobjectproperty_of_axioms))
+#define ADD_SUBOBJECTPROPERTY_OF_AXIOM(ax, tbox)			SET_ADD_64(ax, &(tbox->subobjectproperty_of_axioms))
 
 // add a given transitive role axiom to a given ontology
-#define ADD_TRANSITIVE_OBJECTPROPERTY_AXIOM(ax, tbox)		SET_ADD(ax, &(tbox->transitive_objectproperty_axioms))
+#define ADD_TRANSITIVE_OBJECTPROPERTY_AXIOM(ax, tbox)		SET_ADD_64(ax, &(tbox->transitive_objectproperty_axioms))
 
 // add a given equivalent object properties axiom to a given ontology
-#define ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(ax, tbox)		SET_ADD(ax, &(tbox->equivalent_objectproperties_axioms))
+#define ADD_EQUIVALENT_OBJECTPROPERTIES_AXIOM(ax, tbox)		SET_ADD_64(ax, &(tbox->equivalent_objectproperties_axioms))
 
 // add a given object property domain axiom to a given ontology
-#define ADD_OBJECTPROPERTY_DOMAIN_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->objectproperty_domain_axioms))
+#define ADD_OBJECTPROPERTY_DOMAIN_AXIOM(ax, tbox)			SET_ADD_64(ax, &(tbox->objectproperty_domain_axioms))
 
 // add a given same individual axiom to a given ontology
-#define ADD_SAME_INDIVIDUAL_AXIOM(ax, tbox)					SET_ADD(ax, &(tbox->same_individual_axioms))
+#define ADD_SAME_INDIVIDUAL_AXIOM(ax, tbox)					SET_ADD_64(ax, &(tbox->same_individual_axioms))
 
 // add a given different individuals axiom to a given ontology
-#define ADD_DIFFERENT_INDIVIDUALS_AXIOM(ax, tbox)			SET_ADD(ax, &(tbox->different_individuals_axioms))
+#define ADD_DIFFERENT_INDIVIDUALS_AXIOM(ax, tbox)			SET_ADD_64(ax, &(tbox->different_individuals_axioms))
 /******************************************************************************
  * Get/create functions for ABox
  *****************************************************************************/
 
 // returns the individual with given name or creates if it does not
 // already exist
-Individual* get_create_individual(char* name, ABox* abox);
+IndividualId get_create_individual(char* name, ABox* abox);
 
 /******************************************************************************
  * Create functions for ABox assertions
  *****************************************************************************/
 // create the concept assertion axiom with the given concept description and individual
-ClassAssertion* create_concept_assertion(Individual* individual, ClassExpression* concept);
+ClassAssertion* create_concept_assertion(IndividualId individual, ClassExpressionId concept);
 
 // create the role assertion with the given role and individuals
-ObjectPropertyAssertion* create_role_assertion(ObjectPropertyExpression* role, Individual* source_ind, Individual* target_ind);
+ObjectPropertyAssertion* create_role_assertion(ObjectPropertyExpressionId role, IndividualId source_ind, IndividualId target_ind);
 
 /******************************************************************************
  * Add functions for ABox assertions

@@ -41,47 +41,47 @@
 	// number of conjuncts in an ObjectIntersectionOf expression
 	int conjunct_count;
 	// the conjuncts in an ObjectIntersectionOf expression
-	ClassExpression* conjuncts[MAX_CONJUNCT_COUNT];
+	ClassExpressionId conjuncts[MAX_CONJUNCT_COUNT];
 
 	// for parsing EquivalentClasses axioms containing more than 2 class expressions
 	// number of class expressions in an EquivalentClasses axiom 
 	int equivalent_classes_count;
 	// the number of class expressions in an EquivalentClasses axiom
-	ClassExpression* equivalent_classes[MAX_EQ_CLASS_EXP_COUNT];
+	ClassExpressionId equivalent_classes[MAX_EQ_CLASS_EXP_COUNT];
 	
 	// for parsing EquivalentObjectProperties axioms containing more than 2 object properties
 	// the number of object property expressions in an EquivalentObjectProperties axiom
 	int equivalent_objectproperties_count;
 	// the object property expressions in an EquivalentObjectProperties axiom
-	ObjectPropertyExpression* equivalent_objectproperties[MAX_EQ_ROLE_EXP_COUNT];
+	ObjectPropertyExpressionId equivalent_objectproperties[MAX_EQ_ROLE_EXP_COUNT];
 	
 	// for parsing ObjectPropertyChain expressions
 	// the number of object property expressions in an object property chain expression
 	int objectproperty_chain_components_count;
 	// the object property expressions in an object property chain expression
-	ObjectPropertyExpression* objectproperty_chain_components[MAX_ROLE_COMPOSITION_SIZE];
+	ObjectPropertyExpressionId objectproperty_chain_components[MAX_ROLE_COMPOSITION_SIZE];
 	
 	// for parsing HasKey expressions
 	// the number of object properties in an HasKey expression
 	int haskey_objectproperty_expression_count;
 	// the object properties in an HasKey expression
-	ObjectPropertyExpression* haskey_objectproperties[MAX_ROLE_COMPOSITION_SIZE];
+	ObjectPropertyExpressionId haskey_objectproperties[MAX_ROLE_COMPOSITION_SIZE];
 	
 	// for parsing DisjointClasses axioms
 	// number of classes in a DisjointClasses axiom 
 	int disjoint_classes_count;
 	// the class expressions in a DisjointClasses axiom
-	ClassExpression* disjoint_classes[MAX_DISJ_CLASS_EXP_COUNT];
+	ClassExpressionId disjoint_classes[MAX_DISJ_CLASS_EXP_COUNT];
 
 	// for parsing SameIndividual axioms
 	int same_individuals_count;
 	// the individuals in a SameIndividual axiom
-	Individual* same_individuals[MAX_SAME_INDIVIDUAL_COUNT];
+	IndividualId same_individuals[MAX_SAME_INDIVIDUAL_COUNT];
 
 	// for parsing DifferentIndividuals axioms
 	int different_individuals_count;
 	// the individuals in a DifferentIndividuals axiom
-	Individual* different_individuals[MAX_DIFFERENT_INDIVIDUALS_COUNT];
+	IndividualId different_individuals[MAX_DIFFERENT_INDIVIDUALS_COUNT];
 
 	void unsupported_feature(char* feature);
 %}
@@ -321,7 +321,7 @@ ClassExpression:
 
 conjuncts:
 	| ClassExpression conjuncts {
-		if ($1.concept != NULL)
+		if ($1.concept != EXPRESSION_ID_NULL)
 			conjuncts[conjunct_count++] = $1.concept;
 	};
 
@@ -418,7 +418,7 @@ EquivalentClasses:
 // for parsing EquivalentClasses axioms containing more than 2 class expressions
 equivalentClassExpressions:
 	| ClassExpression equivalentClassExpressions {
-		if ($1.concept != NULL)
+		if ($1.concept != EXPRESSION_ID_NULL)
 			equivalent_classes[equivalent_classes_count++] = $1.concept;
 	};
 
@@ -433,7 +433,7 @@ DisjointClasses:
 
 disjointClassExpressions:
 	| ClassExpression disjointClassExpressions {
-		if ($1.concept != NULL)
+		if ($1.concept != EXPRESSION_ID_NULL)
 			disjoint_classes[disjoint_classes_count++] = $1.concept;
 	};
 
@@ -466,7 +466,7 @@ propertyExpressionChain:
 
 chainObjectPropertyExpressions:
 	| ObjectPropertyExpression chainObjectPropertyExpressions {
-		if ($1.role != NULL)
+		if ($1.role != EXPRESSION_ID_NULL)
 			objectproperty_chain_components[objectproperty_chain_components_count++] = $1.role;
 	};
 
@@ -486,7 +486,7 @@ EquivalentObjectProperties:
 	
 equivalentObjectPropertyExpressions:
 	| ObjectPropertyExpression equivalentObjectPropertyExpressions {
-		if ($1.role != NULL)
+		if ($1.role != EXPRESSION_ID_NULL)
 			equivalent_objectproperties[equivalent_objectproperties_count++] = $1.role;
 	};
 
@@ -560,7 +560,7 @@ HasKey:
 
 hasKeyObjectPropertyExpressions:
 	| ObjectPropertyExpression hasKeyObjectPropertyExpressions {
-		if ($1.role != NULL)
+		if ($1.role != EXPRESSION_ID_NULL)
 			haskey_objectproperties[haskey_objectproperty_expression_count++] = $1.role;
 	};
 
@@ -592,7 +592,7 @@ SameIndividual:
 	
 sameIndividuals:
 	| Individual sameIndividuals {
-		if ($1.individual != NULL)
+		if ($1.individual != EXPRESSION_ID_NULL)
 			same_individuals[same_individuals_count++] = $1.individual;
 	};
 
@@ -606,7 +606,7 @@ DifferentIndividuals:
 
 differentIndividuals:
 	| Individual differentIndividuals {
-		if ($1.individual != NULL)
+		if ($1.individual != EXPRESSION_ID_NULL)
 			different_individuals[different_individuals_count++] = $1.individual;
 	};
 

@@ -6,3 +6,12 @@ TODO:
 	
 	- Optimize the preprocessing of disjointness axioms. The current implementation introduces
 	n^2 new subclass axioms for a disjointness axiom containing n concepts.
+	
+	- Nominals generated from ABox individuals during preprocessing are kept and treated separately. 
+	Is this a problem in saturation?
+	
+	- check all loops with MAP_ITERATOR_NEXT. the condition of the loop should be while (c != KEY_NOT_FOUND) 
+	
+	- convert dynamic_hash_table also to store uint32_t? Used in the Set.
+	
+	- Set and Queue (in role saturation) store void*. Should be converted to Id-Type (uint32_t)

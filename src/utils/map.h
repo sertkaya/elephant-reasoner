@@ -25,10 +25,13 @@
 #define MAP_H_
 
 #include "../hashing/hash_map.h"
+#include "../hashing/hash_map_64.h"
 
 typedef HashMap Map;
 typedef HashMapIterator MapIterator;
 
+typedef HashMap_64 Map_64;
+typedef HashMapIterator_64 MapIterator_64;
 
 /**
  * Create a map with an underlying hash map of the given size.
@@ -40,12 +43,20 @@ typedef HashMapIterator MapIterator;
  * Initialize a map with an underlying hash map of the given size.
  */
 #define MAP_INIT(map, size)				hash_map_init(map, size)
+#define MAP_INIT_64(map, size)				hash_map_init_64(map, size)
 
 /**
  * Adds the pair (key,value) to the map m.
  * Returns 1 if e is successfully added, 0 otherwise.
  */
 #define MAP_PUT(key, value, map)		hash_map_put(map, key, value)
+
+/**
+ * Adds the pair (key,value) to the map m.
+ * Returns 1 if e is successfully added, 0 otherwise.
+ */
+#define MAP_PUT_64(key, value, map)		hash_map_put_64(map, key, value)
+
 
 /**
  * Removes the element with the given key if it is present. The map stays unchanged
@@ -56,9 +67,15 @@ typedef HashMapIterator MapIterator;
 
 /**
  * Get the value associated with the given key.
- * Returns 1 if the key occurs, 0 otherwise
+ * Returns KEY_NOT_FOUND  if the key does not occur.
  */
 #define MAP_GET(key, map)				hash_map_get(map, key)
+
+/**
+ * Get the value associated with the given key.
+ * Returns NULL if the key does not occur.
+ */
+#define MAP_GET_64(key, map)				hash_map_get_64(map, key)
 
 /**
  * Free the space allocated for the given map.
@@ -73,6 +90,7 @@ typedef HashMapIterator MapIterator;
  * Returns the number of freed bytes.
  */
 #define MAP_RESET(s)					hash_map_reset(s)
+#define MAP_RESET_64(s)					hash_map_reset_64(s)
 
 /**
  * Create an iterator for the elements of the map.
@@ -85,6 +103,7 @@ typedef HashMapIterator MapIterator;
  * It is the iterator of the underlying hash map.
  */
 #define MAP_ITERATOR_INIT(map_it, map)	hash_map_iterator_init(map_it, map)
+#define MAP_ITERATOR_INIT_64(map_it, map)	hash_map_iterator_init_64(map_it, map)
 
 /**
  * Get the next element in the map.
@@ -92,6 +111,7 @@ typedef HashMapIterator MapIterator;
  * Elements are not necessarily returned in the order of addition.
  */
 #define MAP_ITERATOR_NEXT(map_it)		hash_map_iterator_next(map_it)
+#define MAP_ITERATOR_NEXT_64(map_it)		hash_map_iterator_next_64(map_it)
 
 /**
  * Free the space for the given map iterator.

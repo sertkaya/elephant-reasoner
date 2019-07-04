@@ -20,6 +20,8 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
+#include <stdint.h>
+
 typedef struct queue_element QueueElement;
 typedef struct queue Queue;
 
@@ -30,7 +32,7 @@ typedef struct queue Queue;
 
 
 struct queue_element {
-	void* data;
+	uint32_t data;
 	QueueElement* next;
 };
 
@@ -50,8 +52,8 @@ struct queue {
 };
 */
 void init_queue(Queue* q);
-void enqueue(Queue* queue, void* data);
-void* dequeue(Queue* queue);
+void enqueue(Queue* queue, uint32_t data);
+uint32_t dequeue(Queue* queue);
 
 
 

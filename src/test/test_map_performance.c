@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	int test_size = atoi(argv[1]);
 	int map_size = atoi(argv[2]);
 
-	uint64_t* tmp = malloc(test_size * sizeof(uint64_t));
+	uint32_t* tmp = malloc(test_size * sizeof(uint32_t));
 	assert(tmp != NULL);
 
 	Map map;
@@ -41,14 +41,14 @@ int main(int argc, char *argv[]) {
 	START_TIMER(start_time);
 	for (i = 1; i < test_size + 1; ++i) {
 		tmp[i] = i;
-		MAP_PUT(i, (void*) tmp[i], &map);
+		MAP_PUT(i, tmp[i], &map);
 	}
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
 
 	MapIterator it;
 	MAP_ITERATOR_INIT(&it, &map);
-	void* e = MAP_ITERATOR_NEXT(&it);
+	uint32_t e = MAP_ITERATOR_NEXT(&it);
 	printf("Iterating .........................: ");
 	fflush(stdout);
 	START_TIMER(start_time);

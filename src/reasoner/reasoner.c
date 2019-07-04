@@ -46,8 +46,19 @@ TBox* init_tbox() {
 	TBox* tbox = (TBox*) malloc(sizeof(TBox));
 	assert(tbox != NULL);
 
-	tbox->next_class_expression_id = 0;
-	tbox->next_objectproperty_expression_id = 0;
+	tbox->class_expressions = calloc(INITIAL_DEFAULT_CLASS_EXPRESSION_COUNT, sizeof(ClassExpression));
+	assert(tbox->class_expressions != NULL);
+	tbox->class_expressions_size = INITIAL_DEFAULT_CLASS_EXPRESSION_COUNT;
+
+	tbox->object_property_expressions= calloc(INITIAL_DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT, sizeof(ObjectPropertyExpression));
+	assert(tbox->object_property_expressions != NULL);
+	tbox->object_property_expressions_size = INITIAL_DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT;
+
+	// Last assigned class expression id. Increment before using
+	// The first id that will be given is 1. 0 is not a valid id.
+	tbox->last_class_expression_id = 0;
+	// Last assigned object property expression id. Increment before using
+	tbox->last_object_property_expression_id = 0;
 
 	MAP_INIT(&(tbox->classes), DEFAULT_ATOMIC_CONCEPTS_HASH_SIZE);
 
@@ -67,19 +78,27 @@ TBox* init_tbox() {
 	tbox->binary_role_composition_count = 0;
 	MAP_INIT(&(tbox->objectproperty_chains), DEFAULT_ROLE_COMPOSITIONS_HASH_SIZE);
 
-	SET_INIT(&(tbox->subclass_of_axioms), DEFAULT_SUBCLASS_OF_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->equivalent_classes_axioms), DEFAULT_EQUIVALENT_CLASSES_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->disjoint_classes_axioms), DEFAULT_DISJOINT_CLASSES_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->subobjectproperty_of_axioms), DEFAULT_SUBOBJECTPROPERTY_OF_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->equivalent_objectproperties_axioms), DEFAULT_EQUIVALENT_OBJECTPROPERTIES_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->transitive_objectproperty_axioms), DEFAULT_TRANSITIVE_OBJECTPROPERTY_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->objectproperty_domain_axioms), DEFAULT_OBJECTPROPERTY_DOMAIN_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->same_individual_axioms), DEFAULT_SAME_INDIVIDUAL_AXIOMS_SET_SIZE);
-	SET_INIT(&(tbox->different_individuals_axioms), DEFAULT_DIFFERENT_INDIVIDUALS_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->subclass_of_axioms), DEFAULT_SUBCLASS_OF_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->equivalent_classes_axioms), DEFAULT_EQUIVALENT_CLASSES_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->disjoint_classes_axioms), DEFAULT_DISJOINT_CLASSES_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->subobjectproperty_of_axioms), DEFAULT_SUBOBJECTPROPERTY_OF_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->equivalent_objectproperties_axioms), DEFAULT_EQUIVALENT_OBJECTPROPERTIES_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->transitive_objectproperty_axioms), DEFAULT_TRANSITIVE_OBJECTPROPERTY_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->objectproperty_domain_axioms), DEFAULT_OBJECTPROPERTY_DOMAIN_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->same_individual_axioms), DEFAULT_SAME_INDIVIDUAL_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->different_individuals_axioms), DEFAULT_DIFFERENT_INDIVIDUALS_AXIOMS_SET_SIZE);
 
 	// add the top and bottom concepts
 	tbox->top_concept = get_create_atomic_concept(OWL_THING, tbox);
 	tbox->bottom_concept = get_create_atomic_concept(OWL_NOTHING, tbox);
+
+	// init the generated axioms, nominals and exists restrictions
+	tbox->generated_object_some_values_from_count = 0;
+	MAP_INIT(&(tbox->generated_object_some_values_from_exps), DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
+	MAP_INIT(&(tbox->generated_object_one_of_exps), DEFAULT_NOMINALS_HASH_SIZE);
+
+	SET_INIT_64(&(tbox->generated_subclass_of_axioms), DEFAULT_SUBCLASS_OF_AXIOMS_SET_SIZE);
+	SET_INIT_64(&(tbox->generated_subobjectproperty_of_axioms), DEFAULT_SUBOBJECTPROPERTY_OF_AXIOMS_SET_SIZE);
 
 	return tbox;
 }
@@ -89,9 +108,12 @@ ABox* init_abox() {
 	ABox* abox = (ABox*) malloc(sizeof(ABox));
 	assert(abox != NULL);
 
-	abox->last_individual_id = 1;
+	abox->individuals = calloc(DEFAULT_INDIVIDUAL_COUNT, sizeof(Individual));
+	assert(abox->individuals != NULL);
+
+	abox->last_individual_id = -1;
 	abox->individual_count = 0;
-	abox->individuals = hash_map_create(DEFAULT_INDIVIDUALS_HASH_SIZE);
+	abox->individuals_map = hash_map_create(DEFAULT_INDIVIDUALS_HASH_SIZE);
 	// abox->individual_list = NULL;
 
 	abox->concept_assertion_count = 0;
@@ -112,17 +134,8 @@ KB* init_kb() {
 
 	kb->inconsistent = 0;
 
-	LIST_INIT(&(kb->prefix_names));
-	MAP_INIT(&(kb->prefixes), DEFAULT_PREFIXES_HASH_SIZE);
-
-	// init the generated axioms, nominals and exists restrictions
-	kb->generated_exists_restriction_count = 0;
-	kb->generated_exists_restrictions = hash_map_create(DEFAULT_EXISTS_RESTRICTIONS_HASH_SIZE);
-	MAP_INIT(&(kb->generated_nominals), DEFAULT_NOMINALS_HASH_SIZE);
-	kb->generated_subclass_axiom_count = 0;
-	kb->generated_subclass_axioms = NULL;
-	kb->generated_subrole_axiom_count = 0;
-	kb->generated_subrole_axioms = NULL;
+	LIST_INIT_64(&(kb->prefix_names));
+	MAP_INIT_64(&(kb->prefixes), DEFAULT_PREFIXES_HASH_SIZE);
 
 	kb->top_occurs_on_lhs = 0;
 	kb->bottom_occurs_on_rhs = 0;

@@ -27,10 +27,9 @@ int main(int argc, char *argv[]) {
 	Set* set = SET_CREATE(20);
 
 	int i;
-	void* tmp[100];
-	for (i = 0; i < 100; ++i) {
-		tmp[i] = malloc(sizeof(void));
-		assert(tmp[i] != NULL);
+	uint32_t tmp[100];
+	for (i = 1; i <= 100; ++i) {
+		tmp[i] = i;
 		printf("%d: add %p\n", i, tmp[i]);
 		SET_ADD(tmp[i], set);
 	}
@@ -46,8 +45,8 @@ int main(int argc, char *argv[]) {
 			printf("%d: found!\n", i);
 
 	SetIterator* it = SET_ITERATOR_CREATE(set);
-	void* e = SET_ITERATOR_NEXT(it);
-	while (e != NULL) {
+	uint32_t e = SET_ITERATOR_NEXT(it);
+	while (e != HASH_TABLE_ZERO_KEY) {
 		printf("%p\n", e);
 		e = SET_ITERATOR_NEXT(it);
 	}

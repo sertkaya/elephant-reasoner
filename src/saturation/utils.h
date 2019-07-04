@@ -25,14 +25,18 @@
 #include "../hashing/hash_table.h"
 
 
+#define CEXP(c)      tbox->class_expressions[c]
+
+#define OPEXP(r)    tbox->object_property_expressions[r]
+
 // Check if c1 is subsumed by c2. Used both
 // for class and object property expressions.
-#define IS_SUBSUMED_BY(c1,c2)						SET_CONTAINS(c2, &(c1->subsumers))
+#define IS_SUBSUMED_BY(c1,c2,tbox)						SET_CONTAINS(c2, &(tbox->class_expressions[c1].subsumers))
 
 // add r-predecessor p to c
-int add_predecessor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* p, TBox* tbox);
+int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpressionId p, TBox* tbox);
 
 // add r-successor s to c
-int add_successor(ClassExpression* c, ObjectPropertyExpression* r, ClassExpression* s, TBox* tbox);
+int add_successor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpressionId s, TBox* tbox);
 
 #endif /* SATURATION_UTILS_H_ */

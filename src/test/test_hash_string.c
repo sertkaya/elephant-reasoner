@@ -24,12 +24,12 @@
 #include "../hashing/utils.h"
 
 int main(int argc, char *argv[]) {
-	Map map;
-	MAP_INIT(&map, 16);
-	MAP_PUT(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), "D054872", &map);
+	Map_64 map;
+	MAP_INIT_64(&map, 16);
+	MAP_PUT_64(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), "D054872", &map);
 
-	printf("%s\n", (char*) MAP_GET(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), &map));
-	printf("%s\n", (char*) MAP_GET(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"), &map));
+	printf("%s\n", (char*) MAP_GET_64(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"), &map));
+	printf("%s\n", (char*) MAP_GET_64(HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"), &map));
 	printf("%" PRIu64 "\n%" PRIu64 "\n", HASH_STRING("<http://sadi-ontology.semanticscience.org#D054872>"),
 			HASH_STRING("<http://sadi-ontology.semanticscience.org#D054809>"));
 

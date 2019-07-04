@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	int test_size = atoi(argv[1]);
 	int hash_map_size = atoi(argv[2]);
 
-	uint64_t* tmp = malloc(test_size * sizeof(uint64_t));
+	uint32_t * tmp = malloc(test_size * sizeof(uint32_t));
 	assert(tmp != NULL);
 
 	HashMap* hash_map = hash_map_create(hash_map_size);
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 	START_TIMER(start_time);
 	for (i = 0; i < test_size; ++i) {
 		tmp[i] = i;
-		hash_map_put(hash_map,  i, (void*) tmp[i]);
+		hash_map_put(hash_map,  i,  tmp[i]);
 	}
 	STOP_TIMER(stop_time);
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);

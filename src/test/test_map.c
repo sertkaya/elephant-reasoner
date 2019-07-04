@@ -23,18 +23,18 @@
 #include "../utils/map.h"
 
 int main(int argc, char *argv[]) {
-	Map map;
-	MAP_INIT(&map, 16);
+	Map_64 map;
+	MAP_INIT_64(&map, 16);
 
 	char* prefix_name = "";
 	char* prefix = "<http://www.w3.org/2002/07/owl#>";
-	MAP_PUT(HASH_STRING(prefix_name), prefix, &map);
+	MAP_PUT_64(HASH_STRING(prefix_name), prefix, &map);
 
 	char str[32] = ":Thing";
 	char delim[2] = ":";
 	char* token = strtok(str, delim);
 	printf("token: %s\n", token);
-	printf("token value: %s\n", (char*) MAP_GET(HASH_STRING(token), &map));
+	printf("token value: %s\n", (char*) MAP_GET_64(HASH_STRING(token), &map));
 
 	return 0;
 }

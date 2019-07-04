@@ -34,7 +34,7 @@
  */
 // char index_tbox(TBox* tbox, ReasoningTask reasoning_task );
 
-void index_role(ObjectPropertyExpression* r);
+void index_role(ObjectPropertyExpressionId r);
 
 // void index_abox(ABox* abox);
 

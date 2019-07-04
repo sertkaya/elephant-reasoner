@@ -24,12 +24,12 @@
 
 #include "datatypes.h"
 
-char* class_expression_to_string(KB* kb, ClassExpression* c);
-char* object_property_expression_to_string(KB* kb, ObjectPropertyExpression* r);
+char* class_expression_to_string(KB* kb, ClassExpressionId c);
+char* object_property_expression_to_string(KB* kb, ObjectPropertyExpressionId r);
 
 // utility functions for printing concepts, axioms and statistics
 void print_exists(ObjectSomeValuesFrom* ex);
-void print_concept(ClassExpression* c);
+void print_concept(ClassExpressionId c);
 void print_subclass_axiom(SubClassOfAxiom* subclass_ax);
 void print_eqclass_axiom(EquivalentClassesAxiom* subclass_ax);
 void print_subrole_axiom(SubObjectPropertyOfAxiom* subrole_ax);

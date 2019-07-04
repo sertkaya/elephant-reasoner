@@ -37,7 +37,8 @@ char* object_one_of_to_string(KB* kb, ObjectOneOf* nominal);
 
 char* object_property_chain_to_string(KB* kb, ObjectPropertyChain* rc);
 
-char* class_expression_to_string(KB* kb, ClassExpression* c) {
+char* class_expression_to_string(KB* kb, ClassExpressionId id) {
+	ClassExpression* c = &(kb->tbox->class_expressions[id]);
 	switch (c->type) {
 		case CLASS_TYPE:
 			return iri_to_string(kb, c->description.atomic.IRI);
@@ -53,7 +54,8 @@ char* class_expression_to_string(KB* kb, ClassExpression* c) {
 	}
 }
 
-char* object_property_expression_to_string(KB* kb, ObjectPropertyExpression* r) {
+char* object_property_expression_to_string(KB* kb, ObjectPropertyExpressionId id) {
+	ObjectPropertyExpression* r = &(kb->tbox->object_property_expressions[id]);
 	switch (r->type) {
 		case OBJECT_PROPERTY_TYPE:
 			return iri_to_string(kb, r->description.atomic.IRI);
@@ -156,7 +158,7 @@ char* object_intersection_of_to_string(KB* kb, ObjectIntersectionOf* obj_int) {
 }
 
 char* object_one_of_to_string(KB* kb, ObjectOneOf* nominal) {
-	char* individual_str = iri_to_string(kb, nominal->individual->IRI);
+	char* individual_str = iri_to_string(kb, kb->abox->individuals[nominal->individual].IRI);
 	int size = strlen(individual_str) + 3 /* 2 for the curly braces, 1 for the \0 */;
 	char* str = calloc(1, size);
 	assert(str != NULL);
@@ -227,15 +229,15 @@ char* sub_object_property_axiom_to_string(KB* kb, SubObjectPropertyOfAxiom* sub_
 }
 
 void print_tbox(KB* kb) {
-	SetIterator it;
-	SET_ITERATOR_INIT(&it, &(kb->tbox->subclass_of_axioms));
-	SubClassOfAxiom* ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT(&it);
+	SetIterator_64 it;
+	SET_ITERATOR_INIT_64(&it, &(kb->tbox->subclass_of_axioms));
+	SubClassOfAxiom* ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT_64(&it);
 	char* ax_str;
 	while (ax) {
 		ax_str = subclass_of_axiom_to_string(kb, ax);
 		printf("%s\n", ax_str);
 		free(ax_str);
-		ax = SET_ITERATOR_NEXT(&it);
+		ax = SET_ITERATOR_NEXT_64(&it);
 	}
 }
 
@@ -267,20 +269,25 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	MapIterator map_it;
 	SetIterator equivalent_classes_iterator;
 	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
-	ClassExpression* atomic_concept = (ClassExpression*) MAP_ITERATOR_NEXT(&map_it);
+	ClassExpressionId id =  MAP_ITERATOR_NEXT(&map_it);
+	// ClassExpression* atomic_concept = &(kb->tbox->class_expressions[id]);
 	char* atomic_concept_str;
 	SetIterator direct_subsumers_iterator;
-	while (atomic_concept) {
+	// while (atomic_concept) {
+	while (id != HASH_TABLE_ZERO_KEY) {
 		// check if the equivalence class is already printed
-		if (!SET_CONTAINS(atomic_concept, printed)) {
-			atomic_concept_str = class_expression_to_string(kb, atomic_concept);
+		// if (!SET_CONTAINS(atomic_concept, printed)) {
+		if (!SET_CONTAINS(id, printed)) {
+			atomic_concept_str = class_expression_to_string(kb, id);
 			// do not print the direct subsumers of bottom
-			if (atomic_concept != kb->tbox->bottom_concept) {
+			if (id != kb->tbox->bottom_concept) {
 				// iterate over the direct subsumers and print them
-				SET_ITERATOR_INIT(&direct_subsumers_iterator, &(atomic_concept->description.atomic.direct_subsumers));
-				ClassExpression* direct_subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&direct_subsumers_iterator);
+				// SET_ITERATOR_INIT(&direct_subsumers_iterator, &(atomic_concept->description.atomic.direct_subsumers));
+				SET_ITERATOR_INIT(&direct_subsumers_iterator, &(kb->tbox->class_expressions[id].description.atomic.direct_subsumers));
+				ClassExpressionId direct_subsumer = (ClassExpressionId) SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 				char* direct_subsumer_str;
-				while (direct_subsumer != NULL) {
+				// while (direct_subsumer != NULL) {
+				while (direct_subsumer != HASH_TABLE_ZERO_KEY) {
 					direct_subsumer_str = class_expression_to_string(kb, direct_subsumer);
 					fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", atomic_concept_str, direct_subsumer_str);
 					free(direct_subsumer_str);
@@ -289,13 +296,14 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 			}
 
 			// print the equivalent classes
-			if (atomic_concept->description.atomic.equivalent_classes.element_count > 0) {
+			// if (atomic_concept->description.atomic.equivalent_classes.element_count > 0) {
+			if (kb->tbox->class_expressions[id].description.atomic.equivalent_classes.element_count > 0) {
 				fprintf(taxonomy_fp, "EquivalentClasses(%s", atomic_concept_str);
 
-				SET_ITERATOR_INIT(&equivalent_classes_iterator, &(atomic_concept->description.atomic.equivalent_classes));
-				ClassExpression* equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
+				SET_ITERATOR_INIT(&equivalent_classes_iterator, &(kb->tbox->class_expressions[id].description.atomic.equivalent_classes));
+				ClassExpressionId equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
 				char* equivalent_class_str;
-				while (equivalent_class != NULL) {
+				while (equivalent_class != HASH_TABLE_ZERO_KEY) {
 					// mark the concepts in the equivalent classes as already printed
 					SET_ADD(equivalent_class, printed);
 					// now print it
@@ -308,7 +316,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 			}
 			free(atomic_concept_str);
 		}
-		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
+		id = MAP_ITERATOR_NEXT(&map_it);
 	}
 	SET_FREE(printed);
 
@@ -342,25 +350,31 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 
 	// Traverse the hash of nominals that are generated during preprocessing.
 	MapIterator iterator;
-	MAP_ITERATOR_INIT(&iterator, &(kb->generated_nominals));
-	ClassExpression* nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
+	MAP_ITERATOR_INIT(&iterator, &(kb->tbox->generated_object_one_of_exps));
+	ClassExpressionId id = (ClassExpressionId) MAP_ITERATOR_NEXT(&iterator);
+	// ClassExpression* nominal = kb->tbox->class_expressions[id];
 	SetIterator subsumers_iterator;
 	char* nominal_str;
-	while (nominal) {
+	// while (nominal) {
+	while (id != HASH_TABLE_ZERO_KEY) {
 		char* subsumer_str;
-		nominal_str = iri_to_string(kb, nominal->description.nominal.individual->IRI);
-		SET_ITERATOR_INIT(&subsumers_iterator, &(nominal->subsumers));
-		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
-		while (subsumer != NULL) {
-			if (subsumer->type == CLASS_TYPE) {
-				subsumer_str = class_expression_to_string(kb, subsumer);
+		// nominal_str = iri_to_string(kb, kb->abox->individuals[nominal->description.nominal.individual]->IRI);
+		nominal_str = iri_to_string(kb, kb->abox->individuals[kb->tbox->class_expressions[id].description.nominal.individual].IRI);
+		// SET_ITERATOR_INIT(&subsumers_iterator, &(nominal->subsumers));
+		SET_ITERATOR_INIT(&subsumers_iterator, &(kb->tbox->class_expressions[id].subsumers));
+		ClassExpressionId subsumer_id =  SET_ITERATOR_NEXT(&subsumers_iterator);
+		// ClassExpression* subsumer = kb->tbox->class_expressions[subsumer_id];
+		// while (subsumer != NULL) {
+		while (subsumer_id != HASH_TABLE_ZERO_KEY) {
+			if (kb->tbox->class_expressions[subsumer_id].type == CLASS_TYPE) {
+				subsumer_str = class_expression_to_string(kb, subsumer_id);
 				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n", subsumer_str, nominal_str);
 				free(subsumer_str);
 			}
-			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+			subsumer_id = (ClassExpressionId) SET_ITERATOR_NEXT(&subsumers_iterator);
 		}
 		free(nominal_str);
-		nominal = (ClassExpression*) MAP_ITERATOR_NEXT(&iterator);
+		id = (ClassExpressionId) MAP_ITERATOR_NEXT(&iterator);
 	}
 
 	// the closing parentheses for the ontology tag

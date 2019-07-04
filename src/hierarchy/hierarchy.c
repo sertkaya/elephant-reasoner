@@ -39,54 +39,54 @@ void compute_concept_hierarchy(KB* kb) {
 	// Add the top class to the subsumers of every atomic concept.
 	// Whether top is a direct subsumer or not will be computed below
 	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
-	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
-	while (atomic_concept) {
-		SET_ADD(kb->tbox->top_concept, &(((ClassExpression*) atomic_concept)->subsumers));
+	ClassExpressionId atomic_concept = MAP_ITERATOR_NEXT(&map_it);
+	while (atomic_concept != EXPRESSION_ID_NULL) {
+		SET_ADD(kb->tbox->top_concept, &(kb->tbox->class_expressions[atomic_concept].subsumers));
 		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	}
 
 	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
 	atomic_concept = MAP_ITERATOR_NEXT(&map_it);
-	while (atomic_concept) {
-		SET_ITERATOR_INIT(&subsumers_iterator, &(((ClassExpression*) atomic_concept)->subsumers));
-		ClassExpression* subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
-		while (subsumer != NULL) {
+	while (atomic_concept != EXPRESSION_ID_NULL) {
+		SET_ITERATOR_INIT(&subsumers_iterator, &(kb->tbox->class_expressions[atomic_concept].subsumers));
+		ClassExpressionId subsumer = (ClassExpressionId) SET_ITERATOR_NEXT(&subsumers_iterator);
+		while (subsumer != EXPRESSION_ID_NULL) {
 
-			if (subsumer->type != CLASS_TYPE) {
-				subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+			if (kb->tbox->class_expressions[subsumer].type != CLASS_TYPE) {
+				subsumer = (ClassExpressionId) SET_ITERATOR_NEXT(&subsumers_iterator);
 				continue;
 			}
 			// check if tbox->atomic_concept_list[i] is a subsumer of the 'subsumer'
 			// if yes, then they are equivalent
-			if (IS_SUBSUMED_BY(subsumer, (ClassExpression*) atomic_concept)) {
-				if (subsumer != (ClassExpression*) atomic_concept)
-					ADD_EQUIVALENT_CLASS(subsumer, ((ClassExpression*) atomic_concept));
+			if (IS_SUBSUMED_BY(subsumer,  atomic_concept,kb->tbox)) {
+				if (subsumer != (ClassExpressionId) atomic_concept)
+					ADD_EQUIVALENT_CLASS(subsumer,  atomic_concept, kb->tbox);
 			}
 			else {
 				is_direct_subsumer = 1;
-				SET_ITERATOR_INIT(&direct_subsumers_iterator,  &(((ClassExpression*) atomic_concept)->description.atomic.direct_subsumers));
-				void* direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
+				SET_ITERATOR_INIT(&direct_subsumers_iterator,  &(kb->tbox->class_expressions[atomic_concept].description.atomic.direct_subsumers));
+				ClassExpressionId direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 
-				while (direct_subsumer != NULL) {
+				while (direct_subsumer != EXPRESSION_ID_NULL) {
 					// check if the 'subsumer' is a subsumer of the 'direct_subsumer'
 					// if yes, then the 'subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]
-					if (IS_SUBSUMED_BY(((ClassExpression*) direct_subsumer), subsumer)) {
+					if (IS_SUBSUMED_BY(direct_subsumer, subsumer, kb->tbox)) {
 						is_direct_subsumer = 0;
 						break;
 					}
 					// now check if the 'direct_subsumer' is a subsumer of the 'subsumer'
 					// if yes, then the 'direct_subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]
 					// remove it from the list of direct subsumers
-					if (IS_SUBSUMED_BY(subsumer, direct_subsumer))
-						REMOVE_DIRECT_SUBSUMER(direct_subsumer, ((ClassExpression*) atomic_concept));
+					if (IS_SUBSUMED_BY(subsumer, direct_subsumer,kb->tbox))
+						REMOVE_DIRECT_SUBSUMER(direct_subsumer,  atomic_concept, kb->tbox);
 
 					direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 				}
 
 				if (is_direct_subsumer)
-					ADD_DIRECT_SUBSUMER(subsumer, ((ClassExpression*) atomic_concept));
+					ADD_DIRECT_SUBSUMER(subsumer,  atomic_concept, kb->tbox);
 			}
-			subsumer = (ClassExpression*) SET_ITERATOR_NEXT(&subsumers_iterator);
+			subsumer = (ClassExpressionId) SET_ITERATOR_NEXT(&subsumers_iterator);
 		}
 		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	}

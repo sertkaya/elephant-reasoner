@@ -22,12 +22,11 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "dynamic_hash_table.h"
+#include "dynamic_hash_table_64.h"
 #include "utils.h"
 
 /**
  * A dynamic hash table implementation for storing keys only, no associated values.
- * Keys are of type uint32_t.
  * The allocated space is doubled once the load factor reaches 0.75.
  * Uses open addressing with linear probing.
  * Keys cannot be NULL.
@@ -35,14 +34,14 @@
  */
 
 
-void dynamic_hash_table_init(DynamicHashTable* hash_table, unsigned int size) {
+void dynamic_hash_table_init_64(DynamicHashTable_64* hash_table, unsigned int size) {
 
 	if (size < 8)
 		size = 8;
 	else
 		size = roundup_pow2(size);
 
-	hash_table->elements = (uint32_t*) calloc(size, sizeof(uint32_t));
+	hash_table->elements = (void**) calloc(size, sizeof(void*));
 	assert(hash_table->elements != NULL);
 	hash_table->end_indexes = (unsigned int*) calloc(size, sizeof(unsigned int));
 	assert(hash_table->end_indexes != NULL);
@@ -56,15 +55,15 @@ void dynamic_hash_table_init(DynamicHashTable* hash_table, unsigned int size) {
 	return;
 }
 
-DynamicHashTable* dynamic_hash_table_create(unsigned int size) {
+DynamicHashTable_64* dynamic_hash_table_create_64(unsigned int size) {
 	if (size < 8)
 		size = 8;
 	else
 		size = roundup_pow2(size);
-	DynamicHashTable* hash_table = (DynamicHashTable*) malloc(sizeof(DynamicHashTable));
+	DynamicHashTable_64* hash_table = (DynamicHashTable_64*) malloc(sizeof(DynamicHashTable_64));
 	assert(hash_table != NULL);
 
-	hash_table->elements = (uint32_t*) calloc(size, sizeof(uint32_t));
+	hash_table->elements = (void**) calloc(size, sizeof(void*));
 	assert(hash_table->elements != NULL);
 	hash_table->end_indexes = (unsigned int*) calloc(size, sizeof(unsigned int));
 	assert(hash_table->end_indexes != NULL);
@@ -78,49 +77,49 @@ DynamicHashTable* dynamic_hash_table_create(unsigned int size) {
 	return hash_table;
 }
 
-extern inline char dynamic_hash_table_insert(uint32_t key, DynamicHashTable* hash_table);
+extern inline char dynamic_hash_table_insert_64(void* key, DynamicHashTable_64* hash_table);
 
-extern inline char dynamic_hash_table_contains(uint32_t key, DynamicHashTable* hash_table);
+extern inline char dynamic_hash_table_contains_64(void* key, DynamicHashTable_64* hash_table);
 
-extern char dynamic_hash_table_remove(uint32_t key, DynamicHashTable* hash_table);
+extern char dynamic_hash_table_remove_64(void* key, DynamicHashTable_64* hash_table);
 
 /**
  * Create an iterator for the given hash table.
  */
-extern inline DynamicHashTableIterator* dynamic_hash_table_iterator_create(DynamicHashTable* h);
+extern inline DynamicHashTableIterator_64* dynamic_hash_table_iterator_create_64(DynamicHashTable_64* h);
 
-extern inline void dynamic_hash_table_iterator_init(DynamicHashTableIterator* iterator, DynamicHashTable* hash_table);
+extern inline void dynamic_hash_table_iterator_init_64(DynamicHashTableIterator_64* iterator, DynamicHashTable_64* hash_table);
 
 /**
  * Get the next element.
- * Returns HASH_TABLE_ZERO_KEY if there is no next element.
+ * Returns NULL if there is no next element.
  */
-extern inline uint32_t dynamic_hash_table_iterator_next(DynamicHashTableIterator* iterator);
+extern inline void* dynamic_hash_table_iterator_next_64(DynamicHashTableIterator_64* iterator);
 
 
 
-int dynamic_hash_table_free(DynamicHashTable* hash_table) {
+int dynamic_hash_table_free_64(DynamicHashTable_64* hash_table) {
 	int i;
 	int freed_bytes = 0;
 
 	free(hash_table->elements);
-	freed_bytes += hash_table->size * sizeof(uint32_t);
+	freed_bytes += hash_table->size * sizeof(void*);
 
 	free(hash_table->end_indexes);
 	freed_bytes += hash_table->size * sizeof(unsigned int);
 
 	free(hash_table);
-	freed_bytes += sizeof(DynamicHashTable);
+	freed_bytes += sizeof(DynamicHashTable_64);
 
 	return freed_bytes;
 }
 
-int dynamic_hash_table_reset(DynamicHashTable* hash_table) {
+int dynamic_hash_table_reset_64(DynamicHashTable_64* hash_table) {
 	int i;
 	int freed_bytes = 0;
 
 	free(hash_table->elements);
-	freed_bytes += hash_table->size * sizeof(uint32_t);
+	freed_bytes += hash_table->size * sizeof(void*);
 
 	free(hash_table->end_indexes);
 	freed_bytes += hash_table->size * sizeof(unsigned int);
@@ -131,8 +130,8 @@ int dynamic_hash_table_reset(DynamicHashTable* hash_table) {
 	return freed_bytes;
 }
 
-inline int dynamic_hash_table_iterator_free(DynamicHashTableIterator* iterator) {
+inline int dynamic_hash_table_iterator_free_64(DynamicHashTableIterator_64* iterator) {
 	free(iterator);
 
-	return sizeof(DynamicHashTableIterator);
+	return sizeof(DynamicHashTableIterator_64);
 }
