@@ -41,7 +41,7 @@ inline HashMap* hash_map_create(unsigned int size) {
 
 	// allocate space for the chain sizes
 	hash_map->chain_sizes = (unsigned*) calloc(size, sizeof(unsigned int));
-	assert(hash_map->buckets != NULL);
+	assert(hash_map->chain_sizes != NULL);
 
 	hash_map->bucket_count = size;
 
@@ -65,7 +65,7 @@ void hash_map_init(HashMap* hash_map, unsigned int size) {
 
 	// allocate space for the chain sizes
 	hash_map->chain_sizes = (unsigned*) calloc(size, sizeof(unsigned int));
-	assert(hash_map->buckets != NULL);
+	assert(hash_map->chain_sizes != NULL);
 
 	hash_map->bucket_count = size;
 

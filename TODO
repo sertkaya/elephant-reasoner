@@ -15,3 +15,5 @@ TODO:
 	- convert dynamic_hash_table also to store uint32_t? Used in the Set.
 	
 	- Set and Queue (in role saturation) store void*. Should be converted to Id-Type (uint32_t)
+	
+	- Why is hash_map->buckets (backwards) linked list? Is just an array of HashMapElement not better? (Reimplement)
