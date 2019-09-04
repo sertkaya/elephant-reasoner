@@ -43,7 +43,7 @@ ClassExpressionId create_class_expression_template(TBox* tbox) {
 	++tbox->last_class_expression_id;
 
 	if (tbox->last_class_expression_id == (tbox->class_expressions_size -1)) {
-		ClassExpression* tmp = realloc(tbox->class_expressions, tbox->class_expressions_size + DEFAULT_CLASS_EXPRESSION_COUNT_INCREMENT);
+		ClassExpression* tmp = realloc(tbox->class_expressions, (tbox->class_expressions_size + DEFAULT_CLASS_EXPRESSION_COUNT_INCREMENT) * sizeof(ClassExpression));
 		assert (tmp != NULL);
 		tbox->class_expressions = tmp;
 		tbox->class_expressions_size += DEFAULT_CLASS_EXPRESSION_COUNT_INCREMENT;
