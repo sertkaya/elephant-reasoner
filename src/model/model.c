@@ -215,7 +215,7 @@ ObjectPropertyExpressionId create_object_property_expression_template(TBox* tbox
 	++tbox->last_object_property_expression_id;
 
 	if (tbox->last_object_property_expression_id >= tbox->object_property_expressions_size - 1) {
-		ObjectPropertyExpression* tmp = realloc(tbox->object_property_expressions, tbox->object_property_expressions_size + DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT_INCREMENT);
+		ObjectPropertyExpression* tmp = realloc(tbox->object_property_expressions, (tbox->object_property_expressions_size + DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT_INCREMENT) * sizeof(ObjectPropertyExpression));
 		assert (tmp != NULL);
 		tbox->object_property_expressions = tmp;
 	}
