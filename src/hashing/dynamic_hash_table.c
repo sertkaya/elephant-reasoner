@@ -72,8 +72,8 @@ DynamicHashTable* dynamic_hash_table_create(unsigned int size) {
 	hash_table->element_count = 0;
 	int i;
 	for (i = 0; i < hash_table->size; ++i)
-		// initialize with HASH_TABLE_EMPTY_KEY
-		hash_table->elements[i] = HASH_TABLE_EMPTY_KEY;
+		// initialize with HASH_TABLE_KEY_NULL
+		hash_table->elements[i] = HASH_TABLE_KEY_NULL;
 		// each chain initially ends at its starting point
 		hash_table->end_indexes[i] = i;
 
@@ -84,7 +84,7 @@ extern inline char dynamic_hash_table_insert(uint32_t key, DynamicHashTable* has
 
 extern inline char dynamic_hash_table_contains(uint32_t key, DynamicHashTable* hash_table);
 
-extern char dynamic_hash_table_remove(uint32_t key, DynamicHashTable* hash_table);
+ extern char dynamic_hash_table_remove(uint32_t key, DynamicHashTable* hash_table);
 
 /**
  * Create an iterator for the given hash table.

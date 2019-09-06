@@ -274,7 +274,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	char* atomic_concept_str;
 	SetIterator direct_subsumers_iterator;
 	// while (atomic_concept) {
-	while (id != HASH_TABLE_ZERO_KEY) {
+	while (id != HASH_TABLE_KEY_NOT_FOUND) {
 		// check if the equivalence class is already printed
 		// if (!SET_CONTAINS(atomic_concept, printed)) {
 		if (!SET_CONTAINS(id, printed)) {
@@ -287,7 +287,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 				ClassExpressionId direct_subsumer = (ClassExpressionId) SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 				char* direct_subsumer_str;
 				// while (direct_subsumer != NULL) {
-				while (direct_subsumer != HASH_TABLE_ZERO_KEY) {
+				while (direct_subsumer != HASH_TABLE_KEY_NOT_FOUND) {
 					direct_subsumer_str = class_expression_to_string(kb, direct_subsumer);
 					fprintf(taxonomy_fp, "SubClassOf(%s %s)\n", atomic_concept_str, direct_subsumer_str);
 					free(direct_subsumer_str);
@@ -303,7 +303,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 				SET_ITERATOR_INIT(&equivalent_classes_iterator, &(kb->tbox->class_expressions[id].description.atomic.equivalent_classes));
 				ClassExpressionId equivalent_class = SET_ITERATOR_NEXT(&equivalent_classes_iterator);
 				char* equivalent_class_str;
-				while (equivalent_class != HASH_TABLE_ZERO_KEY) {
+				while (equivalent_class != HASH_TABLE_KEY_NOT_FOUND) {
 					// mark the concepts in the equivalent classes as already printed
 					SET_ADD(equivalent_class, printed);
 					// now print it
@@ -356,7 +356,7 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 	SetIterator subsumers_iterator;
 	char* nominal_str;
 	// while (nominal) {
-	while (id != HASH_TABLE_ZERO_KEY) {
+	while (id != HASH_TABLE_KEY_NOT_FOUND) {
 		char* subsumer_str;
 		// nominal_str = iri_to_string(kb, kb->abox->individuals[nominal->description.nominal.individual]->IRI);
 		nominal_str = iri_to_string(kb, kb->abox->individuals[kb->tbox->class_expressions[id].description.nominal.individual].IRI);
@@ -365,7 +365,7 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 		ClassExpressionId subsumer_id =  SET_ITERATOR_NEXT(&subsumers_iterator);
 		// ClassExpression* subsumer = kb->tbox->class_expressions[subsumer_id];
 		// while (subsumer != NULL) {
-		while (subsumer_id != HASH_TABLE_ZERO_KEY) {
+		while (subsumer_id != HASH_TABLE_KEY_NOT_FOUND) {
 			if (kb->tbox->class_expressions[subsumer_id].type == CLASS_TYPE) {
 				subsumer_str = class_expression_to_string(kb, subsumer_id);
 				fprintf(taxonomy_fp, "ClassAssertion(%s %s)\n", subsumer_str, nominal_str);

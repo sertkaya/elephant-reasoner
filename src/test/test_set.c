@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 	SET_REMOVE(tmp[99], set);
 
 
-	for (i = 0; i < 100; ++i)
+	for (i = 1; i <= 100; ++i)
 		if (!SET_CONTAINS(tmp[i], set))
 			printf("%d: not found!\n", i);
 		else
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 	SetIterator* it = SET_ITERATOR_CREATE(set);
 	uint32_t e = SET_ITERATOR_NEXT(it);
-	while (e != HASH_TABLE_ZERO_KEY) {
+	while (e != HASH_TABLE_KEY_NOT_FOUND) {
 		printf("%p\n", e);
 		e = SET_ITERATOR_NEXT(it);
 	}

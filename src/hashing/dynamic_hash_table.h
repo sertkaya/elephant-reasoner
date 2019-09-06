@@ -32,17 +32,17 @@
 typedef struct dynamic_hash_table DynamicHashTable;
 typedef struct dynamic_hash_table_iterator DynamicHashTableIterator;
 
-// TODO: !!
-#define HASH_TABLE_ZERO_KEY		0
-#define HASH_TABLE_EMPTY_KEY		-1
-#define HASH_TABLE_DELETED_KEY		-2
+#define HASH_TABLE_KEY_NOT_FOUND	0
+#define HASH_TABLE_KEY_NULL				0
+// TODO: Is this a good idea in case such a real key exists?
+#define HASH_TABLE_DELETED_KEY			UINT32_MAX
 
 /**
  * Hash table.
  */
 struct dynamic_hash_table {
-	uint32_t* elements;			// the buckets
-	unsigned int* end_indexes;	// the end indexes of chains
+	uint32_t *elements;			// the buckets
+	unsigned int *end_indexes;	// the end indexes of chains
 	unsigned int size;			// size of the hash table
 	unsigned int element_count;	// the number of elements
 };
@@ -74,23 +74,22 @@ int dynamic_hash_table_free(DynamicHashTable* hash_table);
 int dynamic_hash_table_reset(DynamicHashTable* hash_table);
 
 /**
- * Insert the given key into the hash table. The key cannot be NULL.
+ * Insert the given key into the hash table. The key cannot be HASH_TABLE_KEY_NULL.
  * Returns 1 if the key is inserted, 0 if it already existed.
  */
 inline char dynamic_hash_table_insert(uint32_t key, DynamicHashTable* hash_table) {
 	int i, j, new_size;
 	size_t start_index;
 
-	assert(key != HASH_TABLE_EMPTY_KEY && key != HASH_TABLE_DELETED_KEY && key != HASH_TABLE_ZERO_KEY);
+	assert(key != HASH_TABLE_KEY_NULL && key != HASH_TABLE_DELETED_KEY);
 
-	// start_index = HASH_POINTER(key) & (hash_table->size - 1);
 	start_index = HASH_UNSIGNED(key) & (hash_table->size - 1);
 	for (i = start_index; ; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key)
 			// the key already exists
 			return 0;
 
-		if (hash_table->elements[i] == HASH_TABLE_EMPTY_KEY) {
+		if (hash_table->elements[i] == HASH_TABLE_KEY_NULL) {
 			// an empty slot is found, insert the key here
 			hash_table->elements[i] = key;
 			++hash_table->element_count;
@@ -107,13 +106,16 @@ inline char dynamic_hash_table_insert(uint32_t key, DynamicHashTable* hash_table
 		uint32_t* tmp_elements = (uint32_t*) calloc(new_size, sizeof(uint32_t));
 		assert(tmp_elements != NULL);
 
+		for (i = 0; i < new_size; ++i) {
+			// initialize the elements with HASH_TABLE_KEY_NULL
+			tmp_elements[i] = HASH_TABLE_KEY_NULL;
+		}
+
 		// free the end indexes, allocate and initialize new
 		free(hash_table->end_indexes);
 		hash_table->end_indexes = (unsigned int*) calloc(new_size, sizeof(unsigned int));
 		assert(hash_table->end_indexes != NULL);
 		for (i = 0; i < new_size; ++i) {
-			// initialize the elements with HASH_TABLE_EMPTY_KEY
-			hash_table->elements[i] = HASH_TABLE_EMPTY_KEY;
 			hash_table->end_indexes[i] = i;
 		}
 
@@ -123,8 +125,7 @@ inline char dynamic_hash_table_insert(uint32_t key, DynamicHashTable* hash_table
 			// if (hash_table->elements[i] != NULL) {
 				start_index = HASH_UNSIGNED(hash_table->elements[i]) & (new_size - 1);
 				for (j = start_index; ; j = (j + 1) & (new_size - 1))
-					// if (tmp_elements[j] == HASH_TABLE_ZERO_KEY) {
-					if (tmp_elements[j] == HASH_TABLE_EMPTY_KEY) {
+					if (tmp_elements[j] == HASH_TABLE_KEY_NULL) {
 						tmp_elements[j] = hash_table->elements[i];
 						break;
 					}
@@ -153,10 +154,10 @@ inline char dynamic_hash_table_insert(uint32_t key, DynamicHashTable* hash_table
  * Returns 1 if the key is removed, 0 otherwise.
  */
 inline char dynamic_hash_table_remove(uint32_t key, DynamicHashTable* hash_table) {
-	assert(key != HASH_TABLE_EMPTY_KEY && key != HASH_TABLE_DELETED_KEY && key != HASH_TABLE_ZERO_KEY);
+	assert(key != HASH_TABLE_KEY_NULL && key != HASH_TABLE_DELETED_KEY);
 
 	int i;
-	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
+	size_t start_index = HASH_UNSIGNED(key) & (hash_table->size - 1);
 
 	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key) {
@@ -174,8 +175,8 @@ inline char dynamic_hash_table_remove(uint32_t key, DynamicHashTable* hash_table
  * Returns 1 if so, 0 otherwise.
  */
 inline char dynamic_hash_table_contains(uint32_t key, DynamicHashTable* hash_table) {
-	assert(key != HASH_TABLE_EMPTY_KEY && key != HASH_TABLE_DELETED_KEY);
-	size_t start_index = HASH_POINTER(key) & (hash_table->size - 1);
+	assert(key != HASH_TABLE_KEY_NULL && key != HASH_TABLE_DELETED_KEY);
+	size_t start_index = HASH_UNSIGNED(key) & (hash_table->size - 1);
 
 	int i;
 	for (i = start_index; i != hash_table->end_indexes[start_index]; i = (i + 1) & (hash_table->size - 1)) {
@@ -206,12 +207,12 @@ inline uint32_t dynamic_hash_table_iterator_next(DynamicHashTableIterator* itera
 
 	int i;
 	for (i = iterator->current_index; i < iterator->hash_table->size; ++i)
-		if (iterator->hash_table->elements[i] != HASH_TABLE_EMPTY_KEY && iterator->hash_table->elements[i] != HASH_TABLE_DELETED_KEY) {
+		if (iterator->hash_table->elements[i] != HASH_TABLE_KEY_NULL && iterator->hash_table->elements[i] != HASH_TABLE_DELETED_KEY) {
 			iterator->current_index = i + 1;
 			return iterator->hash_table->elements[i];
 		}
 
-	return HASH_TABLE_ZERO_KEY;
+	return HASH_TABLE_KEY_NOT_FOUND;
 }
 
 /**
