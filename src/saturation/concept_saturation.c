@@ -87,7 +87,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	MapIterator iterator;
 	MAP_ITERATOR_INIT(&iterator, &(tbox->classes));
 	ClassExpressionId class = (ClassExpressionId) MAP_ITERATOR_NEXT(&iterator);
-	while (class != EXPRESSION_ID_NULL) {
+	while (class != KEY_NOT_FOUND_IN_HASH_MAP) {
 		push(&scheduled_axioms, create_concept_saturation_axiom(class, class, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 		if (kb->top_occurs_on_lhs) {
 			push(&scheduled_axioms, create_concept_saturation_axiom(class, tbox->top_concept, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));

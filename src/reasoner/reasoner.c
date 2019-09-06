@@ -111,7 +111,9 @@ ABox* init_abox() {
 	abox->individuals = calloc(DEFAULT_INDIVIDUAL_COUNT, sizeof(Individual));
 	assert(abox->individuals != NULL);
 
-	abox->last_individual_id = -1;
+	// Last assigned individual id. Increment before using
+	// The first id that will be given is 1. 0 is not a valid id.
+	abox->last_individual_id = 0;
 	abox->individual_count = 0;
 	abox->individuals_map = hash_map_create(DEFAULT_INDIVIDUALS_HASH_SIZE);
 	// abox->individual_list = NULL;

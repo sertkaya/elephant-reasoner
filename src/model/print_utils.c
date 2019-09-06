@@ -274,7 +274,7 @@ void print_concept_hierarchy(KB* kb, FILE* taxonomy_fp) {
 	char* atomic_concept_str;
 	SetIterator direct_subsumers_iterator;
 	// while (atomic_concept) {
-	while (id != HASH_TABLE_KEY_NOT_FOUND) {
+	while (id != KEY_NOT_FOUND_IN_HASH_MAP) {
 		// check if the equivalence class is already printed
 		// if (!SET_CONTAINS(atomic_concept, printed)) {
 		if (!SET_CONTAINS(id, printed)) {
@@ -356,7 +356,7 @@ void print_individual_types(KB* kb, FILE* taxonomy_fp) {
 	SetIterator subsumers_iterator;
 	char* nominal_str;
 	// while (nominal) {
-	while (id != HASH_TABLE_KEY_NOT_FOUND) {
+	while (id != KEY_NOT_FOUND_IN_HASH_MAP) {
 		char* subsumer_str;
 		// nominal_str = iri_to_string(kb, kb->abox->individuals[nominal->description.nominal.individual]->IRI);
 		nominal_str = iri_to_string(kb, kb->abox->individuals[kb->tbox->class_expressions[id].description.nominal.individual].IRI);

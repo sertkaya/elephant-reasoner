@@ -261,7 +261,7 @@ int free_tbox(TBox* tbox) {
 
 	// iterate over the tbox->class_expressions array, free the class expressions
 	ClassExpressionId id;
-	for (id = 0; id <= tbox->last_class_expression_id; ++id) {
+	for (id = 1; id <= tbox->last_class_expression_id; ++id) {
 		total_freed_bytes += free_concept(id, tbox);
 	}
 
@@ -290,7 +290,7 @@ int free_tbox(TBox* tbox) {
 
 	// iterate over the object property expressions array,
 	// free the object property expressions
-	for (id = 0; id <= tbox->last_object_property_expression_id; ++id)
+	for (id = 1; id <= tbox->last_object_property_expression_id; ++id)
 		total_freed_bytes += free_role(id, tbox);
 
 	// free the object property expressions array itself
@@ -337,7 +337,7 @@ int free_abox(ABox* abox) {
 
 	// iterate over the individuals array, free the individuals
 	ClassExpressionId id;
-	for (id = 0; id <= abox->last_individual_id; ++id)
+	for (id = 1; id <= abox->last_individual_id; ++id)
 		total_freed_bytes += free_individual(id, abox);
 
 	// free the individuals array

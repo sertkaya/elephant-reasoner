@@ -60,7 +60,7 @@ uint32_t dequeue(Queue* queue) {
 
 	if (queue->front == NULL && queue->rear == NULL)
 		// the queue is empty
-		return -1;
+		return QUEUE_ELEMENT_NOT_FOUND;
 
 	data = queue->front->data;
 	if (queue->rear == queue->front)

@@ -412,7 +412,7 @@ IndividualId get_create_individual(char* name, ABox* abox) {
 	id = ++abox->last_individual_id;
 
 	if (abox->last_individual_id >= abox->individual_count) {
-		Individual* tmp = realloc(abox->individuals, abox->individual_count + DEFAULT_INDIVIDUAL_COUNT_INCREMENT);
+		Individual* tmp = realloc(abox->individuals, (abox->individual_count + DEFAULT_INDIVIDUAL_COUNT_INCREMENT) * sizeof(Individual));
 		assert (tmp != NULL);
 		abox->individuals = tmp;
 		abox->individual_count += DEFAULT_INDIVIDUAL_COUNT_INCREMENT;

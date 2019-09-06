@@ -25,6 +25,7 @@
 typedef struct queue_element QueueElement;
 typedef struct queue Queue;
 
+#define QUEUE_ELEMENT_NOT_FOUND	0
 
 // #define DEQUEUE(qe,q) 		qe = (q)->data[(q)->front++]
 // #define IS_EMPTY_QUEUE(q) 	((q)->front == (q)->rear)

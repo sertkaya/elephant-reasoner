@@ -184,8 +184,6 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 		subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT_64(&iterator);
 	}
 
-	printf("\nGenerated SubClassAxioms indexed\n");
-
 	// If bottom does not appear on the rhs, the KB cannot be inconsistent, i.e., it is consistent
 	if (reasoning_task == CONSISTENCY && kb->bottom_occurs_on_rhs == 0)
 		return 1;

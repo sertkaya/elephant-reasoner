@@ -157,7 +157,7 @@ void saturate_roles(KB* kb) {
 	Set subsumers_to_remove;
 	MAP_ITERATOR_INIT(&map_iterator, &(kb->tbox->objectproperty_chains));
 	object_property_chain = (ObjectPropertyExpressionId) MAP_ITERATOR_NEXT(&map_iterator);
-	while (object_property_chain) {
+	while (object_property_chain != KEY_NOT_FOUND_IN_HASH_MAP) {
 		// printf("%s:%d\n", object_property_expression_to_string(kb, object_property_chain), object_property_chain->subsumers.element_count);
 		SET_INIT(&subsumers_to_remove, 16);
 		SetIterator subsumers_iterator_1;
@@ -172,7 +172,7 @@ void saturate_roles(KB* kb) {
 			SetIterator subsumers_iterator_2;
 			SET_ITERATOR_INIT(&subsumers_iterator_2, &(OPEXP(object_property_chain).subsumers));
 			ObjectPropertyExpressionId subsumer_2 = (ObjectPropertyExpressionId) SET_ITERATOR_NEXT(&subsumers_iterator_2);
-			while (subsumer_2) {
+			while (subsumer_2 != HASH_TABLE_KEY_NOT_FOUND) {
 				if (subsumer_2 == object_property_chain || subsumer_1 == subsumer_2) {
 					subsumer_2 = (ObjectPropertyExpressionId) SET_ITERATOR_NEXT(&subsumers_iterator_2);
 					continue;
@@ -191,7 +191,7 @@ void saturate_roles(KB* kb) {
 		SetIterator remove_iterator;
 		SET_ITERATOR_INIT(&remove_iterator, &subsumers_to_remove);
 		ObjectPropertyExpressionId subsumer_to_remove = (ObjectPropertyExpressionId) SET_ITERATOR_NEXT(&remove_iterator);
-		while (subsumer_to_remove) {
+		while (subsumer_to_remove != HASH_TABLE_KEY_NOT_FOUND) {
 			// list_remove(subsumer_to_remove, &(object_property_chain->subsumer_list));
 			// printf("removed %s from the subsumers of %s\n", object_property_expression_to_string(kb, subsumer_to_remove), object_property_expression_to_string(kb, object_property_chain));
 			subsumer_to_remove = (ObjectPropertyExpressionId) SET_ITERATOR_NEXT(&remove_iterator);
