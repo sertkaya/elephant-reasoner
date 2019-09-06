@@ -83,7 +83,8 @@ inline char dynamic_hash_table_insert(uint32_t key, DynamicHashTable* hash_table
 
 	assert(key != HASH_TABLE_EMPTY_KEY && key != HASH_TABLE_DELETED_KEY && key != HASH_TABLE_ZERO_KEY);
 
-	start_index = HASH_POINTER(key) & (hash_table->size - 1);
+	// start_index = HASH_POINTER(key) & (hash_table->size - 1);
+	start_index = HASH_UNSIGNED(key) & (hash_table->size - 1);
 	for (i = start_index; ; i = (i + 1) & (hash_table->size - 1)) {
 		if (hash_table->elements[i] == key)
 			// the key already exists
@@ -110,16 +111,20 @@ inline char dynamic_hash_table_insert(uint32_t key, DynamicHashTable* hash_table
 		free(hash_table->end_indexes);
 		hash_table->end_indexes = (unsigned int*) calloc(new_size, sizeof(unsigned int));
 		assert(hash_table->end_indexes != NULL);
-		for (i = 0; i < new_size; ++i)
+		for (i = 0; i < new_size; ++i) {
+			// initialize the elements with HASH_TABLE_EMPTY_KEY
+			hash_table->elements[i] = HASH_TABLE_EMPTY_KEY;
 			hash_table->end_indexes[i] = i;
+		}
 
 		// re-populate
 		for (i = 0; i < hash_table->size; ++i) {
 			// TODO: Check if commenting it out caused malfunctioning
 			// if (hash_table->elements[i] != NULL) {
-				start_index = HASH_POINTER(hash_table->elements[i]) & (new_size - 1);
+				start_index = HASH_UNSIGNED(hash_table->elements[i]) & (new_size - 1);
 				for (j = start_index; ; j = (j + 1) & (new_size - 1))
-					if (tmp_elements[j] == HASH_TABLE_ZERO_KEY) {
+					// if (tmp_elements[j] == HASH_TABLE_ZERO_KEY) {
+					if (tmp_elements[j] == HASH_TABLE_EMPTY_KEY) {
 						tmp_elements[j] = hash_table->elements[i];
 						break;
 					}

@@ -72,6 +72,8 @@ DynamicHashTable* dynamic_hash_table_create(unsigned int size) {
 	hash_table->element_count = 0;
 	int i;
 	for (i = 0; i < hash_table->size; ++i)
+		// initialize with HASH_TABLE_EMPTY_KEY
+		hash_table->elements[i] = HASH_TABLE_EMPTY_KEY;
 		// each chain initially ends at its starting point
 		hash_table->end_indexes[i] = i;
 

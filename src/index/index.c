@@ -27,7 +27,6 @@
 
 
 void index_class_expression(ClassExpressionId id, KB* kb) {
-
 	// ClassExpression* c = kb->tbox->class_expressions[id];
 	switch (kb->tbox->class_expressions[id].type) {
 	case CLASS_TYPE:
@@ -153,7 +152,6 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 			kb->bottom_occurs_on_rhs = 1;
 		subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT_64(&iterator);
 	}
-
 	// Now index the subclass axioms generated during preprocessing
 	SET_ITERATOR_INIT_64(&iterator, &(kb->tbox->generated_subclass_of_axioms));
 	subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT_64(&iterator);
@@ -185,6 +183,8 @@ char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 			kb->bottom_occurs_on_rhs = 1;
 		subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT_64(&iterator);
 	}
+
+	printf("\nGenerated SubClassAxioms indexed\n");
 
 	// If bottom does not appear on the rhs, the KB cannot be inconsistent, i.e., it is consistent
 	if (reasoning_task == CONSISTENCY && kb->bottom_occurs_on_rhs == 0)
