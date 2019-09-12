@@ -163,8 +163,8 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 
 
 				// told subsumers
-				for (i = 0; i < OPEXP(ax->rhs).told_subsumers.size; ++i)
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, OPEXP(ax->rhs).told_subsumers.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_TOLD_SUBSUMER));
+				for (i = 0; i < CEXP(ax->rhs).told_subsumers.size; ++i)
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).told_subsumers.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_TOLD_SUBSUMER));
 			}
 			break;
 		case SUBSUMPTION_INITIALIZATION:
@@ -280,7 +280,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				SET_ITERATOR_INIT(&subsumers_iterator, &(CEXP(ax->rhs).subsumers));
 				ClassExpressionId subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 				// TODO: change the order of the loops for better performance
-				while (subsumer != KEY_NOT_FOUND_IN_HASH_MAP) {
+				while (subsumer != HASH_TABLE_KEY_NOT_FOUND) {
 					for (j = 0; j < OPEXP(ax->role).subsumer_list.size; ++j) {
 						ClassExpressionId ex = GET_NEGATIVE_EXISTS(subsumer,  OPEXP(ax->role).subsumer_list.elements[j], tbox);
 						if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {

@@ -218,6 +218,7 @@ ObjectPropertyExpressionId create_object_property_expression_template(TBox* tbox
 		ObjectPropertyExpression* tmp = realloc(tbox->object_property_expressions, (tbox->object_property_expressions_size + DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT_INCREMENT) * sizeof(ObjectPropertyExpression));
 		assert (tmp != NULL);
 		tbox->object_property_expressions = tmp;
+		tbox->object_property_expressions_size += DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT_INCREMENT;
 	}
 
 	// now fill this object property expression

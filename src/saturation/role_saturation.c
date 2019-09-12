@@ -83,7 +83,6 @@ void saturate_roles(KB* kb) {
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
-
    // the object properties
 	MAP_ITERATOR_INIT(&map_iterator, &(tbox->objectproperties));
 	ObjectPropertyExpressionId object_property = MAP_ITERATOR_NEXT(&map_iterator);
@@ -100,7 +99,7 @@ void saturate_roles(KB* kb) {
 			// told subsumers
 			SET_ITERATOR_INIT(&told_subsumers_iterator, &(OPEXP(ax->rhs).told_subsumers));
 			ObjectPropertyExpressionId told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
-			while (told_subsumer != KEY_NOT_FOUND_IN_HASH_MAP) {
+			while (told_subsumer != HASH_TABLE_KEY_NOT_FOUND) {
 				push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, told_subsumer));
 				told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
 			}
@@ -144,7 +143,7 @@ void saturate_roles(KB* kb) {
 							kb->tbox);
 
 					add_to_role_subsumer_list(new_composition, object_property_chain, tbox);
-					index_role(new_composition);
+					index_role(new_composition, kb->tbox);
 				subsumee_2 = (ObjectPropertyExpressionId) SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}
 			subsumee_1 = (ObjectPropertyExpressionId) SET_ITERATOR_NEXT(&subsumees_iterator_1);
