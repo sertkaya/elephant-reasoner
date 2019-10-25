@@ -42,7 +42,7 @@ struct hash_map_element {
 };
 
 struct hash_map {
-	HashMapElement*** buckets;		// the buckets
+	HashMapElement** buckets;		// the buckets
 	unsigned int bucket_count;		// the number of buckets
 	unsigned int* chain_sizes;		// sizes of the chains
 	unsigned int element_count;	// the number of elements
@@ -88,27 +88,25 @@ inline int hash_map_put(HashMap* hash_map, uint64_t key, uint32_t value) {
 
 	int hash_value = key & (hash_map->bucket_count - 1);
 	// int hash_value = HASH_UNSIGNED(key) & (hash_map->bucket_count - 1);
-	HashMapElement** bucket = hash_map->buckets[hash_value];
+	HashMapElement* bucket = hash_map->buckets[hash_value];
 	int chain_size = hash_map->chain_sizes[hash_value];
 
 	int i;
 	for (i = 0; i < chain_size; i++)
-		if (bucket[i]->key == key) {
-			bucket[i]->value = value;
+		if (bucket[i].key == key) {
+			bucket[i].value = value;
 			return 0;
 		}
 
-	HashMapElement** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement*));
+	HashMapElement* tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement));
 	assert(tmp != NULL);
 	bucket = hash_map->buckets[hash_value] = tmp;
 
-	bucket[chain_size] = malloc(sizeof(HashMapElement));
-	assert(bucket[chain_size] != NULL);
-	bucket[chain_size]->key = key;
-	bucket[chain_size]->value = value;
-	bucket[chain_size]->previous = hash_map->tail;
+	bucket[chain_size].key = key;
+	bucket[chain_size].value = value;
+	bucket[chain_size].previous = hash_map->tail;
 
-	hash_map->tail = bucket[chain_size];
+	hash_map->tail = &bucket[chain_size];
 
 	++hash_map->chain_sizes[hash_value];
 
@@ -123,13 +121,13 @@ inline int hash_map_put(HashMap* hash_map, uint64_t key, uint32_t value) {
  */
 inline uint32_t hash_map_get(HashMap* hash_map, uint64_t key) {
 	int bucket_index = key & (hash_map->bucket_count - 1);
-	HashMapElement** bucket = hash_map->buckets[bucket_index];
+	HashMapElement* bucket = hash_map->buckets[bucket_index];
 	int chain_size = hash_map->chain_sizes[bucket_index];
 
 	int i;
 	for (i = 0; i < chain_size; i++)
-		if (key == bucket[i]->key)
-			return bucket[i]->value;
+		if (key == bucket[i].key)
+			return bucket[i].value;
 
 	return KEY_NOT_FOUND_IN_HASH_MAP;
 }
@@ -143,10 +141,12 @@ void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map);
  * Returns NULL if there is no next element.
  */
 inline uint32_t  hash_map_iterator_next(HashMapIterator* iterator) {
-	void* next = iterator->current_element->previous;
+	// HashMapElement *next = iterator->current_element->previous;
+	HashMapElement *next = iterator->current_element;
+	if (!next)
+		return KEY_NOT_FOUND_IN_HASH_MAP;
 	iterator->current_element = iterator->current_element->previous;
-	if (!next) return KEY_NOT_FOUND_IN_HASH_MAP;
-	return ((HashMapElement*) next)->value;
+	return next->value;
 }
 
 

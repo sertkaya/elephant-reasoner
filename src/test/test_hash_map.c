@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <assert.h>
 
 #include "../hashing/hash_map.h"
@@ -26,22 +27,23 @@ int main(int argc, char *argv[]) {
 
 	HashMap* hash_table = hash_map_create(20);
 
-	/*
-	size_t i;
+	uint32_t i;
 	int tmp[100];
 	for (i = 0; i < 100; ++i) {
 		tmp[i] = i;
-		hash_map_put(hash_table,  i, (void*) tmp[i]);
+		hash_map_put(hash_table,  i,  tmp[i]);
 	}
 
 	tmp[21] = -1;
+	tmp[13] = -1;
+	tmp[99] = -1;
+	tmp[0] = -1;
 
 	for (i = 0; i < 100; ++i) {
-		int val = (int) hash_map_get(hash_table,  i);
+		int val = (uint32_t) hash_map_get(hash_table,  i);
 		if (val != tmp[i])
 			printf("%d different!\n", i);
 	}
-	*/
 
 	return 1;
 }

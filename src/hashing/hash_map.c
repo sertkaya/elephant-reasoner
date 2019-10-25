@@ -36,7 +36,7 @@ inline HashMap* hash_map_create(unsigned int size) {
 		size = roundup_pow2(size);
 
 	// allocate space for the buckets
-	hash_map->buckets = (HashMapElement***) calloc(size, sizeof(HashMapElement**));
+	hash_map->buckets = (HashMapElement**) calloc(size, sizeof(HashMapElement*));
 	assert(hash_map->buckets != NULL);
 
 	// allocate space for the chain sizes
@@ -60,7 +60,7 @@ void hash_map_init(HashMap* hash_map, unsigned int size) {
 		size = roundup_pow2(size);
 
 	// allocate space for the buckets
-	hash_map->buckets = (HashMapElement***) calloc(size, sizeof(HashMapElement**));
+	hash_map->buckets = (HashMapElement**) calloc(size, sizeof(HashMapElement*));
 	assert(hash_map->buckets != NULL);
 
 	// allocate space for the chain sizes
@@ -81,20 +81,12 @@ int hash_map_free(HashMap* hash_map) {
 	int i;
 	for (i = 0; i < hash_map->bucket_count; ++i) {
 		if (hash_map->buckets[i] != NULL) {
-			int j;
-			for (j = 0; j < hash_map->chain_sizes[i]; ++j) {
-				// note that we only free the node.
-				// the space allocated for  node->value is not freed!
-				free(hash_map->buckets[i][j]);
-				freed_bytes += sizeof(HashMapElement);
-			}
-
 			free(hash_map->buckets[i]);
-			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement*);
+			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement);
 		}
 	}
 	free(hash_map->buckets);
-	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement***);
+	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement**);
 
 	free(hash_map->chain_sizes);
 	freed_bytes += hash_map->bucket_count * sizeof(unsigned int);
@@ -107,24 +99,15 @@ int hash_map_free(HashMap* hash_map) {
 
 int hash_map_reset(HashMap* hash_map) {
 	int freed_bytes = 0;
-
 	int i;
 	for (i = 0; i < hash_map->bucket_count; ++i) {
 		if (hash_map->buckets[i] != NULL) {
-			int j;
-			for (j = 0; j < hash_map->chain_sizes[i]; ++j) {
-				// note that we only free the node.
-				// the space allocated for  node->value is not freed!
-				free(hash_map->buckets[i][j]);
-				freed_bytes += sizeof(HashMapElement);
-			}
-
 			free(hash_map->buckets[i]);
-			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement*);
+			freed_bytes += hash_map->chain_sizes[i] * sizeof(HashMapElement);
 		}
 	}
 	free(hash_map->buckets);
-	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement***);
+	freed_bytes += hash_map->bucket_count * sizeof(HashMapElement**);
 
 	free(hash_map->chain_sizes);
 	freed_bytes += hash_map->bucket_count * sizeof(unsigned int);

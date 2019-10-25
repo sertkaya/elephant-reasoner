@@ -212,8 +212,8 @@ ClassExpressionId get_create_nominal(IndividualId ind, TBox* tbox) {
 
 ObjectPropertyExpressionId create_object_property_expression_template(TBox* tbox) {
 	// first increment the last id
-	++tbox->last_object_property_expression_id;
-
+	++(tbox->last_object_property_expression_id);
+	printf("LAST_OPE_ID: %d\n", tbox->last_object_property_expression_id);
 	if (tbox->last_object_property_expression_id >= tbox->object_property_expressions_size - 1) {
 		ObjectPropertyExpression* tmp = realloc(tbox->object_property_expressions, (tbox->object_property_expressions_size + DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT_INCREMENT) * sizeof(ObjectPropertyExpression));
 		assert (tmp != NULL);
@@ -241,8 +241,8 @@ ObjectPropertyExpressionId create_object_property_expression_template(TBox* tbox
 
 	// return the id of this object property expression
 	return(tbox->last_object_property_expression_id);
-
 }
+
 ObjectPropertyExpressionId get_create_atomic_role(char* IRI, TBox* tbox) {
 	ObjectPropertyExpressionId id;
 
@@ -268,7 +268,7 @@ ObjectPropertyExpressionId get_create_atomic_role(char* IRI, TBox* tbox) {
 ObjectPropertyExpressionId get_create_role_composition_binary(ObjectPropertyExpressionId r1, ObjectPropertyExpressionId r2, TBox* tbox) {
 	ObjectPropertyExpressionId id;
 
-	tbox->binary_role_composition_count++;
+	++tbox->binary_role_composition_count;
 	if ((id = GET_ROLE_COMPOSITION(r1, r2, tbox)) != KEY_NOT_FOUND_IN_HASH_MAP)
 		return(id);
 
@@ -279,6 +279,7 @@ ObjectPropertyExpressionId get_create_role_composition_binary(ObjectPropertyExpr
 
 	// we DO assume role1 and role2 to be ordered!
 	// TODO: is it required that they are ordered? As it is, there is no sorting!
+	// * later addition: should not be sorted! *
 	tbox->object_property_expressions[id].description.object_property_chain.role1 = r1;
 	tbox->object_property_expressions[id].description.object_property_chain.role2 = r2;
 
@@ -412,11 +413,11 @@ IndividualId get_create_individual(char* name, ABox* abox) {
 	// first increment the last id
 	id = ++abox->last_individual_id;
 
-	if (abox->last_individual_id >= abox->individual_count) {
-		Individual* tmp = realloc(abox->individuals, (abox->individual_count + DEFAULT_INDIVIDUAL_COUNT_INCREMENT) * sizeof(Individual));
+	if (abox->last_individual_id >= abox->individuals_size - 1) {
+		Individual* tmp = realloc(abox->individuals, (abox->individuals_size + DEFAULT_INDIVIDUAL_COUNT_INCREMENT) * sizeof(Individual));
 		assert (tmp != NULL);
 		abox->individuals = tmp;
-		abox->individual_count += DEFAULT_INDIVIDUAL_COUNT_INCREMENT;
+		abox->individuals_size += DEFAULT_INDIVIDUAL_COUNT_INCREMENT;
 	}
 
 	abox->individuals[id].IRI = (char*) malloc((strlen(name) + 1) * sizeof(char));

@@ -435,6 +435,8 @@ struct abox {
 
 	 Individual* individuals;
 
+	 int individuals_size;
+
 	HashMap* individuals_map;
 
 	int concept_assertion_count;
