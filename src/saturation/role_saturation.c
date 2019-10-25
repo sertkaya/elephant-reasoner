@@ -80,7 +80,6 @@ void saturate_roles(KB* kb) {
 	while (object_property_chain != KEY_NOT_FOUND_IN_HASH_MAP) {
 		push(&scheduled_axioms, create_role_saturation_axiom(object_property_chain, object_property_chain));
 		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
-		printf("OPC: %d\n", object_property_chain);
 	}
 
    // the object properties
@@ -89,7 +88,6 @@ void saturate_roles(KB* kb) {
 	while (object_property != KEY_NOT_FOUND_IN_HASH_MAP) {
 		push(&scheduled_axioms, create_role_saturation_axiom(object_property, object_property));
 		object_property = MAP_ITERATOR_NEXT(&map_iterator);
-		printf("OP: %d\n", object_property);
 	}
 
 	// reflexive transitive closure
@@ -131,27 +129,18 @@ void saturate_roles(KB* kb) {
 	// object_property_chain = pop(&scheduled_object_property_chains);
 	object_property_chain = dequeue(&scheduled_object_property_chains);
 	while (object_property_chain != QUEUE_ELEMENT_NOT_FOUND) {
-		 printf("============\nobject_property_chain: %d:%s\n=============\n", object_property_chain, object_property_expression_to_string(kb, object_property_chain));
-		// printf("object_property_chain: %d / role1: %d / role2: %d\n", object_property_chain, OPEXP(object_property_chain).description.object_property_chain.role1, OPEXP(object_property_chain).description.object_property_chain.role2);
 		SET_ITERATOR_INIT(&subsumees_iterator_1, &(OPEXP(OPEXP(object_property_chain).description.object_property_chain.role1).subsumees));
 		subsumee_1 =  SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		while (subsumee_1 != HASH_TABLE_KEY_NOT_FOUND) {
-		 printf("subsumee_1: %d:%s\n",subsumee_1, object_property_expression_to_string(kb, subsumee_1));
 			SET_ITERATOR_INIT(&subsumees_iterator_2, &(OPEXP(OPEXP(object_property_chain).description.object_property_chain.role2).subsumees));
 			subsumee_2 =  SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			while (subsumee_2 != HASH_TABLE_KEY_NOT_FOUND) {
-		 printf("subsumee_2: %d:%s\n",subsumee_2, object_property_expression_to_string(kb, subsumee_2));
 					// new object property chain
-
 					ObjectPropertyExpressionId new_composition = get_create_role_composition_binary(
 							 subsumee_1,
 							 subsumee_2,
 							kb->tbox);
 					// TODO: Also enqueue new_composition?
-
-
-		// printf("\t\tnew_composition: %d\n", new_composition);
-
 					add_to_role_subsumer_list(new_composition, object_property_chain, tbox);
 					index_role(new_composition, kb->tbox);
 

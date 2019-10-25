@@ -124,10 +124,8 @@ extern inline uint32_t hash_map_get(HashMap* hash_map, uint64_t key);
 
 void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map) {
 	iterator->hash_map = map;
-	HashMapElement* tmp = (HashMapElement*) calloc(1, sizeof(HashMapElement));
-	assert(tmp != NULL);
-	tmp->previous = map->tail;
-	iterator->current_element = tmp;
+	iterator->current_bucket = 0;
+	iterator->index_in_current_bucket = 0;
 }
 
 extern inline uint32_t hash_map_iterator_next(HashMapIterator* iterator);

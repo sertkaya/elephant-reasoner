@@ -167,6 +167,7 @@ void read_kb(FILE* input_kb, KB* kb) {
 		exit(-1);
 	}
 	printf("%.3f milisecs\n", TIME_DIFF(start_time, stop_time) / 1000);
+
 }
 
 void classify(KB* kb) {

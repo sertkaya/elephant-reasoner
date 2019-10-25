@@ -99,7 +99,6 @@ extern inline void* dynamic_hash_table_iterator_next_64(DynamicHashTableIterator
 
 
 int dynamic_hash_table_free_64(DynamicHashTable_64* hash_table) {
-	int i;
 	int freed_bytes = 0;
 
 	free(hash_table->elements);
@@ -115,7 +114,6 @@ int dynamic_hash_table_free_64(DynamicHashTable_64* hash_table) {
 }
 
 int dynamic_hash_table_reset_64(DynamicHashTable_64* hash_table) {
-	int i;
 	int freed_bytes = 0;
 
 	free(hash_table->elements);

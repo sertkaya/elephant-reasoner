@@ -118,9 +118,9 @@ void preprocess_tbox(KB* kb) {
 						get_create_generated_nominal(tbox, different_individuals_ax->individuals.elements[i]),
 						get_create_generated_nominal(tbox, different_individuals_ax->individuals.elements[j]), tbox);
 				ADD_GENERATED_SUBCLASS_OF_AXIOM(create_subclass_axiom(conjunction, tbox->bottom_concept), tbox);
-				printf("%s\n", class_expression_to_string(kb, conjunction));
+				// printf("%s\n", class_expression_to_string(kb, conjunction));
 			}
-		printf("--------------------\n");
+		// printf("--------------------\n");
 		different_individuals_ax = SET_ITERATOR_NEXT_64(&set_iterator);
 	}
 }

@@ -213,8 +213,7 @@ ClassExpressionId get_create_nominal(IndividualId ind, TBox* tbox) {
 ObjectPropertyExpressionId create_object_property_expression_template(TBox* tbox) {
 	// first increment the last id
 	++(tbox->last_object_property_expression_id);
-	printf("LAST_OPE_ID: %d\n", tbox->last_object_property_expression_id);
-	if (tbox->last_object_property_expression_id >= tbox->object_property_expressions_size - 1) {
+	if (tbox->last_object_property_expression_id == tbox->object_property_expressions_size - 1) {
 		ObjectPropertyExpression* tmp = realloc(tbox->object_property_expressions, (tbox->object_property_expressions_size + DEFAULT_OBJECT_PROPERTY_EXPRESSION_COUNT_INCREMENT) * sizeof(ObjectPropertyExpression));
 		assert (tmp != NULL);
 		tbox->object_property_expressions = tmp;

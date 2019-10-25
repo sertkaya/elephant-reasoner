@@ -20,6 +20,7 @@
 #define HASH_MAP_H
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <stdlib.h>
 
@@ -55,7 +56,8 @@ struct hash_map {
  */
 struct hash_map_iterator {
 	HashMap* hash_map;
-	HashMapElement* current_element;// of the current element
+	int current_bucket;
+	int index_in_current_bucket;
 };
 
 /**
@@ -141,12 +143,26 @@ void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map);
  * Returns NULL if there is no next element.
  */
 inline uint32_t  hash_map_iterator_next(HashMapIterator* iterator) {
-	// HashMapElement *next = iterator->current_element->previous;
-	HashMapElement *next = iterator->current_element;
-	if (!next)
+	// skip the empty buckets
+	while (iterator->current_bucket < iterator->hash_map->bucket_count && iterator->hash_map->chain_sizes[iterator->current_bucket] == 0)
+		++iterator->current_bucket;
+
+	// return if all buckets visited
+	if (iterator->current_bucket == iterator->hash_map->bucket_count)
 		return KEY_NOT_FOUND_IN_HASH_MAP;
-	iterator->current_element = iterator->current_element->previous;
-	return next->value;
+
+	// get the current value
+	int next_value = iterator->hash_map->buckets[iterator->current_bucket][iterator->index_in_current_bucket].value;
+	// proceed to next value in the chain
+	++iterator->index_in_current_bucket;
+
+	// proceed to next bucket if all values in the chain are visited
+	if (iterator->index_in_current_bucket == iterator->hash_map->chain_sizes[iterator->current_bucket]) {
+		++iterator->current_bucket;
+		iterator->index_in_current_bucket = 0;
+	}
+
+	return next_value;
 }
 
 

@@ -71,11 +71,12 @@ DynamicHashTable* dynamic_hash_table_create(unsigned int size) {
 	hash_table->size = size;
 	hash_table->element_count = 0;
 	int i;
-	for (i = 0; i < hash_table->size; ++i)
+	for (i = 0; i < hash_table->size; ++i) {
 		// initialize with HASH_TABLE_KEY_NULL
 		hash_table->elements[i] = HASH_TABLE_KEY_NULL;
 		// each chain initially ends at its starting point
 		hash_table->end_indexes[i] = i;
+	}
 
 	return hash_table;
 }
@@ -102,7 +103,6 @@ extern inline uint32_t dynamic_hash_table_iterator_next(DynamicHashTableIterator
 
 
 int dynamic_hash_table_free(DynamicHashTable* hash_table) {
-	int i;
 	int freed_bytes = 0;
 
 	free(hash_table->elements);
@@ -118,7 +118,6 @@ int dynamic_hash_table_free(DynamicHashTable* hash_table) {
 }
 
 int dynamic_hash_table_reset(DynamicHashTable* hash_table) {
-	int i;
 	int freed_bytes = 0;
 
 	free(hash_table->elements);
