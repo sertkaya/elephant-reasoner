@@ -120,7 +120,6 @@ void index_role(ObjectPropertyExpressionId id, TBox* tbox) {
  */
 char index_tbox(KB* kb, ReasoningTask reasoning_task) {
 
-	int i;
 	SetIterator_64 iterator;
 	SET_ITERATOR_INIT_64(&iterator, &(kb->tbox->subclass_of_axioms));
 	SubClassOfAxiom* subclass_ax = (SubClassOfAxiom*) SET_ITERATOR_NEXT_64(&iterator);

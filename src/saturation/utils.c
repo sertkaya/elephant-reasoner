@@ -30,7 +30,7 @@
 int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpressionId p, TBox* tbox) {
 
 	// first check if we already have a link for role r
-	int i, j;
+	int i;
 	void* tmp;
 	for (i = 0; i < CEXP(c).predecessor_r_count; ++i)
 		if (CEXP(c).predecessors[i].role == r) {
@@ -75,7 +75,7 @@ int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpr
 int add_successor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpressionId p, TBox* tbox) {
 
 	// first check if we already have a link for role r
-	int i, j;
+	int i;
 	void* tmp;
 	for (i = 0; i < CEXP(c).successor_r_count; ++i)
 		if (CEXP(c).successors[i].role == r) {

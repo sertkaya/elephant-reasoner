@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 	uint32_t tmp[100];
 	for (i = 1; i <= 100; ++i) {
 		tmp[i] = i;
-		printf("%d: add %p\n", i, tmp[i]);
+		printf("%d: add %d\n", i, tmp[i]);
 		SET_ADD(tmp[i], set);
 	}
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	SetIterator* it = SET_ITERATOR_CREATE(set);
 	uint32_t e = SET_ITERATOR_NEXT(it);
 	while (e != HASH_TABLE_KEY_NOT_FOUND) {
-		printf("%p\n", e);
+		printf("%d\n", e);
 		e = SET_ITERATOR_NEXT(it);
 	}
 	SET_ITERATOR_FREE(it);

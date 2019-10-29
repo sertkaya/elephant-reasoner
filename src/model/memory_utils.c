@@ -140,7 +140,7 @@ int free_role(ObjectPropertyExpressionId id, TBox* tbox) {
 }
 
 int free_tbox(TBox* tbox) {
-	int i, total_freed_bytes = 0;
+	int  total_freed_bytes = 0;
 
 	SetIterator_64 set_iterator;
 	// free subclass axioms

@@ -117,7 +117,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 		}
 	}
 
-	int i, j, k;
+	int i, j;
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		switch (ax->type) {
@@ -235,7 +235,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				}
 
 				// existential introduction
-				int j,k;
+				int j;
 				ClassExpressionId ex;
 				for (i = 0; i < CEXP(ax->lhs).predecessor_r_count; ++i)
 					for (j = 0; j < OPEXP(CEXP(ax->lhs).predecessors[i].role).subsumer_list.size; ++j) {
@@ -268,7 +268,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				// init
 				// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, NULL, SUBSUMPTION_INITIALIZATION));
 
-				int i, j, k;
+				int i, j;
 
 				// bottom rule
 				if (IS_SUBSUMED_BY(ax->rhs, tbox->bottom_concept, kb->tbox))

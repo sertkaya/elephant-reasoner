@@ -125,7 +125,7 @@ void saturate_roles(KB* kb) {
 
 	// object property chain hierarchy computation.
 	ObjectPropertyExpressionId subsumee_1, subsumee_2;
-	SetIterator subsumees_iterator_1, subsumees_iterator_2, component_of_iterator;
+	SetIterator subsumees_iterator_1, subsumees_iterator_2;
 	// object_property_chain = pop(&scheduled_object_property_chains);
 	object_property_chain = dequeue(&scheduled_object_property_chains);
 	while (object_property_chain != QUEUE_ELEMENT_NOT_FOUND) {
