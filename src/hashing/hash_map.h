@@ -39,15 +39,15 @@ typedef struct hash_map_iterator HashMapIterator;
 struct hash_map_element {
 	uint64_t key;
 	uint32_t value;
-	HashMapElement* previous;
+	HashMapElement *previous;
 };
 
 struct hash_map {
-	HashMapElement** buckets;		// the buckets
+	HashMapElement*** buckets;		// the buckets
 	unsigned int bucket_count;		// the number of buckets
-	unsigned int* chain_sizes;		// sizes of the chains
+	unsigned int *chain_sizes;		// sizes of the chains
 	unsigned int element_count;	// the number of elements
-	HashMapElement* tail;			// the last node of the hash.
+	HashMapElement *tail;			// the last node of the hash.
 									// we maintain a backward linked list.
 };
 
@@ -55,9 +55,8 @@ struct hash_map {
  * Iterator for hash map.
  */
 struct hash_map_iterator {
-	HashMap* hash_map;
-	int current_bucket;
-	int index_in_current_bucket;
+	HashMap *hash_map;
+	HashMapElement *current_element;
 };
 
 /**
@@ -90,25 +89,27 @@ inline int hash_map_put(HashMap* hash_map, uint64_t key, uint32_t value) {
 
 	int hash_value = key & (hash_map->bucket_count - 1);
 	// int hash_value = HASH_UNSIGNED(key) & (hash_map->bucket_count - 1);
-	HashMapElement* bucket = hash_map->buckets[hash_value];
+	HashMapElement** bucket = hash_map->buckets[hash_value];
 	int chain_size = hash_map->chain_sizes[hash_value];
 
 	int i;
 	for (i = 0; i < chain_size; i++)
-		if (bucket[i].key == key) {
-			bucket[i].value = value;
+		if (bucket[i]->key == key) {
+			bucket[i]->value = value;
 			return 0;
 		}
 
-	HashMapElement* tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement));
+	HashMapElement** tmp = realloc(bucket, (chain_size + 1) * sizeof(HashMapElement*));
 	assert(tmp != NULL);
 	bucket = hash_map->buckets[hash_value] = tmp;
 
-	bucket[chain_size].key = key;
-	bucket[chain_size].value = value;
-	bucket[chain_size].previous = hash_map->tail;
+	bucket[chain_size] = malloc(sizeof(HashMapElement));
+	assert(bucket[chain_size] != NULL);
+	bucket[chain_size]->key = key;
+	bucket[chain_size]->value = value;
+	bucket[chain_size]->previous = hash_map->tail;
 
-	hash_map->tail = &bucket[chain_size];
+	hash_map->tail = bucket[chain_size];
 
 	++hash_map->chain_sizes[hash_value];
 
@@ -123,13 +124,13 @@ inline int hash_map_put(HashMap* hash_map, uint64_t key, uint32_t value) {
  */
 inline uint32_t hash_map_get(HashMap* hash_map, uint64_t key) {
 	int bucket_index = key & (hash_map->bucket_count - 1);
-	HashMapElement* bucket = hash_map->buckets[bucket_index];
+	HashMapElement** bucket = hash_map->buckets[bucket_index];
 	int chain_size = hash_map->chain_sizes[bucket_index];
 
 	int i;
 	for (i = 0; i < chain_size; i++)
-		if (key == bucket[i].key)
-			return bucket[i].value;
+		if (key == bucket[i]->key)
+			return bucket[i]->value;
 
 	return KEY_NOT_FOUND_IN_HASH_MAP;
 }
@@ -143,26 +144,18 @@ void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map);
  * Returns NULL if there is no next element.
  */
 inline uint32_t  hash_map_iterator_next(HashMapIterator* iterator) {
-	// skip the empty buckets
-	while (iterator->current_bucket < iterator->hash_map->bucket_count && iterator->hash_map->chain_sizes[iterator->current_bucket] == 0)
-		++iterator->current_bucket;
-
-	// return if all buckets visited
-	if (iterator->current_bucket == iterator->hash_map->bucket_count)
-		return KEY_NOT_FOUND_IN_HASH_MAP;
-
-	// get the current value
-	int next_value = iterator->hash_map->buckets[iterator->current_bucket][iterator->index_in_current_bucket].value;
-	// proceed to next value in the chain
-	++iterator->index_in_current_bucket;
-
-	// proceed to next bucket if all values in the chain are visited
-	if (iterator->index_in_current_bucket == iterator->hash_map->chain_sizes[iterator->current_bucket]) {
-		++iterator->current_bucket;
-		iterator->index_in_current_bucket = 0;
-	}
-
-	return next_value;
+	/*
+	HashMapElement *next = iterator->current_element->previous;
+	iterator->current_element = next;
+	if (!next)
+		return(NULL);
+	return(next->value);
+	*/
+	HashMapElement *next = iterator->current_element;
+	if (!next)
+		return(KEY_NOT_FOUND_IN_HASH_MAP);
+	iterator->current_element = next->previous;
+	return(next->value);
 }
 
 

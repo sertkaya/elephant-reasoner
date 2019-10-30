@@ -22,6 +22,7 @@
 #include <assert.h>
 
 #include "../hashing/hash_map.h"
+#include "../utils/map.h"
 
 int main(int argc, char *argv[]) {
 
@@ -34,6 +35,16 @@ int main(int argc, char *argv[]) {
 		hash_map_put(hash_table,  i,  tmp[i]);
 	}
 
+	MapIterator it;
+	MAP_ITERATOR_INIT(&it, hash_table);
+
+	i = MAP_ITERATOR_NEXT(&it);
+	while (i != KEY_NOT_FOUND_IN_HASH_MAP) {
+		printf("%d ", i);
+		i = MAP_ITERATOR_NEXT(&it);
+	}
+	printf("\n\n\n");
+
 	tmp[21] = -1;
 	tmp[13] = -1;
 	tmp[99] = -1;
@@ -43,6 +54,15 @@ int main(int argc, char *argv[]) {
 		int val = (uint32_t) hash_map_get(hash_table,  i);
 		if (val != tmp[i])
 			printf("%d different!\n", i);
+	}
+	printf("\n\n\n");
+
+	MAP_ITERATOR_INIT(&it, hash_table);
+
+	i = MAP_ITERATOR_NEXT(&it);
+	while (i != KEY_NOT_FOUND_IN_HASH_MAP) {
+		printf("%d ", i);
+		i = MAP_ITERATOR_NEXT(&it);
 	}
 
 	return 1;
