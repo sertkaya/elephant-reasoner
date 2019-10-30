@@ -99,6 +99,9 @@ typedef DynamicHashTableIterator_64 SetIterator_64;
  * It is the iterator of the underlying hash table.
  */
 #define SET_ITERATOR_INIT(it, s)	dynamic_hash_table_iterator_init(it, s)
+// Ad-hoc solution! Do not use!
+#define SET_ITERATOR_UPDATE_HASH_TABLE(it, s)	((it)->hash_table=s)
+
 #define SET_ITERATOR_INIT_64(it, s)	dynamic_hash_table_iterator_init_64(it, s)
 
 /**

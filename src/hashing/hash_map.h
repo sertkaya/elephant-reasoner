@@ -144,13 +144,6 @@ void hash_map_iterator_init(HashMapIterator* iterator, HashMap* map);
  * Returns NULL if there is no next element.
  */
 inline uint32_t  hash_map_iterator_next(HashMapIterator* iterator) {
-	/*
-	HashMapElement *next = iterator->current_element->previous;
-	iterator->current_element = next;
-	if (!next)
-		return(NULL);
-	return(next->value);
-	*/
 	HashMapElement *next = iterator->current_element;
 	if (!next)
 		return(KEY_NOT_FOUND_IN_HASH_MAP);

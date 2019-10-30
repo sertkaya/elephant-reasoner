@@ -135,18 +135,22 @@ void saturate_roles(KB* kb) {
 			SET_ITERATOR_INIT(&subsumees_iterator_2, &(OPEXP(OPEXP(object_property_chain).description.object_property_chain.role2).subsumees));
 			subsumee_2 =  SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			while (subsumee_2 != HASH_TABLE_KEY_NOT_FOUND) {
-					// new object property chain
-					ObjectPropertyExpressionId new_composition = get_create_role_composition_binary(
-							 subsumee_1,
-							 subsumee_2,
-							kb->tbox);
-					// TODO: Also enqueue new_composition?
-					add_to_role_subsumer_list(new_composition, object_property_chain, tbox);
-					index_role(new_composition, kb->tbox);
+				// new object property chain
+				ObjectPropertyExpressionId new_composition = get_create_role_composition_binary( subsumee_1, subsumee_2, kb->tbox);
+				// TODO: Also enqueue new_composition?
+				add_to_role_subsumer_list(new_composition, object_property_chain, tbox);
+				index_role(new_composition, kb->tbox);
 
+				// TODO: Updating the address of the hash_table in the iterator is just an ad-hoc solution. Not elegant!
+				// The reason is: tbox->object_property_expressions gets realloced in create_object_property_expression_template in model.c. During realloc, the address of
+				// (OPEXP(OPEXP(object_property_chain).description.object_property_chain.role1).subsumees changes but the reference  in the iterator remains.
+				SET_ITERATOR_UPDATE_HASH_TABLE(&subsumees_iterator_2, &(OPEXP(OPEXP(object_property_chain).description.object_property_chain.role2).subsumees));
 				subsumee_2 =  SET_ITERATOR_NEXT(&subsumees_iterator_2);
-
 			}
+			// TODO: Updating the address of the hash_table in the iterator is just an ad-hoc solution. Not elegant!
+			// The reason is: tbox->object_property_expressions gets realloced in create_object_property_expression_template in model.c. During realloc, the address of
+			// (OPEXP(OPEXP(object_property_chain).description.object_property_chain.role1).subsumees changes but the reference  in the iterator remains.
+			SET_ITERATOR_UPDATE_HASH_TABLE(&subsumees_iterator_1, &(OPEXP(OPEXP(object_property_chain).description.object_property_chain.role1).subsumees));
 			subsumee_1 =  SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		}
 		// object_property_chain = pop(&scheduled_object_property_chains);
