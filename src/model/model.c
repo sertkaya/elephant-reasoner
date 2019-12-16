@@ -163,11 +163,7 @@ ClassExpressionId get_create_conjunction_binary(ClassExpressionId c1, ClassExpre
 
 // comparison function for qsorting conjucts based on ids
  static int compare_conjunct(const void* c1, const void* c2) {
-	if (c1 <  c2)
-		return -1;
-	if ( c1 == c2)
-		return 0;
-	return 1;
+	return ( *(int*)c1 - *(int*)c2 );
 }
 
 // returns a binary conjunction from a given list of conjuncts.
