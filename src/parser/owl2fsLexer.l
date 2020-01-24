@@ -17,6 +17,7 @@
  */
 
 
+COMMENT							"#"[^\n]*
 DIGIT                           [0-9]
 PN_CHARS_BASE                   [A-Za-z]
 PN_CHARS_U                      ({PN_CHARS_BASE}|_)
@@ -130,6 +131,7 @@ AnnotationPropertyRange         { return ANNOTATION_PROPERTY_RANGE; }
 {LANGTAG}                       { return LANGTAG; }
 {QUOTED_STRING}                 { return QUOTED_STRING; }
 {DOUBLE_CARET}                  { return DOUBLE_CARET; }
+{COMMENT}						;
 
 %%
 
