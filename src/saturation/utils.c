@@ -49,7 +49,7 @@ int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpr
 			return 1;
 			 */
 			added = SET_ADD(p, &(CEXP(c).predecessors[i].fillers));
-			if (added && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2)
+			if (added && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3)
 				SET_ADD(p, &(CEXP(c).predecessors[i].fillers_not_exist_introduction));
 			return(added);
 		}
@@ -70,7 +70,7 @@ int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpr
 	SET_ADD(p, &(CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers));
 
 	SET_INIT(&(CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers_not_exist_introduction), DEFAULT_PREDECESSORS_SET__SIZE);
-	if (ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2)
+	if (ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3)
 		SET_ADD(p, &(CEXP(c).predecessors[i].fillers_not_exist_introduction));
 
 	// finally increment the r_count

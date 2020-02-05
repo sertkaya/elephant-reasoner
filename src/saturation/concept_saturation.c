@@ -264,6 +264,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 			*/
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1:
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2:
+		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3:
 			// do not apply the existential decomposition rule
 			// do not apply the existential introduction-1 rule
 			// conjunction decomposition cannot be applied anyway since ax->rhs is an existential
