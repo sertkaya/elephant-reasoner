@@ -130,7 +130,8 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 			// do not apply the conjunction decomposition rule if the axiom is derived using the conjunction introduction rule
-			// existential introduction-1 and existential decomposition cannot be applied anyway, since ax->rhs is a conjunction
+			// existential introduction-1,2,3 and existential decomposition cannot be applied anyway, since ax->rhs is a conjunction
+			// bottom rule neither due to the same reason
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				// printf("\tyes\n");
 				++saturation_unique_subsumption_count;
@@ -267,8 +268,9 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3:
 			// do not apply the existential decomposition rule
 			// do not apply the existential introduction-1 rule
-			// conjunction decomposition cannot be applied anyway since ax->rhs is an existential
 			// existential introduction-2 is required
+			// conjunction decomposition cannot be applied anyway since ax->rhs is an existential
+			// bottom rule neither due to the same reason
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				// printf("\tyes\n");
 				++saturation_unique_subsumption_count;
@@ -321,6 +323,29 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				// printf("\tyes\n");
 				++saturation_unique_subsumption_count;
+
+
+				// bottom rule
+				if (ax->rhs == tbox->bottom_concept) {
+					// If the top concept or a nominal is subsumed by bottom, the kb is inconsistent
+					if (CEXP(ax->lhs).type == OBJECT_ONE_OF_TYPE || ax->lhs == tbox->top_concept)
+						// return inconsistent immediately
+						return(-1);
+					// We push the saturation axiom bottom <= ax->lhs, if we already know ax->lhs <= bottom. This way ax->lhs = bottom
+					// gets computed. The information bottom <= c is not taken into account for any other concept c.
+					push(&scheduled_axioms, create_concept_saturation_axiom(tbox->bottom_concept, ax->lhs, EXPRESSION_ID_NULL, SUBSUMPTION_BOTTOM));
+					for (i = 0; i < CEXP(ax->lhs).predecessor_r_count; ++i) {
+						SetIterator predecessors_iterator;
+						// TODO: !!! which fillers? all or only those that were not obtained by an ex_intro rule?
+						SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[i].fillers));
+						ClassExpressionId predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
+						while (predecessor != HASH_TABLE_KEY_NOT_FOUND) {
+							push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, tbox->bottom_concept, EXPRESSION_ID_NULL, SUBSUMPTION_BOTTOM));
+							predecessor = SET_ITERATOR_NEXT(&predecessors_iterator);
+						}
+					}
+				}
+
 				// conjunction introduction
 				// the first conjunct
 				for (i = 0; i < CEXP(ax->rhs).first_conjunct_of_list.size; ++i) {
@@ -364,6 +389,10 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 									push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1));
 								}
 							}
+							// the bottom rule
+							if (subsumer == tbox->bottom_concept)
+								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, tbox->bottom_concept, EXPRESSION_ID_NULL, SUBSUMPTION_BOTTOM));
+
 							subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 						}
 						// TODO: Can we optimize this by pushing only if the filler is a conjunction? Would that be correct?: NO!
