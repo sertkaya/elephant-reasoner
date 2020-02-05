@@ -349,10 +349,10 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				case OBJECT_SOME_VALUES_FROM_TYPE:
 					// existential introduction
 					// TODO: Is this check necessary?
-					// if (add_successor(ax->lhs, CEXP(ax->rhs).description.exists.role, CEXP(ax->rhs).description.exists.filler, tbox)) {
-						// add_successor(ax->lhs, CEXP(ax->rhs).description.exists.role, CEXP(ax->rhs).description.exists.filler, tbox);
+					// if (add_successor(ax->lhs, CEXP(ax->rhs).description.exists.role, CEXP(ax->rhs).description.exists.filler, tbox))
 					if (add_predecessor(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, ax->lhs, ax->type, tbox)) {
 						// add_predecessor(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, ax->lhs, ax->type, tbox);
+						add_successor(ax->lhs, CEXP(ax->rhs).description.exists.role, CEXP(ax->rhs).description.exists.filler, tbox);
 
 						SET_ITERATOR_INIT(&subsumers_iterator, &(CEXP(CEXP(ax->rhs).description.exists.filler).subsumers));
 						ClassExpressionId subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
@@ -368,6 +368,54 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 						// TODO: Can we optimize this by pushing only if the filler is a conjunction? Would that be correct?: NO!
 						// if (CEXP(CEXP(ax->rhs).description.exists.filler).type != CLASS_TYPE)
 						push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_DECOMPOSITION));
+
+						// the role chain rule
+						// the role composition where this role appears as the second component
+						ObjectPropertyExpressionId role = CEXP(ax->rhs).description.exists.role;
+						for (i = 0; i < OPEXP(role).second_component_of_count; ++i) {
+							for (j = 0; j < CEXP(ax->lhs).predecessor_r_count; ++j)
+								if (CEXP(ax->lhs).predecessors[j].role == OPEXP(OPEXP(role).second_component_of_list[i]).description.object_property_chain.role1) {
+									SetIterator predecessors_iterator;
+									// SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[j].fillers));
+									// !!!
+									SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[j].fillers_not_exist_introduction));
+									ClassExpressionId predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
+									while (predecessor != HASH_TABLE_KEY_NOT_FOUND) {
+										int l;
+										for (l = 0; l < OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.size; ++l) {
+											push(&scheduled_axioms,
+													create_concept_saturation_axiom(predecessor, CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
+											// TODO: Is this needed?
+											// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+										}
+										predecessor = SET_ITERATOR_NEXT(&predecessors_iterator);
+									}
+								}
+						}
+
+
+						// now the same for the successors of the filler of the existential on the rhs
+						// the role composition where this role appears as the first component
+						ClassExpressionId filler = CEXP(ax->rhs).description.exists.filler;
+						for (i = 0; i < OPEXP(role).first_component_of_count; ++i) {
+							for (j = 0; j < CEXP(filler).successor_r_count; ++j)
+								if (CEXP(filler).successors[j].role == OPEXP(OPEXP(role).first_component_of_list[i]).description.object_property_chain.role2) {
+									SetIterator successors_iterator;
+									// TODO: fillers not obtained from exists introduction instead?
+									SET_ITERATOR_INIT(&successors_iterator, &(CEXP(filler).successors[j].fillers));
+									ClassExpressionId successor =  SET_ITERATOR_NEXT(&successors_iterator);
+									while (successor!= HASH_TABLE_KEY_NOT_FOUND) {
+										int l;
+										for (l = 0; l < OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.size; ++l) {
+											push(&scheduled_axioms,
+												create_concept_saturation_axiom(ax->lhs, successor,  OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
+											// TODO: Is this needed?
+											push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+										}
+										successor= (ClassExpressionId) SET_ITERATOR_NEXT(&successors_iterator);
+									}
+								}
+						}
 					}
 					break;
 				}
