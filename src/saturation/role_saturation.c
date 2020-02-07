@@ -56,7 +56,7 @@ int mark_role_saturation_axiom_processed(RoleSaturationAxiom* ax, TBox* tbox) {
 static inline void print_role_saturation_axiom(KB* kb, RoleSaturationAxiom* ax) {
 	char* lhs_str = object_property_expression_to_string(kb, ax->lhs);
 	char* rhs_str = object_property_expression_to_string(kb, ax->rhs);
-	printf("%s <= %s\n", lhs_str, rhs_str);
+	printf("%s -> %s\n", lhs_str, rhs_str);
 	free(lhs_str);
 	free(rhs_str);
 }
@@ -72,15 +72,6 @@ void saturate_roles(KB* kb) {
 
 	// push the input axioms to the stack
 	MapIterator map_iterator;
-	ObjectPropertyExpressionId object_property_chain;
-
-	// the object property chains
-	MAP_ITERATOR_INIT(&map_iterator, &(tbox->objectproperty_chains));
-	object_property_chain =  MAP_ITERATOR_NEXT(&map_iterator);
-	while (object_property_chain != KEY_NOT_FOUND_IN_HASH_MAP) {
-		push(&scheduled_axioms, create_role_saturation_axiom(object_property_chain, object_property_chain));
-		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
-	}
 
    // the object properties
 	MAP_ITERATOR_INIT(&map_iterator, &(tbox->objectproperties));
@@ -90,8 +81,32 @@ void saturate_roles(KB* kb) {
 		object_property = MAP_ITERATOR_NEXT(&map_iterator);
 	}
 
-	// reflexive transitive closure
+	// reflexive transitive closure of object properties
 	SetIterator told_subsumers_iterator;
+	ax = pop(&scheduled_axioms);
+	while (ax != NULL) {
+		if (mark_role_saturation_axiom_processed(ax, kb->tbox)) {
+			// told subsumers
+			SET_ITERATOR_INIT(&told_subsumers_iterator, &(OPEXP(ax->rhs).told_subsumers));
+			ObjectPropertyExpressionId told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
+			while (told_subsumer != HASH_TABLE_KEY_NOT_FOUND) {
+				push(&scheduled_axioms, create_role_saturation_axiom(ax->lhs, told_subsumer));
+				told_subsumer = SET_ITERATOR_NEXT(&told_subsumers_iterator);
+			}
+		}
+		free(ax);
+		ax = pop(&scheduled_axioms);
+	}
+
+	// the object property chains
+	MAP_ITERATOR_INIT(&map_iterator, &(tbox->objectproperty_chains));
+	ObjectPropertyExpressionId object_property_chain;
+	object_property_chain =  MAP_ITERATOR_NEXT(&map_iterator);
+	while (object_property_chain != KEY_NOT_FOUND_IN_HASH_MAP) {
+		push(&scheduled_axioms, create_role_saturation_axiom(object_property_chain, object_property_chain));
+		object_property_chain = MAP_ITERATOR_NEXT(&map_iterator);
+	}
+	// reflexive transitive closure of object property chains
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		if (mark_role_saturation_axiom_processed(ax, kb->tbox)) {
@@ -129,6 +144,7 @@ void saturate_roles(KB* kb) {
 	// object_property_chain = pop(&scheduled_object_property_chains);
 	object_property_chain = dequeue(&scheduled_object_property_chains);
 	while (object_property_chain != QUEUE_ELEMENT_NOT_FOUND) {
+		// printf("object_property_chain:%s\n", object_property_expression_to_string(kb, object_property_chain));
 		SET_ITERATOR_INIT(&subsumees_iterator_1, &(OPEXP(OPEXP(object_property_chain).description.object_property_chain.role1).subsumees));
 		subsumee_1 =  SET_ITERATOR_NEXT(&subsumees_iterator_1);
 		while (subsumee_1 != HASH_TABLE_KEY_NOT_FOUND) {
@@ -137,8 +153,19 @@ void saturate_roles(KB* kb) {
 			while (subsumee_2 != HASH_TABLE_KEY_NOT_FOUND) {
 				// new object property chain
 				ObjectPropertyExpressionId new_composition = get_create_role_composition_binary( subsumee_1, subsumee_2, kb->tbox);
+				// printf("new composition: %s\n", object_property_expression_to_string(kb, new_composition));
 				// TODO: Also enqueue new_composition?
-				add_to_role_subsumer_list(new_composition, object_property_chain, tbox);
+				// add_to_role_subsumer_list(new_composition, object_property_chain, tbox);
+				// instead add the subsumers of the object_property_chain to the subsumers of new_composition?
+
+				SetIterator subsumers_iterator;
+				SET_ITERATOR_INIT(&subsumers_iterator, &(OPEXP(object_property_chain).subsumers));
+				ObjectPropertyExpressionId subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+				while (subsumer != HASH_TABLE_KEY_NOT_FOUND) {
+					add_to_role_subsumer_list(new_composition, subsumer, tbox);
+					subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+				}
+
 				index_role(new_composition, kb->tbox);
 
 				// TODO: Updating the address of the hash_table in the iterator is just an ad-hoc solution. Not elegant!
@@ -157,6 +184,8 @@ void saturate_roles(KB* kb) {
 		// object_property_chain = pop(&scheduled_object_property_chains);
 		object_property_chain = dequeue(&scheduled_object_property_chains);
 	}
+
+
 
 	// remove the redundant subsumers of object property chains
 	Set subsumers_to_remove;
