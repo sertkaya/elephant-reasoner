@@ -125,7 +125,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	ax = pop(&scheduled_axioms);
 	while (ax != NULL) {
 		++saturation_total_subsumption_count;
-		// print_saturation_axiom(kb, ax);
+		print_saturation_axiom(kb, ax);
 		switch (ax->type) {
 
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
@@ -402,7 +402,9 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 						// the role chain rule
 						// the role composition where this role appears as the second component
 						ObjectPropertyExpressionId role = CEXP(ax->rhs).description.exists.role;
+						printf("second component: %s\n", object_property_expression_to_string(kb, role));
 						for (i = 0; i < OPEXP(role).second_component_of_count; ++i) {
+							printf("role chain: %s\n", object_property_expression_to_string(kb, OPEXP(role).second_component_of_list[i]));
 							for (j = 0; j < CEXP(ax->lhs).predecessor_r_count; ++j)
 								if (CEXP(ax->lhs).predecessors[j].role == OPEXP(OPEXP(role).second_component_of_list[i]).description.object_property_chain.role1) {
 									SetIterator predecessors_iterator;
@@ -413,8 +415,12 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 									while (predecessor != HASH_TABLE_KEY_NOT_FOUND) {
 										int l;
 										for (l = 0; l < OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.size; ++l) {
-											push(&scheduled_axioms,
-													create_concept_saturation_axiom(predecessor, CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
+											printf("role chain subsumer: %s\n", object_property_expression_to_string(kb, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l]));
+											ClassExpressionId ex = GET_NEGATIVE_EXISTS(predecessor, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], tbox);
+											if (ex != KEY_NOT_FOUND_IN_HASH_MAP)
+												push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
+											// push(&scheduled_axioms,
+											// 		create_concept_saturation_axiom(predecessor, CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
 											// TODO: Is this needed?
 											// push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 										}

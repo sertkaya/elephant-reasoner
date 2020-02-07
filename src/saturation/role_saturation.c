@@ -144,6 +144,7 @@ void saturate_roles(KB* kb) {
 				// TODO: Updating the address of the hash_table in the iterator is just an ad-hoc solution. Not elegant!
 				// The reason is: tbox->object_property_expressions gets realloced in create_object_property_expression_template in model.c. During realloc, the address of
 				// (OPEXP(OPEXP(object_property_chain).description.object_property_chain.role1).subsumees changes but the reference  in the iterator remains.
+				// addendum: then iterating over the subsumees is affected by this change
 				SET_ITERATOR_UPDATE_HASH_TABLE(&subsumees_iterator_2, &(OPEXP(OPEXP(object_property_chain).description.object_property_chain.role2).subsumees));
 				subsumee_2 =  SET_ITERATOR_NEXT(&subsumees_iterator_2);
 			}
