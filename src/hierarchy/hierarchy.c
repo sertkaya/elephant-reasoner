@@ -23,6 +23,7 @@
 #include <assert.h>
 
 #include "../model/datatypes.h"
+#include "../model/print_utils.h"
 #include "../model/limits.h"
 #include "utils.h"
 #include "../saturation/utils.h"
@@ -77,8 +78,10 @@ void compute_concept_hierarchy(KB* kb) {
 					// now check if the 'direct_subsumer' is a subsumer of the 'subsumer'
 					// if yes, then the 'direct_subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]
 					// remove it from the list of direct subsumers
-					if (IS_SUBSUMED_BY(subsumer, direct_subsumer,kb->tbox))
+					if (IS_SUBSUMED_BY(subsumer, direct_subsumer,kb->tbox)) {
+						// printf("%s|%s\n", class_expression_to_string(kb, atomic_concept), class_expression_to_string(kb, direct_subsumer));
 						REMOVE_DIRECT_SUBSUMER(direct_subsumer,  atomic_concept, kb->tbox);
+					}
 
 					direct_subsumer = SET_ITERATOR_NEXT(&direct_subsumers_iterator);
 				}
