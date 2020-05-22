@@ -308,6 +308,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				// told subsumers
 				for (i = 0; i < CEXP(ax->rhs).told_subsumers.size; ++i)
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).told_subsumers.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_TOLD_SUBSUMER));
+
 			}
 			break;
 
@@ -416,9 +417,9 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 											if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
 												// printf("ex: %s\n", class_expression_to_string(kb, ex));
 												push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-											// push(&scheduled_axioms,
-											// 		create_concept_saturation_axiom(predecessor, CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-											// TODO: Is this needed?
+												// push(&scheduled_axioms,
+												// 	create_concept_saturation_axiom(predecessor, CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
+												// TODO: Is this needed?
 												// push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ex).description.exists.filler, CEXP(ex).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 											}
 										}
@@ -450,8 +451,9 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 											if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
 												push(&scheduled_axioms,
 														create_concept_saturation_axiom(ax->lhs, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-												// create_concept_saturation_axiom(ax->lhs, successor,  OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-											// TODO: Is this needed?
+												// push(&scheduled_axioms,
+												// 		create_concept_saturation_axiom(ax->lhs, successor,  OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
+												// TODO: Is this needed?
 												// push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 											}
 										}
