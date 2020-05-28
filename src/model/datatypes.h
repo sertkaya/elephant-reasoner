@@ -173,8 +173,6 @@ struct link {
 	// int filler_count;
 	// Set of all role fillers
 	Set fillers;
-	// Set of role fillers that are not obtained via the existential introduction rule
-	Set fillers_not_exist_introduction;
 };
 
 /*****************************************************************************/

@@ -126,6 +126,13 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	while (ax != NULL) {
 		++saturation_total_subsumption_count;
 		switch (ax->type) {
+		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1:
+		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2:
+			// do not apply the existential decomposition rule
+			// do not apply the existential introduction-1 rule
+			// existential introduction-2 is required
+			// conjunction decomposition cannot be applied anyway since ax->rhs is an existential
+			// bottom rule neither due to the same reason
 		case SUBSUMPTION_CONJUNCTION_INTRODUCTION:
 			// do not apply the conjunction decomposition rule if the axiom is derived using the conjunction introduction rule
 			// existential introduction-1,2,3 and existential decomposition cannot be applied anyway, since ax->rhs is a conjunction
@@ -172,146 +179,97 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				// told subsumers
 				for (i = 0; i < CEXP(ax->rhs).told_subsumers.size; ++i)
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).told_subsumers.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_TOLD_SUBSUMER));
+
 			}
 			break;
-/*
-		case SUBSUMPTION_EXISTENTIAL_DECOMPOSITION:
-			// apply all rules
-			// while applying the existential introduction-2 rule, only use predecessors that were not obtained via the existential introduction-1 and -2 rules
-			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
-				++saturation_unique_subsumption_count;
-				// conjunction introduction
-				// the first conjunct
-				for (i = 0; i < CEXP(ax->rhs).first_conjunct_of_list.size; ++i) {
-					// check if lhs is subsumed by the second conjunct as well
-					if (IS_SUBSUMED_BY(ax->lhs, CEXP(CEXP(ax->rhs).first_conjunct_of_list.elements[i]).description.conj.conjunct2, kb->tbox))
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs,  CEXP(ax->rhs).first_conjunct_of_list.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-				}
+		case LINK:
+			++saturation_total_link_count;
+			if (add_successor(ax->lhs, ax->role, ax->rhs, tbox)) {
+				add_predecessor(ax->rhs, ax->role, ax->lhs, tbox);
+				++saturation_unique_link_count;
 
-				// now the same for the second conjunct
-				for (i = 0; i < CEXP(ax->rhs).second_conjunct_of_list.size; ++i) {
-					// check if lhs is also subsumed by the first conjunct
-					if (IS_SUBSUMED_BY(ax->lhs, CEXP(CEXP(ax->rhs).second_conjunct_of_list.elements[i]).description.conj.conjunct1, kb->tbox))
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs,  CEXP(ax->rhs).second_conjunct_of_list.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-				}
+				// bottom rule
+				if (IS_SUBSUMED_BY(ax->rhs, tbox->bottom_concept, kb->tbox))
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, tbox->bottom_concept, EXPRESSION_ID_NULL, SUBSUMPTION_BOTTOM));
 
+
+				// existential introduction
 				SetIterator subsumers_iterator;
-
-				switch (CEXP(ax->rhs).type) {
-				case OBJECT_INTERSECTION_OF_TYPE:
-					// conjunction decomposition
-					// conjunct 1 as rhs
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).description.conj.conjunct1, EXPRESSION_ID_NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
-
-					// conjunct 2 as rhs
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).description.conj.conjunct2, EXPRESSION_ID_NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
-					break;
-				case OBJECT_SOME_VALUES_FROM_TYPE:
-					// existential introduction
-					// TODO: Is this check necessary?
-					// if (add_successor(ax->lhs, CEXP(ax->rhs).description.exists.role, CEXP(ax->rhs).description.exists.filler, tbox)) {
-						// add_successor(ax->lhs, CEXP(ax->rhs).description.exists.role, CEXP(ax->rhs).description.exists.filler, tbox);
-						// add_predecessor(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, ax->lhs, ax->type, tbox);
-					if (add_predecessor(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, ax->lhs, ax->type, tbox)) {
-
-						SET_ITERATOR_INIT(&subsumers_iterator, &(CEXP(CEXP(ax->rhs).description.exists.filler).subsumers));
-						ClassExpressionId subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-						while (subsumer != HASH_TABLE_KEY_NOT_FOUND) {
-							ClassExpressionId ex = GET_NEGATIVE_EXISTS(subsumer, CEXP(ax->rhs).description.exists.role, tbox);
-							if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
-								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1));
-							}
-							subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+				SET_ITERATOR_INIT(&subsumers_iterator, &(CEXP(ax->rhs).subsumers));
+				ClassExpressionId subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
+				// TODO: change the order of the loops for better performance
+				while (subsumer != HASH_TABLE_KEY_NOT_FOUND) {
+					for (j = 0; j < OPEXP(ax->role).subsumer_list.size; ++j) {
+						ClassExpressionId ex = GET_NEGATIVE_EXISTS(subsumer,  OPEXP(ax->role).subsumer_list.elements[j], tbox);
+						if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
+							push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1));
 						}
-						// TODO: Can we optimize this by pushing only if the filler is a conjunction? Would that be correct?
-						if (CEXP(CEXP(ax->rhs).description.exists.filler).type != CLASS_TYPE)
-							push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_DECOMPOSITION));
 					}
-					break;
+					subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
 				}
 
-				// existential introduction
-
-				ClassExpressionId ex;
-				for (i = 0; i < CEXP(ax->lhs).predecessor_r_count; ++i) {
-					// for (j = 0; j < OPEXP(CEXP(ax->lhs).predecessors[i].role).subsumer_list.size; ++j) {
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, CEXP(ax->lhs).predecessors[i].role, tbox);
-						if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
+				// the role chain rule
+				// the role composition where this role appears as the second component
+				// printf("second component: %s\n", object_property_expression_to_string(kb, role));
+				int i, j;
+				for (i = 0; i < OPEXP(ax->role).second_component_of_count; ++i) {
+					// printf("role chain: %s\n", object_property_expression_to_string(kb, OPEXP(role).second_component_of_list[i]));
+					for (j = 0; j < CEXP(ax->lhs).predecessor_r_count; ++j)
+						if (CEXP(ax->lhs).predecessors[j].role == OPEXP(OPEXP(ax->role).second_component_of_list[i]).description.object_property_chain.role1) {
 							SetIterator predecessors_iterator;
-							// Warning: do not use all predecessors, use only those that are not obtained via the existential introduction rule-1
-							SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[i].fillers_not_exist_introduction));
-							ClassExpressionId predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
-							while (predecessor != HASH_TABLE_KEY_NOT_FOUND) {
-								// push if the CEXP(ax->lhs).predecessors[i].role predecessor of ax->lhs is not obtained using SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 rule.
-								// push if the function check_predecessor(ax->lhs, predecessor, CEXP(ax->lhs).predecessors[i].role) returns false.
-								push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2));
-								predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
-							}
-						}
-					// }
-				}
-
-
-				// told subsumers
-				for (i = 0; i < CEXP(ax->rhs).told_subsumers.size; ++i)
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).told_subsumers.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_TOLD_SUBSUMER));
-			}
-			break;
-			*/
-		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1:
-		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2:
-		case SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3:
-			// do not apply the existential decomposition rule
-			// do not apply the existential introduction-1 rule
-			// existential introduction-2 is required
-			// conjunction decomposition cannot be applied anyway since ax->rhs is an existential
-			// bottom rule neither due to the same reason
-			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
-				++saturation_unique_subsumption_count;
-				// conjunction introduction
-				// the first conjunct
-				for (i = 0; i < CEXP(ax->rhs).first_conjunct_of_list.size; ++i) {
-					// check if lhs is subsumed by the second conjunct as well
-					if (IS_SUBSUMED_BY(ax->lhs, CEXP(CEXP(ax->rhs).first_conjunct_of_list.elements[i]).description.conj.conjunct2, kb->tbox))
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs,  CEXP(ax->rhs).first_conjunct_of_list.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-				}
-
-				// now the same for the second conjunct
-				for (i = 0; i < CEXP(ax->rhs).second_conjunct_of_list.size; ++i) {
-					// check if lhs is also subsumed by the first conjunct
-					if (IS_SUBSUMED_BY(ax->lhs, CEXP(CEXP(ax->rhs).second_conjunct_of_list.elements[i]).description.conj.conjunct1, kb->tbox))
-						push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs,  CEXP(ax->rhs).second_conjunct_of_list.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_CONJUNCTION_INTRODUCTION));
-				}
-
-				// existential introduction
-				ClassExpressionId ex;
-				for (i = 0; i < CEXP(ax->lhs).predecessor_r_count; ++i) {
-					for (j = 0; j < OPEXP(CEXP(ax->lhs).predecessors[i].role).subsumer_list.size; ++j) {
-						// ex = GET_NEGATIVE_EXISTS(ax->rhs, CEXP(ax->lhs).predecessors[i].role, tbox);
-						ex = GET_NEGATIVE_EXISTS(ax->rhs, OPEXP(CEXP(ax->lhs).predecessors[i].role).subsumer_list.elements[j], tbox);
-						if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
-							SetIterator predecessors_iterator;
-							SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[i].fillers));
+							SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[j].fillers));
 							// !!!
-							// SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[i].fillers_not_exist_introduction));
+							// SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[j].fillers_not_exist_introduction));
 							ClassExpressionId predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != HASH_TABLE_KEY_NOT_FOUND) {
-								// push if the CEXP(ax->lhs).predecessors[i].role predecessor of ax->lhs is not obtained using SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 rule.
-								// push if the function check_predecessor(ax->lhs, predecessor, CEXP(ax->lhs).predecessors[i].role) returns false.
-								push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2));
-								predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
+								int l;
+								for (l = 0; l < OPEXP(OPEXP(ax->role).second_component_of_list[i]).subsumer_list.size; ++l) {
+									// add_predecessor(CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], predecessor, ax->type, tbox);
+									// add_successor(predecessor, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], CEXP(ax->rhs).description.exists.filler, tbox);
+									push(&scheduled_axioms,
+											create_concept_saturation_axiom(predecessor, ax->rhs, OPEXP(OPEXP(ax->role).second_component_of_list[i]).subsumer_list.elements[l], LINK));
+									// TODO: Is this needed?
+									// push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ex).description.exists.filler, CEXP(ex).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+								}
+								predecessor = SET_ITERATOR_NEXT(&predecessors_iterator);
 							}
 						}
-					}
 				}
 
-				// told subsumers
-				for (i = 0; i < CEXP(ax->rhs).told_subsumers.size; ++i)
-					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).told_subsumers.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_TOLD_SUBSUMER));
 
+				// now the same for the successors of the filler of the existential on the rhs
+				// the role composition where this role appears as the first component
+				ClassExpressionId filler = CEXP(ax->rhs).description.exists.filler;
+				for (i = 0; i < OPEXP(ax->role).first_component_of_count; ++i) {
+					for (j = 0; j < CEXP(filler).successor_r_count; ++j)
+						if (CEXP(filler).successors[j].role == OPEXP(OPEXP(ax->role).first_component_of_list[i]).description.object_property_chain.role2) {
+							SetIterator successors_iterator;
+							// TODO: fillers not obtained from exists introduction instead?
+							SET_ITERATOR_INIT(&successors_iterator, &(CEXP(filler).successors[j].fillers));
+							ClassExpressionId successor =  SET_ITERATOR_NEXT(&successors_iterator);
+							while (successor!= HASH_TABLE_KEY_NOT_FOUND) {
+								int l;
+								for (l = 0; l < OPEXP(OPEXP(ax->role).first_component_of_list[i]).subsumer_list.size; ++l) {
+									// add_predecessor(successor, OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], ax->lhs, ax->type, tbox);
+									// add_successor(ax->lhs, OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], successor, tbox);
+									push(&scheduled_axioms,
+											create_concept_saturation_axiom(ax->lhs, successor,  OPEXP(OPEXP(ax->role).first_component_of_list[i]).subsumer_list.elements[l], LINK));
+									// TODO: Is this needed?
+									// push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+								}
+								successor = SET_ITERATOR_NEXT(&successors_iterator);
+							}
+						}
+				}
+
+				if (kb->top_occurs_on_lhs) {
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, tbox->top_concept, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+				}
+
+				// TODO: Is this needed?
+				push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 			}
 			break;
-
 		default:
 			// apply all rules
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
@@ -366,102 +324,10 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).description.conj.conjunct2, EXPRESSION_ID_NULL, SUBSUMPTION_CONJUNCTION_DECOMPOSITION));
 					break;
 				case OBJECT_SOME_VALUES_FROM_TYPE:
-					// existential introduction
-					// TODO: Is this check necessary?
-					// if (add_successor(ax->lhs, CEXP(ax->rhs).description.exists.role, CEXP(ax->rhs).description.exists.filler, tbox))
-					if (add_predecessor(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, ax->lhs, ax->type, tbox)) {
-						// add_predecessor(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, ax->lhs, ax->type, tbox);
-						add_successor(ax->lhs, CEXP(ax->rhs).description.exists.role, CEXP(ax->rhs).description.exists.filler, tbox);
-
-						SET_ITERATOR_INIT(&subsumers_iterator, &(CEXP(CEXP(ax->rhs).description.exists.filler).subsumers));
-						ClassExpressionId subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-						while (subsumer != HASH_TABLE_KEY_NOT_FOUND) {
-							for (j = 0; j < OPEXP(CEXP(ax->rhs).description.exists.role).subsumer_list.size; ++j) {
-								ClassExpressionId ex = GET_NEGATIVE_EXISTS(subsumer, OPEXP(CEXP(ax->rhs).description.exists.role).subsumer_list.elements[j], tbox);
-								if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
-									push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1));
-								}
-							}
-							// the bottom rule
-							if (subsumer == tbox->bottom_concept)
-								push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, tbox->bottom_concept, EXPRESSION_ID_NULL, SUBSUMPTION_BOTTOM));
-
-							subsumer = SET_ITERATOR_NEXT(&subsumers_iterator);
-						}
-						// TODO: Can we optimize this by pushing only if the filler is a conjunction? Would that be correct?: NO!
-						// if (CEXP(CEXP(ax->rhs).description.exists.filler).type != CLASS_TYPE)
-						push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_DECOMPOSITION));
-
-						// the role chain rule
-						// the role composition where this role appears as the second component
-						ObjectPropertyExpressionId role = CEXP(ax->rhs).description.exists.role;
-						// printf("second component: %s\n", object_property_expression_to_string(kb, role));
-						for (i = 0; i < OPEXP(role).second_component_of_count; ++i) {
-							// printf("role chain: %s\n", object_property_expression_to_string(kb, OPEXP(role).second_component_of_list[i]));
-							for (j = 0; j < CEXP(ax->lhs).predecessor_r_count; ++j)
-								if (CEXP(ax->lhs).predecessors[j].role == OPEXP(OPEXP(role).second_component_of_list[i]).description.object_property_chain.role1) {
-									SetIterator predecessors_iterator;
-									SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[j].fillers));
-									// !!!
-									// SET_ITERATOR_INIT(&predecessors_iterator, &(CEXP(ax->lhs).predecessors[j].fillers_not_exist_introduction));
-									ClassExpressionId predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
-									while (predecessor != HASH_TABLE_KEY_NOT_FOUND) {
-										int l;
-										for (l = 0; l < OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.size; ++l) {
-											// printf("role chain subsumer: %s\n", object_property_expression_to_string(kb, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l]));
-											// TODO:
-											add_predecessor(CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], predecessor, ax->type, tbox);
-											add_successor(predecessor, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], CEXP(ax->rhs).description.exists.filler, tbox);
-
-											ClassExpressionId ex = GET_NEGATIVE_EXISTS(CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], tbox);
-											if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
-												// printf("ex: %s\n", class_expression_to_string(kb, ex));
-												push(&scheduled_axioms, create_concept_saturation_axiom(predecessor, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-												// push(&scheduled_axioms,
-												// 	create_concept_saturation_axiom(predecessor, CEXP(ax->rhs).description.exists.filler, OPEXP(OPEXP(role).second_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-												// TODO: Is this needed?
-												// push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ex).description.exists.filler, CEXP(ex).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
-											}
-										}
-										predecessor = SET_ITERATOR_NEXT(&predecessors_iterator);
-									}
-								}
-						}
-
-
-						// now the same for the successors of the filler of the existential on the rhs
-						// the role composition where this role appears as the first component
-						ClassExpressionId filler = CEXP(ax->rhs).description.exists.filler;
-						for (i = 0; i < OPEXP(role).first_component_of_count; ++i) {
-							for (j = 0; j < CEXP(filler).successor_r_count; ++j)
-								if (CEXP(filler).successors[j].role == OPEXP(OPEXP(role).first_component_of_list[i]).description.object_property_chain.role2) {
-									SetIterator successors_iterator;
-									// TODO: fillers not obtained from exists introduction instead?
-									SET_ITERATOR_INIT(&successors_iterator, &(CEXP(filler).successors[j].fillers));
-									ClassExpressionId successor =  SET_ITERATOR_NEXT(&successors_iterator);
-									while (successor!= HASH_TABLE_KEY_NOT_FOUND) {
-										int l;
-										for (l = 0; l < OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.size; ++l) {
-											// TODO:
-											add_predecessor(successor, OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], ax->lhs, ax->type, tbox);
-											add_successor(ax->lhs, OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], successor, tbox);
-											// push(&scheduled_axioms,
-											// 	create_concept_saturation_axiom(ax->lhs, successor,  OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-											ClassExpressionId ex = GET_NEGATIVE_EXISTS(successor, OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], tbox);
-											if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
-												push(&scheduled_axioms,
-														create_concept_saturation_axiom(ax->lhs, ex, EXPRESSION_ID_NULL, SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-												// push(&scheduled_axioms,
-												// 		create_concept_saturation_axiom(ax->lhs, successor,  OPEXP(OPEXP(role).first_component_of_list[i]).subsumer_list.elements[l], SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3));
-												// TODO: Is this needed?
-												// push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
-											}
-										}
-										successor = SET_ITERATOR_NEXT(&successors_iterator);
-									}
-								}
-						}
-					}
+					// existential decomposition
+					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, LINK));
+					// TODO:
+					push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 					break;
 				}
 

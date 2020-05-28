@@ -27,7 +27,7 @@
 
 // add p to the predecessors hash of c
 // the key of the predecessors hash is r
-int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpressionId p, ConceptSaturatuinAxiomType ax_type, TBox* tbox) {
+int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpressionId p, TBox* tbox) {
 
 	// first check if we already have a link for role r
 	int i;
@@ -48,10 +48,7 @@ int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpr
 			++CEXP(c).predecessors[i].filler_count;
 			return 1;
 			 */
-			added = SET_ADD(p, &(CEXP(c).predecessors[i].fillers));
-			if (added && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3)
-				SET_ADD(p, &(CEXP(c).predecessors[i].fillers_not_exist_introduction));
-			return(added);
+			return(SET_ADD(p, &(CEXP(c).predecessors[i].fillers)));
 		}
 	// no, we do not already have a link for role r, create it, add p to its filler list
 	// 1) extend the list for links
@@ -68,10 +65,6 @@ int add_predecessor(ClassExpressionId c, ObjectPropertyExpressionId r, ClassExpr
 	*/
 	SET_INIT(&(CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers), DEFAULT_PREDECESSORS_SET__SIZE);
 	SET_ADD(p, &(CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers));
-
-	SET_INIT(&(CEXP(c).predecessors[CEXP(c).predecessor_r_count].fillers_not_exist_introduction), DEFAULT_PREDECESSORS_SET__SIZE);
-	if (ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_2 && ax_type != SUBSUMPTION_EXISTENTIAL_INTRODUCTION_3)
-		SET_ADD(p, &(CEXP(c).predecessors[i].fillers_not_exist_introduction));
 
 	// finally increment the r_count
 	++(CEXP(c).predecessor_r_count);
