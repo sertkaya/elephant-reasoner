@@ -97,29 +97,27 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 		class = (ClassExpressionId) MAP_ITERATOR_NEXT(&iterator);
 	}
 
-	/*
 	// Nominals (created from ABox individuals) take place in the saturation only if either:
 	// - the reasoning task is realisation, or
 	// - the reasoning task is classification and owl:Nothing occurs on the rhs of an axiom
 	// - the reasoning task is consistency and owl:Nothing occurs on the rhs of an axiom
 	// (in the second and third cases, there is the possibility that the ontology is inconsistent since an indivial has the type owl:Nothing)
-	if (reasoning_task == REALISATION || (reasoning_task == CLASSIFICATION && kb->bottom_occurs_on_rhs) || (reasoning_task == CONSISTENCY && kb->bottom_occurs_on_rhs)) {
-		// Traverse the map of nominals that are generated during preprocessing.
-		MAP_ITERATOR_INIT(&iterator, &(kb->tbox->generated_object_one_of_exps));
-		ClassExpressionId nominal =  MAP_ITERATOR_NEXT(&iterator);
-		// The input axioms generated from concept and role assertions
-		while (nominal != KEY_NOT_FOUND_IN_HASH_MAP) {
-			// add owl:Thing manually to the subsumers of the generated nominals
-			SET_ADD(kb->tbox->top_concept, &(tbox->class_expressions[nominal].subsumers));
+	// if (reasoning_task == REALISATION || (reasoning_task == CLASSIFICATION && kb->bottom_occurs_on_rhs) || (reasoning_task == CONSISTENCY && kb->bottom_occurs_on_rhs)) {
+	// 	// Traverse the map of nominals that are generated during preprocessing.
+	// 	MAP_ITERATOR_INIT(&iterator, &(kb->tbox->generated_object_one_of_exps));
+	// 	ClassExpressionId nominal =  MAP_ITERATOR_NEXT(&iterator);
+	// 	// The input axioms generated from concept and role assertions
+	// 	while (nominal != KEY_NOT_FOUND_IN_HASH_MAP) {
+	// 		// add owl:Thing manually to the subsumers of the generated nominals
+	// 		SET_ADD(kb->tbox->top_concept, &(tbox->class_expressions[nominal].subsumers));
 
-			push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
-			if (kb->top_occurs_on_lhs) {
-				push(&scheduled_axioms, create_concept_saturation_axiom(nominal, tbox->top_concept, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
-			}
-			nominal = MAP_ITERATOR_NEXT(&iterator);
-		}
-	}
-	*/
+	// 		push(&scheduled_axioms, create_concept_saturation_axiom(nominal, nominal, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+	// 		if (kb->top_occurs_on_lhs) {
+	// 			push(&scheduled_axioms, create_concept_saturation_axiom(nominal, tbox->top_concept, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+	// 		}
+	// 		nominal = MAP_ITERATOR_NEXT(&iterator);
+	// 	}
+	// }
 
 	int i, j;
 	ax = pop(&scheduled_axioms);
@@ -139,6 +137,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 			// bottom rule neither due to the same reason
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
+
 				// conjunction introduction
 				// the first conjunct
 				for (i = 0; i < CEXP(ax->rhs).first_conjunct_of_list.size; ++i) {
@@ -239,13 +238,16 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 
 				// now the same for the successors of the filler of the existential on the rhs
 				// the role composition where this role appears as the first component
-				ClassExpressionId filler = CEXP(ax->rhs).description.exists.filler;
+				// ClassExpressionId filler = CEXP(ax->rhs).description.exists.filler;
 				for (i = 0; i < OPEXP(ax->role).first_component_of_count; ++i) {
-					for (j = 0; j < CEXP(filler).successor_r_count; ++j)
-						if (CEXP(filler).successors[j].role == OPEXP(OPEXP(ax->role).first_component_of_list[i]).description.object_property_chain.role2) {
+					// for (j = 0; j < CEXP(filler).successor_r_count; ++j)
+					for (j = 0; j < CEXP(ax->rhs).successor_r_count; ++j)
+						// if (CEXP(filler).successors[j].role == OPEXP(OPEXP(ax->role).first_component_of_list[i]).description.object_property_chain.role2) {
+						if (CEXP(ax->rhs).successors[j].role == OPEXP(OPEXP(ax->role).first_component_of_list[i]).description.object_property_chain.role2) {
 							SetIterator successors_iterator;
 							// TODO: fillers not obtained from exists introduction instead?
-							SET_ITERATOR_INIT(&successors_iterator, &(CEXP(filler).successors[j].fillers));
+							// SET_ITERATOR_INIT(&successors_iterator, &(CEXP(filler).successors[j].fillers));
+							SET_ITERATOR_INIT(&successors_iterator, &(CEXP(ax->rhs).successors[j].fillers));
 							ClassExpressionId successor =  SET_ITERATOR_NEXT(&successors_iterator);
 							while (successor!= HASH_TABLE_KEY_NOT_FOUND) {
 								int l;
@@ -274,7 +276,6 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 			// apply all rules
 			if (MARK_CONCEPT_SATURATION_AXIOM_PROCESSED(ax)) {
 				++saturation_unique_subsumption_count;
-
 
 				// bottom rule
 				if (ax->rhs == tbox->bottom_concept) {
@@ -327,7 +328,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 					// existential decomposition
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, LINK));
 					// TODO:
-					push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+					// push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 					break;
 				}
 
