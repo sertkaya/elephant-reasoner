@@ -60,7 +60,7 @@ void compute_concept_hierarchy(KB* kb) {
 			// check if tbox->atomic_concept_list[i] is a subsumer of the 'subsumer'
 			// if yes, then they are equivalent
 			if (IS_SUBSUMED_BY(subsumer,  atomic_concept,kb->tbox)) {
-				if (subsumer != (ClassExpressionId) atomic_concept)
+				if (subsumer !=  atomic_concept)
 					ADD_EQUIVALENT_CLASS(subsumer,  atomic_concept, kb->tbox);
 			}
 			else {
@@ -73,13 +73,11 @@ void compute_concept_hierarchy(KB* kb) {
 					// if yes, then the 'subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]
 					if (IS_SUBSUMED_BY(direct_subsumer, subsumer, kb->tbox)) {
 						is_direct_subsumer = 0;
-						break;
 					}
 					// now check if the 'direct_subsumer' is a subsumer of the 'subsumer'
 					// if yes, then the 'direct_subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]
 					// remove it from the list of direct subsumers
 					if (IS_SUBSUMED_BY(subsumer, direct_subsumer,kb->tbox)) {
-						// printf("%s|%s\n", class_expression_to_string(kb, atomic_concept), class_expression_to_string(kb, direct_subsumer));
 						REMOVE_DIRECT_SUBSUMER(direct_subsumer,  atomic_concept, kb->tbox);
 					}
 

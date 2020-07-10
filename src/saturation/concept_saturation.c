@@ -88,12 +88,10 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 	MAP_ITERATOR_INIT(&iterator, &(tbox->classes));
 	ClassExpressionId class = (ClassExpressionId) MAP_ITERATOR_NEXT(&iterator);
 	while (class != KEY_NOT_FOUND_IN_HASH_MAP) {
+		push(&scheduled_axioms, create_concept_saturation_axiom(class, class, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 		if (kb->top_occurs_on_lhs) {
 			push(&scheduled_axioms, create_concept_saturation_axiom(class, tbox->top_concept, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 		}
-		int i;
-		for (i = 0; i < CEXP(class).told_subsumers.size; ++i)
-			push(&scheduled_axioms, create_concept_saturation_axiom(class, CEXP(class).told_subsumers.elements[i], EXPRESSION_ID_NULL, SUBSUMPTION_TOLD_SUBSUMER));
 		class = (ClassExpressionId) MAP_ITERATOR_NEXT(&iterator);
 	}
 
