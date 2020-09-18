@@ -73,6 +73,7 @@ void compute_concept_hierarchy(KB* kb) {
 					// if yes, then the 'subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]
 					if (IS_SUBSUMED_BY(direct_subsumer, subsumer, kb->tbox)) {
 						is_direct_subsumer = 0;
+						break;
 					}
 					// now check if the 'direct_subsumer' is a subsumer of the 'subsumer'
 					// if yes, then the 'direct_subsumer' is not a direct subsumer of tbox->atomic_concept_list[i]

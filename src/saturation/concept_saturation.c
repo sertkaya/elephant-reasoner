@@ -227,6 +227,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 											create_concept_saturation_axiom(predecessor, ax->rhs, OPEXP(OPEXP(ax->role).second_component_of_list[i]).subsumer_list.elements[l], LINK));
 									// TODO: Is this needed?
 									// push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ex).description.exists.filler, CEXP(ex).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+									push(&scheduled_axioms, create_concept_saturation_axiom(ax->rhs, ax->rhs, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 								}
 								predecessor = SET_ITERATOR_NEXT(&predecessors_iterator);
 							}
@@ -255,7 +256,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 									push(&scheduled_axioms,
 											create_concept_saturation_axiom(ax->lhs, successor,  OPEXP(OPEXP(ax->role).first_component_of_list[i]).subsumer_list.elements[l], LINK));
 									// TODO: Is this needed?
-									// push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+									push(&scheduled_axioms, create_concept_saturation_axiom(successor, successor, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 								}
 								successor = SET_ITERATOR_NEXT(&successors_iterator);
 							}
@@ -326,7 +327,7 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 					// existential decomposition
 					push(&scheduled_axioms, create_concept_saturation_axiom(ax->lhs, CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.role, LINK));
 					// TODO:
-					// push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
+					push(&scheduled_axioms, create_concept_saturation_axiom(CEXP(ax->rhs).description.exists.filler, CEXP(ax->rhs).description.exists.filler, EXPRESSION_ID_NULL, SUBSUMPTION_INITIALIZATION));
 					break;
 				}
 
