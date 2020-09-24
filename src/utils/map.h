@@ -82,6 +82,7 @@ typedef HashMapIterator_64 MapIterator_64;
  * Returns the number of freed bytes.
  */
 #define MAP_FREE(map)					hash_map_free(map)
+#define MAP_FREE_64(map)					hash_map_free_64(map)
 
 /**
  * Free the space allocated for the elements of the given map.
