@@ -35,8 +35,7 @@ enum saturation_axiom_type {
 	SUBSUMPTION_INITIALIZATION,					// 5
 	SUBSUMPTION_TOLD_SUBSUMER,					// 6
 	SUBSUMPTION_CONJUNCTION_DECOMPOSITION,		// 7
-	FORWARD_LINK,										// 8
-	BACKWARD_LINK,										// 8
+	LINK,										// 8
 	SUBSUMPTION_BOTTOM							// 9
 };
 
