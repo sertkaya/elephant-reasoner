@@ -166,8 +166,6 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 						if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
 							SetIterator predecessors_iterator;
 							SET_ITERATOR_INIT(&predecessors_iterator, &(ax_lhs.predecessors[i].fillers));
-							// !!!
-							// SET_ITERATOR_INIT(&predecessors_iterator, &(ax_lhs.predecessors[i].fillers_not_exist_introduction));
 							ClassExpressionId predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != HASH_TABLE_KEY_NOT_FOUND) {
 								// push if the ax_lhs.predecessors[i].role predecessor of ax->lhs is not obtained using SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 rule.
@@ -258,13 +256,10 @@ char saturate_concepts(KB* kb, ReasoningTask reasoning_task) {
 				ClassExpressionId ex;
 				for (i = 0; i < ax_lhs.predecessor_r_count; ++i) {
 					for (j = 0; j < OPEXP(ax_lhs.predecessors[i].role).subsumer_list.size; ++j) {
-						// ex = GET_NEGATIVE_EXISTS(ax->rhs, ax_lhs.predecessors[i].role, tbox);
 						ex = GET_NEGATIVE_EXISTS(ax->rhs, OPEXP(ax_lhs.predecessors[i].role).subsumer_list.elements[j], tbox);
 						if (ex != KEY_NOT_FOUND_IN_HASH_MAP) {
 							SetIterator predecessors_iterator;
 							SET_ITERATOR_INIT(&predecessors_iterator, &(ax_lhs.predecessors[i].fillers));
-							// !!!
-							// SET_ITERATOR_INIT(&predecessors_iterator, &(ax_lhs.predecessors[i].fillers_not_exist_introduction));
 							ClassExpressionId predecessor =  SET_ITERATOR_NEXT(&predecessors_iterator);
 							while (predecessor != HASH_TABLE_KEY_NOT_FOUND) {
 								// push if the ax_lhs.predecessors[i].role predecessor of ax->lhs is not obtained using SUBSUMPTION_EXISTENTIAL_INTRODUCTION_1 rule.
