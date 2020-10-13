@@ -41,6 +41,10 @@ void compute_concept_hierarchy(KB* kb) {
 	MAP_ITERATOR_INIT(&map_it, &(kb->tbox->classes));
 	void* atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	while (atomic_concept) {
+		// Initialize the set of direct subsumers. It is not initialized during creation of the classes in model.c
+		SET_INIT(&(((ClassExpression*) atomic_concept)->description.atomic.direct_subsumers), DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
+		// Initialize the set of equivalent classes. It is not initialized during creation of the classes in model.c
+		SET_INIT(&(((ClassExpression*) atomic_concept)->description.atomic.equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
 		SET_ADD(kb->tbox->top_concept, &(((ClassExpression*) atomic_concept)->subsumers));
 		atomic_concept = MAP_ITERATOR_NEXT(&map_it);
 	}

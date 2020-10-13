@@ -59,10 +59,6 @@ ClassExpression* get_create_atomic_concept(char* IRI, TBox* tbox) {
 
 	strcpy(c->description.atomic.IRI, IRI);
 
-	SET_INIT(&(c->description.atomic.direct_subsumers), DEFAULT_DIRECT_SUBSUMERS_SET_SIZE);
-
-	SET_INIT(&(c->description.atomic.equivalent_classes), DEFAULT_EQUIVALENT_CONCEPTS_SET_SIZE);
-
 	c->type = CLASS_TYPE;
 	c->id = tbox->next_class_expression_id++;
 
