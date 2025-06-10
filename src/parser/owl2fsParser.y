@@ -28,9 +28,9 @@
 	
 	#define YYSTYPE Expression
 
-	char* yytext;
+	extern char* yytext;
 	int yylex(void);
-	int yylineno;
+	extern int yylineno;
 	// void yyerror(TBox* tbox, ABox* abox, char* msg);
 	void yyerror(KB* kb, char* msg);
 	extern FILE *yyin;
@@ -638,7 +638,7 @@ NegativeDataPropertyAssertion:
 %%
 
 void yyerror(KB* kb, char* msg) {
-	fprintf(stderr, "\nline %d: %s\n", yylineno, msg);
+	fprintf(stderr, "\nline %d near %s: %s\n", yylineno, yytext, msg);
 }
 
 void unsupported_feature(char* feature) {
